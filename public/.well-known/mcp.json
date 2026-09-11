@@ -1,0 +1,24 @@
+{
+  "comment": [
+    "A pointer to the MCP servers this ecosystem operates.",
+    "There is no ratified well-known discovery format for 'which MCP servers does this domain run', so this file does not claim conformance to one and deliberately carries no $schema. It is a convenience. The load-bearing agent-facing surface on this site is /llms.txt, and the authority on what a server exposes is the server itself, over the standard tools/list request.",
+    "Note that mzizi.dev is served today by the registry, not by this site, so this file may not be reachable at the apex yet. See the repository README."
+  ],
+  "servers": [
+    {
+      "name": "dev.mzizi/registry",
+      "title": "Mzizi registry",
+      "description": "The Mzizi component registry as whole documents: one call returns everything about a component rather than several.",
+      "transport": "streamable-http",
+      "url": "https://mcp.mzizi.dev/mcp",
+      "authorization": {
+        "required": true,
+        "scheme": "oauth2",
+        "note": "An unauthenticated request answers invalid_token. Signup is free.",
+        "protectedResourceMetadata": "https://mcp.mzizi.dev/.well-known/oauth-protected-resource"
+      }
+    }
+  ],
+  "documentation": "https://mzizi.dev/llms.txt",
+  "source": "https://github.com/mzizi-dev/mzizi-site"
+}

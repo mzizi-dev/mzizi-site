@@ -1,0 +1,26 @@
+---
+import Site from "../layouts/Site.astro";
+
+/**
+ * A real 404. The Worker is configured with
+ * `not_found_handling: "404-page"` rather than the single-page-application
+ * rewrite, because this is a multi-page static site with no client router — an
+ * unknown path that silently rendered the landing page would be a soft 404,
+ * which misleads crawlers and agents far more than a plain error does.
+ */
+---
+
+<Site
+  title="Not found"
+  description="No page at this address."
+  lede="There is no page at this address."
+>
+  <p>
+    The site is small — three pages. Try the <a href="/">overview</a>, the
+    <a href="/language">language</a>, or the <a href="/ecosystem">ecosystem map</a>.
+  </p>
+  <p>
+    If you are an agent, <a href="/llms.txt"><code>/llms.txt</code></a> lists
+    everything this site holds.
+  </p>
+</Site>
