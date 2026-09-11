@@ -1,0 +1,52 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mzizi-site",
+  "compatibility_date": "2026-05-22",
+
+  // A site is a Worker with Static Assets — the shape every other Bundu
+  // surface takes. There is no `main`: Astro emits the HTML and the asset
+  // server is all the routing it needs, so this Worker has no code of its own.
+  "assets": {
+    "directory": "./dist",
+    // Not `single-page-application`. This is a multi-page static site with no
+    // client-side router, so an unknown path SHOULD 404 rather than be
+    // rewritten to the landing page — a soft 404 that renders the homepage is
+    // worse than a real one for both crawlers and agents.
+    "not_found_handling": "404-page",
+  },
+
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+
+  // ---------------------------------------------------------------------
+  // NO ROUTES. THIS IS DELIBERATE. DO NOT ADD `mzizi.dev` HERE CASUALLY.
+  // ---------------------------------------------------------------------
+  //
+  // mzizi.dev is live RIGHT NOW and is served by `mzizi-dev/mzizi-registry`
+  // on Vercel (verify before touching anything: `curl -sSI https://mzizi.dev`
+  // returns `x-vercel-id` and `x-powered-by: Next.js`). Adding a custom domain
+  // for mzizi.dev to this Worker takes the apex off the registry and points it
+  // at this three-page site — losing the component registry, `/api/v1`, and
+  // `/mcp` in one deploy. Shipping a site that is not yet live is a much
+  // smaller failure than that.
+  //
+  // Without a route this Worker still deploys, to
+  // `mzizi-site.<subdomain>.workers.dev`, which is the correct place to review
+  // it until a human decides to cut over. README.md §Deploying and the cutover
+  // section record what that decision actually involves.
+  //
+  // WHEN a route is eventually added, it takes a BARE HOSTNAME:
+  //
+  //     "routes": [{ "pattern": "mzizi.dev", "custom_domain": true }]
+  //
+  // Never `"mzizi.dev/*"`. Wildcards are rejected outright ("Wildcard
+  // operators (*) are not allowed in Custom Domains"), and a custom domain
+  // already routes every path on the hostname here, so a `/*` is both invalid
+  // and redundant. `zone_name` is inferred and only means anything on a
+  // non-custom-domain route.
+  //
+  // This is not a style note. The three-field form silently broke two Workers
+  // in this org — mzizi-mcp (agent-tools#102) and mzizi-console, which never
+  // deployed at all — because Workers Builds previews upload a version WITHOUT
+  // applying routes. The config is only validated on the PRODUCTION deploy, so
+  // the same commit reads green on a pull request and red on main.
+}

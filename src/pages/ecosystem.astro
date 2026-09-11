@@ -1,0 +1,120 @@
+---
+import Site from "../layouts/Site.astro";
+
+/**
+ * The map. One row per public repository in `mzizi-dev`, with what it holds and
+ * what it serves. Private repositories are not listed, including the one that
+ * operates the MCP server — the endpoint is public and is named, the source is
+ * not.
+ *
+ * `state` is deliberately not a marketing word. "shipping code" means the
+ * repository holds a working implementation; "serving" additionally means a
+ * hostname resolves to it; "placeholder" means a README and nothing else.
+ * These were checked with `dig` and the GitHub API, not assumed.
+ */
+const repos = [
+  {
+    name: "mzizi",
+    role: "The language",
+    state: "shipping code, not routed",
+    body: "Phase 0 of the research charter: the mz compiler front end — lexer, recovering parser, agent diagnostic protocol, content-addressed IR — nine primitives written in Mzizi itself, the four design RFCs, and the public half of the benchmark harness. Rust.",
+    href: "/language",
+    internal: true,
+  },
+  {
+    name: "mzizi-registry",
+    role: "Design system, registry and portal",
+    state: "serving mzizi.dev today",
+    body: "The canonical component registry for the bundu ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and the /api/v1 the apex answers on right now. TypeScript, on Vercel.",
+  },
+  {
+    name: "mzizi-api-gateway",
+    role: "The registry API",
+    state: "shipping code, not routed",
+    body: "api.mzizi.dev — the registry API as a pure-Rust Cloudflare Worker, compiled to WASM through workers-rs. The hostname has no DNS record yet, so the API the console talks to is still the one served from the apex.",
+  },
+  {
+    name: "mzizi-console",
+    role: "The console",
+    state: "shipping code, not routed",
+    body: "app.mzizi.dev — Astro renders the chrome as static HTML, Rust/Dioxus islands render the live data from the registry API. Replaces an earlier Svelte mini-app: the doctrine is one UI framework, Astro, with Rust first and TypeScript second underneath.",
+  },
+  {
+    name: "mzizi-site",
+    role: "This site",
+    state: "shipping code, not routed",
+    body: "The front door and the agent-facing surfaces — llms.txt and the MCP card. Astro, static output, deployed as a Cloudflare Worker with static assets. It does not claim mzizi.dev; the registry still holds the apex.",
+  },
+  {
+    name: "mzizi-docs",
+    role: "Documentation",
+    state: "placeholder",
+    body: "Intended for docs.mzizi.dev. Today it holds a licence and a one-line README — there is no documentation site. Long-form product documentation for the design system currently lives at docs.bundu.org/mzizi.",
+  },
+  {
+    name: "mzizi-roadmap",
+    role: "Roadmap",
+    state: "placeholder",
+    body: "The Mzizi roadmap by the Bundu Foundation. An empty repository with a one-line README at the time of writing; the real plan of record is CHARTER.md in the language repository.",
+  },
+];
+---
+
+<Site
+  title="Ecosystem"
+  description="Every public repository in the Mzizi ecosystem: the language, the registry, the API gateway, the console, the docs, and this site — with what each one actually holds today."
+  lede="Seven public repositories, one live hostname, and a lot of code that is built but not yet routed. This page says which is which."
+>
+  <p>
+    The Mzizi ecosystem is governed by the <strong>Bundu Foundation</strong> and
+    operated by nyuchi. Everything listed here is public and Apache-2.0. There
+    are private repositories in the org too — they are not listed, and neither
+    is anything that is not yet real.
+  </p>
+
+  {
+    repos.map((r) => (
+      <div class="panel">
+        <h2>
+          {r.name} <span class="state">— {r.role}</span>
+        </h2>
+        <p>{r.body}</p>
+        <p class="state">
+          State: {r.state} ·{" "}
+          <a href={`https://github.com/mzizi-dev/${r.name}`}>source</a>
+          {r.href && (
+            <>
+              {" · "}
+              <a href={r.href}>more on this site</a>
+            </>
+          )}
+        </p>
+      </div>
+    ))
+  }
+
+  <h2>The one live agent endpoint</h2>
+
+  <p>
+    <code>https://mcp.mzizi.dev/mcp</code> is an MCP server over Streamable HTTP,
+    serving the component registry as whole documents — one call returns
+    everything about a component rather than several. It is gated: an
+    unauthenticated request answers <code>invalid_token</code>, and signup is
+    free. Its source is not public, so it has no row above.
+  </p>
+
+  <p>
+    Discover its tools with the standard <code>tools/list</code> request. Any
+    list of tool names written on a web page — including this one — can go
+    stale, and the server is the only thing that knows what it currently
+    exposes.
+  </p>
+
+  <h2>Naming</h2>
+
+  <p>
+    Every brand wordmark in this ecosystem is lowercase: <code>mzizi</code>,
+    <code>nyuchi</code>, <code>mukoko</code>, <code>shamwari</code>,
+    <code>bundu</code>, <code>nhimbe</code>. <em>Mzizi</em> is Shona for root.
+  </p>
+</Site>

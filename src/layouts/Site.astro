@@ -1,0 +1,93 @@
+---
+/**
+ * The site shell.
+ *
+ * Static HTML and one stylesheet. No script tag, no island, no framework —
+ * a landing page has nothing to hydrate, and the doctrine that governs this
+ * ecosystem (Astro in front, Rust first and TypeScript second underneath, no
+ * third UI framework) means the cheapest correct answer is also the one the
+ * charter asks for.
+ */
+interface Props {
+  title: string;
+  description: string;
+  lede?: string;
+}
+
+const { title, description, lede } = Astro.props;
+
+// The landing page's heading is already the brand, and "Mzizi · Mzizi" in a
+// browser tab is a stutter that reads as a bug. Give that one page a real
+// document title instead of suffixing the site name onto itself.
+const documentTitle =
+  title === "Mzizi"
+    ? "Mzizi — a Rust framework for the agentic web"
+    : `${title} · Mzizi`;
+
+const nav = [
+  { href: "/", label: "Overview" },
+  { href: "/language", label: "The language" },
+  { href: "/ecosystem", label: "Ecosystem" },
+];
+
+// `build.format: "file"` emits `/ecosystem.html`; the asset server serves it
+// from `/ecosystem`. Strip the extension so the current page is marked in both
+// forms, and so a local `astro preview` highlights the same link production does.
+const here = Astro.url.pathname.replace(/\.html$/, "") || "/";
+const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{documentTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <meta property="og:title" content={documentTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical.href} />
+    <!-- Agents that read HTML rather than llms.txt still get pointed at it. -->
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    <link rel="stylesheet" href="/site.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-nav">
+      <a class="wordmark" href="/">mzizi</a>
+      <nav aria-label="Primary">
+        {
+          nav.map((item) => (
+            <a
+              href={item.href}
+              aria-current={here === item.href ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+
+    <main id="main">
+      <h1>{title}</h1>
+      {lede && <p class="lede">{lede}</p>}
+      <slot />
+    </main>
+
+    <footer>
+      <p>
+        Mzizi is a research project of the <strong>Bundu Foundation</strong>,
+        which owns the framework, its components and its logic outright. The
+        design system and registry are operated by nyuchi. Everything public is
+        Apache-2.0.
+      </p>
+      <p class="footer-links">
+        <a href="https://github.com/mzizi-dev">github.com/mzizi-dev</a>
+        <a href="/llms.txt">llms.txt</a>
+      </p>
+    </footer>
+  </body>
+</html>

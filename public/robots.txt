@@ -1,0 +1,15 @@
+# The front door to the Mzizi ecosystem. Everything here is public
+# documentation about public, Apache-2.0 repositories, so everything is
+# crawlable — by search engines and by AI crawlers alike, with no distinction
+# drawn between them.
+#
+# There is no Sitemap line because this site does not generate a sitemap. It is
+# three pages, all reachable from the navigation in one hop, which is a thing a
+# crawler handles without help. If the site grows past that, add a sitemap and
+# a Sitemap line together — a Sitemap directive pointing at a 404 is worse than
+# none.
+#
+# The machine-readable summary of this site is /llms.txt.
+
+User-agent: *
+Allow: /

@@ -1,0 +1,269 @@
+---
+import Site from "../layouts/Site.astro";
+
+/**
+ * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` (§3 design
+ * goals, §4 phasing, §5 non-goals, §6 the resolved benchmark design) and the
+ * four RFCs in that repository's `design/` directory. Where the charter leaves
+ * something open, this page says so rather than rounding it up.
+ */
+
+const goals = [
+  {
+    name: "Low syntactic ambiguity",
+    why: "Every degree of freedom in how a thing could have been written is a degree of freedom a model can get subtly wrong. Fewer distinct-but-equivalent ways to express one intent.",
+  },
+  {
+    name: "Dense, high-signal errors",
+    why: "The agentic loop is generate → compile → read error → fix. Its quality is bounded by how much actionable information the compiler packs into each character of output. This is compiler UX aimed at a machine reader.",
+  },
+  {
+    name: "Fast incremental compilation",
+    why: "A human tolerates a few seconds per iteration. An agent iterating hundreds of times per session treats compile latency as the dominant cost of the whole workflow — so it is a Phase 0 success metric, not a later optimisation.",
+  },
+  {
+    name: "Token-efficient representation",
+    why: "A codebase that fits more real logic into a context window per token spent is one an agent can reason about with less summarisation loss. It applies to the syntax surface and to the IR the tooling exposes.",
+  },
+];
+
+const phases = [
+  {
+    n: "Phase 0",
+    title: "Prove the core claim, no rendering attached",
+    state: "in progress, unmeasured",
+    body: "A standalone compiler and syntax prototype with zero UI story. Success is a defined benchmark: an agent authors equivalent components in Mzizi syntax versus raw Dioxus or Leptos, scored on tokens consumed, iterations to a clean compile, and defect rate. If that shows no measurable advantage, nothing downstream matters.",
+  },
+  {
+    n: "Phase 1",
+    title: "Rendering interop; WASM and native as the deliverable",
+    state: "not started",
+    body: "Wire the compiler output into Dioxus's existing renderer. The artifact — a WASM bundle, and a native binary for desktop — is the cross-platform product, embeddable from a bare script tag, a mobile WebView, or an edge runtime.",
+  },
+  {
+    n: "Phase 2",
+    title: "Edge-first deployment",
+    state: "not started",
+    body: "A native target built on workers-rs. The cheapest phase to execute, because it is the one the team has already shipped against.",
+  },
+  {
+    n: "Phase 3",
+    title: "Candle integration",
+    state: "not started",
+    body: "ML inference declared as a first-class capability inside a component, backed by Candle. Not a competing tensor runtime.",
+  },
+  {
+    n: "Phase 4",
+    title: "Distribution adapters",
+    state: "not started",
+    body: "Thin packaging layers over the Phase 1 artifact — Astro first, because it is furthest along, not because Astro is a platform Mzizi targets.",
+  },
+];
+
+const rfcs = [
+  {
+    id: "RFC-0001",
+    file: "RFC-0001-syntax.md",
+    what: "The nine failure modes an agent hits writing Rust UI code, and the syntax that answers each: end <kind> <name>, one construct per intent, enum data columns, contracts, capabilities, no ownership surface.",
+  },
+  {
+    id: "RFC-0002",
+    file: "RFC-0002-runtime-and-prior-art.md",
+    what: "The design-target correction — small open-weight models, not frontier ones — and why the runtime is the product. Thirteen languages mined for ideas, with the licence discipline that keeps the tree clean.",
+  },
+  {
+    id: "RFC-0003",
+    file: "RFC-0003-ir.md",
+    what: "The eight barriers an agent hits reading a codebase, and the content-addressed IR that answers them: incremental compiles, semantic patching, caching and free renames from one decision.",
+  },
+  {
+    id: "RFC-0004",
+    file: "RFC-0004-test-topology.md",
+    what: "What is public (nearly all the testing) and what is held out (the benchmark task set), why, and the rule that keeps forks working: private consumes public, never the reverse.",
+  },
+];
+---
+
+<Site
+  title="The language"
+  description="Mzizi-lang: a Rust-lowering language whose syntax, type system and compiler feedback loop are designed for machine authorship, and specifically for small open-weight models."
+  lede="Designed for machine authorship — and specifically for the machines that need the help most: small open-weight models with limited parameters, context and long-range attention."
+>
+  <p>
+    Mzizi lowers to Rust and Dioxus. The novel part, and the only part worth
+    defending as research, is the syntax, the type system and the compiler's
+    feedback loop. Cross-platform rendering is interop with Dioxus rather than a
+    rebuilt engine; ML is Candle; the edge target is <code>workers-rs</code>.
+    Reinventing any of those would buy the compiler layer nothing and would cost
+    Phase 0 its focus.
+  </p>
+
+  <div class="status">
+    <h2>What exists, and what that does not prove</h2>
+    <p>
+      Real today: the lexer, a recovering parser, the agent diagnostic protocol,
+      the content-addressed IR, and nine primitives written in Mzizi itself,
+      covered by 75 tests. Contract blocks parse but are not yet evaluated,
+      which is why the defect metric below is still a hand-written Rust test
+      rather than something the toolchain measures.
+    </p>
+    <p>
+      <strong>The Phase 0 benchmark has not run.</strong> Nothing on this page has
+      been measured against the charter's kill criteria. The four design goals below
+      are hypotheses with arguments attached — that is a real and useful thing to
+      publish, and it is not the same thing as a result.
+    </p>
+  </div>
+
+  <h2>What "built for machine authorship" cashes out as</h2>
+
+  <p>
+    The charter insists this be measurable design goals rather than a slogan.
+    There are four.
+  </p>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Goal</th>
+          <th scope="col">Why it is on the list</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          goals.map((g) => (
+            <tr>
+              <th scope="row">{g.name}</th>
+              <td>{g.why}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>How the benchmark is defined</h2>
+
+  <div class="panel">
+    <p>
+      <strong>Task set:</strong> Mzizi's own components — the design system already
+      built out in the registry — authored in Mzizi syntax against the existing implementations
+      as ground truth. Explicitly not a port of an external library.
+    </p>
+    <p>
+      <strong>Defect:</strong> code that compiles cleanly but is behaviourally wrong
+      — it passes the compiler and fails a contract test against the reference. A
+      syntax or compile error is not a defect for this metric; it is the ordinary
+      friction the error-density goal exists to reduce. The metric measures what gets
+      <em>past</em> the compiler wrong.
+    </p>
+    <p>
+      <strong>Visibility:</strong> the harness is public — runner, metric definitions,
+      scoring code, fixture format. The held-out task set and its expected outputs
+      are not, and live in a separate private repository. That is a measurement-validity
+      requirement rather than a secrecy preference: a public task set gets scraped
+      into training data, after which the benchmark measures memorisation, a contaminated
+      benchmark looks like a successful one, and the kill criterion could never fire.
+    </p>
+  </div>
+
+  <h2>Phasing</h2>
+
+  <p>
+    Research portfolios ship one thread at a time or ship nothing. This is the
+    order, not a wishlist.
+  </p>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Phase</th>
+          <th scope="col">State</th>
+          <th scope="col">What it is</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          phases.map((p) => (
+            <tr>
+              <th scope="row">
+                {p.n}
+                <br />
+                <span class="state">{p.title}</span>
+              </th>
+              <td class="state">{p.state}</td>
+              <td>{p.body}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Stated non-goals</h2>
+
+  <ul class="spaced">
+    <li>Not a competing tensor or ML runtime. Candle is the dependency.</li>
+    <li>
+      Not a native cross-platform renderer in Phase 0 or 1. Dioxus interop
+      first; a native renderer only if interop is proven insufficient.
+    </li>
+    <li>
+      Not post-quantum cryptography. Named as a future research thread and
+      deliberately kept out of this charter's scope.
+    </li>
+  </ul>
+
+  <h2>The RFCs</h2>
+
+  <p>
+    These are the design record, and they are the thing to read before the code.
+  </p>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">RFC</th>
+          <th scope="col">What it settles</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rfcs.map((r) => (
+            <tr>
+              <th scope="row">
+                <a
+                  href={`https://github.com/mzizi-dev/mzizi/blob/main/design/${r.file}`}
+                >
+                  {r.id}
+                </a>
+              </th>
+              <td>{r.what}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Trying it</h2>
+
+  <p>
+    The compiler is the <code>mz</code> binary in
+    <a href="https://github.com/mzizi-dev/mzizi">mzizi-dev/mzizi</a>. The surface
+    an agent should use is <code>mz check --agent</code>: whole-program NDJSON in
+    a deterministic order, at most one diagnostic per real error, every message written
+    for a reader with no prior context, and machine-applicable fixes tagged
+    <code>exact</code> or <code>guess</code>.
+  </p>
+
+  <p>
+    Start with <a href="https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md"
+      >CHARTER.md</a
+    >, which carries the full thesis, the phasing, the resolved benchmark
+    decisions and the questions still open.
+  </p>
+</Site>
