@@ -59,8 +59,8 @@ A custom domain takes a **bare hostname**:
 "routes": [{ "pattern": "mzizi.dev", "custom_domain": true }]
 ```
 
-Never `"mzizi.dev/*"`. Wildcards are rejected outright — *"Wildcard operators
-(\*) are not allowed in Custom Domains"* — and a custom domain already routes
+Never `"mzizi.dev/*"`. Wildcards are rejected outright — _"Wildcard operators
+(\*) are not allowed in Custom Domains"_ — and a custom domain already routes
 every path on the hostname to the Worker, so a `/*` is both invalid and
 redundant. `zone_name` is inferred and only means anything on a
 non-custom-domain route.
@@ -87,11 +87,11 @@ mzizi-site/
 └── wrangler.jsonc      # no routes — read the section above before changing that
 ```
 
-| Page         | What it says                                                                                                                          |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`          | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                                |
-| `/language`  | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs    |
-| `/ecosystem` | Every public repository, what it holds, and whether it is routed                                                                       |
+| Page         | What it says                                                                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `/`          | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                             |
+| `/language`  | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs |
+| `/ecosystem` | Every public repository, what it holds, and whether it is routed                                                                    |
 
 ### On content accuracy
 
