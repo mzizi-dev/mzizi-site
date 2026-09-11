@@ -4,21 +4,25 @@ import { defineConfig } from "astro/config";
 /**
  * The front door. Astro, static output, no framework islands.
  *
- * `output: "static"` because every word on this site is prose that a human
- * wrote and a build step can render once. Nothing here reads the registry at
- * runtime — the pages that show live data are the console (`mzizi-console`)
- * and the API (`mzizi-api-gateway`), and duplicating their numbers into a
- * build-time snapshot would produce exactly the defect this ecosystem keeps
- * removing: a stale copy that still looks authoritative.
+ * `output: "static"`, and the registry pages read the API AT BUILD TIME rather
+ * than in the browser. An earlier version of this comment argued the opposite —
+ * that a build-time snapshot of a live number is a stale copy that still looks
+ * authoritative. That worry is real and is answered rather than ignored: every
+ * page rendered from the API stamps the minute it was read and links the
+ * endpoint beside the number, so a reader can always see how old it is.
+ *
+ * The alternative was tried in this ecosystem and failed worse. `mzizi-console`
+ * fetched on mount: the bundle loaded, the fetch returned 200, nothing threw,
+ * CI was green, and the page painted nothing, because the island mounted
+ * against an element that was not there. A dated fact beats a blank page, and
+ * `scripts/verify-rendered.py` now fails the build if a page renders empty.
  *
  * There is no UI framework here and there will not be one. The doctrine is
  * Astro in front, Rust first and TypeScript second underneath, and no third
  * UI framework (`mzizi-dev/agent-tools#82`; see CHARTER.md in `mzizi-dev/mzizi`).
- * A landing page does not need an island, so it does not have one.
+ * The one script on the site filters cards that are already in the HTML.
  *
- * `site` is the domain this is BUILT for, not the domain it currently serves.
- * mzizi.dev is served today by `mzizi-dev/mzizi-registry` on Vercel; see the
- * cutover section in README.md before changing that.
+ * `site` is mzizi.dev, which this site now serves.
  */
 export default defineConfig({
   output: "static",

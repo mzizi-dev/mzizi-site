@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "mzizi.dev \u2014 the front door to the Mzizi ecosystem, and the agent-facing surfaces that describe it.",
+  "description": "mzizi.dev — the front door to the Mzizi ecosystem, and the agent-facing surfaces that describe it.",
   "type": "module",
   "packageManager": "pnpm@10.28.1",
   "scripts": {
@@ -18,5 +18,8 @@
     "astro": "^7.2.9",
     "typescript": "^5.9.3",
     "wrangler": "^4.45.0"
+  },
+  "dependencies": {
+    "@bundu/ui": "^0.1.1"
   }
 }
