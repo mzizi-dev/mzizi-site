@@ -1,0 +1,1294 @@
+/* mzizi.dev — the stylesheet.
+ *
+ * ============================================================================
+ * THERE IS NOT ONE COLOUR, SIZE, RADIUS OR WEIGHT IN THIS FILE.
+ * ============================================================================
+ *
+ * The estate's styling source is `@bundu/ui`, which `bundu-labs/marketing`
+ * (three apps) and `shamwari-ai/shamwari/site` already consume. This site now
+ * consumes it too: the import below is the same one they use, and every value
+ * in this file is a `var(--…)` from that token contract. A fourth styling
+ * approach for mzizi.dev is exactly the drift being eliminated.
+ *
+ * `@bundu/ui@0.1.1` covers seven of the twenty-one colour families and has no
+ * surface ladder, so `src/components/DesignTokens.astro` fills the gap from the
+ * live brand API — under THESE SAME NAMES, so the 0.2.0 upgrade is deleting
+ * that component and keeping this import, not rewriting this file. Read its
+ * header for exactly what it supplies and why.
+ *
+ * If a dimension looks arbitrary — 56px controls, 22px badges, 14px card
+ * radius, pill buttons — it is not: those are `componentSpecs` from the same
+ * source, which is what the registry's own React components are built to.
+ *
+ * The one thing this file owns is LAYOUT: grids, flow, sticky behaviour, where
+ * things sit. That is not a token and never was.
+ */
+
+@import "@bundu/ui/styles/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(a) {
+  color: var(--info);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+/* APCA AAA is the standard these tokens are held to; a 2px ring at 2px offset
+ * is what `/v1/brand`'s accessibility block specifies, so that is the ring. */
+:where(a, button, input, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------------------------------------------------------------- type --- */
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-family: var(--family-h1);
+  font-size: clamp(var(--text-h2), 6vw, var(--text-h1));
+  line-height: var(--leading-h1);
+  font-weight: var(--weight-h1);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-family: var(--family-h2);
+  font-size: clamp(var(--text-h3), 4.5vw, var(--text-h2));
+  line-height: var(--leading-h2);
+  font-weight: var(--weight-h2);
+  letter-spacing: -0.015em;
+  margin-block: var(--space-3xl) var(--space-md);
+}
+
+h3 {
+  font-family: var(--family-h4);
+  font-size: var(--text-h4);
+  line-height: var(--leading-h4);
+  font-weight: var(--weight-h4);
+  margin-block: var(--space-xl) var(--space-sm);
+}
+
+h4 {
+  font-family: var(--family-h5);
+  font-size: var(--text-h5);
+  line-height: var(--leading-h5);
+  font-weight: var(--weight-h5);
+  margin-block: var(--space-lg) var(--space-sm);
+}
+
+p {
+  margin-block: 0 var(--space-base);
+}
+
+/* The wordmarks in this ecosystem are lowercase — bundu, nyuchi, mzizi — and
+ * the brand's voice guide says so in as many words. */
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-h1);
+  font-size: var(--text-h5);
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  text-decoration: none;
+  text-transform: lowercase;
+}
+
+.eyebrow {
+  display: block;
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  font-weight: var(--weight-h6);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+  margin-block-end: var(--space-md);
+}
+
+.lede {
+  font-size: var(--text-body-large);
+  line-height: var(--leading-body-large);
+  color: var(--muted-foreground);
+  max-width: 54ch;
+  margin-block: var(--space-base) var(--space-lg);
+}
+
+.prose {
+  max-width: 68ch;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+}
+
+:not(pre) > code {
+  background: var(--surface-container);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.35em;
+}
+
+/* --------------------------------------------------------------- shell --- */
+
+.skip {
+  position: absolute;
+  inset-inline-start: -9999px;
+}
+
+.skip:focus {
+  inset-inline-start: var(--space-base);
+  inset-block-start: var(--space-base);
+  z-index: 10;
+  background: var(--card);
+  color: var(--foreground);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-button-radius);
+}
+
+.site-nav {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-base) var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border-block-end: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-void) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.site-nav nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* Nav items are pills at the spec'd minimum touch target, like every other
+ * interactive thing in the system. */
+.site-nav nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-sm);
+  padding-inline: var(--space-base);
+  border-radius: var(--spec-button-radius);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: var(--text-body-small);
+  font-weight: var(--weight-h6);
+}
+
+.site-nav nav a:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.site-nav nav a[aria-current="page"] {
+  background: var(--accent);
+  color: var(--info);
+}
+
+main {
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: var(--space-4xl) var(--space-lg) var(--space-5xl);
+}
+
+body.wide main,
+body.wide .footer-inner {
+  max-width: 78rem;
+}
+
+/* A hairline between a page's hero and its content, and between sections. The
+ * old apex used exactly this device and it is worth keeping. */
+.rule {
+  border: 0;
+  border-block-start: 1px solid var(--border);
+  margin-block: var(--space-2xl);
+}
+
+footer {
+  border-block-start: 1px solid var(--border);
+  background: var(--surface-container);
+  color: var(--muted-foreground);
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body-small);
+}
+
+.footer-inner {
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  margin-block-end: 0;
+}
+
+/* ------------------------------------------------------- system pieces --- */
+/*
+ * These are the registry's components, built to `componentSpecs` rather than
+ * installed: this site is Astro with no UI framework by charter, so a React
+ * `<Badge>` cannot be dropped in. What CAN be honoured — and is, here — is the
+ * spec every one of those components is built against. A badge is 22px and
+ * fully pill because the spec says a badge is; a card is 14px radius with a
+ * 1px border because the spec says a card is.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--spec-badge-default);
+  padding-inline: var(--space-sm);
+  border-radius: var(--spec-badge-radius);
+  background: var(--surface-container);
+  color: var(--muted-foreground);
+  font-size: var(--text-caption);
+  line-height: 1;
+  font-weight: var(--weight-h6);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge.outline {
+  background: none;
+  border: 1px solid var(--border);
+}
+
+.badge.solid {
+  background: var(--accent);
+  color: var(--info);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  padding: var(--space-base);
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-dialog-radius);
+  padding: var(--space-lg);
+  margin-block: var(--space-lg);
+}
+
+.panel > :first-child {
+  margin-block-start: 0;
+}
+
+.panel > :last-child {
+  margin-block-end: 0;
+}
+
+/* An install command is the point of the whole registry, so it gets the
+ * treatment: its own surface, selectable, wrapping rather than clipped. */
+.cmd {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  line-height: var(--leading-code);
+  background: var(--surface-container);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.cmd.lead {
+  font-size: var(--text-code);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  color: var(--foreground);
+  padding: var(--space-base) var(--space-lg);
+}
+
+.cmd .flag {
+  color: var(--info);
+}
+
+/* Present for a screen reader, absent for the eye. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ evidence --- */
+
+/* Where a number came from, and when it was read. A snapshot that says when it
+ * was taken is a fact; one that does not is a claim. */
+.provenance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-base);
+  align-items: baseline;
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  color: var(--muted-foreground);
+  margin-block: var(--space-lg);
+}
+
+.provenance code {
+  background: none;
+  padding: 0;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xl);
+  margin-block: var(--space-xl);
+  padding: 0;
+  list-style: none;
+}
+
+.stat-value {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: var(--text-h2);
+  line-height: 1;
+  font-weight: var(--weight-h1);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  display: block;
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  margin-block-start: var(--space-xs);
+}
+
+/* ------------------------------------------------------------- tables --- */
+
+.scroller {
+  overflow-x: auto;
+  margin-block: var(--space-lg);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--text-body-small);
+}
+
+th,
+td {
+  text-align: start;
+  vertical-align: top;
+  padding: var(--space-md);
+  border-block-end: 1px solid var(--border);
+}
+
+th {
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  font-weight: var(--weight-h6);
+  white-space: nowrap;
+}
+
+.state {
+  white-space: nowrap;
+  font-size: var(--text-body-small);
+  color: var(--muted-foreground);
+}
+
+ul.spaced li {
+  margin-block-end: var(--space-sm);
+}
+
+/* The status panel on the landing page carries the claim this site most needs
+ * to get right — that nothing has been measured yet — so it is styled to be
+ * read rather than skipped. Warning is a served semantic role. */
+.status {
+  background: color-mix(in oklab, var(--warning) 12%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--warning) 45%, var(--card));
+  border-radius: var(--spec-dialog-radius);
+  padding: var(--space-lg);
+  margin-block: var(--space-xl);
+}
+
+.status h2 {
+  margin-block-start: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-h6);
+  letter-spacing: 0;
+}
+
+.status p:last-child {
+  margin-block-end: 0;
+}
+
+/* ================================================== /components ========= */
+
+.finder[hidden] {
+  display: none;
+}
+
+/* Search and the type filters are progressive enhancement over content that is
+ * already in the HTML. They stay hidden until the script that makes them work
+ * has run, because a control that does nothing is worse than no control. */
+.finder {
+  position: sticky;
+  inset-block-start: calc(var(--touch-target-sm) + var(--space-lg));
+  z-index: 3;
+  background: color-mix(in oklab, var(--background) 92%, transparent);
+  backdrop-filter: blur(12px);
+  padding-block: var(--space-md);
+  margin-block: var(--space-lg);
+  border-block-end: 1px solid var(--border);
+}
+
+.finder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* 56px and fully pill, because `componentSpecs.input` says an input is. */
+.finder input {
+  flex: 1 1 18rem;
+  height: var(--spec-input-default);
+  padding-inline: var(--space-lg);
+  font: inherit;
+  font-size: var(--text-body);
+  color: var(--foreground);
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-input-radius);
+}
+
+/* And 48px pills for the filters, which is `componentSpecs.button` at sm. */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filters button {
+  height: var(--spec-button-sm);
+  padding-inline: var(--space-base);
+  font: inherit;
+  font-size: var(--text-body-small);
+  font-weight: var(--weight-h6);
+  color: var(--muted-foreground);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--spec-button-radius);
+  cursor: pointer;
+}
+
+.filters button:hover {
+  color: var(--foreground);
+  border-color: var(--muted-foreground);
+}
+
+.filters button[aria-pressed="true"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--background);
+}
+
+.finder-count {
+  font-size: var(--text-body-small);
+  color: var(--muted-foreground);
+  margin: var(--space-sm) 0 0;
+  min-height: 1lh;
+}
+
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding: 0;
+  margin-block: var(--space-base);
+  list-style: none;
+}
+
+.jump a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--spec-button-sm);
+  padding-inline: var(--space-base);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-button-radius);
+  background: var(--card);
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: var(--text-body-small);
+}
+
+.jump a:hover {
+  border-color: var(--info);
+  color: var(--info);
+}
+
+.jump b {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+  font-weight: var(--weight-h6);
+}
+
+.node-block {
+  margin-block-start: var(--space-4xl);
+  scroll-margin-block-start: 9rem;
+}
+
+.node-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-md);
+  border-block-end: 1px solid var(--border);
+  padding-block-end: var(--space-md);
+  margin-block-end: var(--space-md);
+}
+
+.node-head h2 {
+  margin: 0;
+  font-size: var(--text-h3);
+}
+
+.node-n {
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+  color: var(--muted-foreground);
+}
+
+.node-covenant {
+  color: var(--muted-foreground);
+  font-size: var(--text-body-small);
+  margin-block-end: var(--space-lg);
+  max-width: 70ch;
+}
+
+.node-covenant em {
+  color: var(--foreground);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-md);
+}
+
+.component {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  padding: var(--space-base);
+}
+
+.component[hidden] {
+  display: none;
+}
+
+.component:hover {
+  border-color: var(--info);
+}
+
+.component > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.component h3 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+  font-weight: var(--weight-h6);
+  line-height: var(--leading-h6);
+  overflow-wrap: anywhere;
+}
+
+.component .title {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: var(--weight-body);
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+}
+
+/* Four lines is enough to decide whether this is the component you want. The
+ * full description stays in the HTML for search and for screen readers. */
+.component p {
+  margin: 0;
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body-small);
+  color: var(--muted-foreground);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+/* One line, scrolling inside its own card rather than growing it. The full
+ * command is still in the HTML — it is the point of the page — but 575 cards
+ * each three lines tall turns a gallery into a wall. */
+.component .cmd {
+  margin-block-start: auto;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.empty[hidden] {
+  display: none;
+}
+
+.empty {
+  padding: var(--space-3xl) 0;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+/* ================================================== /architecture ======= */
+
+.helix-figure {
+  margin: var(--space-xl) 0 var(--space-2xl);
+}
+
+.helix {
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+  margin-inline: auto;
+}
+
+.helix-figure figcaption {
+  max-width: 60ch;
+  margin-inline: auto;
+  text-align: center;
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body-small);
+  color: var(--muted-foreground);
+}
+
+.helix .backbone {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.helix .rung-line {
+  stroke: var(--border);
+  stroke-width: 2;
+  stroke-dasharray: 3 5;
+}
+
+.helix .node-dot {
+  stroke: var(--background);
+  stroke-width: 3;
+}
+
+.helix a:hover .node-dot {
+  stroke: var(--foreground);
+}
+
+.helix .node-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: var(--weight-h6);
+  fill: var(--background);
+}
+
+.helix .node-name {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: var(--weight-h6);
+  fill: var(--foreground);
+}
+
+.helix .node-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--muted-foreground);
+}
+
+.helix a:hover .node-name {
+  fill: var(--info);
+}
+
+.helix .axis-label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: var(--weight-h6);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--muted-foreground);
+}
+
+.strands {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-md);
+  padding: 0;
+  margin-block: var(--space-lg);
+  list-style: none;
+}
+
+.strand {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid var(--strand, var(--border));
+  border-radius: var(--spec-card-radius);
+  padding: var(--space-base);
+}
+
+.strand h3 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-h6);
+}
+
+.covenant {
+  font-family: var(--font-serif);
+  font-size: var(--text-body-large);
+  line-height: var(--leading-h5);
+  color: var(--foreground);
+  margin-block: var(--space-sm);
+}
+
+.strand p:last-child {
+  margin-block-end: 0;
+  font-size: var(--text-body-small);
+  color: var(--muted-foreground);
+}
+
+.helix-entry {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid var(--strand, var(--border));
+  border-radius: var(--spec-card-radius);
+  padding: var(--space-lg);
+  margin-block: var(--space-md);
+  scroll-margin-block-start: 7rem;
+}
+
+.helix-entry > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-sm) var(--space-md);
+}
+
+.helix-entry h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-h4);
+  font-weight: var(--weight-h2);
+}
+
+.helix-entry .role,
+.helix-entry .desc {
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body-small);
+  color: var(--muted-foreground);
+  max-width: 78ch;
+  margin-block: var(--space-xs) 0;
+}
+
+.helix-entry .covenant {
+  margin-block: var(--space-md) var(--space-sm);
+}
+
+.helix-entry .rules {
+  margin-block: var(--space-md) 0;
+  padding-inline-start: var(--space-base);
+  font-size: var(--text-body-small);
+  color: var(--muted-foreground);
+  max-width: 78ch;
+}
+
+.helix-entry .rules li {
+  margin-block-end: var(--space-xs);
+}
+
+.count-link {
+  font-size: var(--text-body-small);
+  white-space: nowrap;
+}
+
+/* ====================================================== /tokens ========= */
+
+.families {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-md);
+  padding: 0;
+  margin-block: var(--space-lg);
+  list-style: none;
+}
+
+.family {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  overflow: hidden;
+}
+
+/* Both halves of every family, side by side, each painted in itself. A palette
+ * page that shows only the current theme's half is showing half a palette. */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.swatch {
+  background: var(--swatch);
+  color: var(--swatch-ink);
+  padding: var(--space-lg) var(--space-md) var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+}
+
+.swatch b {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-h6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  transform: scale(0.85);
+  transform-origin: left;
+}
+
+.family-body {
+  flex: 1;
+  padding: var(--space-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.family-body h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-h6);
+}
+
+.family-body h3 code {
+  background: none;
+  padding: 0;
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+}
+
+.family-body dl {
+  margin: 0;
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body-small);
+}
+
+.family-body dt {
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  margin-block-start: var(--space-sm);
+}
+
+.family-body dd {
+  margin: 0;
+  color: var(--foreground);
+}
+
+.pair.sub {
+  gap: 1px;
+  margin-block-start: var(--space-sm);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.pair.sub .swatch {
+  padding: var(--space-md) var(--space-sm) var(--space-xs);
+}
+
+.ladder {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-md);
+  padding: 0;
+  margin-block: var(--space-lg);
+  list-style: none;
+}
+
+.ladder-item {
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  overflow: hidden;
+  background: var(--card);
+}
+
+.ladder-item .pair > div {
+  background: var(--swatch);
+  color: var(--swatch-ink);
+  padding: var(--space-base) var(--space-sm) var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  overflow-wrap: anywhere;
+}
+
+.ladder-item .meta {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
+.ladder-item .meta strong {
+  display: block;
+  font-size: var(--text-body-small);
+}
+
+.ladder-item .meta span {
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  color: var(--muted-foreground);
+}
+
+/* Type is shown at its own size. A table of numbers is not a type scale. */
+.specimens {
+  margin-block: var(--space-lg);
+  padding: 0;
+  list-style: none;
+}
+
+.specimen {
+  border-block-end: 1px solid var(--border);
+  padding-block: var(--space-base);
+}
+
+.specimen .sample {
+  display: block;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.specimen .spec {
+  display: block;
+  margin-block-start: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Spacing drawn to scale. The bar IS the value. */
+.steps {
+  margin-block: var(--space-lg);
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-md);
+  padding-block: var(--space-xs);
+  border-block-end: 1px solid var(--border);
+}
+
+.step .name {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+}
+
+.step .bar {
+  display: block;
+  height: var(--space-md);
+  width: var(--w);
+  max-width: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-cobalt);
+}
+
+.step .val {
+  display: block;
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  color: var(--muted-foreground);
+  margin-block-start: var(--space-xxs);
+}
+
+.radii {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-base);
+  padding: 0;
+  margin-block: var(--space-lg);
+  list-style: none;
+}
+
+.radius {
+  width: 8rem;
+  text-align: center;
+  font-size: var(--text-body-small);
+}
+
+.radius .box {
+  height: 5rem;
+  border: 2px solid var(--color-cobalt);
+  background: var(--color-cobalt-container);
+  border-radius: var(--r);
+  margin-block-end: var(--space-sm);
+}
+
+.radius code {
+  background: none;
+  padding: 0;
+  color: var(--muted-foreground);
+}
+
+/* The component-spec gallery: the registry's own dimensions, rendered. */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-md);
+  padding: 0;
+  margin-block: var(--space-lg);
+  list-style: none;
+}
+
+.spec-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  padding: var(--space-base);
+}
+
+.spec-card h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+}
+
+.spec-demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--touch-target);
+  padding: var(--space-md);
+  background: var(--background);
+  border-radius: var(--radius-md);
+  margin-block-end: var(--space-md);
+}
+
+.spec-card dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-xxs) var(--space-sm);
+  font-size: var(--text-caption);
+}
+
+.spec-card dt {
+  color: var(--muted-foreground);
+}
+
+.spec-card dd {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.spec-card .note {
+  margin-block: var(--space-sm) 0;
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  color: var(--muted-foreground);
+}
+
+/* Demo pieces, each at its spec'd height and radius. */
+.demo-button {
+  display: inline-flex;
+  align-items: center;
+  height: var(--spec-button-default);
+  padding-inline: var(--space-lg);
+  border-radius: var(--spec-button-radius);
+  background: var(--primary);
+  color: var(--background);
+  font-size: var(--text-body-small);
+  font-weight: var(--weight-h6);
+  border: 0;
+}
+
+.demo-button.outline {
+  background: none;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.demo-button.sm {
+  height: var(--spec-button-sm);
+  padding-inline: var(--space-base);
+}
+
+.demo-input {
+  flex: 1 1 8rem;
+  height: var(--spec-input-default);
+  padding-inline: var(--space-base);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-input-radius);
+  background: var(--input);
+  color: var(--muted-foreground);
+  font-size: var(--text-body-small);
+  display: flex;
+  align-items: center;
+}
+
+.demo-avatar {
+  width: var(--spec-avatar-default);
+  height: var(--spec-avatar-default);
+  border-radius: var(--spec-avatar-radius);
+  background: var(--color-tanzanite-container);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-body-small);
+  font-weight: var(--weight-h6);
+}
+
+.demo-checkbox {
+  width: var(--spec-checkbox-default);
+  height: var(--spec-checkbox-default);
+  border-radius: var(--spec-checkbox-radius);
+  border: 2px solid var(--primary);
+  background: var(--primary);
+  display: inline-block;
+}
+
+.demo-checkbox.off {
+  background: none;
+  border-color: var(--border);
+}
+
+.demo-toggle {
+  width: calc(var(--spec-toggle-default) * 1.8);
+  height: var(--spec-toggle-default);
+  border-radius: var(--spec-toggle-radius);
+  background: var(--primary);
+  display: inline-block;
+}
+
+.demo-card {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  background: var(--card);
+  padding: var(--space-base);
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+}
+
+.demo-tab {
+  display: inline-flex;
+  align-items: center;
+  height: var(--spec-tabs-default);
+  padding-inline: var(--space-base);
+  border-radius: var(--spec-tabs-radius);
+  font-size: var(--text-body-small);
+  color: var(--muted-foreground);
+}
+
+.demo-tab.on {
+  background: var(--accent);
+  color: var(--info);
+}
+
+.demo-dialog {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--spec-dialog-radius);
+  background: var(--surface-overlay);
+  padding: var(--space-lg);
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+}

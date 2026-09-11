@@ -1,0 +1,382 @@
+---
+/**
+ * /tokens — the whole palette, shown rather than listed.
+ *
+ * Twenty-one colour families: seven minerals, seven heritage tones, seven
+ * experimental. Rendering only the seven minerals is the single most common
+ * defect in this estate's token surfaces, so the count is asserted below and
+ * the build fails rather than quietly shipping a partial palette.
+ *
+ * Both the light and the dark value of every family is painted, side by side,
+ * in the colour itself: a palette page that renders only the current theme's
+ * half is showing half a palette. The hex printed on each swatch is the value
+ * the API served; the ink it is printed in is chosen by luminance, which is the
+ * one thing on this page computed rather than fetched.
+ *
+ * The page ends with the registry's own `componentSpecs` rendered as real
+ * pieces at their real dimensions — which is also what the rest of this site is
+ * built out of, so the gallery is not a mock-up of the system, it is a labelled
+ * sample of the system the page itself is wearing.
+ */
+import Site from "../layouts/Site.astro";
+import {
+  getBrand,
+  readableInk,
+  builtAt,
+  CANONICAL_BASE,
+  type ColourFamily,
+} from "../lib/registry";
+
+const brand = await getBrand();
+
+const collections = [
+  {
+    id: "minerals",
+    title: "Seven African Minerals",
+    blurb:
+      "The brand palette. Every mineral is named for something mined on this continent and carries one meaning the design system spends everywhere — cobalt is knowledge, gold is value, terracotta is community.",
+    families: brand.minerals,
+  },
+  {
+    id: "heritage",
+    title: "Seven Heritage tones",
+    blurb:
+      "Atmospheric anchors rather than brand marks. Heritage tones set mood and surface — dusk, dust, river, fire — and are drawn from craft and landscape rather than from geology.",
+    families: brand.heritage,
+  },
+  {
+    id: "experimental",
+    title: "Seven Experimental",
+    blurb:
+      "A seven-point hue wheel under evaluation, served with its container and on-container steps but without the origin-and-symbolism prose the other fourteen carry. They are in the palette; they are not yet spoken for.",
+    families: brand.experimental,
+  },
+];
+
+const familyCount = collections.reduce((sum, collection) => sum + collection.families.length, 0);
+
+// The partial-palette guard. Twenty-one families or the build stops.
+if (familyCount !== 21) {
+  throw new Error(
+    `mzizi-site build: the brand API served ${familyCount} colour families, expected 21 ` +
+      `(7 minerals, 7 heritage, 7 experimental). Refusing to render a partial palette. ` +
+      `If the palette genuinely changed size, update this assertion deliberately.`,
+  );
+}
+
+/** Inline custom properties for one painted swatch. No colour is invented. */
+const paint = (hex: string) => `--swatch: ${hex}; --swatch-ink: ${readableInk(hex)}`;
+
+const hasProse = (family: ColourFamily) =>
+  Boolean(family.origin || family.symbolism || family.usage);
+
+const fonts = Object.entries(brand.typography.fonts) as [
+  "sans" | "serif" | "mono",
+  { family: string; usage: string; reason: string },
+][];
+
+const maxSpace = Math.max(...brand.spacing.map((step) => step.px));
+const radii = Object.entries(brand.radii).filter(([, value]) => /^\d/.test(value));
+const specs = brand.componentSpecs;
+---
+
+<Site
+  title="Colour, type and space"
+  eyebrow="Design tokens"
+  description="The Mzizi design tokens: 21 colour families across minerals, heritage and experimental, plus the surface ladder, semantic roles, typography, spacing, radii and component specs."
+  lede="The fixed ground every Mzizi component is rendered and contract-tested against. Twenty-one colour families, each with a light value and a dark one, and most with a place they came from — plus the surfaces, type, spacing and dimensions this very page is built out of."
+  wide
+>
+  <ul class="stats">
+    <li>
+      <span class="stat-value">{familyCount}</span>
+      <span class="stat-label">Colour families</span>
+    </li>
+    <li>
+      <span class="stat-value">{brand.backgrounds.length}</span>
+      <span class="stat-label">Surfaces</span>
+    </li>
+    <li>
+      <span class="stat-value">{brand.semanticColors.length}</span>
+      <span class="stat-label">Semantic roles</span>
+    </li>
+    <li>
+      <span class="stat-value">{brand.typography.scale.length}</span>
+      <span class="stat-label">Type steps</span>
+    </li>
+    <li>
+      <span class="stat-value">{brand.spacing.length}</span>
+      <span class="stat-label">Spacing steps</span>
+    </li>
+  </ul>
+
+  <p class="provenance">
+    <span>
+      Read from <code>{CANONICAL_BASE}/brand</code> when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time> — brand system v{brand.version},
+      last changed {brand.lastUpdated}.
+    </span>
+    <a href={`${CANONICAL_BASE}/brand`}>Read the JSON</a>
+  </p>
+
+  {collections.map((collection) => (
+    <section>
+      <h2 id={collection.id}>{collection.title}</h2>
+      <div class="prose"><p>{collection.blurb}</p></div>
+      <ul class="families">
+        {collection.families.map((family) => (
+          <li class="family">
+            <div class="pair">
+              <div class="swatch" style={paint(family.lightHex)}>
+                <b>Light</b>{family.lightHex}
+              </div>
+              <div class="swatch" style={paint(family.darkHex)}>
+                <b>Dark</b>{family.darkHex}
+              </div>
+            </div>
+            <div class="family-body">
+              <h3>
+                {family.name}
+                <code>{family.cssVar}</code>
+              </h3>
+              {hasProse(family) ? (
+                <dl>
+                  {family.symbolism && (<><dt>Means</dt><dd>{family.symbolism}</dd></>)}
+                  {family.origin && (<><dt>From</dt><dd>{family.origin}</dd></>)}
+                  {family.usage && (<><dt>Used for</dt><dd>{family.usage}</dd></>)}
+                </dl>
+              ) : (
+                <p class="count-link">No origin or symbolism recorded for this family yet.</p>
+              )}
+              {family.containerLight && family.containerDark && (
+                <div class="pair sub">
+                  <div class="swatch" style={paint(family.containerLight)}>
+                    <b>Container</b>{family.containerLight}
+                  </div>
+                  <div class="swatch" style={paint(family.containerDark)}>
+                    <b>Container</b>{family.containerDark}
+                  </div>
+                </div>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+
+  <hr class="rule" />
+
+  <h2 id="surfaces">The surface ladder</h2>
+  <div class="prose">
+    <p>
+      Ambient to elevated: what a page sits on, what a card sits on, what a menu
+      floats above, and what a modal darkens behind it. This page is painted with
+      these exact values — the body is <code>base</code>, every card is
+      <code>surface</code>, every inset is <code>container</code>.
+    </p>
+  </div>
+  <ul class="ladder">
+    {brand.backgrounds.map((surface) => (
+      <li class="ladder-item">
+        <div class="pair">
+          <div style={paint(surface.light)}>{surface.light}</div>
+          <div style={paint(surface.dark)}>{surface.dark}</div>
+        </div>
+        <div class="meta">
+          <strong>{surface.name}</strong>
+          <span>{surface.usage}</span>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <h2 id="semantic">Semantic roles</h2>
+  <div class="prose">
+    <p>
+      The roles, not the pigments. A component asks for <code>--destructive</code>
+      or <code>--ring</code>; which mineral answers is a decision that lives at
+      node N1 and nowhere else. Note that <code>--primary</code> is tanzanite and
+      cobalt is reserved for links and information — the palette says so itself.
+    </p>
+  </div>
+  <ul class="ladder">
+    {brand.semanticColors.map((token) => (
+      <li class="ladder-item">
+        <div class="pair">
+          <div style={paint(token.light)}>{token.light}</div>
+          <div style={paint(token.dark)}>{token.dark}</div>
+        </div>
+        <div class="meta">
+          <strong>{token.name}</strong>
+          <span>{token.usage}</span>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <hr class="rule" />
+
+  <h2 id="typography">Typography</h2>
+  <div class="prose">
+    <p>
+      Three families, chosen for language coverage before looks: Noto carries the
+      diacritics African languages need, which a display face picked for its
+      lowercase <em>g</em> does not.
+    </p>
+  </div>
+  <ul class="ladder">
+    {fonts.map(([role, font]) => (
+      <li class="ladder-item">
+        <div class="meta">
+          <strong style={`font-family: var(--font-${role}); font-size: var(--text-h5);`}>
+            {font.family}
+          </strong>
+          <span>{role} · {font.usage}. {font.reason}.</span>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <ul class="specimens">
+    {brand.typography.scale.map((step) => (
+      <li class="specimen">
+        <span
+          class="sample"
+          style={`font-family: var(--font-${step.font}); font-size: min(${step.sizePx}px, 11vw); line-height: ${step.lineHeight}; font-weight: ${step.weight};`}
+        >
+          {step.name} — Ndiri nekuti tiri
+        </span>
+        <span class="spec">
+          {step.sizePx}px · {step.sizeRem} · weight {step.weight} · line-height
+          {" "}{step.lineHeight} · {step.font} — {step.usage}
+        </span>
+      </li>
+    ))}
+  </ul>
+
+  <h2 id="spacing">Spacing</h2>
+  <div class="prose"><p>Drawn to scale. The bar is the value.</p></div>
+  <ul class="steps">
+    {brand.spacing.map((step) => (
+      <li class="step">
+        <span>
+          <span class="name">{step.name}</span>
+          <span class="val">{step.px}px · {step.rem}</span>
+        </span>
+        <span>
+          <span class="bar" style={`--w: ${((step.px / maxSpace) * 100).toFixed(2)}%`}></span>
+          <span class="val">{step.usage}</span>
+        </span>
+      </li>
+    ))}
+  </ul>
+
+  <h2 id="radii">Radii</h2>
+  <div class="prose"><p>{brand.radii.system}</p></div>
+  <ul class="radii">
+    {radii.map(([name, value]) => (
+      <li class="radius">
+        <div class="box" style={`--r: ${value}`}></div>
+        <strong>{name}</strong> <code>{value}</code>
+      </li>
+    ))}
+  </ul>
+
+  <hr class="rule" />
+
+  <h2 id="specs">Component specs, rendered</h2>
+  <div class="prose">
+    <p>
+      The dimensions every component in the registry is built to. They are not
+      decorative: a button is a pill at {brand.accessibility.defaultTouchTarget}px
+      and never below {brand.accessibility.minTouchTarget}px, because that is the
+      touch target this system commits to. Everything on this page — the search
+      field on <a href="/components">/components</a>, the badges, the cards, the
+      nav pills — is built to these same numbers, read from the same API.
+    </p>
+  </div>
+  <ul class="specs">
+    {specs.map((spec) => (
+      <li class="spec-card">
+        <h3>{spec.name}</h3>
+        <div class="spec-demo">
+          {spec.name === "button" && (
+            <>
+              <span class="demo-button">Install</span>
+              <span class="demo-button outline sm">Docs</span>
+            </>
+          )}
+          {spec.name === "input" && <span class="demo-input">Search components…</span>}
+          {spec.name === "avatar" && <span class="demo-avatar">nz</span>}
+          {spec.name === "badge" && (
+            <>
+              <span class="badge">ui</span>
+              <span class="badge solid">block</span>
+              <span class="badge outline">lib</span>
+            </>
+          )}
+          {spec.name === "card" && <span class="demo-card">A card is 14px and 1px.</span>}
+          {spec.name === "dialog" && <span class="demo-dialog">A dialog is 17px.</span>}
+          {spec.name === "toggle" && <span class="demo-toggle"></span>}
+          {spec.name === "checkbox" && (
+            <>
+              <span class="demo-checkbox"></span>
+              <span class="demo-checkbox off"></span>
+            </>
+          )}
+          {spec.name === "tabs" && (
+            <>
+              <span class="demo-tab on">Preview</span>
+              <span class="demo-tab">Code</span>
+            </>
+          )}
+        </div>
+        <dl>
+          <dt>Radius</dt>
+          <dd>{spec.borderRadius >= 9999 ? "pill" : `${spec.borderRadius}px`}</dd>
+          <dt>Height</dt>
+          <dd>
+            {Object.entries(spec.heights)
+              .filter(([, height]) => height > 0)
+              .map(([size, height]) => `${size} ${height}px`)
+              .join(", ") || "auto"}
+          </dd>
+          <dt>Padding</dt>
+          <dd>{spec.padding}</dd>
+          <dt>Variants</dt>
+          <dd>{spec.variants.join(", ")}</dd>
+        </dl>
+        {spec.note && <p class="note">{spec.note}</p>}
+      </li>
+    ))}
+  </ul>
+
+  <h2 id="accessibility">What these values are held to</h2>
+  <div class="panel prose">
+    <p>
+      <strong>{brand.accessibility.standard}.</strong>
+      {" "}{brand.accessibility.contrastDescription}
+    </p>
+    <p>
+      Focus: {brand.accessibility.focusIndicator}. Touch targets:
+      {" "}{brand.accessibility.defaultTouchTarget}px by default, never below
+      {" "}{brand.accessibility.minTouchTarget}px.
+      {" "}{brand.accessibility.keyboardNavigation}.
+      {" "}{brand.accessibility.screenReaders}.
+    </p>
+  </div>
+
+  <hr class="rule" />
+
+  <h2>Reading this as a machine</h2>
+  <div class="prose">
+    <p>
+      The whole brand system — every family, container step, semantic role, type
+      step, spacing step, radius and component spec — is served as JSON at
+      <code>{CANONICAL_BASE}/brand</code>. Token files are generated from it, and
+      nothing in this ecosystem should be holding its own copy of a hex value.
+      This site does not: <code>public/site.css</code> contains no colour at all.
+    </p>
+  </div>
+</Site>

@@ -2,37 +2,58 @@
 /**
  * The site shell.
  *
- * Static HTML and one stylesheet. No script tag, no island, no framework —
- * a landing page has nothing to hydrate, and the doctrine that governs this
- * ecosystem (Astro in front, Rust first and TypeScript second underneath, no
- * third UI framework) means the cheapest correct answer is also the one the
- * charter asks for.
+ * Static HTML, one stylesheet, and a generated token block. No island, no
+ * framework — the doctrine that governs this ecosystem is Astro in front, Rust
+ * first and TypeScript second underneath, and no third UI framework
+ * (`mzizi-dev/agent-tools#82`; CHARTER.md in `mzizi-dev/mzizi`).
+ *
+ * `DesignTokens` is emitted for EVERY page, not just the three that render
+ * registry data. This site is the design system's front door, so a landing page
+ * in default Astro styling next to a component gallery in the real palette
+ * would be the contradiction the whole site exists to disprove. The cost is
+ * that every page's build reads the brand API — which the data pages already
+ * required, so the failure mode is unchanged.
  */
+import DesignTokens from "../components/DesignTokens.astro";
+import "../styles/site.css";
+
 interface Props {
   title: string;
   description: string;
+  /** Small caps label above the title. The old apex used one; it earns its place. */
+  eyebrow?: string;
   lede?: string;
+  /**
+   * Widen the measure. Prose pages want a reading column; the pages built from
+   * the registry are grids of cards and swatches and a helix diagram, and a
+   * reading column crushes them into a single file of narrow boxes.
+   */
+  wide?: boolean;
 }
 
-const { title, description, lede } = Astro.props;
+const { title, description, eyebrow, lede, wide = false } = Astro.props;
 
-// The landing page's heading is already the brand, and "Mzizi · Mzizi" in a
-// browser tab is a stutter that reads as a bug. Give that one page a real
-// document title instead of suffixing the site name onto itself.
+// "Mzizi · Mzizi" in a browser tab is a stutter that reads as a bug, so the
+// landing page gets a real document title instead of its own name twice.
 const documentTitle =
   title === "Mzizi"
     ? "Mzizi — a Rust framework for the agentic web"
     : `${title} · Mzizi`;
 
+// A reading order, not an alphabet: what this is, then the three surfaces a
+// person comes here to explore, then the wider estate.
 const nav = [
   { href: "/", label: "Overview" },
   { href: "/language", label: "The language" },
+  { href: "/architecture", label: "Architecture" },
+  { href: "/components", label: "Components" },
+  { href: "/tokens", label: "Tokens" },
   { href: "/ecosystem", label: "Ecosystem" },
 ];
 
 // `build.format: "file"` emits `/ecosystem.html`; the asset server serves it
 // from `/ecosystem`. Strip the extension so the current page is marked in both
-// forms, and so a local `astro preview` highlights the same link production does.
+// forms, and so `astro preview` highlights the same link production does.
 const here = Astro.url.pathname.replace(/\.html$/, "") || "/";
 const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
 ---
@@ -51,10 +72,26 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
     <meta property="og:url" content={canonical.href} />
     <!-- Agents that read HTML rather than llms.txt still get pointed at it. -->
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
-    <link rel="stylesheet" href="/site.css" />
+
+    <!--
+      The three families the brand system names. Noto is not a style choice: it
+      is picked for language coverage, because the diacritics African languages
+      need are the first thing a display face drops. Every rule falls back to a
+      real system stack, so a blocked font request costs the look, not the page.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
+    />
+
+    <DesignTokens />
+    <slot name="head" />
   </head>
-  <body>
+  <body class={wide ? "wide" : undefined}>
     <a class="skip" href="#main">Skip to content</a>
+
     <header class="site-nav">
       <a class="wordmark" href="/">mzizi</a>
       <nav aria-label="Primary">
@@ -72,22 +109,27 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
     </header>
 
     <main id="main">
+      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
       <h1>{title}</h1>
       {lede && <p class="lede">{lede}</p>}
       <slot />
     </main>
 
     <footer>
-      <p>
-        Mzizi is a research project of the <strong>Bundu Foundation</strong>,
-        which owns the framework, its components and its logic outright. The
-        design system and registry are operated by nyuchi. Everything public is
-        Apache-2.0.
-      </p>
-      <p class="footer-links">
-        <a href="https://github.com/mzizi-dev">github.com/mzizi-dev</a>
-        <a href="/llms.txt">llms.txt</a>
-      </p>
+      <div class="footer-inner">
+        <p>
+          Mzizi is a research project of the <strong>Bundu Foundation</strong>,
+          which owns the framework, its components and its logic outright. The
+          design system and registry are operated by nyuchi. Everything public
+          is Apache-2.0.
+        </p>
+        <p class="footer-links">
+          <a href="https://github.com/mzizi-dev">github.com/mzizi-dev</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="https://api.mzizi.dev/v1/ui">Registry API</a>
+          <a href="https://mcp.mzizi.dev/mcp">MCP server</a>
+        </p>
+      </div>
     </footer>
   </body>
 </html>
