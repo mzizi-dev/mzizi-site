@@ -18,23 +18,36 @@
   "observability": { "enabled": true, "head_sampling_rate": 1 },
 
   // ---------------------------------------------------------------------
-  // NO ROUTES. THIS IS DELIBERATE. DO NOT ADD `mzizi.dev` HERE CASUALLY.
+  // NO ROUTES HERE — BUT THIS WORKER SERVES `mzizi.dev` ANYWAY.
   // ---------------------------------------------------------------------
   //
-  // mzizi.dev is live RIGHT NOW and is served by `mzizi-dev/mzizi-registry`
-  // on Vercel (verify before touching anything: `curl -sSI https://mzizi.dev`
-  // returns `x-vercel-id` and `x-powered-by: Next.js`). Adding a custom domain
-  // for mzizi.dev to this Worker takes the apex off the registry and points it
-  // at this three-page site — losing the component registry, `/api/v1`, and
-  // `/mcp` in one deploy. Shipping a site that is not yet live is a much
-  // smaller failure than that.
+  // Read that twice. It is not a contradiction, it is the defect.
   //
-  // Without a route this Worker still deploys, to
-  // `mzizi-site.<subdomain>.workers.dev`, which is the correct place to review
-  // it until a human decides to cut over. README.md §Deploying and the cutover
-  // section record what that decision actually involves.
+  // This block used to say that mzizi.dev was served by
+  // `mzizi-dev/mzizi-registry` on Vercel and that adding a custom domain here
+  // would take the apex away from it. Measured 2026-09-12, that has already
+  // happened: `curl -sSI https://mzizi.dev` returns `server: cloudflare` with
+  // no `x-vercel-id` and no `x-powered-by: Next.js`, the apex title is this
+  // site's, and `https://mzizi.dev/llms.txt` is byte-identical to
+  // `public/llms.txt` in this repository.
   //
-  // WHEN a route is eventually added, it takes a BARE HOSTNAME:
+  // The custom domain was attached to this Worker in the CLOUDFLARE DASHBOARD,
+  // not from this file. Nothing in this repository routes anything. So:
+  //
+  //   * `wrangler deploy` from here is a PRODUCTION deploy to mzizi.dev.
+  //   * The route cannot be reviewed, reverted or diffed in version control.
+  //   * The registry surfaces the apex used to serve — /components, /tokens,
+  //     /brand, /architecture, /observability, /r/, /api/v1, /mcp — now 404 on
+  //     mzizi.dev. The API and the MCP server survived on api.mzizi.dev and
+  //     mcp.mzizi.dev; the developer portal did not move anywhere and has no
+  //     live address.
+  //
+  // The cutover runbook (mzizi-site#3) and the pull request that ports the
+  // displaced pages here (mzizi-site#5) are both still OPEN, and
+  // mzizi-registry#334, which would have made the route reviewable, was CLOSED
+  // unmerged. README.md records the full sequence.
+  //
+  // WHEN the route is finally written down here, it takes a BARE HOSTNAME:
   //
   //     "routes": [{ "pattern": "mzizi.dev", "custom_domain": true }]
   //
