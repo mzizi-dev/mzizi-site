@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # Not just main. Stacked pull requests target the branch below them in the
+    # stack, and a filter of [main] silently gives every layer but the bottom
+    # one zero checks — a green PR with nothing run looks identical to a
+    # passing one.
+    branches: [main, "claude/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      # No `version:` here on purpose — the action reads `packageManager` from
+      # package.json, so the version CI installs and the version that wrote
+      # pnpm-lock.yaml cannot drift apart without someone noticing.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      # `astro check` typechecks the pages and their frontmatter — every page
+      # here builds its tables from typed arrays in the frontmatter, so a field
+      # renamed in one place and read in another fails here rather than
+      # rendering `undefined` into production HTML.
+      - run: pnpm exec astro check
+
+      - run: pnpm exec astro build
+
+      # The site is static, so `dist/` IS the deliverable and a missing file is
+      # a broken page rather than a missing feature. These four are the
+      # agent-facing surfaces and the 404 the Worker is configured to serve;
+      # they live in `public/`, where a rename or a stray .gitignore rule can
+      # drop them from the build with no other symptom. `.well-known/` earns
+      # its check twice over: it is a dot-directory, and tooling skips those by
+      # default often enough to be worth proving on every commit.
+      - name: Built output has the agent-facing surfaces
+        run: |
+          set -euo pipefail
+          for f in llms.txt robots.txt .well-known/mcp.json 404.html; do
+            test -s "dist/$f" || { echo "missing or empty: dist/$f"; exit 1; }
+          done
+          python3 -c "import json; json.load(open('dist/.well-known/mcp.json'))"
+          echo "all agent-facing surfaces present"
+
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      # The gitleaks/gitleaks-action wrapper requires a paid licence for org
+      # repos. The binary is MIT-licensed, so it runs directly and stays free.
+      - name: Install gitleaks
+        env:
+          VERSION: "8.21.2"
+        run: |
+          set -euo pipefail
+          curl -sSL --fail -o /tmp/gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz"
+          sudo tar -xzf /tmp/gitleaks.tar.gz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - run: gitleaks detect --source . --redact --no-banner --verbose
