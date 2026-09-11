@@ -1,0 +1,186 @@
+---
+import Site from "../layouts/Site.astro";
+
+/**
+ * The front door.
+ *
+ * Every claim on this page is checkable against a file in this org:
+ * `mzizi-dev/mzizi/CHARTER.md` for what Mzizi is and what it has not yet
+ * proven, and the repositories themselves for the rest. Nothing here is
+ * measured, because nothing has been measured yet — see the status panel,
+ * which is the single most important block on the site.
+ */
+
+// Where each surface is served from, and whether that hostname resolves today.
+// Checked with `dig`, not assumed: as of the last edit, only mzizi.dev and
+// mcp.mzizi.dev have DNS records. Anything marked planned is a repository that
+// exists and builds, not a name someone reserved.
+const surfaces = [
+  {
+    what: "This site",
+    host: "mzizi.dev",
+    repo: "mzizi-site",
+    live: false,
+    note: "The apex currently serves the registry. See the repo README for what a cutover involves.",
+  },
+  {
+    what: "Registry and design system",
+    host: "mzizi.dev",
+    repo: "mzizi-registry",
+    live: true,
+    note: "Components, brand, tokens, the DNA-helix architecture, and the /api/v1 the apex serves today.",
+  },
+  {
+    what: "Registry API",
+    host: "api.mzizi.dev",
+    repo: "mzizi-api-gateway",
+    live: false,
+    note: "A pure-Rust Cloudflare Worker. Built; the hostname does not resolve yet.",
+  },
+  {
+    what: "Console",
+    host: "app.mzizi.dev",
+    repo: "mzizi-console",
+    live: false,
+    note: "Astro chrome, Rust/Dioxus islands. Built; the hostname does not resolve yet.",
+  },
+  {
+    what: "Documentation",
+    host: "docs.mzizi.dev",
+    repo: "mzizi-docs",
+    live: false,
+    note: "Repository exists and holds a licence and a README. There is no docs site yet.",
+  },
+  {
+    what: "MCP server",
+    host: "mcp.mzizi.dev",
+    repo: null,
+    live: true,
+    note: "Live and OAuth-gated: an unauthenticated request answers invalid_token.",
+  },
+];
+---
+
+<Site
+  title="Mzizi"
+  description="Mzizi is a Rust framework for the agentic web — a language, compiler and IR designed for machine authorship. A Bundu Foundation research project."
+  lede="A Rust framework for the agentic web, designed for machine authorship — and the ecosystem built around it."
+>
+  <p>
+    Every web framework in use today was designed on the assumption that a human
+    is typing: reading docs, holding context in their head, tolerating a few
+    seconds per compile. Mzizi starts from a different bottleneck — an agent
+    iterating against a compiler thousands of times, where compile speed, the
+    information density of an error message, and how many tokens a codebase
+    costs to read are first-order metrics rather than nice-to-haves.
+  </p>
+
+  <p>
+    That is the whole of the claim, and it is a narrow one on purpose. Mzizi is
+    a language, a compiler and an intermediate representation. It is not a
+    rendering engine (it lowers to Dioxus), not an ML runtime (Candle is the
+    dependency), and not a post-quantum cryptography project. Those are stated
+    non-goals, not omissions.
+  </p>
+
+  <div class="status">
+    <h2>Status: unmeasured</h2>
+    <p>
+      The compiler front end exists and is tested — a lexer, a recovering
+      parser, an agent diagnostic protocol, a content-addressed IR, and nine
+      primitives written in Mzizi itself. Contract blocks parse but are not yet
+      evaluated.
+    </p>
+    <p>
+      <strong
+        >The Phase 0 benchmark has not run, so nothing here has been measured
+        against the charter's kill criteria.</strong
+      > The charter is explicit that if the benchmark shows no measurable advantage
+      over raw Dioxus or Leptos, nothing downstream matters. Treat every claim on
+      this site as a design intent with an argument behind it, not a result.
+    </p>
+  </div>
+
+  <h2>Where things are</h2>
+
+  <p>
+    Most of this ecosystem is built and not yet routed. The table is honest
+    about which is which: <em>live</em> means the hostname resolves and answers,
+    <em>planned</em> means the repository exists and builds but DNS does not point
+    anywhere yet.
+  </p>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Surface</th>
+          <th scope="col">Host</th>
+          <th scope="col">State</th>
+          <th scope="col">Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          surfaces.map((s) => (
+            <tr>
+              <th scope="row">
+                {s.what}
+                <br />
+                <span class="state">{s.note}</span>
+              </th>
+              <td>
+                <code>{s.host}</code>
+              </td>
+              <td class="state">{s.live ? "● live" : "○ planned"}</td>
+              <td>
+                {s.repo ? (
+                  <a href={`https://github.com/mzizi-dev/${s.repo}`}>{s.repo}</a>
+                ) : (
+                  <span class="state">not public</span>
+                )}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    <a href="/ecosystem">What each repository actually contains →</a>
+  </p>
+
+  <h2>For agents</h2>
+
+  <div class="panel">
+    <p>
+      <a href="/llms.txt"><code>/llms.txt</code></a> is the machine-readable
+      summary of this site and the ecosystem it points at — the same facts as
+      these pages, without the chrome.
+    </p>
+    <p>
+      <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a> names
+      the one public MCP server in this ecosystem. It requires OAuth; signup is
+      free. Discover its tools with the standard <code>tools/list</code> request
+      rather than trusting any list written down here, which can go stale.
+    </p>
+    <p>
+      Do not hardcode component counts, versions or token values read from any
+      page. The registry API is generated from a database and is the only
+      authoritative source for them.
+    </p>
+  </div>
+
+  <h2>Two things called Mzizi</h2>
+
+  <p>
+    Worth untangling, because the names collide and sources on the web conflate
+    them. <strong>Mzizi the framework</strong> — the language, compiler and IR described
+    above — is 100% Bundu Foundation IP and is what this page is mostly about. <strong
+      >Mzizi the design system</strong
+    > is the component registry, brand system and DNA-helix architecture, operated
+    by nyuchi, and is what <code>mzizi.dev</code> serves today. They share a name
+    and an org; they are different work with different owners.
+  </p>
+</Site>
