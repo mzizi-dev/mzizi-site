@@ -1,0 +1,12 @@
+# Astro build output and its type cache. Both are generated; neither is
+# authored.
+dist/
+.astro/
+
+node_modules/
+
+# Wrangler's local state
+.wrangler/
+
+# macOS
+.DS_Store
