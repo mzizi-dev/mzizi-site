@@ -51,6 +51,47 @@ const nav = [
   { href: "/ecosystem", label: "Ecosystem" },
 ];
 
+// The header is not the canonical nav — the footer is. The header's job is
+// fast access to the handful of places a returning reader actually wants,
+// so only three of the six routes above surface there; the rest live one
+// tap away behind the mobile drawer and, in full, in the footer.
+const fastNav = nav.filter((item) =>
+  ["/language", "/components", "/ecosystem"].includes(item.href),
+);
+
+const footerSections = [
+  {
+    label: "Explore",
+    links: nav,
+  },
+  {
+    label: "For agents",
+    links: [
+      { href: "/llms.txt", label: "llms.txt" },
+      { href: "https://mcp.mzizi.dev/mcp", label: "MCP server" },
+      { href: "https://api.mzizi.dev/v1/ui", label: "Registry API" },
+    ],
+  },
+  {
+    label: "The org",
+    links: [
+      { href: "https://github.com/mzizi-dev", label: "github.com/mzizi-dev" },
+      { href: "https://github.com/mzizi-dev/mzizi", label: "mzizi (the language)" },
+      { href: "https://github.com/mzizi-dev/mzizi-registry", label: "mzizi-registry" },
+    ],
+  },
+];
+
+const minerals = [
+  "cobalt",
+  "tanzanite",
+  "malachite",
+  "gold",
+  "terracotta",
+  "sodalite",
+  "copper",
+];
+
 // `build.format: "file"` emits `/ecosystem.html`; the asset server serves it
 // from `/ecosystem`. Strip the extension so the current page is marked in both
 // forms, and so `astro preview` highlights the same link production does.
@@ -92,11 +133,18 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
   <body class={wide ? "wide" : undefined}>
     <a class="skip" href="#main">Skip to content</a>
 
+    <div class="mineral-strip" aria-hidden="true">
+      {minerals.map((name) => <span class={`m-${name}`} />)}
+    </div>
+
     <header class="site-nav">
-      <a class="wordmark" href="/">mzizi</a>
-      <nav aria-label="Primary">
+      <a class="wordmark" href="/">
+        <span class="dot" aria-hidden="true" />
+        mzizi
+      </a>
+      <nav class="site-nav-fast" aria-label="Primary">
         {
-          nav.map((item) => (
+          fastNav.map((item) => (
             <a
               href={item.href}
               aria-current={here === item.href ? "page" : undefined}
@@ -106,7 +154,62 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
           ))
         }
       </nav>
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-drawer"
+      >
+        <span class="sr-only">Menu</span>
+        <span class="bar" aria-hidden="true" />
+        <span class="bar" aria-hidden="true" />
+        <span class="bar" aria-hidden="true" />
+      </button>
     </header>
+
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden />
+    <div
+      class="mobile-drawer"
+      id="mobile-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu"
+      hidden
+    >
+      <div class="drawer-head">
+        <a class="wordmark" href="/">
+          <span class="dot" aria-hidden="true" />
+          mzizi
+        </a>
+        <button class="drawer-close" id="drawer-close" type="button">
+          <span class="sr-only">Close menu</span>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <nav class="drawer-nav" aria-label="Mobile">
+        <div class="drawer-section">
+          <span class="drawer-eyebrow">Explore</span>
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                aria-current={here === item.href ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+        <div class="drawer-section">
+          <span class="drawer-eyebrow">For agents</span>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="https://mcp.mzizi.dev/mcp">MCP server</a>
+          <a href="https://api.mzizi.dev/v1/ui">Registry API</a>
+        </div>
+      </nav>
+      <a class="drawer-cta" href="/components">Browse components</a>
+    </div>
 
     <main id="main">
       {eyebrow && <span class="eyebrow">{eyebrow}</span>}
@@ -116,20 +219,114 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
     </main>
 
     <footer>
+      <div class="mineral-strip" aria-hidden="true">
+        {minerals.map((name) => <span class={`m-${name}`} />)}
+      </div>
       <div class="footer-inner">
-        <p>
-          Mzizi is a research project of the <strong>Bundu Foundation</strong>,
-          which owns the framework, its components and its logic outright. The
-          design system and registry are operated by nyuchi. Everything public
-          is Apache-2.0.
-        </p>
-        <p class="footer-links">
-          <a href="https://github.com/mzizi-dev">github.com/mzizi-dev</a>
-          <a href="/llms.txt">llms.txt</a>
-          <a href="https://api.mzizi.dev/v1/ui">Registry API</a>
-          <a href="https://mcp.mzizi.dev/mcp">MCP server</a>
-        </p>
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a class="wordmark" href="/">
+              <span class="dot" aria-hidden="true" />
+              mzizi
+            </a>
+            <p>
+              Mzizi is a research project of the <strong>Bundu Foundation</strong>,
+              which owns the framework, its components and its logic outright.
+              The design system and registry are operated by nyuchi.
+              Everything public is Apache-2.0.
+            </p>
+            <div class="mineral-dots" aria-hidden="true">
+              {minerals.map((name) => <span class={`m-${name}`} />)}
+            </div>
+          </div>
+          {
+            footerSections.map((section) => (
+              <div class="footer-section">
+                <span class="footer-heading">{section.label}</span>
+                <ul>
+                  {section.links.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+        <div class="footer-bottom">
+          <span>© {new Date().getFullYear()} Bundu Foundation</span>
+          <div class="mineral-dots" aria-hidden="true">
+            {minerals.map((name) => <span class={`m-${name}`} />)}
+          </div>
+        </div>
       </div>
     </footer>
+
+    <script>
+      // The header is intentionally not the full nav (see the comment above
+      // `fastNav`), so small screens need a real drawer rather than the old
+      // always-visible wrapping list, which is what made mobile unusable.
+      const toggle = document.getElementById("nav-toggle") as HTMLButtonElement;
+      const closeBtn = document.getElementById("drawer-close") as HTMLButtonElement;
+      const drawer = document.getElementById("mobile-drawer") as HTMLElement;
+      const backdrop = document.getElementById("drawer-backdrop") as HTMLElement;
+
+      let lastFocused: HTMLElement | null = null;
+
+      const focusable = () =>
+        Array.from(
+          drawer.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        );
+
+      const openDrawer = () => {
+        lastFocused = document.activeElement as HTMLElement;
+        drawer.hidden = false;
+        backdrop.hidden = false;
+        toggle.setAttribute("aria-expanded", "true");
+        document.body.style.overflow = "hidden";
+        focusable()[0]?.focus();
+        document.addEventListener("keydown", onKeydown);
+      };
+
+      const closeDrawer = () => {
+        drawer.hidden = true;
+        backdrop.hidden = true;
+        toggle.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+        document.removeEventListener("keydown", onKeydown);
+        (lastFocused ?? toggle).focus();
+      };
+
+      const onKeydown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeDrawer();
+          return;
+        }
+        if (event.key !== "Tab") return;
+        const items = focusable();
+        if (items.length === 0) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+
+      toggle.addEventListener("click", () => {
+        if (drawer.hidden) openDrawer();
+        else closeDrawer();
+      });
+      closeBtn.addEventListener("click", closeDrawer);
+      backdrop.addEventListener("click", closeDrawer);
+      drawer.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeDrawer));
+    </script>
   </body>
 </html>
