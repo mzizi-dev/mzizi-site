@@ -120,8 +120,12 @@ p {
 }
 
 /* The wordmarks in this ecosystem are lowercase — bundu, nyuchi, mzizi — and
- * the brand's voice guide says so in as many words. */
+ * the brand's voice guide says so in as many words. The dot ahead of it is
+ * the same identity mark bundu.org's own header and footer use. */
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
   font-family: var(--font-serif);
   font-weight: var(--weight-h1);
   font-size: var(--text-h5);
@@ -129,6 +133,78 @@ p {
   color: var(--foreground);
   text-decoration: none;
   text-transform: lowercase;
+}
+
+.wordmark .dot {
+  inline-size: 0.5em;
+  block-size: 0.5em;
+  border-radius: 50%;
+  background: var(--color-cobalt);
+  flex-shrink: 0;
+}
+
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The seven-mineral identity strip. Canonical N7 shell anatomy: it sits above
+ * the header and again at the top of the footer in every property in this
+ * estate (see mzizi nyuchi-footer's own comment for the same rule). */
+.mineral-strip {
+  display: flex;
+  block-size: 3px;
+}
+
+.mineral-strip span {
+  flex: 1;
+}
+
+.mineral-dots {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.mineral-dots span {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+}
+
+.mineral-strip .m-cobalt,
+.mineral-dots .m-cobalt {
+  background: var(--color-cobalt);
+}
+.mineral-strip .m-tanzanite,
+.mineral-dots .m-tanzanite {
+  background: var(--color-tanzanite);
+}
+.mineral-strip .m-malachite,
+.mineral-dots .m-malachite {
+  background: var(--color-malachite);
+}
+.mineral-strip .m-gold,
+.mineral-dots .m-gold {
+  background: var(--color-gold);
+}
+.mineral-strip .m-terracotta,
+.mineral-dots .m-terracotta {
+  background: var(--color-terracotta);
+}
+.mineral-strip .m-sodalite,
+.mineral-dots .m-sodalite {
+  background: var(--color-sodalite);
+}
+.mineral-strip .m-copper,
+.mineral-dots .m-copper {
+  background: var(--color-copper);
 }
 
 .eyebrow {
@@ -185,29 +261,40 @@ samp {
   border-radius: var(--spec-button-radius);
 }
 
+/* Sticky, blurred bar with a small "fast access" nav — matching bundu.org's
+ * own header treatment. The header is deliberately NOT the full site nav;
+ * the footer is (see the `fastNav`/`nav` comment in Site.astro). Below the
+ * `md` breakpoint the fast nav also disappears, replaced by the hamburger
+ * and drawer — that switch, not a wrapping list of six links, is the fix
+ * for the header genuinely not working on a phone. */
 .site-nav {
   position: sticky;
   inset-block-start: 0;
   z-index: 5;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-base) var(--space-lg);
+  justify-content: space-between;
+  gap: var(--space-lg);
   padding: var(--space-md) var(--space-lg);
   border-block-end: 1px solid var(--border);
   background: color-mix(in oklab, var(--surface-void) 88%, transparent);
   backdrop-filter: blur(12px);
 }
 
-.site-nav nav {
-  display: flex;
-  flex-wrap: wrap;
+.site-nav-fast {
+  display: none;
   gap: var(--space-xs);
+}
+
+@media (min-width: 760px) {
+  .site-nav-fast {
+    display: flex;
+  }
 }
 
 /* Nav items are pills at the spec'd minimum touch target, like every other
  * interactive thing in the system. */
-.site-nav nav a {
+.site-nav-fast a {
   display: inline-flex;
   align-items: center;
   min-height: var(--touch-target-sm);
@@ -219,14 +306,171 @@ samp {
   font-weight: var(--weight-h6);
 }
 
-.site-nav nav a:hover {
+.site-nav-fast a:hover {
   background: var(--accent);
   color: var(--foreground);
 }
 
-.site-nav nav a[aria-current="page"] {
+.site-nav-fast a[aria-current="page"] {
   background: var(--accent);
   color: var(--info);
+}
+
+/* --------------------------------------------------------- mobile nav --- */
+
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  inline-size: var(--touch-target);
+  block-size: var(--touch-target);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-button-radius);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+@media (min-width: 760px) {
+  .nav-toggle {
+    display: none;
+  }
+}
+
+.nav-toggle .bar {
+  display: block;
+  inline-size: 18px;
+  block-size: 2px;
+  background: var(--foreground);
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .bar:nth-child(2) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .bar:nth-child(3) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .bar:nth-child(4) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  /* The dedicated scrim step of the surface ladder — already an alpha
+   * value, and unlike `pitch` it is dark in BOTH themes (pitch is the
+   * lightest surface in light mode, which made an earlier version of this
+   * backdrop render as good as invisible). */
+  background: var(--surface-scrim);
+}
+
+.mobile-drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 50;
+  inline-size: min(100%, 22rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-inline-start: 1px solid var(--border);
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+/* `display: flex` above is an author rule, which beats the browser's own
+ * `[hidden] { display: none }` regardless of selector specificity — so
+ * without this, the drawer stayed visible (and clickable) at all times,
+ * `hidden` attribute or not. This is what actually makes `hidden` hide it. */
+.mobile-drawer[hidden] {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .mobile-drawer,
+  .drawer-backdrop {
+    display: none !important;
+  }
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-xl);
+}
+
+.drawer-close {
+  inline-size: var(--touch-target-sm);
+  block-size: var(--touch-target-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-button-radius);
+  background: transparent;
+  color: var(--foreground);
+  font-size: var(--text-h5);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.drawer-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.drawer-eyebrow {
+  display: block;
+  margin-block-end: var(--space-xs);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-h6);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+}
+
+.drawer-nav a {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding-inline: var(--space-base);
+  border-radius: var(--spec-button-radius);
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: var(--text-body);
+}
+
+.drawer-nav a:hover,
+.drawer-nav a[aria-current="page"] {
+  background: var(--accent);
+  color: var(--info);
+}
+
+.drawer-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target);
+  margin-block-start: var(--space-lg);
+  border-radius: var(--spec-button-radius);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  text-decoration: none;
+  font-weight: var(--weight-h6);
 }
 
 main {
@@ -262,11 +506,62 @@ footer {
   padding: var(--space-2xl) var(--space-lg);
 }
 
-.footer-links {
+/* The canonical nav lives here, not in the header — a sectioned grid rather
+ * than the header's fast-access handful, matching bundu.org's own footer. */
+.footer-grid {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+@media (min-width: 760px) {
+  .footer-grid {
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+  }
+}
+
+.footer-brand p {
+  max-width: 32ch;
+  margin-block: var(--space-base) var(--space-base);
+}
+
+.footer-heading {
+  display: block;
+  margin-block-end: var(--space-base);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-h6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.footer-section ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-section a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.footer-section a:hover {
+  color: var(--foreground);
+  text-decoration: underline;
+}
+
+.footer-bottom {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-lg);
-  margin-block-end: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-base);
+  margin-block-start: var(--space-2xl);
+  padding-block-start: var(--space-lg);
+  border-block-start: 1px solid var(--border);
 }
 
 /* ------------------------------------------------------- system pieces --- */
