@@ -57,9 +57,17 @@ const brand = await getBrand();
 const light: string[] = [];
 const dark: string[] = [];
 
+// This whole block is injected as raw HTML via `set:html` below, which
+// bypasses Astro's normal auto-escaping. Every value here is build-time API
+// data (`/v1/brand`), not user input, but it is still an untrusted string as
+// far as this file is concerned — this is the one place that stops a stray
+// `</style>` or `<script>` in a served name or hex value from breaking out of
+// the style tag and running as HTML in every page's `<head>`.
+const escapeForInlineStyle = (value: string) => value.replaceAll("<", "\\3c ").replaceAll(">", "\\3e ");
+
 const put = (name: string, lightValue: string, darkValue: string) => {
-  light.push(`  --${name}: ${lightValue};`);
-  dark.push(`  --${name}: ${darkValue};`);
+  light.push(`  --${escapeForInlineStyle(name)}: ${escapeForInlineStyle(lightValue)};`);
+  dark.push(`  --${escapeForInlineStyle(name)}: ${escapeForInlineStyle(darkValue)};`);
 };
 const fixed = (name: string, value: string) => put(name, value, value);
 
@@ -106,6 +114,7 @@ const surface = find(brand.backgrounds, "surface");
 const base = find(brand.backgrounds, "base");
 const container = find(brand.backgrounds, "container");
 const pitch = find(brand.backgrounds, "pitch");
+const raised = find(brand.backgrounds, "raised");
 put("surface", surface.light, surface.dark);
 
 // --- semantic roles ------------------------------------------------------
@@ -114,6 +123,11 @@ for (const token of brand.semanticColors) {
 }
 const primary = find(brand.semanticColors, "primary");
 const accent = find(brand.semanticColors, "accent");
+// `--brand-accent` is the exact, unprefixed name the `wash` surface's own
+// `color-mix()` expression references (see the comment above the surface
+// ladder loop). `--accent` below is the `@bundu/ui` contract name; this is
+// the same value under the name `wash` actually resolves against.
+put("brand-accent", accent.light, accent.dark);
 const neutral = find(brand.semanticColors, "neutral");
 const error = find(brand.semanticColors, "error");
 
@@ -121,7 +135,7 @@ const error = find(brand.semanticColors, "error");
 put("background", base.light, base.dark);
 put("canvas", base.light, base.dark);
 put("card", surface.light, surface.dark);
-put("popover", find(brand.backgrounds, "raised").light, find(brand.backgrounds, "raised").dark);
+put("popover", raised.light, raised.dark);
 put("secondary", container.light, container.dark);
 put("muted", container.light, container.dark);
 put("destructive", error.light, error.dark);
