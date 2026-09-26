@@ -658,6 +658,18 @@ ul.spaced li {
   display: none;
 }
 
+/* Optional: only rendered when scripts/generate-previews.mjs has produced a
+   screenshot for this item. Most cards have no img here at all — this is a
+   progressive enhancement over the text card, not a layout it depends on. */
+.component-preview {
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  object-fit: cover;
+  border-radius: calc(var(--spec-card-radius) - var(--space-xs, 0.25rem));
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+
 .component:hover {
   border-color: var(--info);
 }
