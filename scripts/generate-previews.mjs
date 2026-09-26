@@ -28,7 +28,13 @@ const OUT_DIR = path.join(__dirname, "..", "public", "previews");
 // so a repo that has never run this script gets an empty match rather than a
 // missing-file build error. The images themselves stay in `public/previews/`
 // since those ARE meant to be served as-is at `/previews/<name>.jpg`.
-const MANIFEST_PATH = path.join(__dirname, "..", "src", "data", "component-previews.json");
+const MANIFEST_PATH = path.join(
+  __dirname,
+  "..",
+  "src",
+  "data",
+  "component-previews.json",
+);
 
 // Where the components list comes from, and where the actual rendering
 // happens. These are deliberately two different hosts: the registry API is
@@ -37,7 +43,8 @@ const MANIFEST_PATH = path.join(__dirname, "..", "src", "data", "component-previ
 // exists on the registry's own Next.js app, not on the API surface.
 const API_ORIGIN = process.env.MZIZI_API_ORIGIN ?? "https://api.mzizi.dev";
 const PLAYGROUND_ORIGIN =
-  process.env.MZIZI_PLAYGROUND_ORIGIN ?? "https://mzizi-registry.nyuchi.workers.dev";
+  process.env.MZIZI_PLAYGROUND_ORIGIN ??
+  "https://mzizi-registry.nyuchi.workers.dev";
 
 const CHROMIUM_PATH =
   process.env.PLAYWRIGHT_CHROMIUM_PATH ?? "/opt/pw-browsers/chromium";
@@ -123,7 +130,9 @@ async function main() {
       console.log(`  ok    ${name}`);
     } catch (error) {
       failed.push(name);
-      console.log(`  fail  ${name} — ${error instanceof Error ? error.message : error}`);
+      console.log(
+        `  fail  ${name} — ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 
@@ -131,13 +140,17 @@ async function main() {
   await writeManifest(names, succeeded);
 
   if (failed.length > 0) {
-    console.log(`\n${failed.length} component(s) failed and were left without a preview:`);
+    console.log(
+      `\n${failed.length} component(s) failed and were left without a preview:`,
+    );
     for (const name of failed) console.log(`  - ${name}`);
   }
 }
 
 async function writeManifest(allNames, haveNames) {
-  const manifest = Object.fromEntries(allNames.map((n) => [n, haveNames.has(n)]));
+  const manifest = Object.fromEntries(
+    allNames.map((n) => [n, haveNames.has(n)]),
+  );
   await writeFile(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + "\n");
   console.log(`\nwrote ${MANIFEST_PATH}`);
 }
