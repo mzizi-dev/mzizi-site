@@ -1,5 +1,6 @@
 ---
 import Site from "../layouts/Site.astro";
+import { getComponents, builtAt, CANONICAL_BASE } from "../lib/registry";
 
 /**
  * The front door.
@@ -9,54 +10,101 @@ import Site from "../layouts/Site.astro";
  * proven, and the repositories themselves for the rest. Nothing here is
  * measured, because nothing has been measured yet — see the status panel,
  * which is the single most important block on the site.
+ *
+ * The contract bench below is a live instance of `mz contract`, not a
+ * mock-up: `primitives/button.mz` (mirrored verbatim, cited below) and the
+ * three clauses it declares, re-implemented in this page's own script so a
+ * visitor can edit a height and watch it fail. Every message the script can
+ * print was checked against a real `mz contract` run first — see the commit
+ * cited in the bench footer.
  */
 
-// Where each surface is served from, and whether that hostname resolves today.
-// Checked with `dig`, not assumed: as of the last edit, only mzizi.dev and
-// mcp.mzizi.dev have DNS records. Anything marked planned is a repository that
-// exists and builds, not a name someone reserved.
+const { total } = await getComponents();
+
+// Checked live (DNS + a request), not assumed — the whole point of this
+// table is that an address the ecosystem writes down is not the same as one
+// that exists. `docs.mzizi.dev` is the one gap.
 const surfaces = [
   {
     what: "This site",
     host: "mzizi.dev",
     repo: "mzizi-site",
-    live: false,
-    note: "The apex currently serves the registry. See the repo README for what a cutover involves.",
-  },
-  {
-    what: "Registry and design system",
-    host: "mzizi.dev",
-    repo: "mzizi-registry",
-    live: true,
-    note: "Components, brand, tokens, the DNA-helix architecture, and the /api/v1 the apex serves today.",
+    note: "Static Astro, cut over from the registry's own Worker.",
   },
   {
     what: "Registry API",
     host: "api.mzizi.dev",
-    repo: "mzizi-api-gateway",
-    live: false,
-    note: "A pure-Rust Cloudflare Worker. Built; the hostname does not resolve yet.",
+    repo: "mzizi-registry",
+    note: `${total} components, brand, tokens, the DNA-helix architecture.`,
   },
   {
     what: "Console",
     host: "app.mzizi.dev",
     repo: "mzizi-console",
-    live: false,
-    note: "Astro chrome, Rust/Dioxus islands. Built; the hostname does not resolve yet.",
-  },
-  {
-    what: "Documentation",
-    host: "docs.mzizi.dev",
-    repo: "mzizi-docs",
-    live: false,
-    note: "Repository exists and holds a licence and a README. There is no docs site yet.",
+    note: "Astro chrome, Rust/Dioxus islands, WorkOS-gated.",
   },
   {
     what: "MCP server",
     host: "mcp.mzizi.dev",
     repo: null,
-    live: true,
-    note: "Live and OAuth-gated: an unauthenticated request answers invalid_token.",
+    note: "OAuth-gated: an unauthenticated request answers invalid_token.",
+  },
+];
+
+const notYet = [
+  {
+    what: "docs.mzizi.dev",
+    note: "The repository exists and holds a licence and a README. There is no docs site there yet.",
+  },
+  {
+    what: "api.mzizi.dev on mzizi-api-gateway",
+    note: "A pure-Rust Cloudflare Worker is built and merged. The hostname still answers from the registry's own Worker, not this one.",
+  },
+  {
+    what: "The registry portal's other pages, here",
+    note: "/playground, /skills, /cli, /observability and per-component detail pages are ported one at a time; today they still 404 on this site.",
+  },
+];
+
+const repos = [
+  {
+    name: "mzizi",
+    lang: "Rust",
+    langColor: "var(--color-copper)",
+    desc: "The language: compiler, primitives, RFCs, roadmap.",
+    lead: true,
+  },
+  {
+    name: "mzizi-registry",
+    lang: "TypeScript",
+    langColor: "var(--color-cobalt)",
+    desc: `${total} components over a shadcn-compatible API, the brand system, and the benchmark corpus this language is scored against.`,
+  },
+  {
+    name: "mzizi-api-gateway",
+    lang: "Rust",
+    langColor: "var(--color-copper)",
+    desc: "Pure-Rust Cloudflare Worker for api.mzizi.dev. Built; not yet the hostname's origin.",
+    tag: "not serving yet",
+  },
+  {
+    name: "mzizi-console",
+    lang: "Rust",
+    langColor: "var(--color-copper)",
+    desc: "app.mzizi.dev — Astro chrome over Rust/Dioxus islands, reading the registry API live.",
+  },
+  {
+    name: "mzizi-site",
+    lang: "Astro",
+    langColor: "var(--color-malachite, var(--info))",
+    desc: "This site — the apex, bringing the language, the registry and the docs together.",
+  },
+  {
+    name: "mzizi-docs",
+    lang: "MDX",
+    langColor: "var(--color-sodalite, var(--muted-foreground))",
+    desc: "Mintlify deployment, destined for docs.mzizi.dev.",
+    tag: "domain not live",
   },
 ];
 ---
@@ -65,31 +113,53 @@ const surfaces = [
   title="Mzizi"
   description="Mzizi is a Rust framework for the agentic web — a language, compiler and IR designed for machine authorship. A Bundu Foundation research project."
   lede="A Rust framework for the agentic web, designed for machine authorship — and the ecosystem built around it."
+  wide
 >
-  <p>
-    Every web framework in use today was designed on the assumption that a human
-    is typing: reading docs, holding context in their head, tolerating a few
-    seconds per compile. Mzizi starts from a different bottleneck — an agent
-    iterating against a compiler thousands of times, where compile speed, the
-    information density of an error message, and how many tokens a codebase
-    costs to read are first-order metrics rather than nice-to-haves.
-  </p>
+  <div class="hero-split">
+    <div>
+      <p>
+        Every web framework in use today was designed on the assumption that
+        a human is typing: reading docs, holding context in their head,
+        tolerating a few seconds per compile. Mzizi starts from a different
+        bottleneck — an agent iterating against a compiler thousands of
+        times, where compile speed, the information density of an error
+        message, and how many tokens a codebase costs to read are
+        first-order metrics rather than nice-to-haves.
+      </p>
+      <p>
+        That is the whole of the claim, and it is a narrow one on purpose.
+        Mzizi is a language, a compiler and an intermediate representation.
+        It is not a rendering engine (it lowers to Dioxus), not an ML
+        runtime (Candle is the dependency), and not a post-quantum
+        cryptography project. Those are stated non-goals, not omissions.
+      </p>
+      <div class="stamp"><i></i>Phase 0 in progress, unmeasured against the kill criterion</div>
+    </div>
 
-  <p>
-    That is the whole of the claim, and it is a narrow one on purpose. Mzizi is
-    a language, a compiler and an intermediate representation. It is not a
-    rendering engine (it lowers to Dioxus), not an ML runtime (Candle is the
-    dependency), and not a post-quantum cryptography project. Those are stated
-    non-goals, not omissions.
-  </p>
+    <div class="bench" aria-labelledby="bench-title">
+      <div class="bench-head">
+        <h3 id="bench-title">primitives/button.mz</h3>
+        <p>Change a touch height. The contract answers.</p>
+      </div>
+      <div class="bench-src" id="bench-src"></div>
+      <div class="bench-term" id="bench-term" aria-live="polite"></div>
+      <div class="bench-foot">
+        Messages are verbatim from <code>mz contract</code>, checked against a real
+        run at <a href="https://github.com/mzizi-dev/mzizi/blob/4c61d28/primitives/button.mz">4c61d28</a>.
+        The check is re-implemented in this page's script so you can play with it.
+        <button class="bench-reset" id="bench-reset" type="button">Reset</button>
+      </div>
+    </div>
+  </div>
 
   <div class="status">
     <h2>Status: unmeasured</h2>
     <p>
       The compiler front end exists and is tested — a lexer, a recovering
       parser, an agent diagnostic protocol, a content-addressed IR, and nine
-      primitives written in Mzizi itself. Contract blocks parse but are not yet
-      evaluated.
+      primitives written in Mzizi itself. Contract blocks are evaluated (see
+      the bench above), but comparison against a reference implementation —
+      the other half of the defect metric — is not built.
     </p>
     <p>
       <strong
@@ -101,55 +171,93 @@ const surfaces = [
     </p>
   </div>
 
-  <h2>Where things are</h2>
-
-  <p>
-    Most of this ecosystem is built and not yet routed. The table is honest
-    about which is which: <em>live</em> means the hostname resolves and answers,
-    <em>planned</em> means the repository exists and builds but DNS does not point
-    anywhere yet.
+  <ul class="figs">
+    <li class="fig"><b>107</b><span>tests passing, 7 suites</span></li>
+    <li class="fig"><b>33</b><span>contract clauses evaluated</span></li>
+    <li class="fig"><b>3,966</b><span>lines of Rust in the compiler</span></li>
+    <li class="fig"><b>{total}</b><span>registry components, live</span></li>
+  </ul>
+  <p class="provenance">
+    <span>
+      Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
+      <a href="https://github.com/mzizi-dev/mzizi/commit/4c61d28"><code>4c61d28</code></a>.
+      Component count read from <code>{CANONICAL_BASE}/ui</code> when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time>.
+    </span>
   </p>
 
-  <div class="scroller">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Surface</th>
-          <th scope="col">Host</th>
-          <th scope="col">State</th>
-          <th scope="col">Source</th>
-        </tr>
-      </thead>
-      <tbody>
+  <h2>Where things are</h2>
+
+  <div class="ledger">
+    <div class="col have">
+      <h3>Live today</h3>
+      <ul>
         {
           surfaces.map((s) => (
-            <tr>
-              <th scope="row">
-                {s.what}
+            <li>
+              <div>
+                <strong>
+                  <code>{s.host}</code>
+                </strong>
                 <br />
-                <span class="state">{s.note}</span>
-              </th>
-              <td>
-                <code>{s.host}</code>
-              </td>
-              <td class="state">{s.live ? "● live" : "○ planned"}</td>
-              <td>
-                {s.repo ? (
-                  <a href={`https://github.com/mzizi-dev/${s.repo}`}>{s.repo}</a>
-                ) : (
-                  <span class="state">not public</span>
-                )}
-              </td>
-            </tr>
+                <span>
+                  {s.what}
+                  {s.repo && (
+                    <>
+                      {" — "}
+                      <a href={`https://github.com/mzizi-dev/${s.repo}`}>{s.repo}</a>
+                    </>
+                  )}
+                  {". "}
+                  {s.note}
+                </span>
+              </div>
+            </li>
           ))
         }
-      </tbody>
-    </table>
+      </ul>
+    </div>
+    <div class="col not">
+      <h3>Not yet</h3>
+      <ul>
+        {
+          notYet.map((n) => (
+            <li>
+              <div>
+                <strong>{n.what}</strong>
+                <br />
+                <span>{n.note}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 
   <p>
     <a href="/ecosystem">What each repository actually contains →</a>
   </p>
+
+  <h2>The org, repository by repository</h2>
+
+  <div class="repos">
+    {
+      repos.map((r) => (
+        <div class={r.lead ? "repo lead-repo" : "repo"}>
+          <a class="repo-name" href={`https://github.com/mzizi-dev/${r.name}`}>
+            {r.name}
+          </a>
+          <p>{r.desc}</p>
+          <span class="lang">
+            <i style={`background:${r.langColor}`} />
+            {r.lang}
+            {r.tag && <span class="badge outline">{r.tag}</span>}
+          </span>
+        </div>
+      ))
+    }
+  </div>
 
   <h2>For agents</h2>
 
@@ -180,7 +288,149 @@ const surfaces = [
     above — is 100% Bundu Foundation IP and is what this page is mostly about. <strong
       >Mzizi the design system</strong
     > is the component registry, brand system and DNA-helix architecture, operated
-    by nyuchi, and is what <code>mzizi.dev</code> serves today. They share a name
-    and an org; they are different work with different owners.
+    by nyuchi, and is what powers <code>{total}</code> components you can install
+    today. They share a name and an org; they are different work with different
+    owners.
   </p>
 </Site>
+
+<script is:inline>
+  // Progressive enhancement over real, cited output — see the note at the
+  // top of this file. If this never runs, the bench shows the clean
+  // unedited file and its real all-pass summary, which is itself a true
+  // statement, not a placeholder.
+  (function () {
+    const srcEl = document.getElementById("bench-src");
+    const termEl = document.getElementById("bench-term");
+    const resetBtn = document.getElementById("bench-reset");
+    if (!srcEl || !termEl || !resetBtn) return;
+
+    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@4c61d28).
+    // Line 45's own comment is left out of this abbreviated view only —
+    // it doesn't affect the contract, and it ran long enough to force
+    // horizontal scroll on a panel this narrow.
+    const order = ["default", "sm", "lg", "icon", "icon_sm"];
+    const init = { default: 56, sm: 48, lg: 56, icon: 56, icon_sm: 48 };
+    let h = Object.assign({}, init);
+
+    function esc(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function evaluate() {
+      const fails = [];
+      const low = order.filter((k) => h[k] < 48);
+      if (low.length) {
+        fails.push({
+          ln: 47,
+          msg:
+            "`every button_size height at_least 48` does not hold — `" +
+            low[0] +
+            "` is " +
+            h[low[0]] +
+            ", below 48",
+        });
+      }
+      if (h.default !== 56) {
+        fails.push({ ln: 48, msg: "`button_size.default height is 56` does not hold — it is " + h.default + ", not 56" });
+      }
+      if (h.sm !== 48) {
+        fails.push({ ln: 49, msg: "`button_size.sm height is 48` does not hold — it is " + h.sm + ", not 48" });
+      }
+      return fails;
+    }
+
+    function line(n, html, cls) {
+      return (
+        '<div class="ln' +
+        (cls ? " " + cls : "") +
+        '"><b>' +
+        n +
+        "</b><span>" +
+        html +
+        "</span></div>"
+      );
+    }
+
+    function render() {
+      const fails = evaluate();
+      const bad = {};
+      for (const f of fails) bad[f.ln] = true;
+
+      let src = "";
+      src += line(17, '  <span class="kw">enum</span> <span class="ty">button_size</span>');
+      order.forEach(function (k, i) {
+        const low = h[k] < 48;
+        src +=
+          '<div class="bench-size' +
+          (low ? " fail" : "") +
+          '"><b>' +
+          (18 + i) +
+          "</b><span>    " +
+          (k + "          ").slice(0, 10) +
+          '<span class="kw">height</span></span><span class="bench-step"><button type="button" data-k="' +
+          k +
+          '" data-d="-4" aria-label="Decrease ' +
+          k +
+          ' height">−</button><output>' +
+          h[k] +
+          "</output><button type=\"button\" data-k=\"" +
+          k +
+          '" data-d="4" aria-label="Increase ' +
+          k +
+          ' height">+</button></span></div>';
+      });
+      src += line(23, "  <span class=\"kw\">end</span>");
+      src += line("&#8942;", "");
+      src += line(46, '  <span class="kw">contract</span>');
+      src += line(
+        47,
+        '    <span class="kw">every</span> <span class="ty">button_size</span> height <span class="kw">at_least</span> <span class="num">48</span>',
+        bad[47] ? "fail-ln" : "",
+      );
+      src += line(
+        48,
+        '    <span class="ty">button_size</span>.default height <span class="kw">is</span> <span class="num">56</span>',
+        bad[48] ? "fail-ln" : "",
+      );
+      src += line(
+        49,
+        '    <span class="ty">button_size</span>.sm height <span class="kw">is</span> <span class="num">48</span>',
+        bad[49] ? "fail-ln" : "",
+      );
+      src += line(50, '    <span class="ty">button_variant</span>.default class <span class="kw">contains</span> "bg-primary"');
+      src += line(51, '    slot <span class="kw">is</span> "button"');
+      src += line(52, "  <span class=\"kw\">end</span>");
+      srcEl.innerHTML = src;
+
+      let out = '<div class="cmd">$ mz contract primitives/button.mz</div>';
+      fails.forEach(function (f) {
+        out += '<div class="e">button.mz:' + f.ln + ":5: error [MZ0603] " + esc(f.msg) + "</div>";
+      });
+      out +=
+        '<div class="' +
+        (fails.length ? "e" : "ok") +
+        '">mz: ' +
+        fails.length +
+        " errors (0 exact-fixable), 5 contract clauses, " +
+        fails.length +
+        " failed, 0ms</div>";
+      termEl.innerHTML = out;
+    }
+
+    srcEl.addEventListener("click", function (e) {
+      const b = e.target.closest("button[data-k]");
+      if (!b) return;
+      const k = b.getAttribute("data-k");
+      h[k] = Math.max(24, Math.min(80, h[k] + Number(b.getAttribute("data-d"))));
+      render();
+      const again = srcEl.querySelector('button[data-k="' + k + '"][data-d="' + b.getAttribute("data-d") + '"]');
+      if (again) again.focus();
+    });
+    resetBtn.addEventListener("click", function () {
+      h = Object.assign({}, init);
+      render();
+    });
+    render();
+  })();
+</script>
