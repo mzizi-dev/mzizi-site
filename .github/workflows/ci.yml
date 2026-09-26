@@ -46,20 +46,32 @@ jobs:
       - run: pnpm exec astro build
 
       # The site is static, so `dist/` IS the deliverable and a missing file is
-      # a broken page rather than a missing feature. These four are the
-      # agent-facing surfaces and the 404 the Worker is configured to serve;
-      # they live in `public/`, where a rename or a stray .gitignore rule can
-      # drop them from the build with no other symptom. `.well-known/` earns
+      # a broken page rather than a missing feature. These are the agent-facing
+      # surfaces, the redirect map and the 404 the Worker is configured to
+      # serve; they live in `public/`, where a rename or a stray .gitignore rule
+      # can drop them from the build with no other symptom. `.well-known/` earns
       # its check twice over: it is a dot-directory, and tooling skips those by
       # default often enough to be worth proving on every commit.
       - name: Built output has the agent-facing surfaces
         run: |
           set -euo pipefail
-          for f in llms.txt robots.txt .well-known/mcp.json 404.html; do
+          for f in llms.txt robots.txt _redirects .well-known/mcp.json 404.html; do
             test -s "dist/$f" || { echo "missing or empty: dist/$f"; exit 1; }
           done
           python3 -c "import json; json.load(open('dist/.well-known/mcp.json'))"
           echo "all agent-facing surfaces present"
+
+      # The gate that `mzizi-console` did not have.
+      #
+      # That console shipped a page which was blank in a browser: the bundle
+      # loaded, the fetch returned 200, nothing threw, and CI was green —
+      # because nothing in the pipeline ever asked whether anything had been
+      # RENDERED. This step strips every <script> out of the built HTML and
+      # then greps for the content itself: named components, node titles,
+      # covenants, hex values and the counts. A page that quietly renders
+      # nothing fails here.
+      - name: Pages render their content with JavaScript disabled
+        run: python3 scripts/verify-rendered.py dist
 
   secrets:
     name: secret scan

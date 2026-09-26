@@ -10,6 +10,11 @@
 
 **Version:** 0.1.0 | **Live:** [mzizi.dev](https://mzizi.dev) — this repository serves the apex | **Docs:** [docs.bundu.org](https://docs.bundu.org)
 
+Astro, static output, deployed as a Cloudflare Worker with Static Assets. The
+same shape as `mzizi-console`, minus the islands: a landing page has nothing to
+hydrate, and the registry pages below render at build time for the same
+reason.
+
 ---
 
 ## ⚠️ This site now serves `mzizi.dev`, and nobody planned the day it started
@@ -35,27 +40,30 @@ No `x-vercel-id`. No `x-powered-by: Next.js`. The apex returns
 repository's landing page, and `/llms.txt` on the apex is byte-for-byte the file
 in `public/`. `mzizi.dev` is served by this Worker.
 
-### What that cost
+### What that cost, and what has been rebuilt since
 
-The three pages here are all the apex has. Everything the registry used to serve
-from it is gone:
+The registry's human-facing portal did not move anywhere when the apex changed
+hands, and most of it still has no live address. Three of its highest-value
+pages are the exception — `mzizi-site#5` rebuilt them here, on this site, on
+`@bundu/ui`:
 
-| Path on `mzizi.dev`            | Today | Was                                       |
-| ------------------------------ | ----- | ----------------------------------------- |
-| `/`, `/language`, `/ecosystem` | 200   | This site                                 |
-| `/llms.txt`, `/robots.txt`     | 200   | This site                                 |
-| `/.well-known/mcp.json`        | 200   | This site                                 |
-| `/components`, `/brand`        | 404   | The registry's developer portal           |
-| `/tokens`, `/architecture`     | 404   | The registry's developer portal           |
-| `/observability`, `/r/`        | 404   | The registry's developer portal           |
-| `/api/v1`, `/api/openapi`      | 404   | The registry API — now on `api.mzizi.dev` |
-| `/mcp`                         | 404   | The MCP server — now on `mcp.mzizi.dev`   |
+| Path on `mzizi.dev`            | Today                       | Was                                       |
+| ------------------------------ | --------------------------- | ------------------------------------------ |
+| `/`, `/language`, `/ecosystem` | 200                         | This site                                 |
+| `/llms.txt`, `/robots.txt`     | 200                         | This site                                 |
+| `/.well-known/mcp.json`        | 200                         | This site                                 |
+| `/components`                  | **200 — rebuilt here**      | The registry's developer portal           |
+| `/architecture`                | **200 — rebuilt here**      | The registry's developer portal           |
+| `/tokens`                      | **200 — rebuilt here**      | The registry's developer portal           |
+| `/brand`, `/observability`     | 404                         | The registry's developer portal           |
+| `/r/`                          | 404                         | The registry's developer portal           |
+| `/api/v1`, `/api/openapi`      | 404                         | The registry API — now on `api.mzizi.dev` |
+| `/mcp`                         | 308 to `mcp.mzizi.dev/mcp`  | The MCP server — now on `mcp.mzizi.dev`   |
 
 The API and the MCP server survived, because they had already moved to their own
 hostnames before the apex changed hands: `api.mzizi.dev` answers, and
-`mcp.mzizi.dev/mcp` answers `401` without a token, which is correct — it is
-WorkOS-gated. **The registry's human-facing portal did not move anywhere.** It has
-no live address at all right now.
+`mcp.mzizi.dev/mcp` answers `401` (`invalid_token`) without a token, which is
+correct — it is WorkOS-gated.
 
 ### How it happened, as far as this repository can tell
 
@@ -64,23 +72,28 @@ attaches `mzizi.dev` to this Worker. So the custom domain was added outside
 version control — in the Cloudflare dashboard — and neither this repository nor
 its review history records the decision.
 
-The paperwork that should have preceded it is all still open or refused:
+The paperwork that should have preceded it:
 
 | Change                                                                                                                 | State                |
 | ---------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| [`mzizi-site#3`](https://github.com/mzizi-dev/mzizi-site/pull/3) — the ordered cutover runbook                         | **Open**, unmerged   |
-| [`mzizi-site#5`](https://github.com/mzizi-dev/mzizi-site/pull/5) — port `/components`, `/architecture`, `/tokens` here | **Open**, unmerged   |
+| [`mzizi-site#3`](https://github.com/mzizi-dev/mzizi-site/pull/3) — the ordered cutover runbook                         | Superseded — the cutover it plans for already happened; the registry-side blocker it found (below) is still open |
+| [`mzizi-site#5`](https://github.com/mzizi-dev/mzizi-site/pull/5) — port `/components`, `/architecture`, `/tokens` here | **Merged**            |
 | [`mzizi-registry#334`](https://github.com/mzizi-dev/mzizi-registry/pull/334) — point the apex at the Worker            | **Closed**, unmerged |
 
 So the cutover ran without the runbook, and without the pull request that ports
 the pages it displaced. That ordering is the whole failure: step 1 of the runbook
 was to decide what the apex serves, and step 2 was to move the displaced surfaces
-first. Neither happened.
+first. Neither happened. `mzizi-site#3` also found a real, still-open blocker
+that predates this site entirely: `mzizi-registry`'s own API responses hardcode
+`https://mzizi.dev/...` into `registryDependencies`, `homepage` and `docs` on
+every item, so a consumer's `npx shadcn add` that follows a dependency link off
+this site's install command can still 404 downstream. That needs fixing in
+`mzizi-registry`, not here.
 
 ### The history is kept because it explains the risk, not to relitigate it
 
 The original warning was correct about the mechanism and correct about the
-consequence. It is preserved below, in the past tense, because the next person to
+consequence. It is preserved above, in the past tense, because the next person to
 attach a custom domain to a Worker in this org needs to know that this is how it
 goes wrong — and because `wrangler.jsonc` carries the same reasoning in a comment
 that is now also out of date.
@@ -98,7 +111,8 @@ taken.
 
 ### The route footgun, if a route is ever written down here
 
-A custom domain takes a **bare hostname**:
+**Do not attach a custom domain or change routes without reading this.** A
+custom domain takes a **bare hostname**:
 
 ```jsonc
 "routes": [{ "pattern": "mzizi.dev", "custom_domain": true }]
@@ -121,38 +135,88 @@ commit reads green on a pull request and red on `main`.
 Not in scope for a documentation change, and written down so nobody has to
 reconstruct it:
 
-1. **Decide, retroactively, what the apex serves.** It is currently a three-page
-   site by accident rather than by decision. Either that is ratified, or the
-   registry portal comes back.
-2. **Give the registry portal an address.** `/components`, `/tokens`, `/brand`,
-   `/architecture`, `/observability` and `/r/` have no live home. Either
-   [`mzizi-site#5`](https://github.com/mzizi-dev/mzizi-site/pull/5) lands and
-   they live here, or the registry gets its own hostname.
-3. **Put the route in `wrangler.jsonc`.** A production route that exists only in
+1. **Decide, retroactively, what the apex serves.** It is currently a
+   several-page site by accident rather than by decision. Either that is
+   ratified, or the registry portal comes back in full.
+2. **Finish giving the registry portal an address.** `/components`,
+   `/architecture` and `/tokens` live here now (`mzizi-site#5`).
+   `/brand`, `/observability` and `/r/` still have no live home.
+3. **Fix the hardcoded apex URLs in `mzizi-registry`'s API responses**
+   (`registryDependencies`, `homepage`, `docs` — found by `mzizi-site#3`)
+   before anyone relies on `npx shadcn add` following a transitive dependency.
+4. **Put the route in `wrangler.jsonc`.** A production route that exists only in
    a dashboard is a route nobody can review, and it is why this README was wrong.
-4. **Then update this section again** — with a real request, not a green check.
+5. **Then update this section again** — with a real request, not a green check.
+
+## Where the content comes from
+
+The three registry pages are rendered from the public API **at build time**:
+
+```
+https://api.mzizi.dev/v1/ui            575 components, 11 fields each
+https://api.mzizi.dev/v1/architecture  8 nodes, 4 rungs, 6 strands, live counts
+https://api.mzizi.dev/v1/brand         21 colour families, type, space, radii, specs
+```
+
+Build time, not the browser, and the reasoning is written out in full in
+`src/lib/registry.ts`. The short version: `mzizi-console` shipped a page that
+fetched on mount, returned 200, threw nothing, passed CI and painted nothing.
+Content that is in the HTML cannot do that. The costs — the build depends on the
+API being up, and content is as fresh as the last build — are paid openly: the
+build fails loudly rather than falling back to a snapshot, and every page stamps
+the minute it read the API next to the endpoint it read.
+
+`/v1/*` is the canonical, documented base and is what every page prints.
+`api.mzizi.dev` is attached directly to the registry Worker, which serves its
+routes under `/api/v1/*`; the rewrite that makes `/v1/*` answer is
+`mzizi-registry#335`, still open. So the build TRIES `/v1` and falls back to
+`/api/v1`, and the day #335 lands the fallback simply stops being used. Nothing
+printed on a page changes either way.
+
+### Styling
+
+`@bundu/ui` — the same package `bundu-labs/marketing` (three apps) and
+`shamwari-ai/shamwari/site` consume. `src/styles/site.css` imports
+`@bundu/ui/styles/tokens.css` and contains **no colour, size, radius or weight
+of its own**; it is layout and nothing else.
+
+The published `0.1.1` is incomplete — 7 of 21 colour families, no experimental
+set, heritage under a `--heritage-*` namespace, no surface ladder — so
+`src/components/DesignTokens.astro` fills exactly those gaps from `/v1/brand`,
+emitting them **under the same variable names a complete package would use**.
+When `0.2.0` ships, that component is deleted and the import alone stands. That
+is the whole point of generating rather than pasting: the estate is carrying
+four different terracottas because four people typed a hex into a stylesheet.
 
 ## What is here
 
 ```text
 mzizi-site/
-├── src/pages/          # four pages: /, /language, /ecosystem, 404
+├── src/pages/          # the site
 ├── src/layouts/        # one shell
+├── src/components/     # DesignTokens.astro — the palette, generated
+├── src/lib/            # registry.ts — the one place that reads the API
+├── src/styles/         # site.css — layout only, imports @bundu/ui tokens
+├── scripts/
+│   └── verify-rendered.py   # fails the build if a page renders empty
 ├── public/
 │   ├── llms.txt        # the agent-facing summary of the ecosystem
 │   ├── robots.txt
-│   ├── site.css
+│   ├── _redirects      # /mcp → mcp.mzizi.dev/mcp, 308. Not a page.
 │   └── .well-known/
 │       └── mcp.json    # pointer to the one public MCP server
 ├── astro.config.mjs
 └── wrangler.jsonc      # still no routes — read the section above before changing that
 ```
 
-| Page         | What it says                                                                                                                        |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `/`          | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                             |
-| `/language`  | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs |
-| `/ecosystem` | Every public repository, what it holds, and whether it is routed                                                                    |
+| Page            | What it says                                                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `/`             | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                             |
+| `/language`     | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs |
+| `/architecture` | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
+| `/components`   | All 575, grouped by DNA node, each with its description, categories and install command                                            |
+| `/tokens`       | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
+| `/ecosystem`    | Every public repository, what it holds, and whether it is routed                                                                    |
 
 ### On content accuracy
 
@@ -171,9 +235,11 @@ way. The Phase 0 benchmark has not run, so nothing here has been measured agains
 the charter's kill criteria. "Designed for" is accurate; "faster than" is not,
 and will not be until there is a number.
 
-No page fetches or caches a component count, a version, or a token value. Those
-would go stale at build time, and a stale copy that still looks authoritative is
-the defect class this ecosystem keeps removing — this README being the current
+Numbers that come from the registry — the component count, the per-node counts,
+the palette — are read from the API when the site is built, and every page that
+shows one says when it read it and links the endpoint beside it. A dated fact is
+not the same thing as a stale copy pretending to be current, which is the defect
+class this ecosystem keeps removing — this README's own history above being the
 example.
 
 ### The MCP card
@@ -182,40 +248,65 @@ example.
 is no ratified well-known format for "which MCP servers does this domain
 operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`, which is real and OAuth-gated — an
-unauthenticated request answers `401`. The load-bearing agent surface on this
-site is `/llms.txt`; the authority on what that server exposes is the server,
-over a standard `tools/list` request.
+unauthenticated request answers `401` (`invalid_token`). The load-bearing agent
+surface on this site is `/llms.txt`; the authority on what that server exposes is
+the server, over a standard `tools/list` request.
 
 ## Stack, and why there is no framework in it
 
-Astro renders everything at build time. There are no islands, no client-side
-JavaScript, and no UI framework — not Svelte, not React, not Vue.
+Astro renders everything at build time. There are no islands and no UI framework
+— not Svelte, not React, not Vue.
 
 That is doctrine, not taste: the UI is Astro and underneath is Rust first and
 TypeScript second, with no third UI framework (`mzizi-dev/agent-tools#82`, and
-the charter). `mzizi-console` has islands because it renders live registry data;
-this site renders prose, so the correct amount of runtime is none.
+the charter). It has one consequence worth stating plainly: this site cannot
+`npx shadcn@latest add` a registry component, because every one of them is a
+React `.tsx`. What it does instead is build its own pieces to the registry's
+`componentSpecs` — badges 22px and pill, cards 14px with a 1px border, controls
+56px and never below 48px — read from the same API. The dimensions are the
+system's; only the markup is local.
+
+There is exactly one script on the site: the filter on `/components`, which sets
+`hidden` on cards that are already in the HTML. With JavaScript off the page is
+the entire corpus, just unfiltered. `scripts/verify-rendered.py` proves that on
+every commit by stripping every `<script>` and then grepping for the content.
+
+## Working on it
+
+```bash
+pnpm install
+pnpm dev              # local dev server
+pnpm check            # astro check — typechecks pages and frontmatter
+pnpm build            # emits dist/
+pnpm preview          # serve dist/ locally
+```
+
+```bash
+python3 scripts/verify-rendered.py dist    # what CI runs; see below
+```
+
+CI runs `astro check`, `astro build`, a guard that the built `dist/` still
+contains `llms.txt`, `robots.txt`, `_redirects`, `.well-known/mcp.json` and
+`404.html`, the rendered-content gate, and a gitleaks scan. The `.well-known`
+guard is there because it is a dot-directory and tooling skips those by default
+often enough to be worth proving every time.
+
+The rendered-content gate is the one `mzizi-console` did not have. It strips
+every `<script>` from the built HTML and then asserts the content is there: 575
+component cards, the eight node titles, the four rung titles, the six strands,
+N2's count of 371, all 21 colour families by CSS variable, specific hex values,
+and the `/mcp` redirect. A page that quietly renders nothing fails the build.
+
+To build against a mirror while the API is down — it went down for several
+minutes during this work — set `MZIZI_API_ORIGIN` to something serving
+`/v1/ui`, `/v1/architecture` and `/v1/brand`. Do not commit a snapshot.
 
 `build.format: "file"` emits `/ecosystem.html` rather than
 `/ecosystem/index.html`, which the Static Assets server resolves from
 `/ecosystem` with no redirect hop. `not_found_handling` is `404-page`, not the
-single-page-application rewrite: this is a multi-page site with no client router,
-and an unknown path that quietly rendered the landing page would be a soft 404.
-
-## Commands
-
-| Command        | What it does                                     |
-| -------------- | ------------------------------------------------ |
-| `pnpm install` | Install                                          |
-| `pnpm dev`     | Local dev server                                 |
-| `pnpm check`   | `astro check` — typechecks pages and frontmatter |
-| `pnpm build`   | Emits `dist/`                                    |
-| `pnpm preview` | Serve `dist/` locally                            |
-
-CI runs `astro check`, `astro build`, a guard that the built `dist/` still
-contains `llms.txt`, `robots.txt`, `.well-known/mcp.json` and `404.html`, and a
-gitleaks scan. The `.well-known` guard is there because it is a dot-directory and
-tooling skips those by default often enough to be worth proving every time.
+single-page-application rewrite: this is a multi-page site with no client
+router, and an unknown path that quietly rendered the landing page would be a
+soft 404.
 
 ## Deploying
 
@@ -224,30 +315,37 @@ pnpm build
 pnpm exec wrangler deploy
 ```
 
-**This is now a production deploy to `mzizi.dev`.** It was not when this section
-was written. Because the custom domain is attached to this Worker in the
-Cloudflare dashboard rather than in `wrangler.jsonc`, `wrangler deploy` publishes
-to the apex whether or not the config mentions it.
+**This is a production deploy to `mzizi.dev`.** Because the custom domain is
+attached to this Worker in the Cloudflare dashboard rather than in
+`wrangler.jsonc`, `wrangler deploy` publishes to the apex whether or not the
+config mentions it. Read the route note above before touching `routes`.
 
 ## Ecosystem
 
 | Repository                                                            | What it is                                                      | Address                                         |
-| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                               |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal currently unrouted                       |
-| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/api/v1)   |
-| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)          |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site                                 | Not deployed; `docs.mzizi.dev` does not resolve |
-| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                  |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------ |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                                |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly restored here; the rest unrouted   |
+| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/v1)        |
+| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)           |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site                                 | Not deployed; `docs.mzizi.dev` does not resolve  |
+| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                   |
 
 ## Deliberately not here
 
-- **A DNS change, or any Vercel configuration.** Human decision — and the last
-  one was made without this repository being told.
-- **A sitemap.** Three pages, all one hop from the navigation. `robots.txt` has
-  no `Sitemap:` line to match — a directive pointing at a 404 is worse than none.
-  Add both together if the site grows.
-- **Live registry data.** That is what the console and the API are for.
+- **A DNS change.** Human decision, every time — and the apex's own was made
+  without this repository being told.
+- **A sitemap.** Most of the site is still one hop from the navigation, and
+  `robots.txt` has no `Sitemap:` line to match — a directive pointing at a 404
+  is worse than none. Add both together once the remaining 14 pages land.
+- **A page at `/mcp`.** It is a 308 to `mcp.mzizi.dev/mcp` and must stay one: an
+  MCP client that lands on HTML instead of being redirected does not degrade, it
+  fails. 308 specifically, because it preserves the method and body of the
+  JSON-RPC POST that streamable-HTTP transport sends; a 301 or 302 lets a client
+  turn that POST into a GET and silently drop the request.
+- **A committed copy of the registry data.** The build reads the API or it
+  fails. A cached snapshot that keeps serving after the source moves is the
+  failure this whole approach exists to avoid.
 - **Any link to a private repository.** One exists in this org and operates the
   MCP server. The endpoint is public and is named; the source is not.
 

@@ -1,0 +1,244 @@
+---
+/**
+ * /components — every component in the registry, on one page, in the HTML.
+ *
+ * `mzizi-console`'s `<noscript>` fallback links here and so does the apex's own
+ * navigation, so this path carries live inbound traffic. It is rendered at
+ * build time from the registry API for the reason argued in `src/lib/registry.ts`:
+ * a discovery page that renders nothing without JavaScript discovers nothing.
+ *
+ * 575 items is not a list anyone reads top to bottom, so the page serves the
+ * two things a person actually arrives with — "I want the date picker" and
+ * "what IS there?" — with a filter over content that is already present, and
+ * with the corpus grouped by the node of the DNA helix each component lives in.
+ * The node is derived from the directory a component sits in, so the grouping
+ * is a fact about the repository, not a taxonomy invented here.
+ */
+import Site from "../layouts/Site.astro";
+import {
+  getComponents,
+  getArchitecture,
+  byNode,
+  shortType,
+  installCommand,
+  builtAt,
+  CANONICAL_BASE,
+} from "../lib/registry";
+
+const [{ items, total }, architecture] = await Promise.all([
+  getComponents(),
+  getArchitecture(),
+]);
+
+const groups = byNode(items);
+const helix = new Map(
+  [...architecture.nodes, ...architecture.rungs].map((entry) => [entry.node_number, entry]),
+);
+
+const typeCounts = [
+  ...items.reduce((acc, item) => {
+    const key = shortType(item.type);
+    acc.set(key, (acc.get(key) ?? 0) + 1);
+    return acc;
+  }, new Map<string, number>()),
+].sort((a, b) => b[1] - a[1]);
+---
+
+<Site
+  title="Components"
+  eyebrow="Benchmark corpus"
+  description={`All ${total} components in the Mzizi registry, grouped by DNA node, each with its install command.`}
+  lede={`The benchmark corpus — ${total} components, each with a TypeScript reference and a growing set of Rust siblings, the fixed ground truth the Mzizi framework is measured against. Every one of them is installable today.`}
+  wide
+>
+  <code class="cmd lead"
+    >npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code
+  >
+
+  <ul class="stats">
+    <li>
+      <span class="stat-value">{total}</span>
+      <span class="stat-label">Components</span>
+    </li>
+    <li>
+      <span class="stat-value">{groups.length}</span>
+      <span class="stat-label">Helix positions filled</span>
+    </li>
+    {typeCounts.slice(0, 3).map(([type, count]) => (
+      <li>
+        <span class="stat-value">{count}</span>
+        <span class="stat-label">registry:{type}</span>
+      </li>
+    ))}
+  </ul>
+
+  <p class="provenance">
+    <span>
+      Read from <code>{CANONICAL_BASE}/ui</code> when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time>.
+    </span>
+    <a href={`${CANONICAL_BASE}/ui`}>Read the JSON</a>
+  </p>
+
+  <!--
+    Search and the type filters are progressive enhancement, and nothing else.
+    Every card below is already in this HTML with its full description and its
+    install command; the script only sets `hidden` on the ones that do not
+    match. It stays out of the document until that script has run, because a
+    control that does nothing is worse than no control at all.
+  -->
+  <div class="finder" id="finder" hidden>
+    <div class="finder-row">
+      <label class="visually-hidden" for="q">Filter components</label>
+      <input id="q" type="search" autocomplete="off" placeholder="Filter components…" />
+      <ul class="filters" id="filters">
+        <li><button type="button" data-type="" aria-pressed="true">All</button></li>
+        {typeCounts.map(([type]) => (
+          <li><button type="button" data-type={type} aria-pressed="false">{type}</button></li>
+        ))}
+      </ul>
+    </div>
+    <p class="finder-count" id="finder-count" aria-live="polite"></p>
+  </div>
+
+  <ul class="jump">
+    {groups.map((group) => (
+      <li>
+        <a href={`#node-${group.node}`}>
+          <span>N{group.node} {helix.get(group.node)?.title ?? group.nodeLabel}</span>
+          <b>{group.items.length}</b>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <p class="empty" id="empty" hidden>Nothing matches that. Try a shorter word.</p>
+
+  {groups.map((group) => {
+    const entry = helix.get(group.node);
+    return (
+      <section class="node-block" id={`node-${group.node}`} data-node>
+        <div class="node-head">
+          <span class="node-n">N{group.node}</span>
+          <h2>{entry?.title ?? group.nodeLabel}</h2>
+          <span class="badge outline">{group.items.length} components</span>
+          <span class="count-link">
+            <a href={`/architecture#n${group.node}`}>what this node is</a>
+          </span>
+        </div>
+        {entry && (
+          <p class="node-covenant">
+            <em>“{entry.covenant}”</em> {entry.role}
+          </p>
+        )}
+        <div class="cards">
+          {group.items.map((item) => (
+            <article class="component" data-component data-type={shortType(item.type)}>
+              <header>
+                <h3>
+                  {item.name}
+                  <span class="title">{item.title}</span>
+                </h3>
+                <span class="badge">{shortType(item.type)}</span>
+              </header>
+              <p>{item.description}</p>
+              {item.categories.length > 0 && (
+                <ul class="badges">
+                  {item.categories.map((category) => (
+                    <li class="badge outline">{category}</li>
+                  ))}
+                </ul>
+              )}
+              <code class="cmd">{installCommand(item.name)}</code>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+
+  <hr class="rule" />
+
+  <h2>Reading this as a machine</h2>
+  <div class="prose">
+    <p>
+      The same corpus is served as JSON at <code>{CANONICAL_BASE}/ui</code> — one
+      item per component, eleven fields each — and a single component at
+      <code>{CANONICAL_BASE}/ui/&lt;name&gt;</code>. An agent should read that
+      rather than this page. There is also an MCP server at
+      <a href="https://mcp.mzizi.dev/mcp">mcp.mzizi.dev/mcp</a> that returns a
+      component as one whole document instead of several calls.
+    </p>
+  </div>
+</Site>
+
+<script is:inline>
+  // Progressive enhancement over content that is already rendered. If this
+  // never runs, the page is still the entire corpus — which is exactly the bug
+  // `mzizi-console` shipped, where an island that failed to mount left a blank
+  // page behind a 200 response and a green CI run.
+  (function () {
+    var finder = document.getElementById("finder");
+    var input = document.getElementById("q");
+    var filters = document.getElementById("filters");
+    var count = document.getElementById("finder-count");
+    var empty = document.getElementById("empty");
+    if (!finder || !input || !filters || !count || !empty) return;
+
+    var cards = Array.prototype.map.call(
+      document.querySelectorAll("[data-component]"),
+      function (card) {
+        return {
+          el: card,
+          type: card.getAttribute("data-type") || "",
+          text: (card.textContent || "").toLowerCase(),
+        };
+      }
+    );
+    var sections = Array.prototype.slice.call(document.querySelectorAll("[data-node]"));
+    var total = cards.length;
+    var type = "";
+
+    input.placeholder = "Filter " + total + " components by name, description or category…";
+    finder.hidden = false;
+
+    function apply() {
+      var query = input.value.trim().toLowerCase();
+      var shown = 0;
+      for (var i = 0; i < cards.length; i++) {
+        var match =
+          (type === "" || cards[i].type === type) &&
+          (query === "" || cards[i].text.indexOf(query) !== -1);
+        cards[i].el.hidden = !match;
+        if (match) shown++;
+      }
+      for (var s = 0; s < sections.length; s++) {
+        sections[s].hidden =
+          sections[s].querySelectorAll("[data-component]:not([hidden])").length === 0;
+      }
+      empty.hidden = shown !== 0;
+      count.textContent =
+        query === "" && type === ""
+          ? ""
+          : shown + " of " + total + " components match";
+    }
+
+    filters.addEventListener("click", function (event) {
+      var button = event.target.closest("button[data-type]");
+      if (!button) return;
+      type = button.getAttribute("data-type");
+      var all = filters.querySelectorAll("button[data-type]");
+      for (var i = 0; i < all.length; i++) {
+        all[i].setAttribute("aria-pressed", all[i] === button ? "true" : "false");
+      }
+      apply();
+    });
+
+    var timer;
+    input.addEventListener("input", function () {
+      clearTimeout(timer);
+      timer = setTimeout(apply, 80);
+    });
+    apply();
+  })();
+</script>

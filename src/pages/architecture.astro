@@ -1,0 +1,300 @@
+---
+/**
+ * /architecture — the DNA double helix, drawn.
+ *
+ * Eight nodes, four rungs, six strands, and the component count each position
+ * actually holds. A table of thirteen rows communicates almost none of the
+ * shape, so the shape is drawn: two backbones winding, the nodes sitting on
+ * them, the rungs bridging both. The geometry is computed in this frontmatter
+ * and emitted as inline SVG, which means the diagram is IN the HTML — no
+ * canvas, no chart library, nothing to hydrate, and it renders with scripting
+ * off.
+ *
+ * Every position links to its components, because "what actually lives at N6?"
+ * is the question the diagram provokes and `/components` is the answer.
+ *
+ * (The previous apex could not render this page at all — it needed Supabase
+ * credentials it did not have in production and printed a configuration error
+ * where the taxonomy should be. Reading the public API at build time removes
+ * that whole class of failure.)
+ */
+import Site from "../layouts/Site.astro";
+import {
+  getArchitecture,
+  getComponents,
+  getBrand,
+  builtAt,
+  CANONICAL_BASE,
+  type HelixEntry,
+} from "../lib/registry";
+
+const [architecture, { total }, brand] = await Promise.all([
+  getArchitecture(),
+  getComponents(),
+  getBrand(),
+]);
+
+const { nodes, rungs, strands } = architecture;
+const nodeTotal = nodes.reduce((sum, node) => sum + node.component_count, 0);
+const rungTotal = rungs.reduce((sum, rung) => sum + rung.component_count, 0);
+
+/**
+ * Strand colour.
+ *
+ * Six strands, seven minerals, taken in the order the palette serves them. The
+ * assignment is positional and claims nothing — a strand is not "the copper
+ * strand" — but it is stable across builds and it is the real palette rather
+ * than six colours picked by eye. The values are `--color-*` custom properties
+ * from the `@bundu/ui` token contract; there is no hex on this page.
+ */
+const strandColour = new Map(
+  strands
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((strand, index) => [
+      strand.name,
+      `var(--color-${brand.minerals[index % brand.minerals.length]!.name})`,
+    ]),
+);
+
+// Rungs cross both backbones and belong to no single strand, so they take the
+// palette's own primary rather than borrowing a strand's meaning.
+const colourFor = (entry: HelixEntry): string =>
+  (entry.strand && strandColour.get(entry.strand)) || "var(--primary)";
+
+// --- helix geometry ------------------------------------------------------
+// One row per position in `sort_order`: N1–N8 on the backbones, N9–N12 as base
+// pairs across them. The sine is the drawing, not decoration — the nodes
+// alternate sides because that is where the winding curve puts them.
+const W = 660;
+const TOP = 64;
+const ROW = 62;
+const CX = W / 2;
+const AMP = 128;
+const TURNS = 1.75;
+
+const ordered = [...nodes, ...rungs].sort((a, b) => a.sort_order - b.sort_order);
+const SPAN = ROW * (ordered.length - 1);
+const H = TOP + SPAN + 56;
+
+const theta = (y: number) => ((y - TOP) / SPAN) * TURNS * Math.PI * 2;
+const strandA = (y: number) => CX + AMP * Math.sin(theta(y));
+const strandB = (y: number) => CX - AMP * Math.sin(theta(y));
+
+function path(fn: (y: number) => number): string {
+  const points: string[] = [];
+  for (let y = TOP - 20; y <= TOP + SPAN + 20; y += 5) {
+    points.push(`${fn(y).toFixed(1)},${y}`);
+  }
+  return `M ${points.join(" L ")}`;
+}
+
+const placed = ordered.map((entry, index) => {
+  const y = TOP + index * ROW;
+  const x = index % 2 === 0 ? strandA(y) : strandB(y);
+  const right = x > CX;
+  return {
+    entry,
+    y,
+    x,
+    ax: strandA(y),
+    bx: strandB(y),
+    anchor: (right ? "start" : "end") as "start" | "end",
+    labelX: right ? x + 28 : x - 28,
+    colour: colourFor(entry),
+  };
+});
+
+const backbones = [...new Set(strands.map((strand) => strand.backbone))];
+---
+
+<Site
+  title="The double helix"
+  eyebrow="Research architecture · Bundu Foundation"
+  description="The Mzizi DNA double helix: eight nodes, four rungs and six strands, with the component count each position holds."
+  lede="Mzizi is organised as a double helix — eight nodes on two backbones, four cross-cutting rungs, and six strands that say what may be changed and what may never be. Every component in the registry sits at exactly one position on it."
+  wide
+>
+  <ul class="stats">
+    <li>
+      <span class="stat-value">{nodes.length}</span>
+      <span class="stat-label">Nodes</span>
+    </li>
+    <li>
+      <span class="stat-value">{rungs.length}</span>
+      <span class="stat-label">Rungs</span>
+    </li>
+    <li>
+      <span class="stat-value">{strands.length}</span>
+      <span class="stat-label">Strands</span>
+    </li>
+    <li>
+      <span class="stat-value">{nodeTotal + rungTotal}</span>
+      <span class="stat-label">Components placed</span>
+    </li>
+  </ul>
+
+  <p class="provenance">
+    <span>
+      Read from <code>{CANONICAL_BASE}/architecture</code> when this page was
+      built, <time datetime={builtAt}>{builtAt}</time>. The counts are the
+      registry's, not an estimate.
+    </span>
+    <a href={`${CANONICAL_BASE}/architecture`}>Read the JSON</a>
+  </p>
+
+  <figure class="helix-figure">
+    <svg class="helix" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="helix-title helix-desc">
+      <title id="helix-title">The Mzizi DNA double helix</title>
+      <desc id="helix-desc">
+        Two backbone strands winding around each other. The eight nodes N1 to N8
+        sit alternately on one backbone and then the other; the four rungs N9 to
+        N12 are drawn as base pairs bridging both. Each position is labelled
+        with its number, its name and the number of components it holds. All of
+        the same information is listed as text below the diagram.
+      </desc>
+
+      <path class="backbone" d={path(strandA)} />
+      <path class="backbone" d={path(strandB)} />
+
+      <text class="axis-label" x={CX} y={22} text-anchor="middle">
+        {backbones.filter(Boolean).join(" and ")} backbones
+      </text>
+
+      {placed.filter((position) => position.entry.type === "rung").map((position) => (
+        <line class="rung-line" x1={position.ax} y1={position.y} x2={position.bx} y2={position.y} />
+      ))}
+
+      {placed.map((position) => (
+        <a href={`#n${position.entry.node_number}`}>
+          <circle class="node-dot" cx={position.x} cy={position.y} r={17} fill={position.colour} />
+          <text class="node-num" x={position.x} y={position.y + 4.5} text-anchor="middle">
+            {position.entry.node_number}
+          </text>
+          <text class="node-name" x={position.labelX} y={position.y + 1} text-anchor={position.anchor}>
+            {position.entry.title}
+          </text>
+          <text class="node-count" x={position.labelX} y={position.y + 15} text-anchor={position.anchor}>
+            {position.entry.component_count === 1
+              ? "1 component"
+              : `${position.entry.component_count} components`}
+          </text>
+        </a>
+      ))}
+    </svg>
+    <figcaption>
+      Coloured by strand. {nodeTotal} components sit across the eight nodes and
+      {" "}{rungTotal} on the rungs — {total} in total. Every circle is a link to
+      what that position holds.
+    </figcaption>
+  </figure>
+
+  <hr class="rule" />
+
+  <h2 id="strands">Six strands</h2>
+  <div class="prose">
+    <p>
+      A strand is a promise about change. It says whether the thing sitting on it
+      is fixed, free to evolve, or yours to replace — which is the first question
+      anyone adopting a design system actually asks.
+    </p>
+  </div>
+
+  {backbones.map((backbone) => (
+    <>
+      <h3>{backbone} backbone</h3>
+      <ul class="strands">
+        {strands
+          .filter((strand) => strand.backbone === backbone)
+          .map((strand) => {
+            const occupants = nodes.filter((node) => node.strand === strand.name);
+            return (
+              <li class="strand" style={`--strand: ${strandColour.get(strand.name)}`}>
+                <h3>{strand.title}</h3>
+                <p class="covenant">“{strand.covenant}”</p>
+                <p>{strand.description}</p>
+                <p class="count-link">
+                  {occupants.length > 0
+                    ? occupants.map((node) => `N${node.node_number} ${node.title}`).join(" · ")
+                    : "No catalogued node sits on this strand yet."}
+                </p>
+              </li>
+            );
+          })}
+      </ul>
+    </>
+  ))}
+
+  <hr class="rule" />
+
+  <h2 id="nodes">Eight nodes</h2>
+  <div class="prose">
+    <p>
+      Each node owns one job and one covenant. Nothing above a node may do the
+      job of the node below it — that rule is what makes the count beside each
+      one mean something rather than just describing a folder.
+    </p>
+  </div>
+
+  {nodes.map((node) => (
+    <section class="helix-entry" id={`n${node.node_number}`} style={`--strand: ${colourFor(node)}`}>
+      <header>
+        <h3>N{node.node_number} · {node.title}</h3>
+        <span class="badge outline">{node.strand}</span>
+        <span class="count-link">
+          <a href={`/components#node-${node.node_number}`}>{node.component_count} components</a>
+        </span>
+      </header>
+      <p class="covenant">“{node.covenant}”</p>
+      <p class="role">{node.role} · owned by the {node.stakeholder.toLowerCase()}.</p>
+      <p class="desc">{node.description}</p>
+      <ul class="rules">
+        {node.implementation_rules.map((rule) => <li>{rule}</li>)}
+      </ul>
+    </section>
+  ))}
+
+  <hr class="rule" />
+
+  <h2 id="rungs">Four rungs</h2>
+  <div class="prose">
+    <p>
+      A rung is a base pair: it bridges both backbones instead of sitting on one.
+      These are the cross-cutting positions — the parts that watch, repair,
+      document and describe everything else.
+    </p>
+  </div>
+
+  {rungs.map((rung) => (
+    <section class="helix-entry" id={`n${rung.node_number}`}>
+      <header>
+        <h3>N{rung.node_number} · {rung.title}</h3>
+        <span class="badge outline">rung</span>
+        <span class="count-link">
+          {rung.component_count > 0 ? (
+            <a href={`/components#node-${rung.node_number}`}>{rung.component_count} components</a>
+          ) : (
+            "no components catalogued yet"
+          )}
+        </span>
+      </header>
+      <p class="covenant">“{rung.covenant}”</p>
+      <p class="role">{rung.role} · owned by the {rung.stakeholder.toLowerCase()}.</p>
+      <p class="desc">{rung.description}</p>
+      <ul class="rules">
+        {rung.implementation_rules.map((rule) => <li>{rule}</li>)}
+      </ul>
+    </section>
+  ))}
+
+  <hr class="rule" />
+
+  <h2>Reading this as a machine</h2>
+  <div class="prose">
+    <p>
+      The whole helix — nodes, rungs, strands, covenants, implementation rules
+      and live counts — is served as JSON at
+      <code>{CANONICAL_BASE}/architecture</code>.
+    </p>
+  </div>
+</Site>
