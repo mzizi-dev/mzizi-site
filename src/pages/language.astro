@@ -253,11 +253,64 @@ const rfcs = [
 
   <p>
     The compiler is the <code>mz</code> binary in
-    <a href="https://github.com/mzizi-dev/mzizi">mzizi-dev/mzizi</a>. The surface
-    an agent should use is <code>mz check --agent</code>: whole-program NDJSON in
-    a deterministic order, at most one diagnostic per real error, every message written
-    for a reader with no prior context, and machine-applicable fixes tagged
-    <code>exact</code> or <code>guess</code>.
+    <a href="https://github.com/mzizi-dev/mzizi">mzizi-dev/mzizi</a>. Building it
+    is one command against a checkout — no toolchain beyond stable Rust:
+  </p>
+
+  <code class="cmd lead">cargo build --release --manifest-path compiler/Cargo.toml</code>
+
+  <p>
+    The surface an agent should use is <code>mz check --agent</code>: whole-program
+    NDJSON in a deterministic order, at most one diagnostic per real error, every
+    message written for a reader with no prior context, and machine-applicable
+    fixes tagged <code>exact</code> or <code>guess</code>. Below is real, captured
+    output — not a mock-up — from running it against
+    <a
+      href="https://github.com/mzizi-dev/mzizi/blob/main/examples/connectivity_bar.mz"
+      ><code>examples/connectivity_bar.mz</code></a
+    >, one of the nine primitives, at
+    <a href={`https://github.com/mzizi-dev/mzizi/commit/4c61d28`}><code>4c61d28</code></a
+    >.
+  </p>
+
+  <p>Clean input, run through the whole pipeline:</p>
+
+  <div class="terminal">
+    <p class="terminal-cmd">$ mz check --agent examples/connectivity_bar.mz</p>
+    <pre><code>{`{"summary":true,"errors":0,"warnings":0,"exact_fixable":0,"ms":0}`}</code></pre>
+  </div>
+
+  <p>
+    The same file with one real mistake — a dropped colon on a typed
+    <code>prop</code> — run through the identical command:
+  </p>
+
+  <div class="terminal">
+    <p class="terminal-cmd">$ mz check --agent examples/connectivity_bar.mz</p>
+    <pre><code>{`{"code":"MZ0305","severity":"error","file":"examples/connectivity_bar.mz","span":[15,16,15,20],"say":"\`prop visible\` needs a type: write \`prop visible: <type>\`","fix":{"span":[15,15,15,15],"replace":": bool","confidence":"guess"}}
+{"summary":true,"errors":1,"warnings":0,"exact_fixable":0,"ms":0}`}</code></pre>
+  </div>
+
+  <p>
+    One diagnostic, one line, the exact character span, a plain-language
+    explanation, and a machine-applicable fix an agent can apply without asking a
+    human to interpret the error first — that is the dense-error design goal
+    above, not as a claim but as something you can reproduce from the commit
+    linked above. Other useful commands against the same file:
+  </p>
+
+  <div class="terminal">
+    <p class="terminal-cmd">$ mz hash examples/connectivity_bar.mz</p>
+    <pre><code>{`23a4481ab3db  connectivity_bar  22 nodes`}</code></pre>
+  </div>
+
+  <p>
+    <code>mz outline</code> and <code>mz ir</code> exist too — see
+    <code>mz --help</code>. What is not there yet: <code>mz fix</code>,
+    <code>mz refs</code>, <code>mz path</code>, <code>mz patch</code> and
+    <code>mz diff</code> are designed (see the RFCs) but not built. The
+    binary above only dispatches <code>check</code>, <code>contract</code>,
+    <code>outline</code>, <code>hash</code> and <code>ir</code>.
   </p>
 
   <p>
@@ -267,3 +320,30 @@ const rfcs = [
     decisions and the questions still open.
   </p>
 </Site>
+
+<style>
+  .terminal {
+    margin-block: var(--space-md);
+  }
+
+  .terminal-cmd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--muted-foreground);
+  }
+
+  .terminal pre {
+    margin-block-start: var(--space-xs, 0.25rem);
+    background: var(--surface-container);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    overflow-x: auto;
+  }
+
+  .terminal pre code {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+</style>
