@@ -153,7 +153,7 @@ reconstruct it:
 The three registry pages are rendered from the public API **at build time**:
 
 ```
-https://api.mzizi.dev/v1/ui            575 components, 11 fields each
+https://api.mzizi.dev/v1/ui            577 components, 11 fields each
 https://api.mzizi.dev/v1/architecture  8 nodes, 4 rungs, 6 strands, live counts
 https://api.mzizi.dev/v1/brand         21 colour families, type, space, radii, specs
 ```
@@ -214,7 +214,7 @@ mzizi-site/
 | `/`             | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                             |
 | `/language`     | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs |
 | `/architecture` | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
-| `/components`   | All 575, grouped by DNA node, each with its description, categories and install command                                            |
+| `/components`   | All 577, grouped by DNA node, each with its description, categories and install command                                            |
 | `/tokens`       | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
 | `/ecosystem`    | Every public repository, what it holds, and whether it is routed                                                                    |
 
@@ -292,7 +292,7 @@ guard is there because it is a dot-directory and tooling skips those by default
 often enough to be worth proving every time.
 
 The rendered-content gate is the one `mzizi-console` did not have. It strips
-every `<script>` from the built HTML and then asserts the content is there: 575
+every `<script>` from the built HTML and then asserts the content is there: 577
 component cards, the eight node titles, the four rung titles, the six strands,
 N2's count of 371, all 21 colour families by CSS variable, specific hex values,
 and the `/mcp` redirect. A page that quietly renders nothing fails the build.
