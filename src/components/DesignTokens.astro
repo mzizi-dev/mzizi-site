@@ -1,0 +1,206 @@
+---
+/**
+ * The Mzizi tokens, in the `@bundu/ui` variable contract, generated from the
+ * live brand API at build time.
+ *
+ * ## Why this file exists at all
+ *
+ * The estate's styling source is `@bundu/ui`. `bundu-labs/marketing` (three
+ * apps) and `shamwari-ai/shamwari/site` already consume it, `src/styles/site.css`
+ * imports `@bundu/ui/styles/tokens.css` here too, and this site adding a fourth
+ * styling approach is exactly the drift being removed.
+ *
+ * The published 0.1.1 is incomplete, in four specific ways:
+ *
+ *   1. Seven `--color-*` families. The palette has twenty-one.
+ *   2. The seven experimental families are absent entirely.
+ *   3. The seven heritage tones are under a `--heritage-*` namespace rather
+ *      than `--color-*`.
+ *   4. No surface ladder — the nine steps (pitch, void, base, surface,
+ *      container, overlay, raised, scrim, wash) are not there.
+ *
+ * A 0.2.0 fixing all four is being prepared by another agent. Until it lands,
+ * this component fills exactly those gaps by reading `/v1/brand` — the same
+ * database the package itself is generated from — and emitting the values under
+ * the **0.2.0 contract names**, so the eventual swap is deleting this component
+ * and keeping the `@import`, not rewriting a stylesheet. Nothing here is a hand
+ * written hex; the estate already carries four different terracottas because
+ * four people typed one.
+ *
+ * ## Dark mode without JavaScript
+ *
+ * `tokens.css` flips its palette under `.dark` and `[data-theme="dark"]`, both
+ * of which need something to set the class. This site ships no theme script, so
+ * the dark values are ALSO emitted under `prefers-color-scheme`, guarded so an
+ * explicit `[data-theme="light"]` still wins. Same values, three selectors, one
+ * generator.
+ *
+ * ## What is derived rather than served
+ *
+ * `/v1/brand` serves surfaces and semantic roles but no foreground colour, so:
+ *
+ *   --foreground        the surface ladder read backwards. `pitch` is the
+ *                       deepest surface in each theme, so its opposite-theme
+ *                       value is the darkest ink available on a light page and
+ *                       the lightest on a dark one.
+ *   --muted-foreground  the `neutral` role, which the API itself describes as
+ *                       "neutral / inactive status, secondary data".
+ *   *-foreground pairs  chosen by WCAG relative luminance against the fill they
+ *                       sit on (`readableInk`).
+ *
+ * All three are functions of served values. None is a colour anyone picked.
+ */
+import { getBrand, readableInk, type ColourFamily } from "../lib/registry";
+
+const brand = await getBrand();
+
+const light: string[] = [];
+const dark: string[] = [];
+
+const put = (name: string, lightValue: string, darkValue: string) => {
+  light.push(`  --${name}: ${lightValue};`);
+  dark.push(`  --${name}: ${darkValue};`);
+};
+const fixed = (name: string, value: string) => put(name, value, value);
+
+const find = <T extends { name: string }>(list: T[], name: string): T => {
+  const hit = list.find((item) => item.name === name);
+  if (!hit) {
+    throw new Error(
+      `mzizi-site build: the brand API no longer serves "${name}", which the ` +
+        `site's token contract depends on. Update src/components/DesignTokens.astro ` +
+        `rather than letting a page render without it.`,
+    );
+  }
+  return hit;
+};
+
+// --- the twenty-one colour families --------------------------------------
+// One namespace for all three collections. 0.1.1 puts heritage under
+// `--heritage-*` and omits experimental; the 0.2.0 contract is `--color-*` for
+// every family, which is what this emits.
+const families: ColourFamily[] = [
+  ...brand.minerals,
+  ...brand.heritage,
+  ...brand.experimental,
+];
+for (const family of families) {
+  put(`color-${family.name}`, family.lightHex, family.darkHex);
+  if (family.containerLight && family.containerDark) {
+    put(`color-${family.name}-container`, family.containerLight, family.containerDark);
+    put(
+      `color-${family.name}-on-container`,
+      family.onContainerLight ?? readableInk(family.containerLight),
+      family.onContainerDark ?? readableInk(family.containerDark),
+    );
+  }
+}
+
+// --- the nine-step surface ladder ----------------------------------------
+// `wash` is served as a `color-mix()` expression referring to `--surface` and
+// `--brand-accent` by those exact names, so both are emitted unprefixed too.
+for (const surface of brand.backgrounds) {
+  put(`surface-${surface.name}`, surface.light, surface.dark);
+}
+const surface = find(brand.backgrounds, "surface");
+const base = find(brand.backgrounds, "base");
+const container = find(brand.backgrounds, "container");
+const pitch = find(brand.backgrounds, "pitch");
+put("surface", surface.light, surface.dark);
+
+// --- semantic roles ------------------------------------------------------
+for (const token of brand.semanticColors) {
+  put(token.name, token.light, token.dark);
+}
+const primary = find(brand.semanticColors, "primary");
+const accent = find(brand.semanticColors, "accent");
+const neutral = find(brand.semanticColors, "neutral");
+const error = find(brand.semanticColors, "error");
+
+// The shadcn-shaped aliases `@bundu/ui` consumers expect.
+put("background", base.light, base.dark);
+put("canvas", base.light, base.dark);
+put("card", surface.light, surface.dark);
+put("popover", find(brand.backgrounds, "raised").light, find(brand.backgrounds, "raised").dark);
+put("secondary", container.light, container.dark);
+put("muted", container.light, container.dark);
+put("destructive", error.light, error.dark);
+
+// Ink, derived. See the header comment.
+put("foreground", pitch.dark, pitch.light);
+put("ink", pitch.dark, pitch.light);
+put("muted-foreground", neutral.light, neutral.dark);
+put("card-foreground", pitch.dark, pitch.light);
+put("popover-foreground", pitch.dark, pitch.light);
+put("secondary-foreground", pitch.dark, pitch.light);
+put("primary-foreground", readableInk(primary.light), readableInk(primary.dark));
+put("accent-foreground", readableInk(accent.light), readableInk(accent.dark));
+put("destructive-foreground", readableInk(error.light), readableInk(error.dark));
+
+// --- dimensions ----------------------------------------------------------
+// `tokens.css` already defines --radius-* and --touch-target*; these are
+// re-emitted from the API so the values cannot drift from the palette that
+// generated the package, and so a stale package cannot quietly shrink a touch
+// target below the standard this system commits to.
+for (const [name, value] of Object.entries(brand.radii)) {
+  // `system` is a prose note about which radii exist, not a length.
+  if (/^\d/.test(value)) fixed(`radius-${name}`, value);
+}
+fixed("touch-target", `${brand.accessibility.defaultTouchTarget}px`);
+fixed("touch-target-sm", `${brand.accessibility.minTouchTarget}px`);
+
+/*
+ * Type, space and component dimensions.
+ *
+ * These are NOT part of the `@bundu/ui` variable contract today, so they are
+ * emitted under names this site owns (`--text-*`, `--space-*`, `--spec-*`). If
+ * the contract grows to cover them, these become aliases rather than a second
+ * source. They come from the same API either way.
+ */
+const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+const fonts: Record<string, string> = {
+  sans: "system-ui, -apple-system, Segoe UI, sans-serif",
+  serif: "Georgia, Cambria, Times New Roman, serif",
+  mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
+};
+for (const [role, font] of Object.entries(brand.typography.fonts)) {
+  fixed(`font-${role}`, `"${font.family}", ${fonts[role]}`);
+}
+for (const step of brand.typography.scale) {
+  const key = slug(step.name);
+  fixed(`text-${key}`, step.sizeRem);
+  fixed(`leading-${key}`, step.lineHeight);
+  fixed(`weight-${key}`, String(step.weight));
+  fixed(`family-${key}`, `var(--font-${step.font})`);
+}
+for (const step of brand.spacing) fixed(`space-${step.name}`, step.rem);
+for (const spec of brand.componentSpecs) {
+  for (const [size, height] of Object.entries(spec.heights)) {
+    if (height > 0) fixed(`spec-${spec.name}-${size}`, `${height}px`);
+  }
+  fixed(
+    `spec-${spec.name}-radius`,
+    spec.borderRadius >= 9999 ? "9999px" : `${spec.borderRadius}px`,
+  );
+}
+
+const banner =
+  `/* Generated at build time from the Mzizi brand API, v${brand.version} ` +
+  `(last changed ${brand.lastUpdated}).\n` +
+  `   Variable names follow the @bundu/ui token contract. Do not edit: edit the palette. */`;
+
+const css = [
+  banner,
+  // `:root:root` rather than `:root` on purpose: it raises specificity above
+  // the imported `tokens.css`, so the LIVE values win whichever order the two
+  // stylesheets end up in the document. Without it, a stale package value could
+  // silently override a fresh one depending on how Astro injects the bundle.
+  `:root:root {\n  color-scheme: light dark;\n${light.join("\n")}\n}`,
+  // The OS preference, unless a theme has been chosen explicitly.
+  `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]):not(.light) {\n${dark.join("\n")}\n  }\n}`,
+  // The explicit choice, in both conventions `@bundu/ui` supports.
+  `:root[data-theme="dark"],\n:root.dark {\n${dark.join("\n")}\n}`,
+].join("\n\n");
+---
+
+<style is:inline set:html={css}></style>

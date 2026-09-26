@@ -1,0 +1,20 @@
+# Redirects applied by the Cloudflare Workers static-asset server.
+#
+# Astro copies public/ into dist/ verbatim, and Workers Static Assets reads
+# _redirects from the root of the assets directory. Format is
+# `[from] [to] [status]`; only 301, 302, 303, 307 and 308 are accepted.
+#
+# ---------------------------------------------------------------------------
+# /mcp — THIS ONE IS LOAD-BEARING. DO NOT TURN IT INTO A PAGE.
+# ---------------------------------------------------------------------------
+# The apex answers /mcp with a 308 to mcp.mzizi.dev/mcp today, and agents follow
+# that documented address. It is the one path on this site that must stay a
+# redirect rather than become a page: an MCP client that lands on HTML instead
+# of being sent to the server does not degrade, it fails.
+#
+# 308, not 301 or 302: a permanent redirect that preserves the request method
+# and body. MCP's streamable-HTTP transport POSTs JSON-RPC, and a 301/302 lets
+# a client rewrite that POST to a GET — which looks like a working redirect and
+# silently drops the request. This is the same status the apex returns now, and
+# it must stay the same through the cutover.
+/mcp https://mcp.mzizi.dev/mcp 308
