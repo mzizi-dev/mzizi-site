@@ -1239,7 +1239,7 @@ ul.spaced li {
   width: var(--spec-avatar-default);
   height: var(--spec-avatar-default);
   border-radius: var(--spec-avatar-radius);
-  background: var(--color-tanzanite-container);
+  background: var(--color-copper-container);
   color: var(--primary);
   display: inline-flex;
   align-items: center;
