@@ -1,4 +1,4 @@
-# mzizi
+# Mzizi
 
 > Mzizi is a Rust framework for the agentic web — a language, compiler and content-addressed IR whose syntax, type system and compiler feedback loop are designed for machine authorship, and specifically for small open-weight models. An independent research project, operated by nyuchi. This file describes `mzizi.dev`, the ecosystem's front door.
 
