@@ -50,7 +50,10 @@ jobs:
       # never .ts/.astro source).
       - run: pnpm run lint
 
-      - run: pnpm exec astro build
+      # Not `pnpm exec astro build` — the `build` script also runs Pagefind
+      # over `dist/` (site search, `src/layouts/Site.astro`'s search dialog),
+      # and that step needs its own CI coverage same as everything else.
+      - run: pnpm run build
 
       # The site is static, so `dist/` IS the deliverable and a missing file is
       # a broken page rather than a missing feature. These are the agent-facing
