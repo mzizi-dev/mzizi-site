@@ -8,7 +8,7 @@
 ![Astro](https://img.shields.io/badge/Astro-7-BC52EE?style=flat-square&logo=astro&logoColor=white)
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=flat-square&logo=cloudflare&logoColor=white)
 
-**Version:** 0.1.0 | **Live:** [mzizi.dev](https://mzizi.dev) — this repository serves the apex | **Docs:** [docs.bundu.org](https://docs.bundu.org)
+**Version:** 0.1.0 | **Live:** [mzizi.dev](https://mzizi.dev) — this repository serves the apex | **Docs:** [docs.mzizi.dev](https://docs.mzizi.dev)
 
 Astro, static output, deployed as a Cloudflare Worker with Static Assets. The
 same shape as `mzizi-console`, minus the islands: a landing page has nothing to
@@ -213,8 +213,8 @@ request that was actually made.
 The live/planned column on the landing page was written when only `mzizi.dev` and
 `mcp.mzizi.dev` had DNS records. **That is out of date in the pages themselves**
 and has not been fixed here, because this change is the README. As of 2026-09-12
-`mzizi.dev`, `api.mzizi.dev`, `app.mzizi.dev` and `mcp.mzizi.dev` all resolve;
-`docs.mzizi.dev` still does not.
+`mzizi.dev`, `api.mzizi.dev`, `app.mzizi.dev` and `mcp.mzizi.dev` all resolve,
+and `docs.mzizi.dev` now does too — it answered HTTP 200 (Mintlify) on 2026-09-27.
 
 The status panel is the most important block on the site and should stay that
 way. The Phase 0 benchmark has not run, so nothing here has been measured against
@@ -272,14 +272,14 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 
 ## Ecosystem
 
-| Repository                                                            | What it is                                                      | Address                                         |
-| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                               |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly restored here; the rest unrouted  |
-| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/v1)       |
-| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)          |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site                                 | Not deployed; `docs.mzizi.dev` does not resolve |
-| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                  |
+| Repository                                                            | What it is                                                      | Address                                        |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                              |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly restored here; the rest unrouted |
+| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/v1)      |
+| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)         |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)       |
+| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                 |
 
 ## Deliberately not here
 
