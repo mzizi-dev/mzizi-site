@@ -273,13 +273,17 @@ samp {
  * `md` breakpoint the fast nav also disappears, replaced by the hamburger
  * and drawer — that switch, not a wrapping list of six links, is the fix
  * for the header genuinely not working on a phone. */
+/* A 3-column grid, not flex space-between: the fast nav sits in the middle
+ * column and is genuinely centered on the header regardless of how wide the
+ * wordmark or the right-side actions are — space-between only balances when
+ * both sides happen to be equal width, which isn't guaranteed here. */
 .site-nav {
   position: sticky;
   inset-block-start: 0;
   z-index: 5;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-lg);
   padding: var(--space-md) var(--space-lg);
   border-block-end: 1px solid var(--border);
@@ -287,8 +291,13 @@ samp {
   backdrop-filter: blur(12px);
 }
 
+.site-nav > .wordmark {
+  justify-self: start;
+}
+
 .site-nav-fast {
   display: none;
+  justify-self: center;
   gap: var(--space-xs);
 }
 
@@ -322,10 +331,20 @@ samp {
   color: var(--info);
 }
 
+/* The right-side column: hamburger immediately left of the icon-group pill,
+ * which stays the outermost, far-right element — both always right-aligned
+ * as a unit against the grid's third column. */
+.site-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  justify-self: end;
+}
+
 /* The icon-only pill capsule — events.mukoko.com's header pattern (a
  * rounded-full primary-fill group of circular icon buttons), carrying the
- * two external actions worth one tap from anywhere: the org on GitHub and
- * the live Registry API. Visible at every width, unlike the fast nav. */
+ * actions worth one tap from anywhere: search, the org on GitHub, and the
+ * live Registry API. Visible at every width, unlike the fast nav. */
 .icon-group {
   display: flex;
   align-items: center;
@@ -336,18 +355,23 @@ samp {
   flex-shrink: 0;
 }
 
-.icon-group a {
+.icon-group a,
+.icon-group button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   inline-size: var(--touch-target-sm);
   block-size: var(--touch-target-sm);
   border-radius: 50%;
+  border: none;
+  background: transparent;
   color: var(--primary-foreground);
+  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
-.icon-group a:hover {
+.icon-group a:hover,
+.icon-group button:hover {
   background: color-mix(in oklab, var(--primary-foreground) 20%, transparent);
 }
 
@@ -511,6 +535,124 @@ samp {
   color: var(--primary-foreground);
   text-decoration: none;
   font-weight: var(--weight-h6);
+}
+
+/* --------------------------------------------------------- site search --- */
+/* Site-wide search, backed by Pagefind (indexes the built `dist/` — see
+ * `package.json`'s `build` script). Same dialog pattern as the mobile
+ * drawer: a backdrop plus a centered panel, not a full-screen takeover,
+ * since a search result list wants to stay short and scannable. */
+
+.search-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: var(--surface-scrim);
+}
+
+.search-dialog {
+  position: fixed;
+  inset-block-start: 12vh;
+  inset-inline: 0;
+  z-index: 80;
+  margin-inline: auto;
+  inline-size: min(90vw, 40rem);
+  max-block-size: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-dialog-radius);
+  box-shadow: 0 20px 60px
+    color-mix(in oklab, var(--surface-pitch) 30%, transparent);
+  overflow: hidden;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-base) var(--space-lg);
+  border-block-end: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-box-icon {
+  inline-size: 18px;
+  block-size: 18px;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.search-box input {
+  flex: 1;
+  min-height: var(--touch-target-sm);
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  font-size: var(--text-body);
+  outline: none;
+}
+
+.search-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--touch-target-sm);
+  block-size: var(--touch-target-sm);
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: var(--text-h5);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.search-results {
+  margin: 0;
+  padding: var(--space-sm);
+  list-style: none;
+  overflow-y: auto;
+}
+
+.search-results a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-base);
+  border-radius: var(--spec-button-radius);
+  text-decoration: none;
+}
+
+.search-results a:hover,
+.search-results a:focus-visible {
+  background: var(--accent);
+}
+
+.search-result-title {
+  color: var(--foreground);
+  font-weight: var(--weight-h6);
+}
+
+.search-result-excerpt {
+  color: var(--muted-foreground);
+  font-size: var(--text-body-small);
+}
+
+/* A tint, not the link colour — these are highlighted terms inside the
+ * excerpt, not their own clickable targets, and the info/link colour made
+ * them read as separate links from the one that wraps the whole result. */
+.search-result-excerpt mark {
+  background: color-mix(in oklab, var(--color-gold) 30%, transparent);
+  color: inherit;
+  font-weight: var(--weight-h6);
+  border-radius: 2px;
+}
+
+.search-empty {
+  padding: var(--space-base) var(--space-lg);
+  color: var(--muted-foreground);
+  font-size: var(--text-body-small);
 }
 
 main {
