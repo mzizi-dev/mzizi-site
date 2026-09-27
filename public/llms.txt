@@ -1,6 +1,6 @@
 # mzizi
 
-> Mzizi is a Rust framework for the agentic web — a language, compiler and content-addressed IR whose syntax, type system and compiler feedback loop are designed for machine authorship, and specifically for small open-weight models. An open research project, owned and operated by Mzizi. This file describes `mzizi.dev`, the ecosystem's front door.
+> Mzizi is a Rust framework for the agentic web — a language, compiler and content-addressed IR whose syntax, type system and compiler feedback loop are designed for machine authorship, and specifically for small open-weight models. A research project of the Bundu Foundation, operated by nyuchi. This file describes `mzizi.dev`, the ecosystem's front door.
 
 Mzizi lowers to Rust and Dioxus. The novel part — and the only part claimed as
 research — is the syntax, the type system and the compiler's feedback loop.
@@ -18,13 +18,13 @@ is explicit that if the benchmark shows no measurable advantage over raw Dioxus 
 Leptos, nothing downstream matters.
 
 **Two different things share the name.** *Mzizi the framework* is the language and
-compiler above, 100% Mzizi IP. *Mzizi the design system* is the component
-registry, brand system and DNA double-helix frontend architecture, operated by
-Mzizi, and is what `mzizi.dev` serves today. They share a name and a GitHub org;
-they are different work, both owned by Mzizi. Sources that conflate them are
-common.
+compiler above, 100% Bundu Foundation IP. *Mzizi the design system* is the
+component registry, brand system and DNA double-helix frontend architecture,
+operated by nyuchi, and is what `mzizi.dev` serves today. They share a name and a
+GitHub org; they are different work with different owners. Sources that conflate
+them are common.
 
-License: Apache-2.0. Owned, governed and operated by Mzizi.
+License: Apache-2.0. Governed by the Bundu Foundation. Operated by nyuchi.
 
 ## Hosting caveat — read before repeating a URL
 
