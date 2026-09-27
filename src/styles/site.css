@@ -322,6 +322,40 @@ samp {
   color: var(--info);
 }
 
+/* The icon-only pill capsule — events.mukoko.com's header pattern (a
+ * rounded-full primary-fill group of circular icon buttons), carrying the
+ * two external actions worth one tap from anywhere: the org on GitHub and
+ * the live Registry API. Visible at every width, unlike the fast nav. */
+.icon-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 9999px;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.icon-group a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--touch-target-sm);
+  block-size: var(--touch-target-sm);
+  border-radius: 50%;
+  color: var(--primary-foreground);
+  transition: background-color 0.15s ease;
+}
+
+.icon-group a:hover {
+  background: color-mix(in oklab, var(--primary-foreground) 20%, transparent);
+}
+
+.icon-group svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
 /* --------------------------------------------------------- mobile nav --- */
 
 .nav-toggle {
