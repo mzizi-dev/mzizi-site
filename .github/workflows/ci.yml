@@ -43,6 +43,13 @@ jobs:
       # rendering `undefined` into production HTML.
       - run: pnpm exec astro check
 
+      # Vite+ (oxlint), same as mzizi-console. This repo had no JS/TS linter at
+      # all before this — `astro check` type-checks but does not lint — so this
+      # is new coverage, not a duplicate of anything the org lint gate already
+      # runs (that gate covers prettier/markdownlint/yamllint/actionlint/JSON,
+      # never .ts/.astro source).
+      - run: pnpm run lint
+
       - run: pnpm exec astro build
 
       # The site is static, so `dist/` IS the deliverable and a missing file is
