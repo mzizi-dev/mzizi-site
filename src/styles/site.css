@@ -155,12 +155,18 @@ p {
   border: 0;
 }
 
-/* The seven-mineral identity strip. Canonical N7 shell anatomy: it sits above
- * the header and again at the top of the footer in every property in this
- * estate (see mzizi nyuchi-footer's own comment for the same rule). */
+/* The seven-mineral identity strip. Vertical, always: a fixed 3px bar on the
+ * left edge of the page, running the full viewport height, present once per
+ * page rather than duplicated per section. */
 .mineral-strip {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 60;
   display: flex;
-  block-size: 3px;
+  flex-direction: column;
+  inline-size: 3px;
+  pointer-events: none;
 }
 
 .mineral-strip span {
