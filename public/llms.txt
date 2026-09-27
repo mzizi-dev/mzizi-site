@@ -28,12 +28,17 @@ License: Apache-2.0. Governed by the Bundu Foundation. Operated by nyuchi.
 
 ## Hosting caveat — read before repeating a URL
 
-This site is built but **not yet routed**. `mzizi.dev` currently serves
-`mzizi-dev/mzizi-registry`, not this site, so the apex today answers with the
-registry portal and its `/api/v1`. Of the ecosystem hostnames, `mzizi.dev`,
-`mcp.mzizi.dev` and `docs.mzizi.dev` resolve (the last live as of 2026-09-27):
-`api.mzizi.dev` and `app.mzizi.dev` have no DNS records yet, however much their
-repositories are finished. Prefer a GitHub URL below over a subdomain you have not just resolved.
+Every ecosystem hostname resolves (checked 2026-09-27). Each is a Cloudflare
+Worker, except the docs, which Mintlify hosts:
+
+- `mzizi.dev` — this site (`mzizi-dev/mzizi-site`)
+- `api.mzizi.dev` — the registry API, served by `mzizi-dev/mzizi-registry`
+- `app.mzizi.dev` — the console (`mzizi-dev/mzizi-console`), behind AuthKit sign-in
+- `mcp.mzizi.dev` — the MCP server (`mzizi-mcp`)
+- `docs.mzizi.dev` — the documentation (`mzizi-dev/mzizi-docs`)
+
+`mzizi-dev/mzizi-api-gateway` is built for `api.mzizi.dev` but is not what serves
+it. Hostnames change; resolve one before repeating it.
 
 ## This site
 
@@ -52,10 +57,10 @@ repositories are finished. Prefer a GitHub URL below over a subdomain you have n
 ## Public repositories
 
 - [mzizi-dev/mzizi](https://github.com/mzizi-dev/mzizi): the language. The `mz` compiler front end, nine primitives, the RFCs, and the public half of the benchmark harness. Rust.
-- [mzizi-dev/mzizi-registry](https://github.com/mzizi-dev/mzizi-registry): the design system, component registry and developer portal. Serves `mzizi.dev` today, including `/api/v1` and `/mcp`.
-- [mzizi-dev/mzizi-api-gateway](https://github.com/mzizi-dev/mzizi-api-gateway): the registry API as a pure-Rust Cloudflare Worker. Built for `api.mzizi.dev`; that hostname does not resolve yet.
-- [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome, Rust/Dioxus islands over the registry API. Built for `app.mzizi.dev`; that hostname does not resolve yet.
-- [mzizi-dev/mzizi-site](https://github.com/mzizi-dev/mzizi-site): this site.
+- [mzizi-dev/mzizi-registry](https://github.com/mzizi-dev/mzizi-registry): the design system, component registry and developer portal. Serves the registry API at [api.mzizi.dev](https://api.mzizi.dev/v1).
+- [mzizi-dev/mzizi-api-gateway](https://github.com/mzizi-dev/mzizi-api-gateway): the registry API as a pure-Rust Cloudflare Worker. Built for `api.mzizi.dev`, but not routed: the registry serves that hostname today.
+- [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome, Rust/Dioxus islands over the registry API. Live at [app.mzizi.dev](https://app.mzizi.dev), behind AuthKit sign-in.
+- [mzizi-dev/mzizi-site](https://github.com/mzizi-dev/mzizi-site): this site, serving [mzizi.dev](https://mzizi.dev).
 - [mzizi-dev/mzizi-docs](https://github.com/mzizi-dev/mzizi-docs): the Mintlify documentation site, live at [docs.mzizi.dev](https://docs.mzizi.dev). The one home of Mzizi's documentation.
 - [mzizi-dev/mzizi-roadmap](https://github.com/mzizi-dev/mzizi-roadmap): the roadmap. A placeholder; `CHARTER.md` is the real plan of record.
 

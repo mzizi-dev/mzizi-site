@@ -25,26 +25,29 @@ const repos = [
   {
     name: "mzizi-registry",
     role: "Design system, registry and portal",
-    state: "serving mzizi.dev today",
-    body: "The canonical component registry for the bundu ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and the /api/v1 the apex answers on right now. TypeScript, on Vercel.",
+    state: "serving api.mzizi.dev today",
+    site: "https://api.mzizi.dev/v1",
+    body: "The canonical component registry for the bundu ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and the registry API served at api.mzizi.dev. TypeScript, deployed as a Cloudflare Worker.",
   },
   {
     name: "mzizi-api-gateway",
     role: "The registry API",
     state: "shipping code, not routed",
-    body: "api.mzizi.dev — the registry API as a pure-Rust Cloudflare Worker, compiled to WASM through workers-rs. The hostname has no DNS record yet, so the API the console talks to is still the one served from the apex.",
+    body: "Built for api.mzizi.dev — the registry API as a pure-Rust Cloudflare Worker, compiled to WASM through workers-rs. Not routed: api.mzizi.dev is served today by mzizi-registry, so this repository is the planned replacement, not the live API.",
   },
   {
     name: "mzizi-console",
     role: "The console",
-    state: "shipping code, not routed",
+    state: "serving app.mzizi.dev today",
+    site: "https://app.mzizi.dev",
     body: "app.mzizi.dev — Astro renders the chrome as static HTML, Rust/Dioxus islands render the live data from the registry API. Replaces an earlier Svelte mini-app: the doctrine is one UI framework, Astro, with Rust first and TypeScript second underneath.",
   },
   {
     name: "mzizi-site",
     role: "This site",
-    state: "shipping code, not routed",
-    body: "The front door and the agent-facing surfaces — llms.txt and the MCP card. Astro, static output, deployed as a Cloudflare Worker with static assets. It does not claim mzizi.dev; the registry still holds the apex.",
+    state: "serving mzizi.dev today",
+    site: "https://mzizi.dev",
+    body: "The front door and the agent-facing surfaces — llms.txt and the MCP card. Astro, static output, deployed as a Cloudflare Worker with static assets, serving the mzizi.dev apex.",
   },
   {
     name: "mzizi-docs",
@@ -65,7 +68,7 @@ const repos = [
 <Site
   title="Ecosystem"
   description="Every public repository in the Mzizi ecosystem: the language, the registry, the API gateway, the console, the docs, and this site — with what each one actually holds today."
-  lede="Seven public repositories — some serving, and a lot of code that is built but not yet routed. This page says which is which."
+  lede="Seven public repositories. Four serve a live hostname; the rest are code that is built but not routed, or a placeholder. This page says which is which."
 >
   <p>
     The Mzizi ecosystem is governed by the <strong>Bundu Foundation</strong>,
