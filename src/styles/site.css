@@ -119,9 +119,11 @@ p {
   margin-block: 0 var(--space-base);
 }
 
-/* The wordmarks in this ecosystem are lowercase — bundu, nyuchi, mzizi — and
- * the brand's voice guide says so in as many words. The dot ahead of it is
- * the same identity mark bundu.org's own header and footer use. */
+/* Capitalized — "Mzizi", not "mzizi". The voice-guide's lowercase rule is
+ * written down, but bundu.org's own live header/footer render "Bundu
+ * Foundation" in title case regardless, and this site follows what the
+ * reference site actually does, on the record. The dot ahead of it is the
+ * same identity mark bundu.org's own header and footer use. */
 .wordmark {
   display: inline-flex;
   align-items: center;
@@ -132,7 +134,12 @@ p {
   letter-spacing: -0.01em;
   color: var(--foreground);
   text-decoration: none;
-  text-transform: lowercase;
+}
+
+/* The header's mark is the site's primary identity — bigger than the
+ * secondary marks in the mobile drawer and footer brand column. */
+.wordmark-lg {
+  font-size: var(--text-h3);
 }
 
 .wordmark .dot {
@@ -291,11 +298,19 @@ samp {
   backdrop-filter: blur(12px);
 }
 
+/* Explicit column placement, not auto-placement: `.site-nav-fast` is
+ * `display: none` below `md`, which removes it as a grid item entirely
+ * (not just hidden) — auto-placement then slides `.site-nav-actions` into
+ * the middle column instead of the third, since only two items exist to
+ * place into three tracks. Pinning each item to its column by line number
+ * keeps the layout correct whether or not the middle item is present. */
 .site-nav > .wordmark {
+  grid-column: 1;
   justify-self: start;
 }
 
 .site-nav-fast {
+  grid-column: 2;
   display: none;
   justify-self: center;
   gap: var(--space-xs);
@@ -335,6 +350,7 @@ samp {
  * which stays the outermost, far-right element — both always right-aligned
  * as a unit against the grid's third column. */
 .site-nav-actions {
+  grid-column: 3;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
