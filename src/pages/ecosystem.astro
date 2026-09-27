@@ -10,6 +10,7 @@ import Site from "../layouts/Site.astro";
  * `state` is deliberately not a marketing word. "shipping code" means the
  * repository holds a working implementation; "serving" additionally means a
  * hostname resolves to it; "placeholder" means a README and nothing else.
+ * `site`, when set, is the live hostname a repository serves.
  * These were checked with `dig` and the GitHub API, not assumed.
  */
 const repos = [
@@ -48,8 +49,9 @@ const repos = [
   {
     name: "mzizi-docs",
     role: "Documentation",
-    state: "placeholder",
-    body: "Intended for docs.mzizi.dev. Today it holds a licence and a one-line README — there is no documentation site. Long-form product documentation for the design system currently lives at docs.bundu.org/mzizi.",
+    state: "serving docs.mzizi.dev today",
+    body: "The Mintlify documentation site, live at docs.mzizi.dev (HTTP 200, checked 2026-09-27). It is the one home of Mzizi's documentation — the language, the registry, design foundations, patterns, blocks and charts.",
+    site: "https://docs.mzizi.dev",
   },
   {
     name: "mzizi-roadmap",
@@ -63,7 +65,7 @@ const repos = [
 <Site
   title="Ecosystem"
   description="Every public repository in the Mzizi ecosystem: the language, the registry, the API gateway, the console, the docs, and this site — with what each one actually holds today."
-  lede="Seven public repositories, one live hostname, and a lot of code that is built but not yet routed. This page says which is which."
+  lede="Seven public repositories — some serving, and a lot of code that is built but not yet routed. This page says which is which."
 >
   <p>
     The Mzizi ecosystem is governed by the <strong>Bundu Foundation</strong>,
@@ -83,6 +85,12 @@ const repos = [
         <p class="state">
           State: {r.state} ·{" "}
           <a href={`https://github.com/mzizi-dev/${r.name}`}>source</a>
+          {r.site && (
+            <>
+              {" · "}
+              <a href={r.site}>{new URL(r.site).host}</a>
+            </>
+          )}
           {r.href && (
             <>
               {" · "}
