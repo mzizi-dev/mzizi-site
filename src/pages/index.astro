@@ -23,7 +23,8 @@ const { total } = await getComponents();
 
 // Checked live (DNS + a request), not assumed — the whole point of this
 // table is that an address the ecosystem writes down is not the same as one
-// that exists. `docs.mzizi.dev` is the one gap.
+// that exists. `docs.mzizi.dev` was the last gap; it answers HTTP 200 as of
+// 2026-09-27.
 const surfaces = [
   {
     what: "This site",
@@ -49,13 +50,15 @@ const surfaces = [
     repo: null,
     note: "OAuth-gated: an unauthenticated request answers invalid_token.",
   },
+  {
+    what: "Documentation",
+    host: "docs.mzizi.dev",
+    repo: "mzizi-docs",
+    note: "Mintlify — the one home of Mzizi's documentation.",
+  },
 ];
 
 const notYet = [
-  {
-    what: "docs.mzizi.dev",
-    note: "The repository exists and holds a licence and a README. There is no docs site there yet.",
-  },
   {
     what: "api.mzizi.dev on mzizi-api-gateway",
     note: "A pure-Rust Cloudflare Worker is built and merged. The hostname still answers from the registry's own Worker, not this one.",
@@ -103,8 +106,7 @@ const repos = [
     name: "mzizi-docs",
     lang: "MDX",
     langColor: "var(--color-sodalite, var(--muted-foreground))",
-    desc: "Mintlify deployment, destined for docs.mzizi.dev.",
-    tag: "domain not live",
+    desc: "The Mintlify documentation site, live at docs.mzizi.dev — the one home of Mzizi's docs.",
   },
 ];
 ---
