@@ -111,24 +111,10 @@ taken.
 
 ### The route footgun, if a route is ever written down here
 
-**Do not attach a custom domain or change routes without reading this.** A
-custom domain takes a **bare hostname**:
-
-```jsonc
-"routes": [{ "pattern": "mzizi.dev", "custom_domain": true }]
-```
-
-Never `"mzizi.dev/*"`. Wildcards are rejected outright — _"Wildcard operators
-(\*) are not allowed in Custom Domains"_ — and a custom domain already routes
-every path on the hostname to the Worker, so a `/*` is both invalid and
-redundant. `zone_name` is inferred and only means anything on a
-non-custom-domain route.
-
-This is not pedantry. The three-field form silently broke two Workers in this
-org — `mzizi-mcp` (`agent-tools#102`) and `mzizi-console`, which never deployed
-at all — because **Workers Builds previews upload a version without applying
-routes**. The config is only validated on the production deploy, so the same
-commit reads green on a pull request and red on `main`.
+**Do not attach a custom domain or change routes without reading
+[`AGENTS.md`](./AGENTS.md) first** — the exact syntax that's safe, the one that silently
+broke two other Workers in this org, and why Workers Builds previews can read green on a
+PR and red on `main` for the identical commit.
 
 ### What is still owed
 
@@ -276,49 +262,13 @@ every commit by stripping every `<script>` and then grepping for the content.
 ```bash
 pnpm install
 pnpm dev              # local dev server
-pnpm check            # astro check — typechecks pages and frontmatter
 pnpm build            # emits dist/
 pnpm preview          # serve dist/ locally
 ```
 
-```bash
-python3 scripts/verify-rendered.py dist    # what CI runs; see below
-```
-
-CI runs `astro check`, `astro build`, a guard that the built `dist/` still
-contains `llms.txt`, `robots.txt`, `_redirects`, `.well-known/mcp.json` and
-`404.html`, the rendered-content gate, and a gitleaks scan. The `.well-known`
-guard is there because it is a dot-directory and tooling skips those by default
-often enough to be worth proving every time.
-
-The rendered-content gate is the one `mzizi-console` did not have. It strips
-every `<script>` from the built HTML and then asserts the content is there: 577
-component cards, the eight node titles, the four rung titles, the six strands,
-N2's count of 371, all 21 colour families by CSS variable, specific hex values,
-and the `/mcp` redirect. A page that quietly renders nothing fails the build.
-
-To build against a mirror while the API is down — it went down for several
-minutes during this work — set `MZIZI_API_ORIGIN` to something serving
-`/v1/ui`, `/v1/architecture` and `/v1/brand`. Do not commit a snapshot.
-
-`build.format: "file"` emits `/ecosystem.html` rather than
-`/ecosystem/index.html`, which the Static Assets server resolves from
-`/ecosystem` with no redirect hop. `not_found_handling` is `404-page`, not the
-single-page-application rewrite: this is a multi-page site with no client
-router, and an unknown path that quietly rendered the landing page would be a
-soft 404.
-
-## Deploying
-
-```bash
-pnpm build
-pnpm exec wrangler deploy
-```
-
-**This is a production deploy to `mzizi.dev`.** Because the custom domain is
-attached to this Worker in the Cloudflare dashboard rather than in
-`wrangler.jsonc`, `wrangler deploy` publishes to the apex whether or not the
-config mentions it. Read the route note above before touching `routes`.
+See [`AGENTS.md`](./AGENTS.md) for the full command set, what CI checks (including the
+rendered-content gate that `mzizi-console` shipped without), and — before you touch
+`wrangler.jsonc` or deploy — the route footgun that took this apex by accident.
 
 ## Ecosystem
 
