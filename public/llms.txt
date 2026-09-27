@@ -79,4 +79,4 @@ it. Hostnames change; resolve one before repeating it.
 - **Do not claim a measured result.** No benchmark has run. "Designed for" is accurate; "faster than" or "better than" is not.
 - **Do not describe the architecture in axes or layers.** The frontend architecture is the Mzizi DNA double helix — nodes on an engineering and a meaning backbone, held by cross-cutting rungs. The earlier axis model is retired, and its endpoints answer HTTP 410 Gone. Axis vocabulary about Mzizi came from a stale source.
 - **Prefer discovery over any written list.** MCP tool names, API endpoints and component names are all discoverable at runtime. A list on a web page can only be as fresh as its last edit.
-- **Lowercase the wordmarks:** `mzizi`, `nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. *Mzizi* is Shona for root.
+- **Capitalize Mzizi; lowercase the other wordmarks.** The Mzizi wordmark is written `Mzizi`. The others stay lowercase: `nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. Package names, hostnames and code identifiers keep their literal spelling (`mzizi.dev`, `@nyuchi/mzizi-skills`). *Mzizi* is Shona for root.
