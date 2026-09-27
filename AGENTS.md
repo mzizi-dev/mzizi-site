@@ -1,0 +1,109 @@
+# AGENTS.md — mzizi-site
+
+> Vendor-neutral instructions for any AI agent working in this repository. See
+> [`README.md`](./README.md) for what this site is and why it looks the way it does.
+
+## What this repo is
+
+Astro, static output, deployed as a Cloudflare Worker with Static Assets, serving the
+`mzizi.dev` apex. No islands, no UI framework — pages render at build time from the public
+registry API (`api.mzizi.dev`). See README's "Where the content comes from" for why build
+time, not the browser.
+
+## Build, test, run
+
+```bash
+pnpm install
+pnpm dev              # local dev server
+pnpm run lint         # vp lint (Vite+/oxlint)
+pnpm check            # astro check — typechecks pages and frontmatter
+pnpm build            # emits dist/
+pnpm preview          # serve dist/ locally
+python3 scripts/verify-rendered.py dist    # what CI runs; see "The rendered-content gate" below
+```
+
+CI runs, in order: `astro check`, `pnpm run lint`, `astro build`, a guard that the built
+`dist/` still contains `llms.txt`, `robots.txt`, `_redirects`, `.well-known/mcp.json` and
+`404.html` (the `.well-known` check exists because it's a dot-directory and tooling skips
+those by default often enough to be worth proving every time), the rendered-content gate,
+and a gitleaks scan.
+
+### The rendered-content gate
+
+Strips every `<script>` from the built HTML and asserts the content is still there: 577
+component cards, the eight node titles, the four rung titles, the six strands, N2's count
+of 371, all 21 colour families by CSS variable, specific hex values, and the `/mcp`
+redirect. A page that quietly renders nothing fails the build — this is the gate
+`mzizi-console` shipped without, and paid for with a blank production page that passed CI.
+
+### Local dev against a mirror
+
+To build against something other than the live API — it went down for several minutes
+during this site's own build-out — set `MZIZI_API_ORIGIN` to a host serving `/v1/ui`,
+`/v1/architecture` and `/v1/brand`. **Do not commit a snapshot.** The build reads the API
+or fails; a cached copy that keeps serving after the source moves is exactly the failure
+this whole approach exists to avoid.
+
+`build.format: "file"` emits `/ecosystem.html` rather than `/ecosystem/index.html`, which
+the Static Assets server resolves from `/ecosystem` with no redirect hop.
+`not_found_handling` is `404-page`, not the single-page-application rewrite: this is a
+multi-page site with no client router, and an unknown path that quietly rendered the
+landing page would be a soft 404.
+
+## Deploying — read this before touching `wrangler.jsonc` or `routes`
+
+```bash
+pnpm build
+pnpm exec wrangler deploy
+```
+
+**This is a production deploy to `mzizi.dev`.** The custom domain is attached to this
+Worker in the Cloudflare dashboard, not in `wrangler.jsonc` (`wrangler.jsonc` still
+declares no routes) — so `wrangler deploy` publishes to the apex whether or not the config
+mentions it.
+
+### The route footgun
+
+A custom domain on a hostname something else already serves **takes** that hostname — no
+staging step, no partial rollout, the change is complete before anyone looks at it. This
+repo's own apex cutover happened exactly this way, outside version control, with no PR
+recording the decision (see README for the full incident account).
+
+If you ever do write a route into `wrangler.jsonc`, a custom domain takes a **bare
+hostname**:
+
+```jsonc
+"routes": [{ "pattern": "mzizi.dev", "custom_domain": true }]
+```
+
+**Never `"mzizi.dev/*"`.** Wildcards are rejected outright, and a custom domain already
+routes every path on the hostname to the Worker, so a `/*` is both invalid and redundant.
+This three-field form silently broke two other Workers in this org (`mzizi-mcp`,
+`agent-tools#102`, and `mzizi-console`, which never deployed at all) because **Workers
+Builds previews upload a version without applying routes** — the config is only validated
+on the production deploy, so the same commit reads green on a PR and red on `main`.
+
+## Content and honesty rules
+
+- **Every claim on this site traces to a file in this org** — mostly
+  [`CHARTER.md`](https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md) — or to a request
+  that was actually made. "Designed for" is accurate; "faster than" is not, and won't be
+  until the Phase 0 benchmark produces a number.
+- Numbers sourced from the registry (component count, per-node counts, the palette) are
+  read from the API at build time. Every page showing one states when it was read and
+  links the endpoint beside it — a dated fact, not a stale copy pretending to be current.
+- `public/.well-known/mcp.json` is a convenience pointer, not a ratified standard — it
+  carries no `$schema` and claims conformance to nothing.
+
+## Deliberately not here
+
+See README's "Deliberately not here" for the full list and reasoning (a DNS change, a
+sitemap before the remaining pages land, a page at `/mcp` instead of its 308, a committed
+copy of the registry data, a link to a private repo). None of these is a missing feature —
+don't add one without reading why first.
+
+## Naming
+
+Brand wordmarks are lowercase in prose: `mzizi`, `bundu`, `nyuchi`. This is `mzizi.dev`
+itself — the front door — not to be confused with `mzizi-registry` (the component source)
+or `mzizi-console` (`app.mzizi.dev`).
