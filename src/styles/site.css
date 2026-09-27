@@ -550,6 +550,14 @@ samp {
   background: var(--surface-scrim);
 }
 
+/* Same trap as `.mobile-drawer[hidden]` above: `.search-dialog`'s own
+ * `display: flex` beats the UA's `[hidden] { display: none }`, so without this
+ * the search panel renders open on every page load. */
+.search-backdrop[hidden],
+.search-dialog[hidden] {
+  display: none;
+}
+
 .search-dialog {
   position: fixed;
   inset-block-start: 12vh;
