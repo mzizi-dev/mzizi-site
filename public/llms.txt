@@ -30,10 +30,10 @@ License: Apache-2.0. Governed by Mzizi. Operated by nyuchi.
 
 This site is built but **not yet routed**. `mzizi.dev` currently serves
 `mzizi-dev/mzizi-registry`, not this site, so the apex today answers with the
-registry portal and its `/api/v1`. Of the ecosystem hostnames, only `mzizi.dev`
-and `mcp.mzizi.dev` resolve at all: `api.mzizi.dev`, `app.mzizi.dev` and
-`docs.mzizi.dev` have no DNS records yet, however much their repositories are
-finished. Prefer a GitHub URL below over a subdomain you have not just resolved.
+registry portal and its `/api/v1`. Of the ecosystem hostnames, `mzizi.dev`,
+`mcp.mzizi.dev` and `docs.mzizi.dev` resolve (the last live as of 2026-09-27):
+`api.mzizi.dev` and `app.mzizi.dev` have no DNS records yet, however much their
+repositories are finished. Prefer a GitHub URL below over a subdomain you have not just resolved.
 
 ## This site
 
@@ -56,8 +56,8 @@ finished. Prefer a GitHub URL below over a subdomain you have not just resolved.
 - [mzizi-dev/mzizi-api-gateway](https://github.com/mzizi-dev/mzizi-api-gateway): the registry API as a pure-Rust Cloudflare Worker. Built for `api.mzizi.dev`; that hostname does not resolve yet.
 - [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome, Rust/Dioxus islands over the registry API. Built for `app.mzizi.dev`; that hostname does not resolve yet.
 - [mzizi-dev/mzizi-site](https://github.com/mzizi-dev/mzizi-site): this site.
-- [mzizi-dev/mzizi-docs](https://github.com/mzizi-dev/mzizi-docs): intended for `docs.mzizi.dev`. A placeholder — a licence and a one-line README. There is no documentation site.
-- [mzizi-dev/mzizi-roadmap](https://github.com/mzizi-dev/mzizi-roadmap): the roadmap. Also a placeholder; `CHARTER.md` is the real plan of record.
+- [mzizi-dev/mzizi-docs](https://github.com/mzizi-dev/mzizi-docs): the Mintlify documentation site, live at [docs.mzizi.dev](https://docs.mzizi.dev). The one home of Mzizi's documentation.
+- [mzizi-dev/mzizi-roadmap](https://github.com/mzizi-dev/mzizi-roadmap): the roadmap. A placeholder; `CHARTER.md` is the real plan of record.
 
 ## Live endpoints
 
@@ -66,6 +66,7 @@ finished. Prefer a GitHub URL below over a subdomain you have not just resolved.
 - [mzizi.dev/llms.txt](https://mzizi.dev/llms.txt): the registry's own llms.txt, which is far more detailed about the design system than this file
 - [mcp.mzizi.dev/mcp](https://mcp.mzizi.dev/mcp): the MCP server, Streamable HTTP. OAuth-gated — an unauthenticated request answers `invalid_token`; signup is free. Protected-resource metadata at [/.well-known/oauth-protected-resource](https://mcp.mzizi.dev/.well-known/oauth-protected-resource).
 - [/.well-known/mcp.json](/.well-known/mcp.json): this site's pointer to that server
+- [docs.mzizi.dev](https://docs.mzizi.dev): Mzizi's documentation (Mintlify, from `mzizi-dev/mzizi-docs`) — the one home of the docs
 
 ## Rules for anything repeating what it reads here
 
