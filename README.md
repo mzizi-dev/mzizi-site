@@ -47,18 +47,18 @@ hands, and most of it still has no live address. Three of its highest-value
 pages are the exception — `mzizi-site#5` rebuilt them here, on this site, on
 `@bundu/ui`:
 
-| Path on `mzizi.dev`            | Today                       | Was                                       |
-| ------------------------------ | --------------------------- | ------------------------------------------ |
-| `/`, `/language`, `/ecosystem` | 200                         | This site                                 |
-| `/llms.txt`, `/robots.txt`     | 200                         | This site                                 |
-| `/.well-known/mcp.json`        | 200                         | This site                                 |
-| `/components`                  | **200 — rebuilt here**      | The registry's developer portal           |
-| `/architecture`                | **200 — rebuilt here**      | The registry's developer portal           |
-| `/tokens`                      | **200 — rebuilt here**      | The registry's developer portal           |
-| `/brand`, `/observability`     | 404                         | The registry's developer portal           |
-| `/r/`                          | 404                         | The registry's developer portal           |
-| `/api/v1`, `/api/openapi`      | 404                         | The registry API — now on `api.mzizi.dev` |
-| `/mcp`                         | 308 to `mcp.mzizi.dev/mcp`  | The MCP server — now on `mcp.mzizi.dev`   |
+| Path on `mzizi.dev`            | Today                      | Was                                       |
+| ------------------------------ | -------------------------- | ----------------------------------------- |
+| `/`, `/language`, `/ecosystem` | 200                        | This site                                 |
+| `/llms.txt`, `/robots.txt`     | 200                        | This site                                 |
+| `/.well-known/mcp.json`        | 200                        | This site                                 |
+| `/components`                  | **200 — rebuilt here**     | The registry's developer portal           |
+| `/architecture`                | **200 — rebuilt here**     | The registry's developer portal           |
+| `/tokens`                      | **200 — rebuilt here**     | The registry's developer portal           |
+| `/brand`, `/observability`     | 404                        | The registry's developer portal           |
+| `/r/`                          | 404                        | The registry's developer portal           |
+| `/api/v1`, `/api/openapi`      | 404                        | The registry API — now on `api.mzizi.dev` |
+| `/mcp`                         | 308 to `mcp.mzizi.dev/mcp` | The MCP server — now on `mcp.mzizi.dev`   |
 
 The API and the MCP server survived, because they had already moved to their own
 hostnames before the apex changed hands: `api.mzizi.dev` answers, and
@@ -74,11 +74,11 @@ its review history records the decision.
 
 The paperwork that should have preceded it:
 
-| Change                                                                                                                 | State                |
-| ---------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| Change                                                                                                                 | State                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | [`mzizi-site#3`](https://github.com/mzizi-dev/mzizi-site/pull/3) — the ordered cutover runbook                         | Superseded — the cutover it plans for already happened; the registry-side blocker it found (below) is still open |
-| [`mzizi-site#5`](https://github.com/mzizi-dev/mzizi-site/pull/5) — port `/components`, `/architecture`, `/tokens` here | **Merged**            |
-| [`mzizi-registry#334`](https://github.com/mzizi-dev/mzizi-registry/pull/334) — point the apex at the Worker            | **Closed**, unmerged |
+| [`mzizi-site#5`](https://github.com/mzizi-dev/mzizi-site/pull/5) — port `/components`, `/architecture`, `/tokens` here | **Merged**                                                                                                       |
+| [`mzizi-registry#334`](https://github.com/mzizi-dev/mzizi-registry/pull/334) — point the apex at the Worker            | **Closed**, unmerged                                                                                             |
 
 So the cutover ran without the runbook, and without the pull request that ports
 the pages it displaced. That ordering is the whole failure: step 1 of the runbook
@@ -214,7 +214,7 @@ mzizi-site/
 | `/`             | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                             |
 | `/language`     | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs |
 | `/architecture` | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
-| `/components`   | All 577, grouped by DNA node, each with its description, categories and install command                                            |
+| `/components`   | All 577, grouped by DNA node, each with its description, categories and install command                                             |
 | `/tokens`       | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
 | `/ecosystem`    | Every public repository, what it holds, and whether it is routed                                                                    |
 
@@ -323,13 +323,13 @@ config mentions it. Read the route note above before touching `routes`.
 ## Ecosystem
 
 | Repository                                                            | What it is                                                      | Address                                         |
-| --------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------ |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                                |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly restored here; the rest unrouted   |
-| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/v1)        |
-| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)           |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site                                 | Not deployed; `docs.mzizi.dev` does not resolve  |
-| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                   |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------- |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                               |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly restored here; the rest unrouted  |
+| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/v1)       |
+| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)          |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site                                 | Not deployed; `docs.mzizi.dev` does not resolve |
+| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                  |
 
 ## Deliberately not here
 
