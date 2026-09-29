@@ -1,0 +1,36 @@
+---
+/**
+ * /skills/<name> — one skill, its body rendered from `/v1/skills/<name>` at
+ * build time. The body is remote input and goes through `renderMarkdown`,
+ * which escapes raw HTML and drops unsafe link schemes.
+ */
+import Site from "../../layouts/Site.astro";
+import { getSkills, getSkill, builtAt, CANONICAL_BASE } from "../../lib/registry";
+import { renderMarkdown } from "../../lib/markdown";
+
+export async function getStaticPaths() {
+  const { skills } = await getSkills();
+  return skills.map((skill) => ({ params: { name: skill.name } }));
+}
+
+const { name } = Astro.params;
+const [skill, { version }] = await Promise.all([getSkill(name!), getSkills()]);
+const body = renderMarkdown(skill.body_mdx);
+const url = `${CANONICAL_BASE}/skills/${skill.name}`;
+---
+
+<Site title={skill.name} eyebrow="Skill" description={skill.description} lede={skill.description}>
+  <p class="provenance">
+    <span>
+      Bundle <code>{version}</code>, read from <code>{url}</code> when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time>.
+    </span>
+    <a href={url}>Read the JSON</a>
+  </p>
+
+  <hr class="rule" />
+
+  <article class="prose skill-body" set:html={body} />
+
+  <p><a href="/skills">← All skills</a></p>
+</Site>

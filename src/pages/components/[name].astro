@@ -1,0 +1,309 @@
+---
+/**
+ * /components/<name> — one static page per registry component.
+ *
+ * Rust first. Where `/v1/rs/<name>` has a Rust implementation, that is the
+ * component as Mzizi Roots presents it, and it leads the page: its source, its
+ * crate, and the honest state of installing it. The React (TSX) build follows
+ * as a secondary section, because it is deprioritised, not gone: it still
+ * installs, and it is still the benchmark's reference implementation.
+ *
+ * Everything here is read from the API at build time (`src/lib/registry.ts`),
+ * so the whole component, source included, is in the HTML with no script.
+ * The page says when it read each document and links it.
+ */
+import Site from "../../layouts/Site.astro";
+import {
+  getComponents,
+  getComponentRecords,
+  getArchitecture,
+  crateStatus,
+  dependencyName,
+  shortType,
+  installCommand,
+  builtAt,
+  CANONICAL_BASE,
+  type RegistryItem,
+  type ComponentRecord,
+} from "../../lib/registry";
+import { hasPreview, previewsGeneratedAt } from "../../lib/previews";
+
+export async function getStaticPaths() {
+  const [{ items }, records] = await Promise.all([getComponents(), getComponentRecords()]);
+  return items.map((item) => ({
+    params: { name: item.name },
+    props: { item, record: records.get(item.name)! },
+  }));
+}
+
+interface Props {
+  item: RegistryItem;
+  record: ComponentRecord;
+}
+
+const { item, record } = Astro.props;
+const { detail, rust } = record;
+
+const architecture = await getArchitecture();
+const helixEntry = [...architecture.nodes, ...architecture.rungs].find(
+  (entry) => entry.node_number === item.node,
+);
+const nodeTitle = helixEntry?.title ?? item.nodeLabel;
+
+const crate = rust ? await crateStatus(rust.crate.name) : null;
+
+// The registry's `docs` field is a few labelled lines ("Use it for: …",
+// "Variants: …"). Shown as the list it is, never re-worded.
+const docLines = (detail.docs ?? "")
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line !== "" && !line.startsWith("Install:"))
+  .map((line) => {
+    const colon = line.indexOf(":");
+    return colon > 0 && colon < 32
+      ? { label: line.slice(0, colon), text: line.slice(colon + 1).trim() }
+      : { label: "", text: line };
+  });
+
+const registryDeps = detail.registryDependencies.map((url) => ({
+  url,
+  name: dependencyName(url),
+}));
+
+const rsUrl = `${CANONICAL_BASE}/rs/${item.name}`;
+const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
+---
+
+<Site
+  title={item.name}
+  eyebrow={rust ? "Mzizi Roots · Rust" : "Component · React build"}
+  description={`${item.title}: ${item.description}`}
+  lede={item.description}
+  wide
+>
+  <ul class="badges component-badges">
+    {rust && <li class="badge solid">Rust · {rust.target}</li>}
+    <li class="badge">{shortType(item.type)}</li>
+    <li class="badge outline">N{item.node} {nodeTitle}</li>
+    {item.categories.map((category) => <li class="badge outline">{category}</li>)}
+  </ul>
+
+  <div class="detail-grid">
+    <dl class="facts">
+      <dt>Title</dt>
+      <dd>{item.title}</dd>
+      <dt>Node</dt>
+      <dd>
+        <a href={`/architecture#n${item.node}`}>N{item.node} · {nodeTitle}</a>
+        {helixEntry && <span class="muted"> — “{helixEntry.covenant}”</span>}
+      </dd>
+      <dt>Owner</dt>
+      <dd><code>{item.owner}</code></dd>
+      <dt>Collection</dt>
+      <dd><code>{item.collection}</code></dd>
+      <dt>Implementations</dt>
+      <dd>{rust ? "Rust (Mzizi Roots) and React" : "React only — no Rust implementation yet"}</dd>
+      <dt>npm dependencies</dt>
+      <dd>
+        {
+          detail.dependencies.length > 0 ? (
+            <ul class="inline-list">
+              {detail.dependencies.map((dep) => (
+                <li>
+                  <code>{dep}</code>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            "none"
+          )
+        }
+      </dd>
+      <dt>Registry dependencies</dt>
+      <dd>
+        {
+          registryDeps.length > 0 ? (
+            <ul class="inline-list">
+              {registryDeps.map((dep) => (
+                <li>
+                  {dep.name ? (
+                    <a href={`/components/${dep.name}`}>
+                      <code>{dep.name}</code>
+                    </a>
+                  ) : (
+                    <code>{dep.url}</code>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            "none"
+          )
+        }
+      </dd>
+    </dl>
+
+    {
+      hasPreview(item.name) && (
+        <figure class="detail-preview">
+          <img
+            src={`/previews/${item.name}.jpg`}
+            alt={`${item.name}, its React build rendered in the registry playground`}
+            width="746"
+            height="300"
+            loading="lazy"
+          />
+          <figcaption>
+            A static screenshot of the React build in the registry playground
+            {previewsGeneratedAt && (
+              <>
+                , taken <time datetime={previewsGeneratedAt}>{previewsGeneratedAt}</time>
+              </>
+            )}
+            . Not interactive. See <a href="/playground">the playground</a>.
+          </figcaption>
+        </figure>
+      )
+    }
+  </div>
+
+  {
+    rust ? (
+      <section class="impl impl-rust" id="rust">
+        <h2>Mzizi Roots: the Rust implementation</h2>
+        <p class="prose">
+          Written for <code>{rust.target}</code>, against the same contract and
+          token set as the React build, not translated from it. This is the
+          component as Mzizi presents it.
+        </p>
+
+        <h3>Installing it</h3>
+        <div class="prose">
+          <p>
+            The API names the crate <code>{rust.crate.name}</code> on{" "}
+            <code>{rust.crate.registry}</code>.{" "}
+            {crate?.state === "published" && (
+              <>
+                It is published, at <code>{crate.version}</code>:
+              </>
+            )}
+            {crate?.state === "absent" && (
+              <>
+                <strong>It is not on crates.io yet</strong>, so there is no{" "}
+                <code>cargo add</code> that works today. Read the source below,
+                or from the API, and build against it.
+              </>
+            )}
+            {crate?.state === "unknown" && (
+              <>Whether it is on crates.io could not be checked when this page was built.</>
+            )}
+          </p>
+          {crate?.state === "published" && (
+            <code class="cmd lead">cargo add {rust.crate.name}</code>
+          )}
+          <p>
+            <code>npx shadcn add</code> cannot install a Rust document; it rejects
+            the schema. <code>mzizi add</code>, an installer for both targets, is
+            written but not published yet.
+          </p>
+        </div>
+        <code class="cmd">curl {rsUrl}</code>
+
+        {rust.files.map((file) => (
+          <figure class="source" data-pagefind-ignore>
+            <figcaption>
+              <code>{file.path}</code>
+              <span class="badge outline">{file.type}</span>
+            </figcaption>
+            <pre><code>{file.content}</code></pre>
+          </figure>
+        ))}
+
+        <p class="provenance">
+          <span>
+            Read from <code>{rsUrl}</code> when this page was built,{" "}
+            <time datetime={builtAt}>{builtAt}</time>
+            {crate && crate.state !== "unknown" && (
+              <>; crates.io checked at the same time</>
+            )}
+            .
+          </span>
+          <a href={rsUrl}>Read the JSON</a>
+        </p>
+      </section>
+    ) : (
+      <section class="impl impl-none" id="rust">
+        <h2>Rust</h2>
+        <p class="prose">
+          <strong>No Rust implementation yet.</strong> <code>{rsUrl}</code>{" "}
+          answers 404: this component ships for React only. Its contract, tokens
+          and variants are in the React build below; a Dioxus version would be
+          written against those, not translated from the TSX.{" "}
+          <a href="/components#roots">The components that do have one →</a>
+        </p>
+      </section>
+    )
+  }
+
+  <section class="impl impl-react" id="react">
+    <h2>{rust ? "React build" : "React build (the only implementation today)"}</h2>
+    <p class="prose">
+      {
+        rust
+          ? "Secondary: the React (TSX) build keeps working and stays installable, but new work goes to Rust. It is also the benchmark's reference implementation."
+          : "Installable today, and the benchmark's reference implementation. React is deprioritised in Mzizi: it keeps working, but new work goes to Rust."
+      }
+    </p>
+    <code class="cmd lead">{installCommand(item.name)}</code>
+
+    {
+      docLines.length > 0 && (
+        <dl class="facts doc-lines">
+          {docLines.map((line) => (
+            <>
+              <dt>{line.label || "Note"}</dt>
+              <dd>{line.text}</dd>
+            </>
+          ))}
+        </dl>
+      )
+    }
+
+    {
+      detail.files.length === 0 && (
+        <p class="prose muted">
+          This item ships no source file: it is a <code>{item.type}</code>, which
+          shadcn applies as configuration. Its full document is at the link below.
+        </p>
+      )
+    }
+
+    {
+      detail.files.map((file) => (
+        <details class="source" data-pagefind-ignore open={!rust}>
+          <summary>
+            <code>{file.path}</code>
+            {file.target && (
+              <span class="muted">
+                {" "}
+                → <code>{file.target}</code>
+              </span>
+            )}
+            <span class="badge outline">{file.type}</span>
+          </summary>
+          <pre><code>{file.content}</code></pre>
+        </details>
+      ))
+    }
+
+    <p class="provenance">
+      <span>
+        Read from <code>{uiUrl}</code> when this page was built,{" "}
+        <time datetime={builtAt}>{builtAt}</time>.
+      </span>
+      <a href={uiUrl}>Read the JSON</a>
+    </p>
+  </section>
+
+  <p><a href="/components">← All components</a></p>
+</Site>

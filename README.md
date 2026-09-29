@@ -47,19 +47,20 @@ hands, and most of it still has no live address. Three of its highest-value
 pages are the exception — `mzizi-site#5` rebuilt them here, on this site, on
 `@bundu/ui`:
 
-| Path on `mzizi.dev`                                                 | Today                      | Was                                             |
-| ------------------------------------------------------------------- | -------------------------- | ----------------------------------------------- |
-| `/`, `/language`, `/ecosystem`                                      | 200                        | This site                                       |
-| `/llms.txt`, `/robots.txt`                                          | 200                        | This site                                       |
-| `/.well-known/mcp.json`                                             | 200                        | This site                                       |
-| `/components`                                                       | **200 — rebuilt here**     | The registry's developer portal                 |
-| `/architecture`                                                     | **200 — rebuilt here**     | The registry's developer portal                 |
-| `/tokens`                                                           | **200 — rebuilt here**     | The registry's developer portal                 |
-| `/brand`, `/r/`                                                     | 404                        | The registry's developer portal                 |
-| `/playground`, `/skills`, `/cli`, `/observability`, `/components/*` | 302 to the registry app    | The registry's developer portal, not ported yet |
-| `/api/v1`, `/api/v1/*`                                              | 308 to `api.mzizi.dev/v1`  | The registry API — now on `api.mzizi.dev`       |
-| `/api/openapi`                                                      | 404                        | The registry API — now `api.mzizi.dev/openapi`  |
-| `/mcp`                                                              | 308 to `mcp.mzizi.dev/mcp` | The MCP server — now on `mcp.mzizi.dev`         |
+| Path on `mzizi.dev`                                       | Today                        | Was                                            |
+| --------------------------------------------------------- | ---------------------------- | ---------------------------------------------- |
+| `/`, `/language`, `/ecosystem`                            | 200                          | This site                                      |
+| `/llms.txt`, `/robots.txt`                                | 200                          | This site                                      |
+| `/.well-known/mcp.json`, `/.well-known/security.txt`      | 200                          | This site                                      |
+| `/components`, `/architecture`, `/tokens`                 | **200 — rebuilt here**       | The registry's developer portal                |
+| `/components/<name>`, `/skills`, `/skills/<name>`, `/cli` | **200 — rebuilt here**       | The registry's developer portal                |
+| `/playground`, `/observability`                           | **200 — rebuilt here**       | The registry's developer portal                |
+| `/playground/<name>`                                      | 302 to `/components/<name>`  | The registry's live preview, per component     |
+| `/components/nyuchi-*`                                    | 301 to `/components/mzizi-*` | The pre-rename component names                 |
+| `/brand`, `/r/`                                           | 404                          | The registry's developer portal                |
+| `/api/v1`, `/api/v1/*`                                    | 308 to `api.mzizi.dev/v1`    | The registry API — now on `api.mzizi.dev`      |
+| `/api/openapi`                                            | 404                          | The registry API — now `api.mzizi.dev/openapi` |
+| `/mcp`                                                    | 308 to `mcp.mzizi.dev/mcp`   | The MCP server — now on `mcp.mzizi.dev`        |
 
 The API and the MCP server survived, because they had already moved to their own
 hostnames before the apex changed hands: `api.mzizi.dev` answers, and
@@ -125,9 +126,10 @@ reconstruct it:
 1. **Decide, retroactively, what the apex serves.** It is currently a
    several-page site by accident rather than by decision. Either that is
    ratified, or the registry portal comes back in full.
-2. **Finish giving the registry portal an address.** `/components`,
-   `/architecture` and `/tokens` live here now (`mzizi-site#5`).
-   `/brand`, `/observability` and `/r/` still have no live home.
+2. **Finish giving the registry portal an address.** Everything but
+   `/brand` and `/r/` lives here now: `/components`, `/architecture` and
+   `/tokens` (`mzizi-site#5`), then `/components/<name>`, `/skills`, `/cli`,
+   `/playground` and `/observability`.
 3. **Fix the hardcoded apex URLs in `mzizi-registry`'s API responses**
    (`registryDependencies`, `homepage`, `docs` — found by `mzizi-site#3`)
    before anyone relies on `npx shadcn add` following a transitive dependency.
@@ -137,12 +139,16 @@ reconstruct it:
 
 ## Where the content comes from
 
-The three registry pages are rendered from the public API **at build time**:
+The registry pages are rendered from the public API **at build time**:
 
 ```
 https://api.mzizi.dev/v1/ui            577 components, 11 fields each
+https://api.mzizi.dev/v1/ui/<name>     one component, with its React source
+https://api.mzizi.dev/v1/rs/<name>     its Rust implementation, or a 404 saying there is none
 https://api.mzizi.dev/v1/architecture  8 nodes, 4 rungs, 6 strands, live counts
 https://api.mzizi.dev/v1/brand         21 colour families, type, space, radii, specs
+https://api.mzizi.dev/v1/skills        the agent skills, and /skills/<name> for each body
+https://api.mzizi.dev/v1/stats         per-node counts from the files (telemetry reads zero)
 ```
 
 Build time, not the browser, and the reasoning is written out in full in
@@ -153,12 +159,27 @@ API being up, and content is as fresh as the last build — are paid openly: the
 build fails loudly rather than falling back to a snapshot, and every page stamps
 the minute it read the API next to the endpoint it read.
 
-`/v1/*` is the canonical, documented base and is what every page prints.
-`api.mzizi.dev` is attached directly to the registry Worker, which serves its
-routes under `/api/v1/*`; the rewrite that makes `/v1/*` answer is
-`mzizi-registry#335`, still open. So the build TRIES `/v1` and falls back to
-`/api/v1`, and the day #335 lands the fallback simply stops being used. Nothing
-printed on a page changes either way.
+There is no `/v1/rs` index, so the build asks `/v1/rs/<name>` for every
+component (over a thousand requests with `/ui/<name>`, eight at a time, about
+fifteen seconds). Only the API's own "has no Rust implementation" 404 is read as
+"none"; anything else is retried and then fails the build, so an outage cannot
+quietly turn every Rust component back into React-only.
+
+Two facts come from public package registries rather than the API: whether
+`mzizi-ui` is on crates.io, and the latest npm versions of `@nyuchi/mzizi-cli`
+and `@nyuchi/mzizi-skills`. They are asked at build time too, so "not on
+crates.io yet" stops being printed the build after it stops being true. A
+failure to reach them never fails the build; the page says it could not check.
+
+`/v1/*` is the canonical, documented base; it is what every page prints and the
+only base the build reads. `api.mzizi.dev` is served by `mzizi-api-gateway`.
+
+The component previews (`public/previews/*.jpg`, used by `/components`,
+`/components/<name>` and `/playground`) are the one exception: they are
+screenshots, generated on demand by `scripts/generate-previews.mjs` and
+committed with a dated manifest in `src/data/component-previews.json`. The
+script drops a panel that rendered blank and never falls back to a picture of
+the whole page, so a component with no demo simply has no picture.
 
 ### Styling
 
@@ -197,14 +218,19 @@ mzizi-site/
 └── wrangler.jsonc      # still no routes — read the section above before changing that
 ```
 
-| Page            | What it says                                                                                                                                                                                         |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`             | The language first: the thesis, the status panel (two pilots, no advantage), the `mz contract` bench, what the language is and isn't, then the toolchain, the components and which hostnames resolve |
-| `/language`     | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs                                                                  |
-| `/architecture` | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                                                                                 |
-| `/components`   | All 577, grouped by DNA node, each with its description, categories and install command                                                                                                              |
-| `/tokens`       | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                                                                                  |
-| `/ecosystem`    | Every public repository, what it holds, and whether it is routed                                                                                                                                     |
+| Page                 | What it says                                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                  | The language first: the thesis, the status panel, the `mz contract` bench, what it is and isn't, then the toolchain and components |
+| `/language`          | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the non-goals and the RFCs        |
+| `/cli`               | `mz`'s commands, the real install paths (React with shadcn, Rust from `/v1/rs`), and the agent CLI. Free, no gate                  |
+| `/components`        | Mzizi Roots (the Rust components) first, then all 577 grouped by DNA node, with a Rust filter                                      |
+| `/components/<name>` | One component: its Rust source first where there is one, then the React build, install command, deps, node, owner                  |
+| `/playground`        | Static, dated screenshots of React builds, each linked to its source. Says plainly that none of it is interactive                  |
+| `/architecture`      | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                               |
+| `/tokens`            | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                |
+| `/skills`            | The agent skills, and each one's body at `/skills/<name>`                                                                          |
+| `/observability`     | Where the logs live (the console), and what is file-backed                                                                         |
+| `/ecosystem`         | Every public repository, what it holds, and whether it is routed                                                                   |
 
 ### On content accuracy
 
@@ -299,7 +325,7 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
   without this repository being told.
 - **A sitemap.** Most of the site is still one hop from the navigation, and
   `robots.txt` has no `Sitemap:` line to match — a directive pointing at a 404
-  is worse than none. Add both together once the remaining 14 pages land.
+  is worse than none. Add both together once `/brand` and `/r/` have a home.
 - **A page at `/mcp`.** It is a 308 to `mcp.mzizi.dev/mcp` and must stay one: an
   MCP client that lands on HTML instead of being redirected does not degrade, it
   fails. 308 specifically, because it preserves the method and body of the
