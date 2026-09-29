@@ -1,6 +1,6 @@
 # mzizi.dev
 
-> The front door to the Mzizi ecosystem — what Mzizi is, where every surface lives, and the agent-facing files (`llms.txt`, `.well-known/mcp.json`) that say the same thing to a machine.
+> The front door to Mzizi, and it leads with the language: what the language is, what it has and has not shown, and then the toolchain and components (Mzizi Roots) that support it — plus the agent-facing files (`llms.txt`, `.well-known/mcp.json`) that say the same thing to a machine.
 
 [![CI](https://github.com/mzizi-dev/mzizi-site/actions/workflows/ci.yml/badge.svg)](https://github.com/mzizi-dev/mzizi-site/actions/workflows/ci.yml)
 [![Lint](https://github.com/mzizi-dev/mzizi-site/actions/workflows/lint.yml/badge.svg)](https://github.com/mzizi-dev/mzizi-site/actions/workflows/lint.yml)
@@ -191,19 +191,20 @@ mzizi-site/
 │   ├── robots.txt
 │   ├── _redirects      # /mcp → mcp.mzizi.dev/mcp, 308. Not a page.
 │   └── .well-known/
-│       └── mcp.json    # pointer to the one public MCP server
+│       ├── mcp.json    # pointer to the one public MCP server
+│       └── security.txt # RFC 9116 security contact; Expires is a fixed date, renew it
 ├── astro.config.mjs
 └── wrangler.jsonc      # still no routes — read the section above before changing that
 ```
 
-| Page            | What it says                                                                                                                        |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `/`             | What Mzizi is, that nothing has been measured yet, and which hostnames actually resolve                                             |
-| `/language`     | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs |
-| `/architecture` | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
-| `/components`   | All 577, grouped by DNA node, each with its description, categories and install command                                             |
-| `/tokens`       | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
-| `/ecosystem`    | Every public repository, what it holds, and whether it is routed                                                                    |
+| Page            | What it says                                                                                                                                                                                         |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`             | The language first: the thesis, the status panel (two pilots, no advantage), the `mz contract` bench, what the language is and isn't, then the toolchain, the components and which hostnames resolve |
+| `/language`     | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs                                                                  |
+| `/architecture` | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                                                                                 |
+| `/components`   | All 577, grouped by DNA node, each with its description, categories and install command                                                                                                              |
+| `/tokens`       | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                                                                                  |
+| `/ecosystem`    | Every public repository, what it holds, and whether it is routed                                                                                                                                     |
 
 ### On content accuracy
 
@@ -221,8 +222,10 @@ way. Two Phase 0 pilots ran on 2026-09-27
 in `mzizi-dev/mzizi`), and neither showed an advantage for Mzizi: on the ~7B
 open-weight arm, Mzizi did worse. Neither is the charter's measurement, so the kill
 criterion has still not been tested. "Designed for" is accurate; "faster than" is
-not. When a new run lands, update the panel, the figures and `public/llms.txt`
-together, whichever way it falls.
+not. The kill criterion is now Mzizi against the best existing language for each
+kind of task (owner, 2026-09-29), and every run is published in `benchmarks/results/`
+whichever way it falls. When a new run lands, update the panel, the figures and
+`public/llms.txt` together.
 
 Numbers that come from the registry — the component count, the per-node counts,
 the palette — are read from the API when the site is built, and every page that
@@ -236,8 +239,12 @@ example.
 `public/.well-known/mcp.json` is a **convenience pointer**, not a standard. There
 is no ratified well-known format for "which MCP servers does this domain
 operate", so the file carries no `$schema` and claims conformance to nothing. It
-names `https://mcp.mzizi.dev/mcp`, which is real and OAuth-gated — an
-unauthenticated request answers `401` (`invalid_token`). The load-bearing agent
+names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
+MCP server and the CLI are free with no gate: auth is required only for the Fundi
+tools (anything that files into the Fundi issue desk or needs a console user), and
+the card says so. The server change is being made in `agent-tools` now; until it
+deploys, an unauthenticated request still answers `401` (`invalid_token`), and the
+card's comment says that too. Drop that caveat once it has. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
 the server, over a standard `tools/list` request.
 
@@ -255,9 +262,11 @@ React `.tsx`. What it does instead is build its own pieces to the registry's
 56px and never below 48px — read from the same API. The dimensions are the
 system's; only the markup is local.
 
-There is exactly one script on the site: the filter on `/components`, which sets
-`hidden` on cards that are already in the HTML. With JavaScript off the page is
-the entire corpus, just unfiltered. `scripts/verify-rendered.py` proves that on
+The scripts on the site are progressive enhancement only: the filter on
+`/components`, which sets `hidden` on cards that are already in the HTML, and the
+`mz contract` bench on the landing page, whose unedited file and real all-pass
+result are rendered into the HTML at build time. With JavaScript off, every page
+still carries its content. `scripts/verify-rendered.py` proves that on
 every commit by stripping every `<script>` and then grepping for the content.
 
 ## Working on it
@@ -277,7 +286,7 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 
 | Repository                                                            | What it is                                                      | Address                                   |
 | --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                         |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language, and Mzizi's main goal — compiler, RFCs, benchmark | —                                         |
 | [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly here; the rest redirected   |
 | [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a Hono Worker, from the registry's files    | [api.mzizi.dev](https://api.mzizi.dev/v1) |
 | [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)    |
@@ -301,6 +310,12 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
   failure this whole approach exists to avoid.
 - **Any link to a private repository.** One exists in this org and operates the
   MCP server. The endpoint is public and is named; the source is not.
+
+## Security
+
+See [`SECURITY.md`](./SECURITY.md). Reports about this site go to
+`security@bundu.org`; the console at `app.mzizi.dev` uses `security@nyuchi.com`.
+`/.well-known/security.txt` carries the same routing for machines.
 
 ## Licence
 

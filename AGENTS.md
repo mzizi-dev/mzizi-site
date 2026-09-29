@@ -23,7 +23,7 @@ python3 scripts/verify-rendered.py dist    # what CI runs; see "The rendered-con
 ```
 
 CI runs, in order: `astro check`, `pnpm run lint`, `astro build`, a guard that the built
-`dist/` still contains `llms.txt`, `robots.txt`, `_redirects`, `.well-known/mcp.json` and
+`dist/` still contains `llms.txt`, `robots.txt`, `_redirects`, `.well-known/mcp.json`, `.well-known/security.txt` and
 `404.html` (the `.well-known` check exists because it's a dot-directory and tooling skips
 those by default often enough to be worth proving every time), the rendered-content gate,
 and a gitleaks scan.

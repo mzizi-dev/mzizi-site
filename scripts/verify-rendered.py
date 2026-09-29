@@ -168,6 +168,45 @@ check("tokens.html", "spacing steps rendered", count(r"<li class=\"step\"", body
       f"found {count(chr(60) + 'li class=.step.', body)}")
 check("tokens.html", "radii rendered", "9999px" in body)
 
+# --- / (the landing page, which leads with the language) -----------------
+print("\nindex.html")
+body = text_without_scripts("index.html")
+plain = html.unescape(re.sub(r"<[^>]+>", " ", body))
+plain = re.sub(r"\s+", " ", plain)
+
+check("index.html", "the status panel is rendered",
+      "Status: two pilots, no advantage yet" in plain)
+check("index.html", "the status panel says neither pilot showed an advantage",
+      "show no measurable advantage for Mzizi" in plain)
+# The panel comes before anything about components: the language leads.
+status_at = plain.find("Status: two pilots")
+components_at = plain.find("The components: Mzizi Roots")
+check("index.html", "the status panel precedes the components section",
+      0 <= status_at < components_at, f"status at {status_at}, components at {components_at}")
+# The bench's first paint is in the HTML, not drawn by its script.
+check("index.html", "the contract bench renders its source without JavaScript",
+      "button_size" in plain and "at_least" in plain)
+check("index.html", "the contract bench renders its all-pass result without JavaScript",
+      "5 contract clauses, 0 failed" in plain)
+check("index.html", "the language-is / isn't section is rendered",
+      "What the language is, and what it isn't" in plain)
+
+# --- /.well-known --------------------------------------------------------
+print("\n.well-known")
+security = (DIST / ".well-known" / "security.txt").read_text(encoding="utf-8")
+check(".well-known/security.txt", "has a Contact line",
+      re.search(r"^Contact: mailto:security@bundu\.org$", security, re.M) is not None)
+expires = re.search(r"^Expires: (\d{4}-\d\d-\d\dT[\d:]+Z)$", security, re.M)
+check(".well-known/security.txt", "has an ISO 8601 Expires line", expires is not None)
+if expires:
+    import datetime
+    when = datetime.datetime.fromisoformat(expires.group(1).replace("Z", "+00:00"))
+    now = datetime.datetime.now(datetime.timezone.utc)
+    check(".well-known/security.txt", "Expires is in the future — renew it if this fails",
+          when > now, expires.group(1))
+check(".well-known/security.txt", "has its Canonical URL",
+      "Canonical: https://mzizi.dev/.well-known/security.txt" in security)
+
 # --- /mcp ----------------------------------------------------------------
 print("\n_redirects")
 redirects = (DIST / "_redirects").read_text(encoding="utf-8")
