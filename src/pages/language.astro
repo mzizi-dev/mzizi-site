@@ -32,7 +32,7 @@ const phases = [
     n: "Phase 0",
     title: "Prove the core claim, no rendering attached",
     state: "in progress: two pilots, no advantage shown",
-    body: "A standalone compiler and syntax prototype with zero UI story. Success is a defined benchmark: an agent authors equivalent components in Mzizi syntax versus raw Dioxus or Leptos, scored on tokens consumed, iterations to a clean compile, and defect rate. If that shows no measurable advantage, nothing downstream matters.",
+    body: "A standalone compiler and syntax prototype with zero UI story. Success is a defined benchmark: an agent authors equivalent components in Mzizi syntax versus raw Dioxus or Leptos, scored on tokens consumed, iterations to a clean compile, and defect rate. If that shows no measurable advantage, nothing downstream matters. The owner has since widened the kill criterion (2026-09-29): Mzizi against the best existing language for each kind of task, aiming to rank with the top languages. Not measured yet.",
   },
   {
     n: "Phase 1",
@@ -259,7 +259,7 @@ const rfcs = [
     </table>
   </div>
 
-  <h2>Trying it</h2>
+  <h2 id="trying-it">Trying it</h2>
 
   <p>
     The compiler is the <code>mz</code> binary in
