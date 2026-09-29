@@ -1,0 +1,110 @@
+---
+/**
+ * /playground — static previews, and the way to each component's source.
+ *
+ * The registry's playground rendered components live in React. This site has
+ * no UI framework by doctrine, so it cannot, and it does not pretend to: the
+ * previews here are screenshots taken by `scripts/generate-previews.mjs` and
+ * committed, each one dated. Nothing on this page is interactive, and it says
+ * so up front.
+ */
+import Site from "../layouts/Site.astro";
+import { getComponents, getComponentRecords, shortType, builtAt, CANONICAL_BASE } from "../lib/registry";
+import { previews, previewsGeneratedAt, previewsSource } from "../lib/previews";
+
+const [{ items, total }, records] = await Promise.all([getComponents(), getComponentRecords()]);
+const hasRust = (name: string) => records.get(name)?.rust != null;
+
+// Rust first, then by node, then by name — the same order /components uses.
+const shown = items
+  .filter((item) => previews[item.name])
+  .sort(
+    (a, b) =>
+      Number(hasRust(b.name)) - Number(hasRust(a.name)) ||
+      a.node - b.node ||
+      a.name.localeCompare(b.name),
+  );
+const without = total - shown.length;
+---
+
+<Site
+  title="Playground"
+  eyebrow="Previews"
+  description="Static previews of Mzizi components with a link to each one's source. Not interactive yet, and it says so."
+  lede="Static previews, each linked to its component's source. Nothing here is interactive yet."
+  wide
+>
+  <div class="status prose">
+    <h2>What this is, and what it isn't yet</h2>
+    <p>
+      <strong>Not interactive.</strong> Every preview is a screenshot of the
+      component's <strong>React build</strong> rendered in the registry's playground
+      {previewsSource && <> (<code>{previewsSource}</code>)</>}
+      {previewsGeneratedAt && <>, taken <time datetime={previewsGeneratedAt}>{previewsGeneratedAt}</time></>}.
+      There are no props to change, no light/dark toggle and no live render.
+    </p>
+    <p>
+      <strong>No Rust previews yet.</strong> Mzizi Roots components are rendered
+      here by their React sibling, which shares their contract and tokens. A
+      Dioxus render has not been captured for any of them.
+    </p>
+    <p>
+      <strong>{without} of {total} components have no preview</strong>, because
+      they have no demo (a library, hook or server component) or their demo
+      renders blank without props. They are left without a picture rather than
+      shown as empty. Every component's source is on its page either way.
+    </p>
+    <p>
+      The one interactive thing on this site is the
+      <a href="/#contracts"><code>mz contract</code> bench</a> on the front page.
+    </p>
+  </div>
+
+  {
+    shown.length === 0 ? (
+      <p class="prose">No previews have been generated for this build.</p>
+    ) : (
+      <div class="cards">
+        {shown.map((item) => (
+          <article class="component preview-card">
+            <img
+              class="component-preview"
+              src={`/previews/${item.name}.jpg`}
+              alt={`${item.name}, its React build rendered in the registry playground`}
+              loading="lazy"
+              width="746"
+              height="300"
+            />
+            <header>
+              <h3>
+                <a href={`/components/${item.name}`}>{item.name}</a>
+                <span class="title">{item.title}</span>
+              </h3>
+              {hasRust(item.name) && <span class="badge solid">Rust</span>}
+              <span class="badge">{shortType(item.type)}</span>
+            </header>
+            <p>
+              <a href={`/components/${item.name}#${hasRust(item.name) ? "rust" : "react"}`}>
+                {hasRust(item.name) ? "Rust source" : "Source"}
+              </a>
+              {hasRust(item.name) && (
+                <>
+                  {" · "}
+                  <a href={`/components/${item.name}#react`}>React source</a>
+                </>
+              )}
+            </p>
+          </article>
+        ))}
+      </div>
+    )
+  }
+
+  <p class="provenance">
+    <span>
+      {shown.length} previews. Component list and Rust implementations read from{" "}
+      <code>{CANONICAL_BASE}/ui</code> and <code>/rs/&lt;name&gt;</code> when this page
+      was built, <time datetime={builtAt}>{builtAt}</time>.
+    </span>
+  </p>
+</Site>

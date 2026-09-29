@@ -31,16 +31,21 @@ and a gitleaks scan.
 ### The rendered-content gate
 
 Strips every `<script>` from the built HTML and asserts the content is still there: 577
-component cards, the eight node titles, the four rung titles, the six strands, N2's count
-of 371, all 21 colour families by CSS variable, specific hex values, and the `/mcp`
-redirect. A page that quietly renders nothing fails the build — this is the gate
+component cards and 577 component pages (each with its source and install command, Rust
+before React where there is Rust), the Roots list, the eight node titles, the four rung
+titles, the six strands, N2's count of 371, all 21 colour families by CSS variable,
+specific hex values, the landing page's status panel ahead of the components and its
+contract bench, the skills, `/cli`, `/playground` and `/observability`, `security.txt`'s
+`Expires` still in the future, the `/mcp` and `/api/v1` redirects, and no redirect left
+pointing at the registry app. A page that quietly renders nothing fails the build — this is the gate
 `mzizi-console` shipped without, and paid for with a blank production page that passed CI.
 
 ### Local dev against a mirror
 
 To build against something other than the live API — it went down for several minutes
 during this site's own build-out — set `MZIZI_API_ORIGIN` to a host serving `/v1/ui`,
-`/v1/architecture` and `/v1/brand`. **Do not commit a snapshot.** The build reads the API
+`/v1/ui/<name>`, `/v1/rs/<name>`, `/v1/architecture`, `/v1/brand`, `/v1/skills` and
+`/v1/stats`. **Do not commit a snapshot.** The build reads the API
 or fails; a cached copy that keeps serving after the source moves is exactly the failure
 this whole approach exists to avoid.
 
@@ -99,7 +104,7 @@ on the production deploy, so the same commit reads green on a PR and red on `mai
 ## Deliberately not here
 
 See README's "Deliberately not here" for the full list and reasoning (a DNS change, a
-sitemap before the remaining pages land, a page at `/mcp` instead of its 308, a committed
+sitemap before `/brand` and `/r/` land, a page at `/mcp` instead of its 308, a committed
 copy of the registry data, a link to a private repo). None of these is a missing feature —
 don't add one without reading why first.
 

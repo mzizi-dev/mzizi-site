@@ -38,10 +38,10 @@ failures: list[str] = []
 notes: list[str] = []
 
 
-def text_without_scripts(page: str) -> str:
+def text_without_scripts(page: str, quiet: bool = False) -> str:
     """The page as a reader with JavaScript switched off would receive it."""
     raw = (DIST / page).read_text(encoding="utf-8")
-    if "<script" in raw:
+    if "<script" in raw and not quiet:
         notes.append(f"{page}: contains <script>; stripping it before every check")
     stripped = re.sub(r"<script\b.*?</script>", "", raw, flags=re.S | re.I)
     return stripped
@@ -91,6 +91,73 @@ for node_title in ("Primitives", "Brand components", "Safety rails",
           node_title in plain)
 
 check("components.html", "the corpus total is printed", str(EXPECTED_COMPONENTS) in plain)
+
+check("components.html", "the Mzizi Roots section leads the page",
+      0 <= plain.find("Mzizi Roots: the Rust components") < plain.find("Every component"))
+roots = count(r'<ul class="roots-list">', body)
+check("components.html", "the Roots list is rendered", roots == 1)
+rust_cards = count(r"data-rust=\"1\"", body)
+check("components.html", "Rust components carry a Rust flag", rust_cards >= 1, f"found {rust_cards}")
+check("components.html", "every card links to its own page",
+      count(r'<h3> ?<a href="/components/', body) >= EXPECTED_COMPONENTS)
+
+# --- /components/<name> --------------------------------------------------
+print("\ncomponents/<name>.html")
+detail_pages = sorted((DIST / "components").glob("*.html"))
+check("components/", f"{EXPECTED_COMPONENTS} component pages built",
+      len(detail_pages) == EXPECTED_COMPONENTS, f"found {len(detail_pages)}")
+rust_pages = 0
+failures_before = len(failures)
+for page in detail_pages:
+    rel = f"components/{page.name}"
+    body = text_without_scripts(rel, quiet=True)
+    if "<pre><code>" not in body and "ships no source file" not in body:
+        check(rel, "renders its source, or says it has none", False)
+    if "npx shadcn@latest add https://api.mzizi.dev/v1/ui/" not in body:
+        check(rel, "prints its React install command", False)
+    rust_at = body.find("Mzizi Roots: the Rust implementation")
+    if rust_at >= 0:
+        rust_pages += 1
+        if not 0 <= rust_at < body.find('id="react"'):
+            check(rel, "the Rust implementation comes before the React build", False)
+check("components/", "every page renders its source (or says it has none) and its install command",
+      len(failures) == failures_before)
+check("components/", "some pages lead with a Rust implementation", rust_pages > 0, f"{rust_pages} Rust pages")
+
+body = text_without_scripts("components/button.html")
+plain = html.unescape(re.sub(r"<[^>]+>", " ", body))
+check("components/button.html", "button leads with its Rust source",
+      "Mzizi Roots: the Rust implementation" in plain and "use dioxus::prelude::*;" in plain)
+check("components/button.html", "button shows its React source too",
+      "class-variance-authority" in plain and "React build" in plain)
+for fact in ("Owner", "Collection", "npm dependencies", "Registry dependencies"):
+    check("components/button.html", f"“{fact}” is shown", fact in plain)
+body = text_without_scripts("components/accordion.html")
+check("components/accordion.html", "a React-only component says it has no Rust yet",
+      "No Rust implementation yet." in body)
+
+# --- /skills -------------------------------------------------------------
+print("\nskills")
+body = text_without_scripts("skills.html")
+skill_cards = count(r'<a href="/skills/', body)
+skill_pages = sorted((DIST / "skills").glob("*.html"))
+check("skills.html", "one card per skill page", skill_cards == len(skill_pages) > 0,
+      f"{skill_cards} cards, {len(skill_pages)} pages")
+body = text_without_scripts("skills/simplify.html")
+check("skills/simplify.html", "the skill body is rendered as HTML", "<h1" in body or "<h2" in body)
+
+# --- /cli, /playground, /observability -----------------------------------
+print("\ncli, playground, observability")
+body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("cli.html")))
+check("cli.html", "the React install path", "npx shadcn@latest add https://api.mzizi.dev/v1/ui/" in body)
+check("cli.html", "the Rust path", "/v1/rs/<name>" in body)
+check("cli.html", "mzizi add is marked unpublished", "mzizi add" in body and "not published" in body)
+check("cli.html", "mz check --agent", "mz check --agent" in body)
+body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("playground.html")))
+check("playground.html", "says plainly it is not interactive", "Not interactive." in body)
+body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("observability.html")))
+check("observability.html", "links the console", "app.mzizi.dev" in body)
+check("observability.html", "shows the file-backed N2 count", "N2" in body and "371" in body)
 
 # --- /architecture -------------------------------------------------------
 print("\narchitecture.html")
@@ -214,6 +281,16 @@ check("_redirects", "/mcp still 308s to mcp.mzizi.dev/mcp",
       re.search(r"^/mcp\s+https://mcp\.mzizi\.dev/mcp\s+308\s*$", redirects, re.M) is not None)
 check("_redirects", "/mcp is not also built as a page",
       not (DIST / "mcp.html").exists())
+check("_redirects", "/api/v1 still 308s to api.mzizi.dev/v1",
+      re.search(r"^/api/v1\s+https://api\.mzizi\.dev/v1\s+308\s*$", redirects, re.M) is not None)
+# The portal pages are ported: nothing on this site may send a reader back to
+# the registry app for them, and each one must exist as a page.
+check("_redirects", "no redirect to the registry app is left",
+      "mzizi-registry.nyuchi.workers.dev" not in redirects)
+for page in ("cli", "skills", "playground", "observability"):
+    check("_redirects", f"/{page} is a page, not a redirect",
+          (DIST / f"{page}.html").exists()
+          and re.search(rf"^/{page}\s", redirects, re.M) is None)
 
 # --- result ---------------------------------------------------------------
 if notes:
