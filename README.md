@@ -63,8 +63,8 @@ pages are the exception — `mzizi-site#5` rebuilt them here, on this site, on
 
 The API and the MCP server survived, because they had already moved to their own
 hostnames before the apex changed hands: `api.mzizi.dev` answers, and
-`mcp.mzizi.dev/mcp` answers `401` (`invalid_token`) without a token, which is
-correct — it is WorkOS-gated.
+`mcp.mzizi.dev/mcp` answers without a token: every tool is free except the two
+Fundi tools, which need a console sign-in.
 
 ### How it happened, as far as this repository can tell
 
@@ -242,9 +242,9 @@ operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
 MCP server and the CLI are free with no gate: auth is required only for the Fundi
 tools (anything that files into the Fundi issue desk or needs a console user), and
-the card says so. The server change is being made in `agent-tools` now; until it
-deploys, an unauthenticated request still answers `401` (`invalid_token`), and the
-card's comment says that too. Drop that caveat once it has. The load-bearing agent
+the card says so. That change is live (`mzizi-mcp` 0.10.1, checked 2026-09-29):
+`initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
+`mzizi_report_issue` ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
 the server, over a standard `tools/list` request.
 
