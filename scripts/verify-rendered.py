@@ -151,7 +151,10 @@ print("\ncli, playground, observability")
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("cli.html")))
 check("cli.html", "the React install path", "npx shadcn@latest add https://api.mzizi.dev/v1/ui/" in body)
 check("cli.html", "the Rust path", "/v1/rs/<name>" in body)
-check("cli.html", "mzizi add is marked unpublished", "mzizi add" in body and "not published" in body)
+check("cli.html", "mzizi add names the release it ships in",
+      "mzizi add" in body and "@nyuchi/mzizi-cli" in body and "0.6.0" in body)
+check("cli.html", "the MCP gate is named as the Fundi tools only",
+      "mzizi_fundi" in body and "mzizi_report_issue" in body)
 check("cli.html", "mz check --agent", "mz check --agent" in body)
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("playground.html")))
 check("playground.html", "says plainly it is not interactive", "Not interactive." in body)
@@ -291,6 +294,21 @@ for page in ("cli", "skills", "playground", "observability"):
     check("_redirects", f"/{page} is a page, not a redirect",
           (DIST / f"{page}.html").exists()
           and re.search(rf"^/{page}\s", redirects, re.M) is None)
+
+# --- stale claims -----------------------------------------------------------
+# Facts that were true while this site was being built and are not now. A page
+# that still says one of them is wrong, however well it renders.
+print("\nstale claims")
+stale = {
+    "invalid_token": "the MCP server answers without a token (mzizi-mcp 0.10.1)",
+    "until it deploys": "the no-sign-in MCP change has deployed",
+    "written but not published": "mzizi add ships in @nyuchi/mzizi-cli 0.6.0",
+    "mzizi-registry.nyuchi.workers.dev/components": "component pages are served here",
+}
+built = [p for p in DIST.rglob("*") if p.suffix in (".html", ".txt", ".json") and "pagefind" not in p.parts]
+for phrase, why in stale.items():
+    hits = [str(p.relative_to(DIST)) for p in built if phrase in p.read_text(encoding="utf-8")]
+    check("dist/", f"no page says “{phrase}” — {why}", not hits, ", ".join(hits[:5]))
 
 # --- result ---------------------------------------------------------------
 if notes:
