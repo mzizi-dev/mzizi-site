@@ -42,17 +42,16 @@ export const API_ORIGIN = "https://api.mzizi.dev";
 export const CANONICAL_BASE = `${API_ORIGIN}/v1`;
 
 /**
- * The bases this build will try to READ from, in order of preference.
+ * The base this build READS from: the canonical one, and only that.
  *
- * `api.mzizi.dev` is attached straight to the registry Worker, which serves its
- * routes under `/api/v1/*`. The rewrite that makes `/v1/*` answer is
- * `mzizi-registry#335`, which is open and unmerged — so right now the canonical
- * path 404s and `/api/v1` is what actually responds. Rather than pin either
- * one, the build asks: canonical first, `/api/v1` as the fallback. The day #335
- * lands, the next build silently starts using `/v1` and this list can lose its
- * second entry. Nothing that is printed on a page changes either way.
+ * `api.mzizi.dev` is served by `mzizi-api-gateway` (a Hono Worker over the
+ * registry's files), which answers `/v1/*` directly. An earlier build also
+ * tried `/api/v1` as a fallback while `mzizi-registry#335` was open; that
+ * rewrite landed, the gateway took over the hostname on 2026-09-29, and a
+ * second base only doubled the requests for every legitimate 404 (a component
+ * with no Rust implementation answers 404 by design).
  */
-const READ_BASES = [`${API_ORIGIN}/v1`, `${API_ORIGIN}/api/v1`];
+const READ_BASES = [`${API_ORIGIN}/v1`];
 
 /**
  * Where the build actually reads from.
@@ -185,7 +184,10 @@ export interface Brand {
   semanticColors: ThemedToken[];
   backgrounds: ThemedToken[];
   typography: {
-    fonts: Record<"sans" | "serif" | "mono", { family: string; usage: string; reason: string }>;
+    fonts: Record<
+      "sans" | "serif" | "mono",
+      { family: string; usage: string; reason: string }
+    >;
     scale: TypeStep[];
   };
   spacing: SpacingStep[];
@@ -214,29 +216,63 @@ export interface Brand {
  * One fetch per endpoint per build, however many pages ask.
  *
  * Astro renders each page in the same process, so a module-level cache is all
- * the deduplication needed — without it, three pages plus `astro check` would
- * hit the API a dozen times for data that cannot change mid-build.
+ * the deduplication needed — without it, the pages plus `astro check` would
+ * hit the API many times for data that cannot change mid-build.
  */
 const inFlight = new Map<string, Promise<unknown>>();
 
 /**
  * Four attempts, doubling from one second.
  *
- * Not optimism — measurement. While this page was being built the API returned
- * 404 on every endpoint for several minutes and then came back on its own; it
- * sits behind a Next.js deployment, so a redeploy takes the whole surface out
- * briefly. A build that gives up on the first blip would make those windows
- * into red CI runs for no reason. Four attempts covers roughly fifteen seconds;
- * anything longer is a real outage and should be reported as one, not waited
- * out.
+ * Not optimism — measurement. While this site was being built the API returned
+ * 404 on every endpoint for several minutes and then came back on its own. A
+ * build that gives up on the first blip would make those windows into red CI
+ * runs for no reason. Four attempts covers roughly fifteen seconds; anything
+ * longer is a real outage and should be reported as one, not waited out.
  */
 const ATTEMPTS = 4;
 
+/**
+ * At most this many requests in flight at once.
+ *
+ * The component pages read two documents per component (`/ui/<name>` and
+ * `/rs/<name>`), over a thousand requests per build. Unbounded, that is a
+ * burst the API would be right to rate-limit; eight at a time keeps the whole
+ * set to well under a minute.
+ */
+const CONCURRENCY = 8;
+let active = 0;
+const queue: (() => void)[] = [];
+async function slot<T>(work: () => Promise<T>): Promise<T> {
+  if (active >= CONCURRENCY) await new Promise<void>((go) => queue.push(go));
+  active++;
+  try {
+    return await work();
+  } finally {
+    active--;
+    queue.shift()?.();
+  }
+}
+
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function readJson<T>(path: string): Promise<T> {
+/**
+ * Read `path` from the API. `absent` decides which non-OK answers are a real,
+ * expected "there is nothing here" (returned as `null`) rather than a failure
+ * to retry: `/rs/<name>` answers 404 for a component with no Rust sibling,
+ * and that is data, not an outage.
+ */
+async function readJson<T>(path: string): Promise<T>;
+async function readJson<T>(
+  path: string,
+  absent: (status: number, body: string) => boolean,
+): Promise<T | null>;
+async function readJson<T>(
+  path: string,
+  absent?: (status: number, body: string) => boolean,
+): Promise<T | null> {
   const bases = ORIGIN_OVERRIDE ? [`${ORIGIN_OVERRIDE}/v1`] : READ_BASES;
-  let pending = inFlight.get(path) as Promise<T> | undefined;
+  let pending = inFlight.get(path) as Promise<T | null> | undefined;
   if (!pending) {
     pending = (async () => {
       let last = "";
@@ -245,10 +281,12 @@ async function readJson<T>(path: string): Promise<T> {
         for (const base of bases) {
           url = `${base}${path}`;
           try {
-            const response = await fetch(url, {
-              headers: { accept: "application/json" },
-            });
+            const response = await slot(() =>
+              fetch(url, { headers: { accept: "application/json" } }),
+            );
             if (response.ok) return (await response.json()) as T;
+            const body = await response.text();
+            if (absent?.(response.status, body)) return null;
             last = `${url} answered ${response.status} ${response.statusText}`;
           } catch (error) {
             last = `${url} threw ${error instanceof Error ? error.message : String(error)}`;
@@ -295,6 +333,209 @@ export async function getArchitecture(): Promise<Architecture> {
   return data;
 }
 
+/** One file of a registry document, exactly as the API serves it. */
+export interface RegistryFile {
+  path: string;
+  type: string;
+  target?: string;
+  content: string;
+}
+
+/** One component, `/v1/ui/<name>`: the React build, with its source. */
+export interface ComponentDetail {
+  name: string;
+  type: string;
+  title: string;
+  description: string;
+  author?: string;
+  categories: string[];
+  docs?: string;
+  dependencies: string[];
+  registryDependencies: string[];
+  files: RegistryFile[];
+}
+
+/** One component's Rust implementation, `/v1/rs/<name>`: a Mzizi Roots component. */
+export interface RustImplementation {
+  name: string;
+  type: string;
+  /** The rendering target the source is written for — `dioxus` today. */
+  target: string;
+  description: string;
+  /** The crate the API says this source belongs to. */
+  crate: { name: string; registry: string };
+  files: RegistryFile[];
+}
+
+/** Everything the site knows about one component. `rust` is null when there is no Rust sibling. */
+export interface ComponentRecord {
+  detail: ComponentDetail;
+  rust: RustImplementation | null;
+}
+
+let allRecords: Promise<Map<string, ComponentRecord>> | undefined;
+
+/**
+ * Every component's full document and, where one exists, its Rust
+ * implementation — read once per build, shared by every page that asks.
+ *
+ * There is no `/v1/rs` index to ask which components have a Rust sibling, so
+ * the build asks `/v1/rs/<name>` for each one. The API answers 404 with
+ * `"<name>" has no Rust implementation` for the rest, and only that answer is
+ * read as "none": any other failure is retried and then fails the build, so an
+ * outage cannot quietly turn every Roots component back into React-only.
+ */
+export function getComponentRecords(): Promise<Map<string, ComponentRecord>> {
+  allRecords ??= (async () => {
+    const { items } = await getComponents();
+    const noRust = (status: number, body: string) =>
+      status === 404 && body.includes("has no Rust implementation");
+    const entries = await Promise.all(
+      items.map(async (item) => {
+        const path = encodeURIComponent(item.name);
+        const [raw, rust] = await Promise.all([
+          readJson<Partial<ComponentDetail>>(`/ui/${path}`),
+          readJson<RustImplementation>(`/rs/${path}`, noRust),
+        ]);
+        // Not every item ships files: a `registry:base` item is a project
+        // config, not a source file. Absent arrays are empty, never invented.
+        const detail: ComponentDetail = {
+          ...item,
+          ...raw,
+          categories: raw.categories ?? item.categories ?? [],
+          dependencies: raw.dependencies ?? [],
+          registryDependencies: raw.registryDependencies ?? [],
+          files: raw.files ?? [],
+        } as ComponentDetail;
+        return [item.name, { detail, rust }] as const;
+      }),
+    );
+    return new Map(entries);
+  })();
+  return allRecords;
+}
+
+/**
+ * `https://api.mzizi.dev/v1/ui/input` → `input`. A registry dependency is an
+ * absolute URL (a bare name would resolve against shadcn's own registry and
+ * install a different component), so the name is read back out of it.
+ */
+export function dependencyName(url: string): string | null {
+  const match = /\/v1\/ui\/([^/?#]+)$/.exec(url);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+/** An agent skill as `/v1/skills` lists it. */
+export interface SkillSummary {
+  name: string;
+  description: string;
+  source: string;
+}
+
+/** One skill with its body, `/v1/skills/<name>`. */
+export interface Skill extends SkillSummary {
+  body_mdx: string;
+}
+
+/** Every skill, `/v1/skills`, and the bundle version the API serves. */
+export async function getSkills(): Promise<{
+  skills: SkillSummary[];
+  version: string;
+}> {
+  const { data, meta } = await readJson<{
+    data: SkillSummary[];
+    meta: { count: number; version: string };
+  }>("/skills");
+  if (data.length !== meta.count) {
+    throw new Error(
+      `mzizi-site build: /skills returned ${data.length} skills but reports ${meta.count}.`,
+    );
+  }
+  return { skills: data, version: meta.version };
+}
+
+/** One skill, `/v1/skills/<name>`. */
+export async function getSkill(name: string): Promise<Skill> {
+  const { data } = await readJson<{ data: Skill }>(
+    `/skills/${encodeURIComponent(name)}`,
+  );
+  return data;
+}
+
+/** `/v1/stats`: usage telemetry (zeros on this API) and the per-node counts from the files. */
+export interface Stats {
+  period_days: number;
+  total_api_calls: number;
+  total_mcp_calls: number;
+  total_errors: number;
+  layers: Record<string, number>;
+}
+
+export async function getStats(): Promise<Stats> {
+  return readJson<Stats>("/stats");
+}
+
+/**
+ * Whether a package exists on a public registry, asked at build time.
+ *
+ * Used for claims like "`mzizi-ui` is not on crates.io yet", which are true
+ * today and will not be forever. Asking at build time makes it a dated fact
+ * rather than a sentence someone has to remember to delete. Unlike the
+ * registry API, these hosts are not this site's data source, so a failure to
+ * reach them never fails the build: it reports `unknown`, and the page says so.
+ */
+export type PackageStatus =
+  | { state: "published"; version: string }
+  | { state: "absent" }
+  | { state: "unknown" };
+
+const packageChecks = new Map<string, Promise<PackageStatus>>();
+
+async function checkPackage(
+  url: string,
+  version: (body: unknown) => string | undefined,
+) {
+  let pending = packageChecks.get(url);
+  if (!pending) {
+    pending = (async (): Promise<PackageStatus> => {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            accept: "application/json",
+            // crates.io refuses requests without an identifying User-Agent.
+            "user-agent":
+              "mzizi-site build (https://github.com/mzizi-dev/mzizi-site)",
+          },
+        });
+        if (response.status === 404) return { state: "absent" };
+        if (!response.ok) return { state: "unknown" };
+        const v = version(await response.json());
+        return v ? { state: "published", version: v } : { state: "unknown" };
+      } catch {
+        return { state: "unknown" };
+      }
+    })();
+    packageChecks.set(url, pending);
+  }
+  return pending;
+}
+
+/** A crate on crates.io. */
+export function crateStatus(name: string): Promise<PackageStatus> {
+  return checkPackage(
+    `https://crates.io/api/v1/crates/${encodeURIComponent(name)}`,
+    (body) => (body as { crate?: { max_version?: string } }).crate?.max_version,
+  );
+}
+
+/** An npm package's `latest` dist-tag. */
+export function npmStatus(name: string): Promise<PackageStatus> {
+  return checkPackage(
+    `https://registry.npmjs.org/${name.replace("/", "%2f")}/latest`,
+    (body) => (body as { version?: string }).version,
+  );
+}
+
 /** The brand system, `/v1/brand`. */
 export async function getBrand(): Promise<Brand> {
   return readJson<Brand>("/brand");
@@ -312,7 +553,10 @@ export const builtAt = new Date().toISOString().replace(/:\d\d\.\d+Z$/, "Z");
 export function byNode(
   items: RegistryItem[],
 ): { node: number; nodeLabel: string; items: RegistryItem[] }[] {
-  const groups = new Map<number, { node: number; nodeLabel: string; items: RegistryItem[] }>();
+  const groups = new Map<
+    number,
+    { node: number; nodeLabel: string; items: RegistryItem[] }
+  >();
   for (const item of items) {
     let group = groups.get(item.node);
     if (!group) {
@@ -358,4 +602,3 @@ export function readableInk(hex: string): "#000000" | "#ffffff" {
     0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
   return luminance > 0.179 ? "#000000" : "#ffffff";
 }
-

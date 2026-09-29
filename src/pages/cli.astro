@@ -1,0 +1,167 @@
+---
+/**
+ * /cli — Mzizi on the command line, as it actually is today.
+ *
+ * Three things, in the order that matters to the language:
+ *   1. `mz`, the language's compiler. Built from a checkout; no release.
+ *   2. Installing components. React through `npx shadcn add`; Rust read from
+ *      `/v1/rs`; `mzizi add` (both targets) written but not published.
+ *   3. `@nyuchi/mzizi-cli`, the agent CLI on npm.
+ *
+ * The owner's decision (2026-09-29): the CLI is free, with no gate. Versions
+ * and crate states are read at build time and dated, never typed in here.
+ */
+import Site from "../layouts/Site.astro";
+import {
+  getComponentRecords,
+  crateStatus,
+  npmStatus,
+  installCommand,
+  builtAt,
+  CANONICAL_BASE,
+} from "../lib/registry";
+
+const records = await getComponentRecords();
+const rustCount = [...records.values()].filter((r) => r.rust).length;
+const [crate, cli] = await Promise.all([crateStatus("mzizi-ui"), npmStatus("@nyuchi/mzizi-cli")]);
+
+const mzCommands = [
+  { cmd: "mz check <file.mz>", what: "Does it compile. Human-readable diagnostics." },
+  {
+    cmd: "mz check --agent <file.mz>",
+    what: "The same check as NDJSON: one line per real error with an exact span, a plain-language message and a fix tagged exact or guess, then a summary line.",
+  },
+  {
+    cmd: "mz contract <file.mz>",
+    what: "Evaluates the file's contract block against its own declarations. Exits 1 if a clause does not hold, exactly as a compile error does.",
+  },
+  { cmd: "mz outline <file.mz>", what: "The interface only, as valid Mzizi: what an agent loads instead of reading the source." },
+  { cmd: "mz hash <file.mz>", what: "The root hash of the content-addressed IR, and the stored node count." },
+  { cmd: "mz ir <file.mz>", what: "Every IR node with its hash and structural path." },
+];
+---
+
+<Site
+  title="CLI"
+  eyebrow="Toolchain"
+  description="Mzizi on the command line: the mz compiler, installing components (React with shadcn, Rust from /v1/rs), and the agent CLI. Free, with no gate."
+  lede="Free, with no gate. The compiler first, because the language is the point; then installing components; then the agent CLI."
+>
+  <h2 id="mz">mz, the language's compiler</h2>
+  <div class="prose">
+    <p>
+      <code>mz</code> is the binary in
+      <a href="https://github.com/mzizi-dev/mzizi">mzizi-dev/mzizi</a>. There is no
+      release and no published binary yet, so it is built from a checkout, with
+      nothing beyond stable Rust:
+    </p>
+  </div>
+  <code class="cmd lead">{"git clone https://github.com/mzizi-dev/mzizi.git && cd mzizi/compiler"}</code>
+  <code class="cmd lead">cargo run --bin mz -- contract ../primitives/button.mz</code>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr><th>Command</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        {
+          mzCommands.map((c) => (
+            <tr>
+              <td><code>{c.cmd}</code></td>
+              <td>{c.what}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">
+    Designed but not built: <code>mz fix</code>, <code>mz refs</code>,
+    <code>mz path</code>, <code>mz patch</code> and <code>mz diff</code>. Real
+    captured output is on <a href="/language#trying-it">the language page</a>.
+  </p>
+
+  <h2 id="install">Installing components</h2>
+
+  <h3>Rust (Mzizi Roots)</h3>
+  <div class="prose">
+    <p>
+      {rustCount} components have a Rust implementation. Each one's source is
+      served at:
+    </p>
+  </div>
+  <code class="cmd lead">curl {CANONICAL_BASE}/rs/&lt;name&gt;</code>
+  <div class="prose">
+    <p>
+      The document names the crate <code>mzizi-ui</code> on crates.io.{" "}
+      {crate.state === "published" && <>It is published, at <code>{crate.version}</code>: <code>cargo add mzizi-ui</code>.</>}
+      {
+        crate.state === "absent" && (
+          <>
+            <strong>That crate is not on crates.io yet</strong>, so there is no{" "}
+            <code>cargo add</code> that works today. Until it is published, build
+            against the source from the API or from{" "}
+            <a href="https://github.com/mzizi-dev/mzizi-registry/tree/main/mzizi-rs"
+              ><code>mzizi-registry/mzizi-rs</code></a
+            >.
+          </>
+        )
+      }
+      {crate.state === "unknown" && <>Whether it is on crates.io could not be checked when this page was built.</>}
+      {" "}<code>npx shadcn add</code> cannot install a Rust document: it rejects the
+      schema.
+    </p>
+    <p>The <a href="/components#roots">Roots list</a> shows every component with a Rust implementation.</p>
+  </div>
+
+  <h3>React</h3>
+  <div class="prose">
+    <p>
+      Every component's React (TSX) build installs with shadcn, from its absolute
+      URL. Always the full URL: a bare name resolves against shadcn's own
+      registry and installs a different component.
+    </p>
+  </div>
+  <code class="cmd lead">npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code>
+  <p class="prose">For example: <code>{installCommand("button")}</code></p>
+
+  <h3><code>mzizi add</code>: not published yet</h3>
+  <p class="prose">
+    An installer for both targets, <code>mzizi add &lt;name&gt;</code>, is written
+    and in review. It detects whether a project is React or Rust, installs
+    registry dependencies by URL, and refuses what it cannot install honestly
+    (a Rust component whose crate is not published, an Astro project). It is
+    not on npm yet. Do not tell anyone to run it until it is.
+  </p>
+
+  <h2 id="agent">The agent CLI: <code>@nyuchi/mzizi-cli</code></h2>
+  <div class="prose">
+    <p>
+      An agent that reads your project off disk and plans a Mzizi-aligned change
+      against the registry and skills. Its binary is <code>fundi</code>.{" "}
+      {cli.state === "published" && <>The latest on npm is <code>{cli.version}</code>.</>}
+      {cli.state === "absent" && <>It is not on npm.</>}
+      {cli.state === "unknown" && <>Its npm version could not be checked when this page was built.</>}
+      {" "}A refresh that fixes its <code>--version</code> and <code>--help</code> is
+      in review and not published.
+    </p>
+  </div>
+  <code class="cmd lead">npx @nyuchi/mzizi-cli --help</code>
+  <div class="prose">
+    <p>
+      <code>explore</code> reads the project and runs offline. <code>plan</code>
+      and <code>chat</code> read the MCP server. The CLI is free, with no gate:
+      the owner's decision is that nothing short of the Fundi tools, which file
+      into the console's issue desk, needs a sign-in. The MCP side of that change
+      is landing now; until it deploys, the server still asks for a token.
+    </p>
+  </div>
+
+  <p class="provenance">
+    <span>
+      Rust count read from <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>; crates.io and
+      npm checked when this page was built, <time datetime={builtAt}>{builtAt}</time>.
+    </span>
+  </p>
+</Site>

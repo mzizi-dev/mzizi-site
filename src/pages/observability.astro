@@ -1,0 +1,96 @@
+---
+/**
+ * /observability — short on purpose.
+ *
+ * Logs, traces and usage belong to the console (app.mzizi.dev), which is run by
+ * Nyuchi and holds the one database in this estate. This site has no telemetry
+ * and no store for any; what it can show is what the registry's files say, and
+ * what the public API reports, dated.
+ */
+import Site from "../layouts/Site.astro";
+import { getStats, getArchitecture, getComponents, builtAt, CANONICAL_BASE } from "../lib/registry";
+
+const [stats, architecture, { items }] = await Promise.all([
+  getStats(),
+  getArchitecture(),
+  getComponents(),
+]);
+const helix = [...architecture.nodes, ...architecture.rungs];
+const counts = Object.entries(stats.layers)
+  .map(([n, count]) => ({ n: Number(n), count, title: helix.find((h) => h.node_number === Number(n))?.title ?? `N${n}` }))
+  .sort((a, b) => a.n - b.n);
+const assurance = items.filter((item) => item.node === 8).sort((a, b) => a.name.localeCompare(b.name));
+const telemetryZero =
+  stats.total_api_calls === 0 && stats.total_mcp_calls === 0 && stats.total_errors === 0;
+---
+
+<Site
+  title="Observability"
+  eyebrow="Console"
+  description="Where Mzizi's logs and telemetry live (the console, app.mzizi.dev), and what the registry's files and public API report."
+  lede="The logs live in the console. This page links there, and shows what is file-backed."
+>
+  <div class="panel">
+    <p>
+      <strong>Logs, traces and usage are in the console</strong>, at
+      <a href="https://app.mzizi.dev">app.mzizi.dev</a>, behind sign-in. It is run by
+      Nyuchi and holds the one database in the estate. This site is static and
+      keeps none.
+    </p>
+  </div>
+
+  <h2>What is file-backed</h2>
+  <p class="prose">
+    The registry API is served from the registry's repository files, with no
+    database. These per-node counts are derived from those files:
+  </p>
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr><th>Node</th><th>Components</th></tr>
+      </thead>
+      <tbody>
+        {
+          counts.map((c) => (
+            <tr>
+              <td><a href={`/architecture#n${c.n}`}>N{c.n} · {c.title}</a></td>
+              <td>{c.count}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">
+    {
+      telemetryZero
+        ? `Usage telemetry is not file-backed, and ${CANONICAL_BASE}/stats reports it as zero (API calls, MCP calls and errors over ${stats.period_days} days) because the API has no telemetry store. A zero there means "not collected here", not "not used".`
+        : `${CANONICAL_BASE}/stats reported ${stats.total_api_calls} API calls, ${stats.total_mcp_calls} MCP calls and ${stats.total_errors} errors over ${stats.period_days} days.`
+    }
+  </p>
+  <p class="provenance">
+    <span>
+      Read from <code>{CANONICAL_BASE}/stats</code> when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time>.
+    </span>
+    <a href={`${CANONICAL_BASE}/stats`}>Read the JSON</a>
+    <a href={`${CANONICAL_BASE}/health`}>Health</a>
+  </p>
+
+  <h2>The components that do the observing</h2>
+  <p class="prose">
+    N8, Assurance, is the node of probes, telemetry and audits that an app
+    installs to observe itself. Its {assurance.length} components:
+  </p>
+  <ul class="inline-list">
+    {
+      assurance.map((item) => (
+        <li>
+          <a href={`/components/${item.name}`}>
+            <code>{item.name}</code>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Site>

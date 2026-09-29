@@ -254,6 +254,8 @@ samp {
   background: var(--surface-container);
   border-radius: var(--radius-sm);
   padding: 0.1em 0.35em;
+  /* A long package name or URL breaks rather than widening a phone-width page. */
+  overflow-wrap: anywhere;
 }
 
 /* --------------------------------------------------------------- shell --- */
@@ -961,6 +963,13 @@ th {
   color: var(--muted-foreground);
 }
 
+/* In a table cell a state stays on one line; as a paragraph it is a sentence
+ * with a URL in it, and must wrap on a phone. */
+p.state {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 ul.spaced li {
   margin-block-end: var(--space-sm);
 }
@@ -1162,10 +1171,15 @@ ul.spaced li {
 /* Optional: only rendered when scripts/generate-previews.mjs has produced a
    screenshot for this item. Most cards have no img here at all — this is a
    progressive enhancement over the text card, not a layout it depends on. */
+/* The screenshots are the playground's panel at 746px wide and whatever height
+ * the component took (200px to about 600px). `contain`, not `cover`: cropping a
+ * component to fill a box shows a close-up of part of it, which is not what it
+ * looks like. */
 .component-preview {
   width: 100%;
-  aspect-ratio: 8 / 5;
-  object-fit: cover;
+  height: auto;
+  aspect-ratio: 746 / 300;
+  object-fit: contain;
   border-radius: calc(var(--spec-card-radius) - var(--space-xs, 0.25rem));
   border: 1px solid var(--border);
   background: var(--background);
@@ -1400,6 +1414,12 @@ ul.spaced li {
 .count-link {
   font-size: var(--text-body-small);
   white-space: nowrap;
+}
+
+/* A strand's occupant list is a sentence of node names, not a label: it wraps,
+ * or it widens a phone-width page. */
+.strand .count-link {
+  white-space: normal;
 }
 
 /* ====================================================== /tokens ========= */
@@ -2192,4 +2212,195 @@ ul.spaced li {
   height: 10px;
   border-radius: 50%;
   display: block;
+}
+
+/* ============================================ /components/<name> ========= */
+
+.component-badges {
+  margin-block: var(--space-md) var(--space-lg);
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.detail-grid {
+  display: grid;
+  gap: var(--space-xl);
+  grid-template-columns: 1fr;
+  align-items: start;
+  margin-block: var(--space-lg);
+}
+
+@media (min-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+
+/* A definition list laid out as label / value rows. */
+.facts {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) 1fr;
+  gap: var(--space-sm) var(--space-base);
+  margin: 0;
+  font-size: var(--text-body-small);
+}
+
+.facts dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-block-start: 0.2em;
+}
+
+.facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.doc-lines {
+  margin-block: var(--space-lg);
+}
+
+.inline-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-preview {
+  margin: 0;
+}
+
+.detail-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 32rem;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  background: var(--card);
+}
+
+.detail-preview figcaption {
+  margin-block-start: var(--space-sm);
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+}
+
+.impl {
+  margin-block: var(--space-2xl);
+}
+
+.impl-rust {
+  border-inline-start: var(--space-xs) solid var(--color-copper, var(--border));
+  padding-inline-start: var(--space-lg);
+}
+
+/* Source, in the HTML. Scrolls inside its own box rather than widening the page. */
+.source {
+  margin: var(--space-lg) 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  overflow: hidden;
+}
+
+.source > figcaption,
+.source > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-base);
+  border-block-end: 1px solid var(--border);
+  font-size: var(--text-caption);
+  min-height: var(--spec-button-sm);
+}
+
+.source > summary {
+  cursor: pointer;
+}
+
+.source:not([open]) > summary {
+  border-block-end: 0;
+}
+
+.source pre {
+  margin: 0;
+  padding: var(--space-base);
+  max-height: 36rem;
+  overflow: auto;
+  background: var(--surface-container);
+}
+
+.source pre code {
+  font-size: var(--text-caption);
+  line-height: var(--leading-code);
+}
+
+/* The Mzizi Roots list at the head of /components: every Rust component, linked. */
+.roots {
+  margin-block: var(--space-xl) var(--space-2xl);
+}
+
+.roots h2 {
+  margin-block-start: 0;
+}
+
+.roots-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-lg) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roots-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--spec-card-radius);
+  background: var(--card);
+}
+
+.component h3 a {
+  color: inherit;
+}
+
+/* ============================================== /skills/<name> ========== */
+
+.skill-body pre {
+  background: var(--surface-container);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  overflow-x: auto;
+}
+
+.skill-body pre code {
+  font-size: var(--text-caption);
+  line-height: var(--leading-code);
+}
+
+.skill-body table {
+  display: block;
+  overflow-x: auto;
+}
+
+.skill-body blockquote {
+  margin-inline: 0;
+  padding-inline-start: var(--space-base);
+  border-inline-start: var(--space-xs) solid var(--border);
+  color: var(--muted-foreground);
 }

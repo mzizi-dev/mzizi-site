@@ -1,6 +1,6 @@
 ---
 import Site from "../layouts/Site.astro";
-import { getComponents, builtAt, CANONICAL_BASE } from "../lib/registry";
+import { getComponents, getComponentRecords, crateStatus, builtAt, CANONICAL_BASE } from "../lib/registry";
 
 /**
  * The front door, and it leads with the language.
@@ -27,7 +27,11 @@ import { getComponents, builtAt, CANONICAL_BASE } from "../lib/registry";
  * and its real all-pass result are in the HTML, built below.
  */
 
-const { total } = await getComponents();
+const [{ total }, records] = await Promise.all([getComponents(), getComponentRecords()]);
+const rustCount = [...records.values()].filter((record) => record.rust !== null).length;
+// Asked at build time (and dated in the provenance line below), because
+// "not on crates.io yet" is true today and will not be forever.
+const crate = await crateStatus("mzizi-ui");
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -168,7 +172,7 @@ const toolchain = [
   },
   {
     name: "The CLIs",
-    href: "/language#trying-it",
+    href: "/cli",
     kind: "Command line",
     note: "mz for the language; npx shadcn for React components; the Rust path is read from /v1/rs. Free, with no gate.",
   },
@@ -228,10 +232,6 @@ const notYet = [
   {
     what: "The wider benchmark and the backend",
     note: "TypeScript/React, Python, Go, C++ and Rust-backend arms, and contracts for backend handlers, are direction with an RFC in progress.",
-  },
-  {
-    what: "The registry portal's other pages, here",
-    note: "/playground, /skills, /cli, /observability and per-component detail pages are ported one at a time. Until then those paths redirect to the registry app, which still serves them.",
   },
 ];
 
@@ -499,12 +499,20 @@ const repos: Repo[] = [
     </p>
   </div>
 
+  <ul class="figs">
+    <li class="fig"><b>{rustCount}</b><span>components in Rust, as Mzizi Roots</span></li>
+    <li class="fig"><b>{total}</b><span>components in the corpus, each with a React build</span></li>
+  </ul>
+
   <p class="prose">
     A Roots component's Rust source is served at
     <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>. The crate it names,
-    <code>mzizi-ui</code>, is not on crates.io yet (checked 2026-09-29), so
-    there is no <code>cargo add</code> to give you. The React build of every
-    component installs with shadcn:
+    <code>mzizi-ui</code>,{" "}
+    {crate.state === "published" && <>is on crates.io at <code>{crate.version}</code>.</>}
+    {crate.state === "absent" && <>is not on crates.io yet, so there is no <code>cargo add</code> to give you.</>}
+    {crate.state === "unknown" && <>could not be checked on crates.io when this page was built.</>}{" "}
+    <a href="/cli#install">How to install either build →</a> The React build of
+    every component installs with shadcn:
   </p>
 
   <code class="cmd lead"
@@ -513,14 +521,16 @@ const repos: Repo[] = [
 
   <p class="provenance">
     <span>
-      Component count read from <code>{CANONICAL_BASE}/ui</code> when this page was built,{" "}
+      Counts read from <code>{CANONICAL_BASE}/ui</code> and <code>/rs/&lt;name&gt;</code>, and crates.io checked, when this page was built,{" "}
       <time datetime={builtAt}>{builtAt}</time>.
     </span>
     <a href={`${CANONICAL_BASE}/ui`}>Read the JSON</a>
   </p>
 
   <p>
-    <a href="/components">Browse all {total} components →</a>{" · "}
+    <a href="/components#roots">The {rustCount} Roots components →</a>{" · "}
+    <a href="/components">Browse all {total} →</a>{" · "}
+    <a href="/playground">Previews →</a>{" · "}
     <a href="/architecture">The DNA helix they sit on →</a>{" · "}
     <a href="/tokens">The tokens they are built from →</a>
   </p>

@@ -1,0 +1,100 @@
+---
+/**
+ * /skills — the agent skills, from `/v1/skills` at build time.
+ *
+ * A skill is a written workflow an agent loads for one kind of task (scaffold
+ * a component, set up an app, simplify). The API serves the bundle bundled
+ * into `api.mzizi.dev`; npm serves `@nyuchi/mzizi-skills`. The two can differ,
+ * and when they do this page says so rather than picking one quietly.
+ */
+import Site from "../layouts/Site.astro";
+import { getSkills, npmStatus, builtAt, CANONICAL_BASE } from "../lib/registry";
+
+const [{ skills, version }, npm] = await Promise.all([
+  getSkills(),
+  npmStatus("@nyuchi/mzizi-skills"),
+]);
+const sorted = [...skills].sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Site
+  title="Skills"
+  eyebrow="For agents"
+  description={`The ${skills.length} Mzizi agent skills: written workflows an agent loads for one kind of task, served by the registry API and the MCP server.`}
+  lede="Written workflows an agent loads for one kind of task: scaffolding a component, setting up an app, simplifying code the Mzizi way. They carry the doctrine; the registry carries the data."
+  wide
+>
+  <ul class="stats">
+    <li>
+      <span class="stat-value">{skills.length}</span>
+      <span class="stat-label">Skills</span>
+    </li>
+    <li>
+      <span class="stat-value">{version}</span>
+      <span class="stat-label">Bundle served by the API</span>
+    </li>
+    {
+      npm.state === "published" && (
+        <li>
+          <span class="stat-value">{npm.version}</span>
+          <span class="stat-label">Latest on npm</span>
+        </li>
+      )
+    }
+  </ul>
+
+  <p class="provenance">
+    <span>
+      Read from <code>{CANONICAL_BASE}/skills</code>
+      {npm.state !== "unknown" && <> and the npm registry</>} when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time>.
+    </span>
+    <a href={`${CANONICAL_BASE}/skills`}>Read the JSON</a>
+  </p>
+
+  {
+    npm.state === "published" && npm.version !== version && (
+      <p class="status prose">
+        The API serves bundle <code>{version}</code>; npm's latest
+        <code>@nyuchi/mzizi-skills</code> is <code>{npm.version}</code>. The pages
+        below show what the API serves. If they disagree with npm, the newer
+        package is the one being maintained.
+      </p>
+    )
+  }
+
+  <div class="cards">
+    {
+      sorted.map((skill) => (
+        <article class="component">
+          <header>
+            <h3>
+              <a href={`/skills/${skill.name}`}>{skill.name}</a>
+            </h3>
+          </header>
+          <p>{skill.description}</p>
+          <code class="cmd">{`${CANONICAL_BASE}/skills/${skill.name}`}</code>
+        </article>
+      ))
+    }
+  </div>
+
+  <h2>Using them</h2>
+  <div class="prose">
+    <p>
+      <strong>Through the MCP server</strong> at
+      <a href="https://mcp.mzizi.dev/mcp"><code>mcp.mzizi.dev/mcp</code></a>, which
+      serves the same bundle as tools. It is free with no sign-in, except the
+      Fundi tools. (That change is landing now; until it deploys the server still
+      asks for a token.)
+    </p>
+    <p>
+      <strong>Over HTTP</strong>: <code>{CANONICAL_BASE}/skills</code> lists them,
+      <code>{CANONICAL_BASE}/skills/&lt;name&gt;</code> returns one with its full
+      body, and <code>/skills/summary</code> is the cheap version-drift check.
+    </p>
+    <p>
+      <strong>From npm</strong>: <code>@nyuchi/mzizi-skills</code>.
+    </p>
+  </div>
+</Site>

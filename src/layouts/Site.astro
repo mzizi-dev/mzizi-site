@@ -40,23 +40,27 @@ const documentTitle =
     ? "Mzizi — a language for the agentic web, in Rust"
     : `${title} · Mzizi`;
 
-// A reading order, not an alphabet: what this is, then the three surfaces a
-// person comes here to explore, then the wider estate.
+// A reading order, not an alphabet: the language and its toolchain first, then
+// the components that support it, then the wider estate.
 const nav = [
   { href: "/", label: "Overview" },
   { href: "/language", label: "The language" },
-  { href: "/architecture", label: "Architecture" },
+  { href: "/cli", label: "CLI" },
   { href: "/components", label: "Components" },
+  { href: "/playground", label: "Playground" },
+  { href: "/architecture", label: "Architecture" },
   { href: "/tokens", label: "Tokens" },
+  { href: "/skills", label: "Skills" },
+  { href: "/observability", label: "Observability" },
   { href: "/ecosystem", label: "Ecosystem" },
 ];
 
 // The header is not the canonical nav — the footer is. The header's job is
 // fast access to the handful of places a returning reader actually wants,
-// so only three of the six routes above surface there; the rest live one
+// so only three of the routes above surface there; the rest live one
 // tap away behind the mobile drawer and, in full, in the footer.
 const fastNav = nav.filter((item) =>
-  ["/language", "/components", "/ecosystem"].includes(item.href),
+  ["/language", "/cli", "/components"].includes(item.href),
 );
 
 const footerSections = [

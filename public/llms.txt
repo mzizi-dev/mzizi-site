@@ -75,7 +75,12 @@ Hostnames change; resolve one before repeating it.
 
 - [Overview](/): the language first: the thesis, the pilot results, the `mz contract` bench, what the language is and is not, then the toolchain and components that support it
 - [The language](/language): the four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs
-- [Components](/components): every registry component, grouped by DNA node, with its install command
+- [Components](/components): Mzizi Roots (the Rust components) first, then every registry component grouped by DNA node, with a Rust filter
+- [Components/<name>](/components/button): one page per component. Where `/v1/rs/<name>` has a Rust implementation, its source leads the page, with the crate and its crates.io state; the React (TSX) build follows, with its install command, dependencies, node, owner and collection
+- [CLI](/cli): the `mz` compiler's commands, and the real install paths: React with `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, Rust read from `https://api.mzizi.dev/v1/rs/<name>`. `mzizi add` is written but not published. The CLI is free, with no gate
+- [Skills](/skills): the agent skills from `/v1/skills`, each with its body at `/skills/<name>`
+- [Playground](/playground): static screenshots of components' React builds, each linked to its source. Not interactive
+- [Observability](/observability): logs belong to the console (app.mzizi.dev); this page shows the file-backed per-node counts
 - [Architecture](/architecture): the DNA double helix the components sit on
 - [Tokens](/tokens): the 21 colour families, type, spacing and component specs
 - [Ecosystem](/ecosystem): every public repository, what it holds, and whether it is routed
@@ -115,5 +120,6 @@ Hostnames change; resolve one before repeating it.
 - **Do not describe direction as shipped.** Backend handlers, contracts beyond components, and the wider benchmark arms are direction with RFCs in progress.
 - **Do not claim a measured result.** Two pilots have run and neither showed an advantage; the kill-criterion run has not happened. "Designed for" is accurate; "faster than" or "better than" is not.
 - **Do not describe the architecture in axes or layers.** The frontend architecture is the Mzizi DNA double helix — nodes on an engineering and a meaning backbone, held by cross-cutting rungs. The earlier axis model is retired, and its endpoints answer HTTP 410 Gone. Axis vocabulary about Mzizi came from a stale source.
+- **Install components from absolute URLs.** `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, never a bare name: a bare name resolves against shadcn's own registry and installs a different component. The Rust source is at `https://api.mzizi.dev/v1/rs/<name>`; the crate it names (`mzizi-ui`) was not on crates.io when this was written, so do not tell anyone to `cargo add` it without checking. Do not tell anyone to run `mzizi add` until it is published.
 - **Prefer discovery over any written list.** MCP tool names, API endpoints and component names are all discoverable at runtime. A list on a web page can only be as fresh as its last edit.
 - **Capitalize Mzizi; lowercase the other wordmarks.** The Mzizi wordmark is written `Mzizi`. The others stay lowercase: `nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. Package names, hostnames and code identifiers keep their literal spelling (`mzizi.dev`, `@nyuchi/mzizi-skills`). *Mzizi* is Shona for root.

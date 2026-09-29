@@ -27,15 +27,20 @@
 /api/v1/* https://api.mzizi.dev/v1/:splat 308
 
 # ---------------------------------------------------------------------------
-# Registry portal pages that are not ported to this site yet. The registry app
-# still serves them, so send visitors there instead of a 404. 302, not 301: each
-# one comes back here as it is ported, and a cached permanent redirect would
-# outlive that. Remove a line when its page lands in src/pages/.
+# The registry portal's pages are all ported now (/components/<name>, /skills,
+# /skills/<name>, /cli, /playground, /observability), so their 302s to the
+# registry app are gone.
+#
+# /playground/<name> was the registry's per-component live preview. Its content
+# (a preview and the source) is on /components/<name> here. 302, not 301: a
+# per-component playground page may come back, and a cached permanent redirect
+# would outlive that.
 # ---------------------------------------------------------------------------
-/playground https://mzizi-registry.nyuchi.workers.dev/playground 302
-/playground/* https://mzizi-registry.nyuchi.workers.dev/playground/:splat 302
-/skills https://mzizi-registry.nyuchi.workers.dev/skills 302
-/skills/* https://mzizi-registry.nyuchi.workers.dev/skills/:splat 302
-/cli https://mzizi-registry.nyuchi.workers.dev/cli 302
-/observability https://mzizi-registry.nyuchi.workers.dev/observability 302
-/components/* https://mzizi-registry.nyuchi.workers.dev/components/:splat 302
+/playground/* /components/:splat 302
+
+# ---------------------------------------------------------------------------
+# Components formerly named nyuchi-* are mzizi-* (2026-09-27). Every entry in
+# the registry's rename map is exactly that prefix swap, so one rule covers all
+# of them. Permanent: the old names are retired.
+# ---------------------------------------------------------------------------
+/components/nyuchi-* /components/mzizi-:splat 301
