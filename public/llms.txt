@@ -43,9 +43,9 @@ nothing has been measured against those arms. Describe all of this as direction.
 `mzizi-dev/mzizi/benchmarks/`, the MCP server at `mcp.mzizi.dev`, and the CLIs.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29; the MCP change is being made in
-`mzizi-dev/agent-tools` now, and until it deploys an unauthenticated request still
-answers `invalid_token`.
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.10.1 serves
+every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
+act as your console user and need sign-in.
 
 **The components are part of Mzizi.** *Mzizi Roots* is Mzizi's own UI and server
 components for the agentic web, in Rust (Dioxus). Where a component has a Rust
@@ -105,7 +105,7 @@ Hostnames change; resolve one before repeating it.
 - [mzizi.dev](https://mzizi.dev): this site — the language first, then the toolchain, the components, brand and tokens
 - [api.mzizi.dev/v1](https://api.mzizi.dev/v1): the registry API discovery document (`mzizi.dev/api/v1/*` redirects there)
 - [api.mzizi.dev/openapi](https://api.mzizi.dev/openapi): the registry API's OpenAPI 3.1 document
-- [mcp.mzizi.dev/mcp](https://mcp.mzizi.dev/mcp): the MCP server, Streamable HTTP. Free, no sign-in, except the Fundi tools, which need OAuth (protected-resource metadata at [/.well-known/oauth-protected-resource](https://mcp.mzizi.dev/.well-known/oauth-protected-resource)). The no-sign-in change is landing in `mzizi-dev/agent-tools`; until it deploys, an unauthenticated request answers `invalid_token`.
+- [mcp.mzizi.dev/mcp](https://mcp.mzizi.dev/mcp): the MCP server, Streamable HTTP. Free, no sign-in, except the Fundi tools, which need OAuth (protected-resource metadata at [/.well-known/oauth-protected-resource](https://mcp.mzizi.dev/.well-known/oauth-protected-resource)).
 - [/.well-known/mcp.json](/.well-known/mcp.json): this site's pointer to that server
 - [docs.mzizi.dev](https://docs.mzizi.dev): Mzizi's documentation (Mintlify, from `mzizi-dev/mzizi-docs`) — the one home of the docs
 
