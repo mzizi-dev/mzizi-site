@@ -7,9 +7,9 @@ import { getComponents, builtAt, CANONICAL_BASE } from "../lib/registry";
  *
  * Every claim on this page is checkable against a file in this org:
  * `mzizi-dev/mzizi/CHARTER.md` for what Mzizi is and what it has not yet
- * proven, and the repositories themselves for the rest. Nothing here is
- * measured, because nothing has been measured yet — see the status panel,
- * which is the single most important block on the site.
+ * proven, `benchmarks/results/` there for the two pilots that have run, and
+ * the repositories themselves for the rest. See the status panel, which is
+ * the single most important block on the site.
  *
  * The contract bench below is a live instance of `mz contract`, not a
  * mock-up: `primitives/button.mz` (mirrored verbatim, cited below) and the
@@ -35,8 +35,8 @@ const surfaces = [
   {
     what: "Registry API",
     host: "api.mzizi.dev",
-    repo: "mzizi-registry",
-    note: `${total} components, brand, tokens, the DNA-helix architecture.`,
+    repo: "mzizi-api-gateway",
+    note: `${total} components, brand, tokens, the DNA-helix architecture. A Hono Worker serving the registry's files, bundled at a pinned commit; no database.`,
   },
   {
     what: "Console",
@@ -48,7 +48,7 @@ const surfaces = [
     what: "MCP server",
     host: "mcp.mzizi.dev",
     repo: null,
-    note: "OAuth-gated: an unauthenticated request answers invalid_token.",
+    note: "Serves the registry and skills from bundled files, and joins in the docs from docs.mzizi.dev/mcp. OAuth-gated: an unauthenticated request answers invalid_token.",
   },
   {
     what: "Documentation",
@@ -60,16 +60,25 @@ const surfaces = [
 
 const notYet = [
   {
-    what: "api.mzizi.dev on mzizi-api-gateway",
-    note: "A pure-Rust Cloudflare Worker is built and merged. The hostname still answers from the registry's own Worker, not this one.",
+    what: "The Phase 0 measurement",
+    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not: it needs the fixes pilot 2 names, a task set that can fail, and fresh tasks.",
   },
   {
     what: "The registry portal's other pages, here",
-    note: "/playground, /skills, /cli, /observability and per-component detail pages are ported one at a time; today they still 404 on this site.",
+    note: "/playground, /skills, /cli, /observability and per-component detail pages are ported one at a time. Until then those paths redirect to the registry app, which still serves them.",
   },
 ];
 
-const repos = [
+type Repo = {
+  name: string;
+  lang: string;
+  langColor: string;
+  desc: string;
+  lead?: boolean;
+  tag?: string;
+};
+
+const repos: Repo[] = [
   {
     name: "mzizi",
     lang: "Rust",
@@ -85,10 +94,9 @@ const repos = [
   },
   {
     name: "mzizi-api-gateway",
-    lang: "Rust",
-    langColor: "var(--color-copper)",
-    desc: "Pure-Rust Cloudflare Worker for api.mzizi.dev. Built; not yet the hostname's origin.",
-    tag: "not serving yet",
+    lang: "TypeScript",
+    langColor: "var(--color-cobalt)",
+    desc: "api.mzizi.dev — a Hono Cloudflare Worker serving the registry API from the registry's files, bundled at build time. No database.",
   },
   {
     name: "mzizi-console",
@@ -135,7 +143,7 @@ const repos = [
         runtime (Candle is the dependency), and not a post-quantum
         cryptography project. Those are stated non-goals, not omissions.
       </p>
-      <div class="stamp"><i></i>Phase 0 in progress, unmeasured against the kill criterion</div>
+      <div class="stamp"><i></i>Phase 0 in progress: two pilots run, no advantage shown yet</div>
     </div>
 
     <div class="bench" aria-labelledby="bench-title">
@@ -149,40 +157,55 @@ const repos = [
         Messages are verbatim from <code>mz contract</code>, checked against a real
         run at <a href="https://github.com/mzizi-dev/mzizi/blob/4c61d28/primitives/button.mz">4c61d28</a>.
         The check is re-implemented in this page's script so you can play with it.
+        <code>0ms</code> is wall-clock time for the contract check alone, rounded
+        down to whole milliseconds; reading the file and starting the process are
+        not included.
         <button class="bench-reset" id="bench-reset" type="button">Reset</button>
       </div>
     </div>
   </div>
 
   <div class="status">
-    <h2>Status: unmeasured</h2>
+    <h2>Status: two pilots, no advantage yet</h2>
     <p>
       The compiler front end exists and is tested — a lexer, a recovering
       parser, an agent diagnostic protocol, a content-addressed IR, and nine
       primitives written in Mzizi itself. Contract blocks are evaluated (see
-      the bench above), but comparison against a reference implementation —
-      the other half of the defect metric — is not built.
+      the bench above), and the benchmark harness scores an agent's output
+      against the registry's reference implementation.
     </p>
     <p>
       <strong
-        >The Phase 0 benchmark has not run, so nothing here has been measured
-        against the charter's kill criteria.</strong
-      > The charter is explicit that if the benchmark shows no measurable advantage
+        >Two pilot runs on 2026-09-27 show no measurable advantage for Mzizi.</strong
+      > With a frontier model, the Mzizi and Dioxus arms were indistinguishable on
+      clean compiles and defects, and Mzizi used about 8% fewer tokens. With a ~7B
+      open-weight model — the size the design targets — Mzizi did worse on all
+      three metrics (2 of 6 clean compiles against Dioxus's 4 of 6). Both pilots
+      are tiny (two scored tasks, three seeds), and neither is the Phase 0 number.
+      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
+        >The write-up</a
+      > names the three failure mechanisms and what has to change before a run
+      that tests the kill criterion.
+    </p>
+    <p>
+      The charter is explicit that if the benchmark shows no measurable advantage
       over raw Dioxus or Leptos, nothing downstream matters. Treat every claim on
       this site as a design intent with an argument behind it, not a result.
     </p>
   </div>
 
   <ul class="figs">
-    <li class="fig"><b>107</b><span>tests passing, 7 suites</span></li>
-    <li class="fig"><b>33</b><span>contract clauses evaluated</span></li>
-    <li class="fig"><b>3,966</b><span>lines of Rust in the compiler</span></li>
+    <li class="fig"><b>269</b><span>tests passing, 12 suites</span></li>
+    <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
+    <li class="fig"><b>6,684</b><span>lines of Rust in the compiler</span></li>
     <li class="fig"><b>{total}</b><span>registry components, live</span></li>
   </ul>
   <p class="provenance">
     <span>
       Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/commit/4c61d28"><code>4c61d28</code></a>.
+      <a href="https://github.com/mzizi-dev/mzizi/commit/a9c928d"><code>a9c928d</code></a>
+      (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;
+      <code>mz contract</code> over <code>primitives/*.mz</code>).
       Component count read from <code>{CANONICAL_BASE}/ui</code> when this page was built,{" "}
       <time datetime={builtAt}>{builtAt}</time>.
     </span>
@@ -277,8 +300,8 @@ const repos = [
     </p>
     <p>
       Do not hardcode component counts, versions or token values read from any
-      page. The registry API is generated from a database and is the only
-      authoritative source for them.
+      page. The registry API, built from the registry's repository files, is
+      the only authoritative source for them.
     </p>
   </div>
 

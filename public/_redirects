@@ -18,3 +18,24 @@
 # silently drops the request. This is the same status the apex returns now, and
 # it must stay the same through the cutover.
 /mcp https://mcp.mzizi.dev/mcp 308
+
+# ---------------------------------------------------------------------------
+# The registry API lives on api.mzizi.dev (mzizi-api-gateway). Old links to the
+# apex's /api/v1 go there, method preserved.
+# ---------------------------------------------------------------------------
+/api/v1 https://api.mzizi.dev/v1 308
+/api/v1/* https://api.mzizi.dev/v1/:splat 308
+
+# ---------------------------------------------------------------------------
+# Registry portal pages that are not ported to this site yet. The registry app
+# still serves them, so send visitors there instead of a 404. 302, not 301: each
+# one comes back here as it is ported, and a cached permanent redirect would
+# outlive that. Remove a line when its page lands in src/pages/.
+# ---------------------------------------------------------------------------
+/playground https://mzizi-registry.nyuchi.workers.dev/playground 302
+/playground/* https://mzizi-registry.nyuchi.workers.dev/playground/:splat 302
+/skills https://mzizi-registry.nyuchi.workers.dev/skills 302
+/skills/* https://mzizi-registry.nyuchi.workers.dev/skills/:splat 302
+/cli https://mzizi-registry.nyuchi.workers.dev/cli 302
+/observability https://mzizi-registry.nyuchi.workers.dev/observability 302
+/components/* https://mzizi-registry.nyuchi.workers.dev/components/:splat 302

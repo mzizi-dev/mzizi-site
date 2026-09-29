@@ -31,7 +31,7 @@ const phases = [
   {
     n: "Phase 0",
     title: "Prove the core claim, no rendering attached",
-    state: "in progress, unmeasured",
+    state: "in progress: two pilots, no advantage shown",
     body: "A standalone compiler and syntax prototype with zero UI story. Success is a defined benchmark: an agent authors equivalent components in Mzizi syntax versus raw Dioxus or Leptos, scored on tokens consumed, iterations to a clean compile, and defect rate. If that shows no measurable advantage, nothing downstream matters.",
   },
   {
@@ -103,15 +103,25 @@ const rfcs = [
     <p>
       Real today: the lexer, a recovering parser, the agent diagnostic protocol,
       the content-addressed IR, and nine primitives written in Mzizi itself,
-      covered by 75 tests. Contract blocks parse but are not yet evaluated,
-      which is why the defect metric below is still a hand-written Rust test
-      rather than something the toolchain measures.
+      covered by 269 tests (<code>mzizi-dev/mzizi</code> at <code>a9c928d</code>).
+      <code>mz contract</code> evaluates contract blocks, and the benchmark
+      harness (<code>mzbench</code>) runs agent episodes against a Mzizi arm and a
+      Dioxus arm and scores each result against the registry's reference.
     </p>
     <p>
-      <strong>The Phase 0 benchmark has not run.</strong> Nothing on this page has
-      been measured against the charter's kill criteria. The four design goals below
-      are hypotheses with arguments attached — that is a real and useful thing to
-      publish, and it is not the same thing as a result.
+      <strong>Two pilots have run, and neither shows an advantage for Mzizi.</strong>
+      On 2026-09-27 a frontier model scored the same on both arms, with Mzizi about
+      8% cheaper in tokens. A ~7B open-weight model, the size the design targets,
+      did worse in Mzizi on all three metrics: 2 of 6 clean compiles against 4 of 6.
+      Its repair loop resubmitted the same file 15 times out of 16. It also hit
+      React idioms Mzizi has no form for, and a variant table that asks for one
+      fact twice. Both pilots are tiny, and neither is the charter's measurement.
+      <a
+        href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
+        >The pilot 2 write-up</a
+      > lists what has to change before a run that tests the kill criterion. The four
+      design goals below are hypotheses with arguments attached, and so far the
+      evidence has not backed them.
     </p>
   </div>
 
