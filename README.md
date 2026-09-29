@@ -47,18 +47,19 @@ hands, and most of it still has no live address. Three of its highest-value
 pages are the exception — `mzizi-site#5` rebuilt them here, on this site, on
 `@bundu/ui`:
 
-| Path on `mzizi.dev`            | Today                      | Was                                       |
-| ------------------------------ | -------------------------- | ----------------------------------------- |
-| `/`, `/language`, `/ecosystem` | 200                        | This site                                 |
-| `/llms.txt`, `/robots.txt`     | 200                        | This site                                 |
-| `/.well-known/mcp.json`        | 200                        | This site                                 |
-| `/components`                  | **200 — rebuilt here**     | The registry's developer portal           |
-| `/architecture`                | **200 — rebuilt here**     | The registry's developer portal           |
-| `/tokens`                      | **200 — rebuilt here**     | The registry's developer portal           |
-| `/brand`, `/observability`     | 404                        | The registry's developer portal           |
-| `/r/`                          | 404                        | The registry's developer portal           |
-| `/api/v1`, `/api/openapi`      | 404                        | The registry API — now on `api.mzizi.dev` |
-| `/mcp`                         | 308 to `mcp.mzizi.dev/mcp` | The MCP server — now on `mcp.mzizi.dev`   |
+| Path on `mzizi.dev`                                                 | Today                      | Was                                             |
+| ------------------------------------------------------------------- | -------------------------- | ----------------------------------------------- |
+| `/`, `/language`, `/ecosystem`                                      | 200                        | This site                                       |
+| `/llms.txt`, `/robots.txt`                                          | 200                        | This site                                       |
+| `/.well-known/mcp.json`                                             | 200                        | This site                                       |
+| `/components`                                                       | **200 — rebuilt here**     | The registry's developer portal                 |
+| `/architecture`                                                     | **200 — rebuilt here**     | The registry's developer portal                 |
+| `/tokens`                                                           | **200 — rebuilt here**     | The registry's developer portal                 |
+| `/brand`, `/r/`                                                     | 404                        | The registry's developer portal                 |
+| `/playground`, `/skills`, `/cli`, `/observability`, `/components/*` | 302 to the registry app    | The registry's developer portal, not ported yet |
+| `/api/v1`, `/api/v1/*`                                              | 308 to `api.mzizi.dev/v1`  | The registry API — now on `api.mzizi.dev`       |
+| `/api/openapi`                                                      | 404                        | The registry API — now `api.mzizi.dev/openapi`  |
+| `/mcp`                                                              | 308 to `mcp.mzizi.dev/mcp` | The MCP server — now on `mcp.mzizi.dev`         |
 
 The API and the MCP server survived, because they had already moved to their own
 hostnames before the apex changed hands: `api.mzizi.dev` answers, and
@@ -210,16 +211,18 @@ Every claim traces to a file in this org — mostly
 [`CHARTER.md`](https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md) — or to a
 request that was actually made.
 
-The live/planned column on the landing page was written when only `mzizi.dev` and
-`mcp.mzizi.dev` had DNS records. **That is out of date in the pages themselves**
-and has not been fixed here, because this change is the README. As of 2026-09-12
-`mzizi.dev`, `api.mzizi.dev`, `app.mzizi.dev` and `mcp.mzizi.dev` all resolve,
-and `docs.mzizi.dev` now does too — it answered HTTP 200 (Mintlify) on 2026-09-27.
+The live/not-yet ledger on the landing page was last re-checked on 2026-09-29.
+Every ecosystem hostname resolves. `api.mzizi.dev` has been served by
+`mzizi-api-gateway` since that day.
 
 The status panel is the most important block on the site and should stay that
-way. The Phase 0 benchmark has not run, so nothing here has been measured against
-the charter's kill criteria. "Designed for" is accurate; "faster than" is not,
-and will not be until there is a number.
+way. Two Phase 0 pilots ran on 2026-09-27
+([`benchmarks/results/`](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results)
+in `mzizi-dev/mzizi`), and neither showed an advantage for Mzizi: on the ~7B
+open-weight arm, Mzizi did worse. Neither is the charter's measurement, so the kill
+criterion has still not been tested. "Designed for" is accurate; "faster than" is
+not. When a new run lands, update the panel, the figures and `public/llms.txt`
+together, whichever way it falls.
 
 Numbers that come from the registry — the component count, the per-node counts,
 the palette — are read from the API when the site is built, and every page that
@@ -272,14 +275,14 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 
 ## Ecosystem
 
-| Repository                                                            | What it is                                                      | Address                                        |
-| --------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                              |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly restored here; the rest unrouted |
-| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a pure-Rust Worker                          | [api.mzizi.dev](https://api.mzizi.dev/v1)      |
-| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)         |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)       |
-| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)                 |
+| Repository                                                            | What it is                                                      | Address                                   |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language — Rust compiler and runtime research, Phase 0      | —                                         |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly here; the rest redirected   |
+| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a Hono Worker, from the registry's files    | [api.mzizi.dev](https://api.mzizi.dev/v1) |
+| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)    |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)  |
+| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)            |
 
 ## Deliberately not here
 

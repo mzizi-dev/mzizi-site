@@ -27,13 +27,13 @@ const repos = [
     role: "Design system, registry and portal",
     state: "serving api.mzizi.dev today",
     site: "https://api.mzizi.dev/v1",
-    body: "The canonical component registry for the Mzizi ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and the registry API served at api.mzizi.dev. TypeScript, deployed as a Cloudflare Worker.",
+    body: "The canonical component registry for the Mzizi ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around. Its files are what api.mzizi.dev serves (through mzizi-api-gateway), and it holds no database. TypeScript, deployed as a Cloudflare Worker.",
   },
   {
     name: "mzizi-api-gateway",
     role: "The registry API",
-    state: "shipping code, not routed",
-    body: "Built for api.mzizi.dev — the registry API as a pure-Rust Cloudflare Worker, compiled to WASM through workers-rs. Not routed: api.mzizi.dev is served today by mzizi-registry, so this repository is the planned replacement, not the live API.",
+    state: "live on api.mzizi.dev",
+    body: "Serves api.mzizi.dev: the registry API as a Hono Cloudflare Worker (TypeScript). Every route answers from the registry's repository files, generated at a pinned commit and bundled into the Worker. There's no origin, no database and no Supabase. It replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check.",
   },
   {
     name: "mzizi-console",
