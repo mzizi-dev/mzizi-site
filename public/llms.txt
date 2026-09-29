@@ -27,6 +27,8 @@ beat Dioxus or Leptos. It has not been measured. If that run shows no measurable
 advantage, nothing downstream matters. **Every result is published, whichever way
 it falls**, in
 [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results).
+Held-out task texts stay unpublished until their task set is retired; their
+scores are published immediately.
 
 **Direction, not shipped (owner, 2026-09-29).** Mzizi is meant to build its
 entire backend infrastructure as well as its UI. The frontend is either Astro with
@@ -40,12 +42,24 @@ nothing has been measured against those arms. Describe all of this as direction.
 **The toolchain supports the language.** The `mz` compiler (`check`, `contract`,
 `outline`, `hash`, `ir`; built from a checkout, no release), `mz check --agent`
 (NDJSON diagnostics with spans and tagged fixes), the benchmark harness in
-`mzizi-dev/mzizi/benchmarks/`, the MCP server at `mcp.mzizi.dev`, and the CLIs.
+`mzizi-dev/mzizi/benchmarks/`, the MCP server at `mcp.mzizi.dev`, the agent
+skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
 the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.10.1 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
 act as your console user and need sign-in.
+
+Versions on 2026-09-29 (read the registries before repeating one):
+
+- `mzizi-mcp` **0.10.1** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`)
+- `@nyuchi/mzizi-skills` **0.7.0**
+- `@nyuchi/mzizi-cli` **0.6.0**, which ships the installer: `mzizi add <name>`
+  for React (writes the TSX) or Rust (records the `mzizi-ui` crate and refuses
+  while that crate is unpublished), plus the `fundi` agent. Known issue in
+  0.6.0: started through npm's bin link (`npx`, `node_modules/.bin/mzizi`) it
+  prints nothing and exits 0; run `node node_modules/@nyuchi/mzizi-cli/dist/cli.js`
+  until a fixed release is out.
 
 **The components are part of Mzizi.** *Mzizi Roots* is Mzizi's own UI and server
 components for the agentic web, in Rust (Dioxus). Where a component has a Rust
@@ -77,7 +91,7 @@ Hostnames change; resolve one before repeating it.
 - [The language](/language): the four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the stated non-goals, and the RFCs
 - [Components](/components): Mzizi Roots (the Rust components) first, then every registry component grouped by DNA node, with a Rust filter
 - [Components/<name>](/components/button): one page per component. Where `/v1/rs/<name>` has a Rust implementation, its source leads the page, with the crate and its crates.io state; the React (TSX) build follows, with its install command, dependencies, node, owner and collection
-- [CLI](/cli): the `mz` compiler's commands, and the real install paths: React with `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, Rust read from `https://api.mzizi.dev/v1/rs/<name>`. `mzizi add` is written but not published. The CLI is free, with no gate
+- [CLI](/cli): the `mz` compiler's commands, and the real install paths: React with `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, Rust read from `https://api.mzizi.dev/v1/rs/<name>`. `mzizi add` in `@nyuchi/mzizi-cli` 0.6.0 for both. The CLI is free, with no gate
 - [Skills](/skills): the agent skills from `/v1/skills`, each with its body at `/skills/<name>`
 - [Playground](/playground): static screenshots of components' React builds, each linked to its source. Not interactive
 - [Observability](/observability): logs belong to the console (app.mzizi.dev); this page shows the file-backed per-node counts
@@ -93,6 +107,10 @@ Hostnames change; resolve one before repeating it.
 - [RFC-0003 — IR](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0003-ir.md): the eight barriers an agent hits *reading* a codebase, and the content-addressed IR that answers them
 - [RFC-0004 — test topology](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0004-test-topology.md): what is public, what is held out, and the rule that keeps forks working — private consumes public, never the reverse
 - [RFC-0006 — contracts](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0006-contracts.md): contract blocks, what `mz contract` evaluates, and what the benchmark harness compares against a reference
+- [RFC-0007 — gap register](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0007-gap-register.md): what the language lacks for the charter's scope, checked against the code and ordered by what blocks what
+- [RFC-0008 — types, collections, records](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0008-types-collections-records.md): name and type resolution, `list(T)`, `record`, `option(T)`, `for each`, and a checker that can say no. Draft
+- RFC-0009 and RFC-0010 are forthcoming in `mzizi-dev/mzizi` and are not in `design/` yet. Do not describe what they settle until they land. RFC-0005 is reserved and unwritten
+- [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, as Dioxus UI components and host-agnostic server components. Proposed
 - [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results): both pilot write-ups and their raw episodes
 
 ## Public repositories
@@ -108,8 +126,8 @@ Hostnames change; resolve one before repeating it.
 ## Live endpoints
 
 - [mzizi.dev](https://mzizi.dev): this site — the language first, then the toolchain, the components, brand and tokens
-- [api.mzizi.dev/v1](https://api.mzizi.dev/v1): the registry API discovery document (`mzizi.dev/api/v1/*` redirects there)
-- [api.mzizi.dev/openapi](https://api.mzizi.dev/openapi): the registry API's OpenAPI 3.1 document
+- [api.mzizi.dev/v1](https://api.mzizi.dev/v1): the registry API discovery document (`mzizi.dev/api/v1/*` redirects there). Every route is served from the registry's files, with no database: components (`/v1/ui`, `/v1/ui/<name>`, `/v1/ui/<name>/docs`), Rust implementations (`/v1/rs/<name>`, 404 where there is none), search (`/v1/search?q=`), AI instruction sets (`/v1/ai/instructions`), skills (`/v1/skills`), architecture, brand and stats. `/v1/docs` answers 410 Gone with a map to `docs.mzizi.dev`, where the long-form docs live
+- [api.mzizi.dev/openapi](https://api.mzizi.dev/openapi): the registry API's OpenAPI 3.1 document (YAML). Its prose still says routes read from Supabase; that is stale, and the routes themselves are the authority
 - [mcp.mzizi.dev/mcp](https://mcp.mzizi.dev/mcp): the MCP server, Streamable HTTP. Free, no sign-in, except the Fundi tools, which need OAuth (protected-resource metadata at [/.well-known/oauth-protected-resource](https://mcp.mzizi.dev/.well-known/oauth-protected-resource)).
 - [/.well-known/mcp.json](/.well-known/mcp.json): this site's pointer to that server
 - [docs.mzizi.dev](https://docs.mzizi.dev): Mzizi's documentation (Mintlify, from `mzizi-dev/mzizi-docs`) — the one home of the docs
@@ -120,6 +138,6 @@ Hostnames change; resolve one before repeating it.
 - **Do not describe direction as shipped.** Backend handlers, contracts beyond components, and the wider benchmark arms are direction with RFCs in progress.
 - **Do not claim a measured result.** Two pilots have run and neither showed an advantage; the kill-criterion run has not happened. "Designed for" is accurate; "faster than" or "better than" is not.
 - **Do not describe the architecture in axes or layers.** The frontend architecture is the Mzizi DNA double helix — nodes on an engineering and a meaning backbone, held by cross-cutting rungs. The earlier axis model is retired, and its endpoints answer HTTP 410 Gone. Axis vocabulary about Mzizi came from a stale source.
-- **Install components from absolute URLs.** `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, never a bare name: a bare name resolves against shadcn's own registry and installs a different component. The Rust source is at `https://api.mzizi.dev/v1/rs/<name>`; the crate it names (`mzizi-ui`) was not on crates.io when this was written, so do not tell anyone to `cargo add` it without checking. Do not tell anyone to run `mzizi add` until it is published.
+- **Install components from absolute URLs.** `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, never a bare name: a bare name resolves against shadcn's own registry and installs a different component. The Rust source is at `https://api.mzizi.dev/v1/rs/<name>`; the crate it names (`mzizi-ui`) was not on crates.io when this was written, so do not tell anyone to `cargo add` it without checking. `mzizi add <name>` (`@nyuchi/mzizi-cli` 0.6.0) installs the React build and refuses the Rust one while the crate is unpublished.
 - **Prefer discovery over any written list.** MCP tool names, API endpoints and component names are all discoverable at runtime. A list on a web page can only be as fresh as its last edit.
 - **Capitalize Mzizi; lowercase the other wordmarks.** The Mzizi wordmark is written `Mzizi`. The others stay lowercase: `nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. Package names, hostnames and code identifiers keep their literal spelling (`mzizi.dev`, `@nyuchi/mzizi-skills`). *Mzizi* is Shona for root.

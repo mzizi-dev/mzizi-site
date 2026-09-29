@@ -4,7 +4,7 @@ import Site from "../layouts/Site.astro";
 /**
  * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` (§3 design
  * goals, §4 phasing, §5 non-goals, §6 the resolved benchmark design) and the
- * four RFCs in that repository's `design/` directory. Where the charter leaves
+ * RFCs in that repository's `design/` directory. Where the charter leaves
  * something open, this page says so rather than rounding it up.
  */
 
@@ -80,6 +80,21 @@ const rfcs = [
     id: "RFC-0004",
     file: "RFC-0004-test-topology.md",
     what: "What is public (nearly all the testing) and what is held out (the benchmark task set), why, and the rule that keeps forks working: private consumes public, never the reverse.",
+  },
+  {
+    id: "RFC-0006",
+    file: "RFC-0006-contracts.md",
+    what: "What a contract block means: the clause grammar, the subject language, and what mz contract proves and deliberately does not. Draft; implemented as mz contract.",
+  },
+  {
+    id: "RFC-0007",
+    file: "RFC-0007-gap-register.md",
+    what: "Everything the charter's scope needs that the grammar and compiler do not yet provide, checked against the code and ordered by what blocks what. A register, not an implementation.",
+  },
+  {
+    id: "RFC-0008",
+    file: "RFC-0008-types-collections-records.md",
+    what: "RFC-0007's first tier: name and type resolution, list(T), record, option(T) and for each, and a checker that can say no. Draft.",
   },
 ];
 ---
@@ -258,6 +273,16 @@ const rfcs = [
       </tbody>
     </table>
   </div>
+
+  <p>
+    RFC-0005 is reserved and unwritten. RFC-0009 and RFC-0010 are forthcoming in
+    the same repository; until they land there, nothing on this site describes
+    what they settle. The Mzizi Roots components have their own RFC in the
+    registry:
+    <a href="https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md"
+      ><code>mzizi-registry/docs/roots/RFC-roots.md</code></a
+    >.
+  </p>
 
   <h2 id="trying-it">Trying it</h2>
 

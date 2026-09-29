@@ -5,8 +5,8 @@
  * Three things, in the order that matters to the language:
  *   1. `mz`, the language's compiler. Built from a checkout; no release.
  *   2. Installing components. React through `npx shadcn add`; Rust read from
- *      `/v1/rs`; `mzizi add` (both targets) written but not published.
- *   3. `@nyuchi/mzizi-cli`, the agent CLI on npm.
+ *      `/v1/rs`; `mzizi add` (both targets) in `@nyuchi/mzizi-cli` 0.6.0+.
+ *   3. `fundi`, the agent CLI in the same package.
  *
  * The owner's decision (2026-09-29): the CLI is free, with no gate. Versions
  * and crate states are read at build time and dated, never typed in here.
@@ -24,6 +24,22 @@ import {
 const records = await getComponentRecords();
 const rustCount = [...records.values()].filter((r) => r.rust).length;
 const [crate, cli] = await Promise.all([crateStatus("mzizi-ui"), npmStatus("@nyuchi/mzizi-cli")]);
+
+// `mzizi add` first shipped in @nyuchi/mzizi-cli 0.6.0. Whether the latest on
+// npm is at least that is asked at build time, not assumed.
+const INSTALLER_SINCE = "0.6.0";
+const atLeast = (version: string, floor: string) => {
+  const a = version.split(/[.-]/).map(Number);
+  const b = floor.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((a[i] ?? 0) !== b[i]) return (a[i] ?? 0) > b[i];
+  }
+  return true;
+};
+const installerShipped = cli.state === "published" && atLeast(cli.version, INSTALLER_SINCE);
+// 0.6.0's entry-point check fails when it is started through a symlink, which
+// is what npm's bin links are (checked 2026-09-29). Shown for that version only.
+const binLinkBug = cli.state === "published" && cli.version === "0.6.0";
 
 const mzCommands = [
   { cmd: "mz check <file.mz>", what: "Does it compile. Human-readable diagnostics." },
@@ -126,35 +142,81 @@ const mzCommands = [
   <code class="cmd lead">npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code>
   <p class="prose">For example: <code>{installCommand("button")}</code></p>
 
-  <h3><code>mzizi add</code>: not published yet</h3>
-  <p class="prose">
-    An installer for both targets, <code>mzizi add &lt;name&gt;</code>, is written
-    and in review. It detects whether a project is React or Rust, installs
-    registry dependencies by URL, and refuses what it cannot install honestly
-    (a Rust component whose crate is not published, an Astro project). It is
-    not on npm yet. Do not tell anyone to run it until it is.
-  </p>
-
-  <h2 id="agent">The agent CLI: <code>@nyuchi/mzizi-cli</code></h2>
+  <h3 id="mzizi-add"><code>mzizi add</code>: both targets, one command</h3>
   <div class="prose">
     <p>
-      An agent that reads your project off disk and plans a Mzizi-aligned change
-      against the registry and skills. Its binary is <code>fundi</code>.{" "}
-      {cli.state === "published" && <>The latest on npm is <code>{cli.version}</code>.</>}
-      {cli.state === "absent" && <>It is not on npm.</>}
-      {cli.state === "unknown" && <>Its npm version could not be checked when this page was built.</>}
-      {" "}A refresh that fixes its <code>--version</code> and <code>--help</code> is
-      in review and not published.
+      {
+        installerShipped ? (
+          <>
+            <code>mzizi add &lt;name&gt;</code> ships in <code>@nyuchi/mzizi-cli</code>{" "}
+            from <code>{INSTALLER_SINCE}</code> (latest on npm: <code>{cli.state === "published" && cli.version}</code>).
+          </>
+        ) : (
+          <>
+            <code>mzizi add &lt;name&gt;</code> ships in <code>@nyuchi/mzizi-cli</code>{" "}
+            from <code>{INSTALLER_SINCE}</code>; npm could not be checked when this page was built.
+          </>
+        )
+      }{" "}
+      It detects whether a project is React or Rust (<code>--target</code>
+      overrides), resolves registry dependencies by absolute URL, and refuses
+      what it cannot install honestly rather than guessing. No API key and no
+      sign-in.
     </p>
+    <ul>
+      <li>
+        <strong>React:</strong> writes the TSX files and names the npm
+        dependencies, as <code>npx shadcn add</code> would.
+      </li>
+      <li>
+        <strong>Rust:</strong> copies no <code>.rs</code> files, because a Roots
+        component is a module of the <code>mzizi-ui</code> crate, not a file to
+        fork. It records the crate and checks crates.io first.{" "}
+        {crate.state !== "published" && (
+          <>
+            While <code>mzizi-ui</code> is unpublished, it exits 1 and says so: a
+            Rust install is blocked on the crate, not on the tool.
+          </>
+        )}
+      </li>
+      <li><strong>Astro:</strong> refused, because the registry serves no <code>.astro</code> files.</li>
+    </ul>
   </div>
-  <code class="cmd lead">npx @nyuchi/mzizi-cli --help</code>
+  <code class="cmd lead">npm install --save-dev @nyuchi/mzizi-cli</code>
+  {
+    binLinkBug ? (
+      <>
+        <div class="status prose">
+          <p>
+            <strong>Known issue in <code>0.6.0</code>:</strong> started through npm's
+            bin link (<code>npx</code>, or <code>node_modules/.bin/mzizi</code>) it
+            prints nothing and exits 0, because its entry-point check compares the
+            link's path with the file's real path. Until a fixed release is on npm,
+            run it by path:
+          </p>
+        </div>
+        <code class="cmd lead">node node_modules/@nyuchi/mzizi-cli/dist/cli.js add button --dry-run</code>
+      </>
+    ) : (
+      <code class="cmd lead">npx mzizi add button --dry-run</code>
+    )
+  }
+
+  <h2 id="agent">The agent CLI: <code>fundi</code></h2>
   <div class="prose">
     <p>
-      <code>explore</code> reads the project and runs offline. <code>plan</code>
-      and <code>chat</code> read the MCP server. The CLI is free, with no gate:
-      the owner's decision is that nothing short of the Fundi tools, which file
-      into the console's issue desk, needs a sign-in. The MCP side of that change
-      is landing now; until it deploys, the server still asks for a token.
+      The same package's other binary, <code>fundi</code>, reads your project off
+      disk and plans a Mzizi-aligned change against the registry and skills.
+      <code>explore</code> runs offline. <code>plan</code> and <code>chat</code>
+      read the MCP server; without an <code>ANTHROPIC_API_KEY</code>,
+      <code>plan</code> hands its context to the coding agent that ran it instead
+      of calling a model itself.
+    </p>
+    <p>
+      The CLI is free, with no gate, and so is the MCP server it reads: nothing
+      needs a sign-in except the Fundi tools (<code>mzizi_fundi</code> and{" "}
+      <code>mzizi_report_issue</code>), which act as your console user.
+      <code>fundi login</code> exists for those alone.
     </p>
   </div>
 

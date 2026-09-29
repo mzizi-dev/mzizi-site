@@ -101,8 +101,9 @@ const typeCounts = [
           {status.state === "unknown" && <>could not be checked on crates.io when this page was built.</>}{" "}
         </>
       ))}
-      <code>mzizi add</code>, an installer for both targets, is written but not
-      published. See <a href="/cli">the CLI page</a>.
+      <code>mzizi add</code>, the installer for both targets, records the crate
+      instead of copying files, and refuses while the crate is unpublished. See
+      <a href="/cli#install">the CLI page</a>.
     </p>
   </section>
 

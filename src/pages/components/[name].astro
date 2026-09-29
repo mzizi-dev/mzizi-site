@@ -203,8 +203,10 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
           )}
           <p>
             <code>npx shadcn add</code> cannot install a Rust document; it rejects
-            the schema. <code>mzizi add</code>, an installer for both targets, is
-            written but not published yet.
+            the schema. <code>mzizi add {item.name} --target rust</code> (in{" "}
+            <code>@nyuchi/mzizi-cli</code> 0.6.0+) records the crate rather than
+            copying files, and refuses while the crate is unpublished.{" "}
+            <a href="/cli#mzizi-add">How to run it →</a>
           </p>
         </div>
         <code class="cmd">curl {rsUrl}</code>
