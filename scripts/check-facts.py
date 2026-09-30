@@ -34,6 +34,10 @@ UA = "mzizi-site check-facts (https://github.com/mzizi-dev/mzizi-site)"
 LANGUAGE_README = "https://raw.githubusercontent.com/mzizi-dev/mzizi/main/README.md"
 LANGUAGE_DESIGN = "https://api.github.com/repos/mzizi-dev/mzizi/contents/design?ref=main"
 LANGUAGE_HEAD = "https://api.github.com/repos/mzizi-dev/mzizi/commits/main"
+LANGUAGE_CHARTER = "https://raw.githubusercontent.com/mzizi-dev/mzizi/main/CHARTER.md"
+LANGUAGE_TRACKER = "https://raw.githubusercontent.com/mzizi-dev/mzizi/main/LANGUAGE-TRACKER.md"
+LANGUAGE_ARMS = "https://api.github.com/repos/mzizi-dev/mzizi/contents/benchmarks/arms?ref=main"
+TRACKER_LINK = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md"
 NPM = ("@nyuchi/mzizi-cli", "@nyuchi/mzizi-mcp", "@nyuchi/mzizi-skills")
 CRATES = (
     "mzizi-tokens",
@@ -135,6 +139,90 @@ if design:
     for rfc in rfcs:
         check(f"language.html links {rfc}",
               f"https://github.com/mzizi-dev/mzizi/blob/main/design/{rfc}" in raw_language)
+
+# The charter's version. Every page that names a charter version names this one.
+charter = upstream("the language's CHARTER.md", lambda: fetch(LANGUAGE_CHARTER))
+if charter:
+    version = re.search(r"Mzizi Research Charter, v(\d+\.\d+)", charter)
+    title = re.search(r"^# (.+)$", charter, re.M)
+    check("CHARTER.md states its version", version is not None)
+    if version:
+        current = version.group(1)
+        for name, text in pages.items():
+            cited = set(re.findall(r"(?:charter|CHARTER\.md)\W{0,3}(?:\(|, )?v(\d+\.\d+)\b", text, re.I))
+            check(f"{name} names no charter version but v{current}", cited <= {current},
+                  ", ".join(sorted(cited - {current})))
+        for name in ("language.html", "llms.txt"):
+            check(f"{name} cites charter v{current}",
+                  re.search(rf"(?:charter|CHARTER\.md)\W{{0,3}}(?:\(|, )?v{re.escape(current)}\b", pages[name], re.I) is not None)
+    if title:
+        heading = title.group(1).strip()
+        check(f"llms.txt carries the charter's title, “{heading}”", heading in pages["llms.txt"])
+
+# The tracker (owner, 2026-09-30): LANGUAGE-TRACKER.md is the one list of what
+# Mzizi still needs, and every capability claim on the site comes from it. The
+# site says Mzizi has none of these yet; the moment one of their rows turns ✅
+# upstream, that sentence is wrong and this fails until it is rewritten.
+tracker = upstream("the language's LANGUAGE-TRACKER.md", lambda: fetch(LANGUAGE_TRACKER))
+MISSING = "no expressions, bindings, callable functions, loops, error handling, modules or standard library yet"
+if tracker:
+    rows = dict(re.findall(r"^\|\s*([A-Z]\d+)\s*\|[^|]*\|\s*(✅|🟡|📝|❌)\s*\|", tracker, re.M))
+    # C1 expressions, C2 bindings, C3 functions, C4 control flow (loops),
+    # C9 error handling, P1 modules, P2 standard library.
+    named = {"C1": "expressions", "C2": "bindings", "C3": "callable functions", "C4": "loops",
+             "C9": "error handling", "P1": "modules", "P2": "standard library"}
+    check("the tracker has every row the site's sentence names", all(r in rows for r in named),
+          ", ".join(r for r in named if r not in rows))
+    done = [named[r] for r in named if rows.get(r) == "✅"]
+    for name in ("index.html", "language.html", "llms.txt"):
+        says = MISSING in pages[name]
+        check(f"{name} says Mzizi has {MISSING}", says)
+        check(f"{name}'s list of what Mzizi lacks matches the tracker", not (says and done),
+              f"the tracker marks {', '.join(done)} ✅" if done else "")
+    for name in ("index.html", "language.html"):
+        raw = (DIST / name).read_text(encoding="utf-8")
+        check(f"{name} links the tracker as “What still has to be built”",
+              f'href="{TRACKER_LINK}"' in raw and "What still has to be built" in pages[name])
+    check("llms.txt links the tracker", TRACKER_LINK in pages["llms.txt"])
+    # Lowering (P3): today a service lowers and nothing else does.
+    if rows.get("P3") == "✅":
+        check("the site's lowering claim matches the tracker (P3 is ✅: everything lowers)", False)
+    elif rows.get("P3") == "🟡":
+        for name in ("index.html", "language.html"):
+            check(f"{name} says a service lowers and no component does (tracker P3 🟡)",
+                  "local Rust + axum package" in pages[name] and "No component lowers yet" in pages[name])
+
+# The benchmark arms: every directory in benchmarks/arms/ is an arm that
+# exists; the /language table says "exists" for exactly those, and "not added
+# yet" for the rest, and the landing page's React arm follows the same listing.
+arms = upstream("the language's benchmarks/arms/ listing", lambda: fetch_json(LANGUAGE_ARMS))
+if arms:
+    present = {entry["name"] for entry in arms if entry["type"] == "dir"}
+    raw_language = (DIST / "language.html").read_text(encoding="utf-8")
+    # Astro adds data-astro-cid-* attributes to scoped elements, so match tags loosely.
+    table = dict(re.findall(r'<th scope="row"[^>]*><code[^>]*>([^<]+)</code></th>.*?<td class="state"[^>]*>([^<]+)</td>',
+                            raw_language, re.S))
+    check("language.html has an arms table", bool(table))
+    for arm in sorted(present):
+        check(f"language.html lists the {arm} arm as existing", table.get(arm, "").startswith("exists"),
+              table.get(arm, "missing"))
+    for arm, state in sorted(table.items()):
+        if arm not in present:
+            check(f"language.html says the {arm} arm is not added yet", state.startswith("not added"), state)
+    react = re.search(r"TypeScript · React\s*(exists, never run|exists|not added yet)", pages["index.html"])
+    check("index.html's React arm state follows benchmarks/arms/",
+          react is not None and (react.group(1).startswith("exists") == ("react" in present)),
+          react.group(1) if react else "missing")
+
+# The skill pages carry @nyuchi/mzizi-skills as /v1/skills serves it. Language
+# facts in them that went stale upstream are the skills-freshness agent's to
+# fix, not this site's, so they are notes here, not failures.
+skill_stale = re.compile(r"\bnothing lowers yet\b|\bRFC is being written\b|(?:charter|CHARTER\.md)\W{0,3}(?:\(|, )?v0\.[0-3]\b", re.I)
+skill_pages = sorted((DIST / "skills").glob("*.html")) if (DIST / "skills").is_dir() else []
+lagging = [p.name for p in skill_pages if skill_stale.search(reader_text(p))]
+if lagging:
+    notes.append(f"skill pages still carry pre-62a0f32 language facts ({', '.join(lagging)}): "
+                 "@nyuchi/mzizi-skills lags the language; tell the skills-freshness agent.")
 
 # --- npm ---------------------------------------------------------------------
 print("\nnpm (latest dist-tags)")

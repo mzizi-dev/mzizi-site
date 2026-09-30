@@ -62,7 +62,7 @@ const mzCommands = [
   },
   {
     cmd: "mz contract <file.mz>",
-    what: "Evaluates the file's contract block against its own declarations. Exits 1 if a clause does not hold, exactly as a compile error does.",
+    what: "For a component, evaluates its contract block against its own declarations. For a service, runs it in process: each example is one request, and each ensure is tested over generated requests (tested, not proven). Exits 1 if a clause does not hold, exactly as a compile error does.",
   },
   {
     cmd: "mz fix <file.mz>",
@@ -71,6 +71,10 @@ const mzCommands = [
   { cmd: "mz outline <file.mz>", what: "The interface only, as valid Mzizi: what an agent loads instead of reading the source." },
   { cmd: "mz hash <file.mz>", what: "The root hash of the content-addressed IR, and the stored node count." },
   { cmd: "mz ir <file.mz>", what: "Every IR node with its hash and structural path." },
+  {
+    cmd: "mz build <service.mz> --out <dir>",
+    what: "Lowers a service to a local Rust + axum package, which builds with Cargo and serves HTTP (RFC-0011 §8). A service only: no component lowers yet, and there is no Workers, Containers or WebAssembly target.",
+  },
 ];
 ---
 
@@ -111,7 +115,11 @@ const mzCommands = [
   </div>
   <p class="prose">
     Designed but not built: <code>mz refs</code>, <code>mz path</code>,{" "}
-    <code>mz patch</code> and <code>mz diff</code>. Real
+    <code>mz patch</code>, <code>mz diff</code>, <code>mz run</code>,{" "}
+    <code>mz test</code> and <code>mz fmt</code> (see{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md"
+      >what still has to be built</a
+    >). Real
     captured output is on <a href="/language#trying-it">the language page</a>.
   </p>
 

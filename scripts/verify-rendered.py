@@ -314,9 +314,42 @@ check("llms.txt", "says which things are toolchain and components, not the langu
 check("llms.txt", "says the harness is the core of the language, and not built yet",
       "**The harness is the core of Mzizi**" in llms and "The harness as a whole is not built" in llms)
 body = text_without_scripts("language.html", quiet=True)
-for rfc in ("RFC-0009-comparison-benchmark.md", "RFC-0010-contracts-everywhere.md"):
+for rfc in ("RFC-0009-comparison-benchmark.md", "RFC-0010-contracts-everywhere.md",
+            "RFC-0011-handlers.md", "RFC-0012-harness.md"):
     check("language.html", f"links {rfc} in mzizi-dev/mzizi design/",
           f'href="https://github.com/mzizi-dev/mzizi/blob/main/design/{rfc}"' in body)
+for rfc in ("RFC-0011-handlers.md", "RFC-0012-harness.md"):
+    check("llms.txt", f"lists {rfc}", f"https://github.com/mzizi-dev/mzizi/blob/main/design/{rfc}" in llms)
+
+# The language tracker (owner, 2026-09-30): LANGUAGE-TRACKER.md is the one list
+# of what Mzizi still needs, and every capability claim comes from it. The
+# /language page and the landing status panel link it as "What still has to be
+# built", and the site says plainly what Mzizi does not have yet. When a
+# tracker row turns ✅, scripts/check-facts.py fails until this sentence moves.
+TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md"
+MISSING = "no expressions, bindings, callable functions, loops, error handling, modules or standard library yet"
+status_panel = re.search(r'id="status".*?</section>', raw_index, re.S)
+check("index.html", "the status panel links the tracker as “What still has to be built”",
+      status_panel is not None and f'href="{TRACKER}"' in status_panel.group(0)
+      and "What still has to be built" in status_panel.group(0))
+check("language.html", "links the tracker as “What still has to be built”",
+      f'href="{TRACKER}"' in body and "What still has to be built" in body)
+language_plain = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body)))
+for name, text in (("index.html", plain), ("language.html", language_plain), ("llms.txt", re.sub(r"\s+", " ", llms.replace("*", "")))):
+    check(name, "says plainly what Mzizi does not have yet (LANGUAGE-TRACKER.md)", MISSING in text)
+# The backend slice (mzizi-dev/mzizi #29–#33): a service lowers, to a local
+# Rust + axum package, and nothing else does. The pages say exactly that.
+for name, text in (("index.html", plain), ("language.html", language_plain)):
+    check(name, "says a service lowers to a local Rust + axum package, and no component does",
+          "local Rust + axum package" in text and "No component lowers yet" in text)
+# The arms as benchmarks/arms/ holds them (checked live by check-facts.py).
+check("index.html", "the React arm exists and has never run",
+      re.search(r"TypeScript · React\s*exists, never run", plain) is not None)
+check("index.html", "the other-language backend arms are not added yet",
+      all(re.search(re.escape(a) + r"\s*not added yet", plain) for a in
+          ("TypeScript · Hono", "Python · FastAPI", "Go · net/http", "C++20 · cpp-httplib", "Rust · axum")))
+check("index.html", "the Mzizi backend arm is mzizi-be, with the probe crate and task B1",
+      "mzizi-be" in plain and "mzprobe" in plain and "B1" in plain)
 
 # --- no framework in the browser -------------------------------------------
 # @bundu/ui's React primitives render to HTML at build time. A `client:*`
@@ -383,9 +416,9 @@ for phrase, why in stale.items():
 # goes stale, add its old wording here so it cannot come back. The live check
 # of the current values is scripts/check-facts.py, which needs the network.
 stale_patterns = {
-    r"\b269 tests\b": "the language has 308 tests in 14 suites (mzizi-dev/mzizi e9e9233)",
-    r"\b12 suites\b": "the language's tests run in 14 suites (e9e9233)",
-    r"\b6,684\b": "compiler/src is 7,454 lines (e9e9233)",
+    r"\b(269|308) tests\b": "the language has 425 tests in 18 suites (mzizi-dev/mzizi 62a0f32)",
+    r"\b(12|14) suites\b": "the language's tests run in 18 suites (62a0f32)",
+    r"\b(6,684|7,454)\b": "compiler/src is 12,644 lines (62a0f32)",
     r"(RFC-0009|RFC-0010)[^.]{0,120}\bforthcoming\b|\bforthcoming\b[^.]{0,120}(RFC-0009|RFC-0010)":
         "RFC-0009 and RFC-0010 are merged in mzizi-dev/mzizi design/",
     r"(RFC-0009|RFC-0010)[^.]{0,120}not in design/ yet": "RFC-0009 and RFC-0010 are in design/",
@@ -413,7 +446,11 @@ stale_patterns = {
     r"\b(general-purpose|Rust) framework for the agentic|a language for the agentic web, in Rust":
         "Mzizi is a programming language, with Rust as its platform",
     r"\bMzizi (lowers|compiles) to Rust\b":
-        "Mzizi is designed to lower to Rust; nothing lowers yet (mzizi-dev/mzizi AGENTS.md)",
+        "Mzizi is designed to lower to Rust; today only a service lowers, to a local Rust + axum package (LANGUAGE-TRACKER.md P3)",
+    r"React[^.]{0,20}\((new|all new)\)|TypeScript · React\s*new\b":
+        "the React arm is in benchmarks/arms/ and has never run",
+    r"mzizi-be[^.]{0,30}\bblocked\b":
+        "the mzizi-be arm exists, with mzprobe and task B1, and has never run",
     r"\bPhase 0\b[^.]{0,40}\bProve the core claim, no rendering attached":
         "Phase 0's one goal is building Mzizi as a programming language, measured against the best existing language for each kind of task (RFC-0009)",
 }
@@ -433,6 +470,26 @@ def reader_text(path: pathlib.Path) -> str:
 readable = {str(p.relative_to(DIST)): reader_text(p) for p in built}
 for pattern, why in stale_patterns.items():
     hits = [name for name, text in readable.items() if re.search(pattern, text, re.I)]
+    check("dist/", f"nothing matches /{pattern}/ — {why}", not hits, ", ".join(hits[:5]))
+
+# The language's state at mzizi-dev/mzizi 62a0f32 (charter v0.4, RFC-0012, the
+# backend slice #29–#33), in this repository's own words. The skill pages are
+# left out: their bodies are @nyuchi/mzizi-skills as /v1/skills serves it, which
+# the skills-freshness agent keeps current, and check-facts.py notes when one
+# lags. Every other page is this repository's text.
+language_state_patterns = {
+    r"\bcharter\W{0,3}(\(|, )?v0\.[0-3]\b|CHARTER\.md\W{0,3}(\(|, )?v0\.[0-3]\b":
+        "the charter on main is v0.4, “Mzizi: a general-purpose programming language”",
+    r"\bnothing lowers yet\b|\bNo lowering to Rust\b|Nothing it compiles runs yet|emits no Rust yet":
+        "a service lowers to a local Rust + axum package, which CI compiles, tests and serves (mz build, #32)",
+    r"cannot write or run a handler":
+        "a service with HTTP routes and handlers exists, and mz contract runs it (#30, #31)",
+    r"\bRFC is being written\b":
+        "the harness's design is RFC-0012, a draft, on main",
+}
+own_pages = {name: text for name, text in readable.items() if not name.startswith("skills/")}
+for pattern, why in language_state_patterns.items():
+    hits = [name for name, text in own_pages.items() if re.search(pattern, text, re.I)]
     check("dist/", f"nothing matches /{pattern}/ — {why}", not hits, ", ".join(hits[:5]))
 
 # --- contact ----------------------------------------------------------------
