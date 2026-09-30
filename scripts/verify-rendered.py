@@ -143,8 +143,13 @@ skill_cards = count(r'<a href="/skills/', body)
 skill_pages = sorted((DIST / "skills").glob("*.html"))
 check("skills.html", "one card per skill page", skill_cards == len(skill_pages) > 0,
       f"{skill_cards} cards, {len(skill_pages)} pages")
-body = text_without_scripts("skills/simplify.html")
-check("skills/simplify.html", "the skill body is rendered as HTML", "<h1" in body or "<h2" in body)
+# Any skill page, not a named one: the set is whatever /v1/skills serves at the
+# gateway's pin, and skills are renamed and removed between releases (0.8.0
+# consolidates them to five).
+if skill_pages:
+    first = str(skill_pages[0].relative_to(DIST))
+    body = text_without_scripts(first)
+    check(first, "the skill body is rendered as HTML", "<h1" in body or "<h2" in body)
 
 # --- /cli, /playground, /observability -----------------------------------
 print("\ncli, playground, observability")
