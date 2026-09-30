@@ -21,6 +21,80 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — Mzizi is presented as a programming language, and Phase 0 as its goal
+
+The owner's positioning (2026-09-30): Mzizi is a programming language whose
+goal is to be used instead of TypeScript, Python and C++, and Rust is its
+platform the way JavaScript is TypeScript's. The toolchain and the components
+are built to support the language; neither is the language. Every claim is
+stated as a goal, never a result.
+
+- **The landing page leads with the owner's tagline.** The hero now reads
+  "Mzizi: a general-purpose programming language", with the subline "Built to
+  make Rust better, the way TypeScript makes JavaScript better" (was "A
+  language designed for machines to write", over "a research language and
+  compiler"). One line says how (no borrows, lifetimes or ownership in the
+  language you write, with the harness at the core, the layer an agent reads)
+  and that this is the goal Phase 0 measures, not a result. The page title,
+  meta description and `llms.txt` say the same. Its second button goes to the new benchmark
+  section instead of the charter. The status panel still follows directly; it
+  now opens with Phase 0's goal, and presents the two pilots as the first tests
+  inside Phase 0, not its goal. Phase 0's one goal is to build Mzizi as a
+  programming language, measured against the best existing language for each
+  kind of task.
+- **Added: "What Mzizi is measured against"**, straight after the status panel.
+  One card per RFC-0009 task family (`ui-spec`, `backend`, `ui-port`, the
+  public suites), with its role (gating or not), what the agent writes, each
+  language it is measured against and whether that arm exists or is new, and
+  where the Mzizi arm stands. It is the benchmark's question, not a results
+  table, and it links where every run is published.
+- **Fixed: the toolchain is no longer "the language".** The toolchain section
+  no longer says "The compiler is the language". "What the language is" no
+  longer lists the `mz` compiler or the IR as parts of the language: it lists
+  the language (syntax, type system, semantics, contracts) and says under "It
+  isn't" that the toolchain and the components are not the language. Agent
+  skills join the toolchain list.
+- **Fixed: the components are no longer "the benchmark corpus the language is
+  scored against".** On the landing page, `/components` and in `llms.txt` they
+  are the language's UI layer and component model (Mzizi Roots, Rust first),
+  and supplying the benchmark's public UI tasks is one of their jobs.
+- **`/language`:** Phase 0 is titled by its goal (build Mzizi as a
+  programming language, measured against the best existing language for each
+  kind of task), the task families are described
+  as RFC-0009 defines them, and a new table lists every benchmark arm with its
+  language, framework and state (exists, never run, new or blocked). Fixed:
+  "Mzizi lowers to Rust and Dioxus" is now "designed to lower to Rust; nothing
+  lowers yet"; the Leptos arm is marked as never run; the held-out task
+  repository is described as not yet created; a defect is defined for backend
+  probes as well as UI facts.
+- **The harness is the core of the language, by design.** The landing page's
+  "It is" list, `/language` and `llms.txt` say the harness is the core of
+  Mzizi, the layer an agent reads and works through: the language as an agent
+  sees it, the agent protocol, and the plugin host the toolchain, the CLI, the
+  MCP server and plugins attach to. Part of it exists as `mz check --agent`'s
+  output; the harness as a whole is designed, not built (its RFC is being
+  written). It lives in the language repository, `mzizi-dev/mzizi`, and the
+  agent-tools packages are its clients. The Phase 0 benchmark harness is named as such everywhere, so the
+  two are not confused.
+- **`llms.txt`** now says plainly, first, that Mzizi is a general-purpose
+  programming language, what its goal is, and which things are toolchain and
+  which are components, with RFC-0009's families and arms, and a new rule: do
+  not call the toolchain or the components the language.
+- **Fixed, stale versions:** `mzizi-mcp` is 0.11.2 on npm, the MCP Registry and
+  `mcp.mzizi.dev` (was 0.11.1 in `llms.txt` and `/ecosystem`, 0.11.0 in `.well-known/mcp.json`).
+  `@nyuchi/mzizi-skills` is 0.8.4 on npm and `mcp.mzizi.dev`;
+  `api.mzizi.dev/v1/skills` still serves 0.8.2 until the gateway's next pin
+  (was "0.8.1 everywhere").
+- `/cli`, `/ecosystem`, `/architecture`, the footer and the page title say the
+  same: `mz` is the compiler that implements the language, the registry is the
+  components built to support it, and Mzizi owns the language, its toolchain
+  and its components rather than "the framework".
+- The rendered-content gate now refuses "the compiler is the language", "the
+  corpus the language is scored against", "framework for the agentic",
+  "Mzizi lowers to Rust" and the old Phase 0 title, and requires the landing
+  page's goal, the Rust-as-platform line, the benchmark section after the
+  status panel with every family and arm, and `llms.txt`'s "what is which".
+
 ### Changed — the site is rebuilt on `@bundu/ui` 0.2.0, with a hero (#31)
 
 - **The landing page opens on a hero.** The headline is "A language designed

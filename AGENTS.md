@@ -49,6 +49,16 @@ It also refuses known-stale facts: an old test count ("269 tests"), RFC-0009 or 
 called "forthcoming", `mz fix` listed as unbuilt, the 0.6.0 bin-link workaround, or
 `/openapi` said to read from Supabase. Add a pattern there whenever a fact goes stale.
 
+It also holds the positioning (owner, 2026-09-30): Mzizi is a programming language whose
+goal is to be used instead of TypeScript, Python and C++, with Rust as its platform the way
+JavaScript is TypeScript's. The landing page must state that goal and the owner's tagline ("Built to make Rust better,
+the way TypeScript makes JavaScript better", as the goal Phase 0 measures), and
+put "What Mzizi is measured against" (every RFC-0009 family and arm, as the benchmark's
+question, not a results table) directly after the status panel; `llms.txt` must say which
+things are toolchain and which are components. No page may say "the compiler is the
+language", call the components "the corpus the language is scored against", call Mzizi a
+"framework for the agentic" web, or say Mzizi lowers or compiles to Rust today.
+
 It also holds the contact addresses: every page's footer links `support@bundu.org` (the
 owner's general contact for Mzizi, 2026-09-30) and `security@bundu.org`; `/ecosystem`,
 `llms.txt` and `.well-known/mcp.json` name `support@bundu.org`; and no page this repo writes
