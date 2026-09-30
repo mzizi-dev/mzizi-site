@@ -44,7 +44,11 @@ const roots = items
   .filter((item) => rustNames.has(item.name))
   .sort((a, b) => a.node - b.node || a.name.localeCompare(b.name));
 const rustCrates = [...new Set([...records.values()].flatMap((r) => (r.rust ? [r.rust.crate.name] : [])))];
-const crateStates = await Promise.all(rustCrates.map(async (name) => ({ name, status: await crateStatus(name) })));
+const [crateStates, umbrella] = await Promise.all([
+  Promise.all(rustCrates.map(async (name) => ({ name, status: await crateStatus(name) }))),
+  crateStatus("mzizi-roots"),
+]);
+const allPublished = crateStates.length > 0 && crateStates.every(({ status }) => status.state === "published");
 
 const groups = byNode(items).map((group) => ({
   ...group,
@@ -101,8 +105,15 @@ const typeCounts = [
           {status.state === "unknown" && <>could not be checked on crates.io when this page was built.</>}{" "}
         </>
       ))}
+      {umbrella.state === "published" && (
+        <>
+          The UI umbrella, <code>mzizi-roots</code> (<code>{umbrella.version}</code>),
+          brings it with the tokens, brand and shell crates:{" "}
+          <code>cargo add mzizi-roots</code>.{" "}
+        </>
+      )}
       <code>mzizi add</code>, the installer for both targets, records the crate
-      instead of copying files, and refuses while the crate is unpublished. See
+      instead of copying files{allPublished ? "" : ", and refuses while the crate is unpublished"}. See
       <a href="/cli#install">the CLI page</a>.
     </p>
   </section>

@@ -1,0 +1,45 @@
+name: Freshness
+
+# The owner's rule (2026-09-30): mzizi.dev must never lag the language or the
+# components. This builds the site from the live API and then compares what it
+# says with the live upstream facts: the language README's test count, npm,
+# crates.io and the MCP Registry (scripts/check-facts.py).
+#
+# It needs the network and fails whenever an upstream moves, so it is
+# deliberately NOT a required check: a manual run and a daily run, never on
+# pull_request. A red run here is the signal to open a site-update PR.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness
+  cancel-in-progress: true
+
+jobs:
+  facts:
+    name: facts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run build
+
+      - name: The built site agrees with upstream
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/check-facts.py dist

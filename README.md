@@ -165,9 +165,10 @@ fifteen seconds). Only the API's own "has no Rust implementation" 404 is read as
 "none"; anything else is retried and then fails the build, so an outage cannot
 quietly turn every Rust component back into React-only.
 
-Two facts come from public package registries rather than the API: whether
-`mzizi-ui` is on crates.io, and the latest npm versions of `@nyuchi/mzizi-cli`
-and `@nyuchi/mzizi-skills`. They are asked at build time too, so "not on
+Some facts come from public package registries rather than the API: whether
+`mzizi-ui` and the Roots umbrellas (`mzizi-roots`, `mzizi-roots-server`) are on
+crates.io, and the latest npm versions of `@nyuchi/mzizi-cli` and
+`@nyuchi/mzizi-skills`. They are asked at build time too, so "not on
 crates.io yet" stops being printed the build after it stops being true. A
 failure to reach them never fails the build; the page says it could not check.
 
@@ -206,7 +207,8 @@ mzizi-site/
 ├── src/lib/            # registry.ts — the one place that reads the API
 ├── src/styles/         # site.css — layout only, imports @bundu/ui tokens
 ├── scripts/
-│   └── verify-rendered.py   # fails the build if a page renders empty
+│   ├── verify-rendered.py   # fails the build if a page renders empty
+│   └── check-facts.py       # fails if dist/ disagrees with live upstream facts
 ├── public/
 │   ├── llms.txt        # the agent-facing summary of the ecosystem
 │   ├── robots.txt
@@ -218,19 +220,19 @@ mzizi-site/
 └── wrangler.jsonc      # still no routes — read the section above before changing that
 ```
 
-| Page                 | What it says                                                                                                                       |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `/`                  | The language first: the thesis, the status panel, the `mz contract` bench, what it is and isn't, then the toolchain and components |
-| `/language`          | The four machine-authorship design goals, the Phase 0 benchmark definition, the five-phase plan, the non-goals and the RFCs        |
-| `/cli`               | `mz`'s commands, the real install paths (React with shadcn, Rust from `/v1/rs`), and the agent CLI. Free, no gate                  |
-| `/components`        | Mzizi Roots (the Rust components) first, then all 577 grouped by DNA node, with a Rust filter                                      |
-| `/components/<name>` | One component: its Rust source first where there is one, then the React build, install command, deps, node, owner                  |
-| `/playground`        | Static, dated screenshots of React builds, each linked to its source. Says plainly that none of it is interactive                  |
-| `/architecture`      | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                               |
-| `/tokens`            | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                |
-| `/skills`            | The agent skills, and each one's body at `/skills/<name>`                                                                          |
-| `/observability`     | Where the logs live (the console), and what is file-backed                                                                         |
-| `/ecosystem`         | Every public repository, what it holds, and whether it is routed                                                                   |
+| Page                 | What it says                                                                                                                        |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                  | The language first: the thesis, the status panel, the `mz contract` bench, what it is and isn't, then the toolchain and components  |
+| `/language`          | The five machine-authorship design goals, the Phase 0 benchmark and kill criterion, the phases (0 to 5), the non-goals and the RFCs |
+| `/cli`               | `mz`'s commands, the real install paths (React with shadcn, Rust from `/v1/rs`), and the agent CLI. Free, no gate                   |
+| `/components`        | Mzizi Roots (the Rust components) first, then all 577 grouped by DNA node, with a Rust filter                                       |
+| `/components/<name>` | One component: its Rust source first where there is one, then the React build, install command, deps, node, owner                   |
+| `/playground`        | Static, dated screenshots of React builds, each linked to its source. Says plainly that none of it is interactive                   |
+| `/architecture`      | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
+| `/tokens`            | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
+| `/skills`            | The agent skills, and each one's body at `/skills/<name>`                                                                           |
+| `/observability`     | Where the logs live (the console), and what is file-backed                                                                          |
+| `/ecosystem`         | Every public repository, what it holds, and whether it is routed                                                                    |
 
 ### On content accuracy
 
@@ -247,11 +249,33 @@ way. Two Phase 0 pilots ran on 2026-09-27
 ([`benchmarks/results/`](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results)
 in `mzizi-dev/mzizi`), and neither showed an advantage for Mzizi: on the ~7B
 open-weight arm, Mzizi did worse. Neither is the charter's measurement, so the kill
-criterion has still not been tested. "Designed for" is accurate; "faster than" is
-not. The kill criterion is now Mzizi against the best existing language for each
-kind of task (owner, 2026-09-29), and every run is published in `benchmarks/results/`
-whichever way it falls. When a new run lands, update the panel, the figures and
-`public/llms.txt` together.
+criterion has still not been tested, and Phase 0 is not complete.
+[`benchmarks/READINESS.md`](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md)
+there says what the gating run still waits on. "Designed for" is accurate;
+"faster than" is not. The kill criterion is Mzizi against the best existing
+language for each kind of task
+([RFC-0009](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md)
+§6: per metric within a task family, beat the best incumbent on two of three, on
+held-out tasks, with a bootstrap 95% interval that excludes zero), and every run
+is published in `benchmarks/results/` whichever way it falls. When a new run
+lands, update the panel, the figures and `public/llms.txt` together.
+
+### Freshness rule
+
+The owner's hard rule (2026-09-30): **mzizi.dev must never lag the language
+(`mzizi-dev/mzizi`) or the components** (`mzizi-registry`, the Mzizi Roots crates
+on crates.io, and the `@nyuchi/` npm packages built in `agent-tools`).
+
+- A standing site-freshness agent checks upstream state (language `main`,
+  registry `main`, the API gateway's registry pin, npm, crates.io and the MCP
+  Registry) against what this site says, and opens a PR whenever it drifts.
+- Anyone changing the language or the components should expect a site update to
+  follow, and say so in their PR.
+- `scripts/check-facts.py` does the mechanical half: it reads the live facts
+  (the language README's test count, the npm and crates.io versions, the MCP
+  Registry listing) and fails when the built `dist/` disagrees. It needs the
+  network, so it runs from the manual and scheduled `Freshness` workflow, not
+  the required CI path.
 
 Numbers that come from the registry — the component count, the per-node counts,
 the palette — are read from the API when the site is built, and every page that
@@ -268,7 +292,8 @@ operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
 MCP server and the CLI are free with no gate: auth is required only for the Fundi
 tools (anything that files into the Fundi issue desk or needs a console user), and
-the card says so. That change is live (`mzizi-mcp` 0.10.1, checked 2026-09-29):
+the card says so. That change is live (`mzizi-mcp` 0.10.1, listed in the MCP
+Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-09-29):
 `initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
 `mzizi_report_issue` ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
@@ -313,7 +338,7 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 | Repository                                                            | What it is                                                      | Address                                   |
 | --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
 | [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language, and Mzizi's main goal — compiler, RFCs, benchmark | —                                         |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system and DNA-helix architecture | Portal partly here; the rest redirected   |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system, DNA helix and Mzizi Roots | Roots crates on crates.io                 |
 | [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a Hono Worker, from the registry's files    | [api.mzizi.dev](https://api.mzizi.dev/v1) |
 | [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)    |
 | [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)  |

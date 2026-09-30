@@ -20,6 +20,7 @@ pnpm check            # astro check — typechecks pages and frontmatter
 pnpm build            # emits dist/
 pnpm preview          # serve dist/ locally
 python3 scripts/verify-rendered.py dist    # what CI runs; see "The rendered-content gate" below
+python3 scripts/check-facts.py dist        # live upstream facts vs dist/; needs the network, not in required CI
 ```
 
 CI runs, in order: `astro check`, `pnpm run lint`, `astro build`, a guard that the built
@@ -39,6 +40,31 @@ contract bench, the skills, `/cli`, `/playground` and `/observability`, `securit
 `Expires` still in the future, the `/mcp` and `/api/v1` redirects, and no redirect left
 pointing at the registry app. A page that quietly renders nothing fails the build — this is the gate
 `mzizi-console` shipped without, and paid for with a blank production page that passed CI.
+
+It also refuses known-stale facts: an old test count ("269 tests"), RFC-0009 or RFC-0010
+called "forthcoming", `mz fix` listed as unbuilt, the 0.6.0 bin-link workaround, or
+`/openapi` said to read from Supabase. Add a pattern there whenever a fact goes stale.
+
+## Freshness rule
+
+The owner's hard rule (2026-09-30): **mzizi.dev must never lag the language
+(`mzizi-dev/mzizi`) or the components** (`mzizi-registry`, the Mzizi Roots crates on
+crates.io, and the `@nyuchi/` npm packages built in `agent-tools`).
+
+- A standing site-freshness agent checks upstream state (language `main`, registry
+  `main`, the API gateway's registry pin, npm, crates.io, the MCP Registry) against what
+  this site says, and opens a PR whenever the site drifts.
+- Anyone changing the language or the components must expect a site update to follow,
+  and should say so in their PR body.
+- `scripts/check-facts.py dist` reads the live facts — the language README's test and
+  suite counts, the npm `latest` versions, the crates.io versions, the MCP Registry
+  listing — and fails when the built site disagrees. It needs the network, so it runs in
+  the `Freshness` workflow (manual and daily), never in the required CI path. When it
+  fails, update the site from the upstream source, not the check.
+- Facts the build can read (component counts, crate states, npm versions) are read at
+  build time. Facts it cannot (the language's test count, lines, commit) are written in
+  `src/pages/index.astro`, `src/pages/language.astro` and `public/llms.txt`, and
+  `check-facts.py` is what keeps them honest.
 
 ### Local dev against a mirror
 
@@ -94,7 +120,8 @@ on the production deploy, so the same commit reads green on a PR and red on `mai
   [`CHARTER.md`](https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md) — or to a request
   that was actually made. "Designed for" is accurate; "faster than" is not. Two pilots
   have run and neither showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
-  report every new result on the status panel, whichever way it falls.
+  the kill-criterion run has not happened (`benchmarks/READINESS.md`), so Phase 0 is
+  not complete. Report every new result on the status panel, whichever way it falls.
 - Numbers sourced from the registry (component count, per-node counts, the palette) are
   read from the API at build time. Every page showing one states when it was read and
   links the endpoint beside it — a dated fact, not a stale copy pretending to be current.
@@ -110,6 +137,8 @@ don't add one without reading why first.
 
 ## Naming
 
-Brand wordmarks are lowercase in prose: `mzizi`, `bundu`, `nyuchi`. This is `mzizi.dev`
+The Mzizi wordmark is capitalised in prose: `Mzizi`. The other wordmarks stay lowercase:
+`nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. Package names, hostnames and code
+identifiers keep their literal spelling. This is `mzizi.dev`
 itself — the front door — not to be confused with `mzizi-registry` (the component source)
 or `mzizi-console` (`app.mzizi.dev`).

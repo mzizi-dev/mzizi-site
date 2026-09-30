@@ -23,7 +23,12 @@ import {
 
 const records = await getComponentRecords();
 const rustCount = [...records.values()].filter((r) => r.rust).length;
-const [crate, cli] = await Promise.all([crateStatus("mzizi-ui"), npmStatus("@nyuchi/mzizi-cli")]);
+const [crate, umbrella, serverUmbrella, cli] = await Promise.all([
+  crateStatus("mzizi-ui"),
+  crateStatus("mzizi-roots"),
+  crateStatus("mzizi-roots-server"),
+  npmStatus("@nyuchi/mzizi-cli"),
+]);
 
 // `mzizi add` first shipped in @nyuchi/mzizi-cli 0.6.0. Whether the latest on
 // npm is at least that is asked at build time, not assumed.
@@ -37,9 +42,6 @@ const atLeast = (version: string, floor: string) => {
   return true;
 };
 const installerShipped = cli.state === "published" && atLeast(cli.version, INSTALLER_SINCE);
-// 0.6.0's entry-point check fails when it is started through a symlink, which
-// is what npm's bin links are (checked 2026-09-29). Shown for that version only.
-const binLinkBug = cli.state === "published" && cli.version === "0.6.0";
 
 const mzCommands = [
   { cmd: "mz check <file.mz>", what: "Does it compile. Human-readable diagnostics." },
@@ -50,6 +52,10 @@ const mzCommands = [
   {
     cmd: "mz contract <file.mz>",
     what: "Evaluates the file's contract block against its own declarations. Exits 1 if a clause does not hold, exactly as a compile error does.",
+  },
+  {
+    cmd: "mz fix <file.mz>",
+    what: "Applies every fix tagged exact in one pass, writes the file, and re-checks it.",
   },
   { cmd: "mz outline <file.mz>", what: "The interface only, as valid Mzizi: what an agent loads instead of reading the source." },
   { cmd: "mz hash <file.mz>", what: "The root hash of the content-addressed IR, and the stored node count." },
@@ -93,8 +99,8 @@ const mzCommands = [
     </table>
   </div>
   <p class="prose">
-    Designed but not built: <code>mz fix</code>, <code>mz refs</code>,
-    <code>mz path</code>, <code>mz patch</code> and <code>mz diff</code>. Real
+    Designed but not built: <code>mz refs</code>, <code>mz path</code>,
+    <code>mz patch</code> and <code>mz diff</code>. Real
     captured output is on <a href="/language#trying-it">the language page</a>.
   </p>
 
@@ -112,6 +118,20 @@ const mzCommands = [
     <p>
       The document names the crate <code>mzizi-ui</code> on crates.io.{" "}
       {crate.state === "published" && <>It is published, at <code>{crate.version}</code>: <code>cargo add mzizi-ui</code>.</>}
+      {umbrella.state === "published" && (
+        <>
+          {" "}Or take the UI umbrella, <code>mzizi-roots</code>
+          (<code>{umbrella.version}</code>), which brings <code>mzizi-ui</code>
+          with the tokens, brand and shell crates in one dependency:
+          <code>cargo add mzizi-roots</code>.
+        </>
+      )}
+      {serverUmbrella.state === "published" && (
+        <>
+          {" "}The server side is <code>mzizi-roots-server</code>
+          (<code>{serverUmbrella.version}</code>).
+        </>
+      )}
       {
         crate.state === "absent" && (
           <>
@@ -183,24 +203,7 @@ const mzCommands = [
     </ul>
   </div>
   <code class="cmd lead">npm install --save-dev @nyuchi/mzizi-cli</code>
-  {
-    binLinkBug ? (
-      <>
-        <div class="status prose">
-          <p>
-            <strong>Known issue in <code>0.6.0</code>:</strong> started through npm's
-            bin link (<code>npx</code>, or <code>node_modules/.bin/mzizi</code>) it
-            prints nothing and exits 0, because its entry-point check compares the
-            link's path with the file's real path. Until a fixed release is on npm,
-            run it by path:
-          </p>
-        </div>
-        <code class="cmd lead">node node_modules/@nyuchi/mzizi-cli/dist/cli.js add button --dry-run</code>
-      </>
-    ) : (
-      <code class="cmd lead">npx mzizi add button --dry-run</code>
-    )
-  }
+  <code class="cmd lead">npx mzizi add button --dry-run</code>
 
   <h2 id="agent">The agent CLI: <code>fundi</code></h2>
   <div class="prose">

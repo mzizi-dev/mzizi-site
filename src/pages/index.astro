@@ -1,6 +1,13 @@
 ---
 import Site from "../layouts/Site.astro";
-import { getComponents, getComponentRecords, crateStatus, builtAt, CANONICAL_BASE } from "../lib/registry";
+import {
+  getComponents,
+  getComponentRecords,
+  crateStatus,
+  npmStatus,
+  builtAt,
+  CANONICAL_BASE,
+} from "../lib/registry";
 
 /**
  * The front door, and it leads with the language.
@@ -14,8 +21,9 @@ import { getComponents, getComponentRecords, crateStatus, builtAt, CANONICAL_BAS
  *
  * Every claim here is checkable against a file in this org:
  * `mzizi-dev/mzizi/CHARTER.md` for what Mzizi is and what it has not yet
- * proven, `benchmarks/results/` there for the two pilots that have run, and
- * the repositories themselves for the rest. The status panel is the most
+ * proven, `benchmarks/results/` there for the two pilots that have run,
+ * `benchmarks/READINESS.md` for what the kill-criterion run still waits on,
+ * and the repositories themselves for the rest. The status panel is the most
  * important block on the site. It stays second on the page and it stays strict.
  *
  * The contract bench is a live instance of `mz contract`, not a mock-up:
@@ -29,9 +37,14 @@ import { getComponents, getComponentRecords, crateStatus, builtAt, CANONICAL_BAS
 
 const [{ total }, records] = await Promise.all([getComponents(), getComponentRecords()]);
 const rustCount = [...records.values()].filter((record) => record.rust !== null).length;
-// Asked at build time (and dated in the provenance line below), because
-// "not on crates.io yet" is true today and will not be forever.
-const crate = await crateStatus("mzizi-ui");
+// Asked at build time (and dated in the provenance line below), never typed
+// in: a crate's state and the CLI's version change without an edit here.
+const [crate, umbrella, cli] = await Promise.all([
+  crateStatus("mzizi-ui"),
+  crateStatus("mzizi-roots"),
+  npmStatus("@nyuchi/mzizi-cli"),
+]);
+const cliVersion = cli.state === "published" ? cli.version : null;
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -111,7 +124,7 @@ const isntList = [
   },
   {
     what: "Not an ML runtime",
-    note: "Candle is the dependency when inference arrives (Phase 3).",
+    note: "Candle is the dependency when inference arrives (Phase 2).",
   },
   {
     what: "Not a post-quantum cryptography project",
@@ -119,7 +132,7 @@ const isntList = [
   },
   {
     what: "Not yet a release",
-    note: "No lowering to Rust, no code generation, no runtime, no published crate or binary. mz is built from a checkout.",
+    note: "No lowering to Rust, no code generation, no runtime, no published compiler crate or binary. mz is built from a checkout.",
   },
 ];
 
@@ -135,11 +148,11 @@ const direction = [
   },
   {
     what: "Everything carries a contract",
-    note: "Components, language functions and backend handlers. The mz contract bench on this page is the first instance; the rest is design.",
+    note: "Components, language functions and backend handlers. The mz contract bench on this page is the first instance; the rest is design, in RFC-0010, a draft with nothing implemented.",
   },
   {
     what: "A wider benchmark",
-    note: "Beyond Dioxus and Leptos, to TypeScript/React, Python, Go and C++, and Rust backends, frontend and backend. An RFC for this is in progress in mzizi-dev/mzizi; nothing has been measured against those arms.",
+    note: "Beyond Dioxus and Leptos, to TypeScript/React, Python, Go and C++, and Rust backends, frontend and backend. RFC-0009 designs it and is a draft; none of those arms has been added, and nothing has been measured against them.",
   },
 ];
 
@@ -150,7 +163,7 @@ const toolchain = [
     name: "mz",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/compiler",
     kind: "Compiler",
-    note: "check, contract, outline, hash and ir. Built from a checkout with stable Rust; there is no release yet.",
+    note: "check, fix, contract, outline, hash and ir. Built from a checkout with stable Rust; there is no release yet.",
   },
   {
     name: "mz check --agent",
@@ -162,7 +175,7 @@ const toolchain = [
     name: "benchmarks/",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/benchmarks",
     kind: "Benchmark harness",
-    note: "The Phase 0 harness, the runner, the Dioxus and Leptos arms and an open-weight arm. It scored both pilots; the held-out task set is private by design.",
+    note: "The Phase 0 harness, the runner, the Dioxus and Leptos arms, an open-weight arm and the kill-criterion driver. It scored both pilots. The held-out task set is not written yet, and will be private by design.",
   },
   {
     name: "mcp.mzizi.dev",
@@ -174,7 +187,7 @@ const toolchain = [
     name: "The CLIs",
     href: "/cli",
     kind: "Command line",
-    note: "mz for the language; mzizi add (in @nyuchi/mzizi-cli 0.6.0) or npx shadcn for components; fundi, the agent. Free, with no gate.",
+    note: `mz for the language; mzizi add (in @nyuchi/mzizi-cli${cliVersion ? ` ${cliVersion}` : ""}), cargo add or npx shadcn for components; fundi, the agent. Free, with no gate.`,
   },
 ];
 
@@ -223,7 +236,7 @@ const surfaces = [
 const notYet = [
   {
     what: "The Phase 0 measurement",
-    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not: it needs the fixes pilot 2 names, a task set that can fail, and fresh tasks.",
+    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed; it still needs the runner's spec and React arm, held-out tasks, a pre-registered PLAN.md, the Leptos arm run end to end, and a Mzizi backend arm (benchmarks/READINESS.md).",
   },
   {
     what: "Lowering, code generation, a runtime, a release",
@@ -231,7 +244,7 @@ const notYet = [
   },
   {
     what: "The wider benchmark and the backend",
-    note: "TypeScript/React, Python, Go, C++ and Rust-backend arms, and contracts for backend handlers, are direction with an RFC in progress.",
+    note: "TypeScript/React, Python, Go, C++ and Rust-backend arms (RFC-0009), and contracts for functions and backend handlers (RFC-0010), are direction. Both RFCs are drafts; nothing in them is implemented.",
   },
 ];
 
@@ -313,10 +326,11 @@ const repos: Repo[] = [
     <h2>Status: two pilots, no advantage yet</h2>
     <p>
       The compiler front end exists and is tested: a lexer, a recovering parser,
-      an agent diagnostic protocol, a content-addressed IR, and nine primitives
-      written in Mzizi itself. Contract blocks are evaluated (see the bench
-      below), and the benchmark harness scores an agent's output against the
-      registry's reference implementation.
+      an agent diagnostic protocol with <code>mz fix</code> to apply its exact
+      fixes, a content-addressed IR, and nine primitives written in Mzizi
+      itself. Contract blocks are evaluated (see the bench below), and the
+      benchmark harness scores an agent's output against the registry's
+      reference implementation.
     </p>
     <p>
       <strong
@@ -332,31 +346,58 @@ const repos: Repo[] = [
       that tests the kill criterion.
     </p>
     <p>
+      <strong>Phase 0 is not complete, and the kill-criterion run has not
+        happened.</strong> Most of the fixes pilot 2 asked for have landed since:
+      <code>mz fix</code>; diagnostics for the React idioms Mzizi has no form for
+      (MZ0106, MZ0312); a declared <code>height</code> that disagrees with its
+      class is now a compile error (MZ0313); relative paths in the diagnostics
+      an agent reads; a <code>slot_set</code> fact and a <code>card</code> task;
+      and a kill-criterion driver that will not start without a pre-registered
+      <code>PLAN.md</code>.
+      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
+        ><code>benchmarks/READINESS.md</code></a
+      > audits each one. The run still waits on five things: the runner's
+      language-neutral <code>spec.md</code> input, <code>arm.toml</code>, a React
+      arm and guides balanced to within 5%; held-out tasks, in a private
+      repository that does not exist yet; the <code>PLAN.md</code> itself; the
+      Leptos arm run end to end; and a Mzizi backend arm, which needs language
+      work first.
+    </p>
+    <p>
       <strong>The kill criterion is Mzizi against the best existing language for
-        each kind of task.</strong> The aim is to rank with the top languages, not
-      only to beat Dioxus or Leptos. That has not been measured: the run that
-      tests it has not happened. If it shows no measurable advantage, nothing
-      downstream matters. Treat every claim on this site as a design intent with
-      an argument behind it, not a result.
+        each kind of task</strong>
+      (<a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
+        >RFC-0009</a
+      > §6). The aim is to rank with the top languages, not only to beat Dioxus
+      or Leptos. Within a task family, the bar on each of the three metrics is
+      the best value any existing language reached, and Mzizi must beat it on
+      two of the three, on held-out tasks, with the ~7B model. A win counts only
+      when a paired bootstrap's 95% interval for the difference excludes zero.
+      Phase 0 passes only if both gating families, UI (<code>ui-spec</code>) and
+      <code>backend</code>, pass. None of that has been measured. If it shows no
+      measurable advantage, nothing downstream matters. Treat every claim on
+      this site as a design intent with an argument behind it, not a result.
     </p>
     <p>
       Every run is published, whichever way it falls. Each one lands in
       <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
         ><code>benchmarks/results/</code></a
-      > in <code>mzizi-dev/mzizi</code>, raw episodes included.
+      > in <code>mzizi-dev/mzizi</code>, raw episodes included. A held-out run
+      publishes its scores on the day; its task texts are published when that
+      task set is retired.
     </p>
   </div>
 
   <ul class="figs">
-    <li class="fig"><b>269</b><span>tests passing, 12 suites</span></li>
+    <li class="fig"><b>308</b><span>tests passing, 14 suites</span></li>
     <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-    <li class="fig"><b>6,684</b><span>lines of Rust in the compiler</span></li>
+    <li class="fig"><b>7,454</b><span>lines of Rust in the compiler</span></li>
     <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
   </ul>
   <p class="provenance">
     <span>
       Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/commit/a9c928d"><code>a9c928d</code></a>{" "}
+      <a href="https://github.com/mzizi-dev/mzizi/commit/e9e9233"><code>e9e9233</code></a>{" "}
       (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;{" "}
       <code>mz contract</code> over <code>primitives/*.mz</code>). Pilots from{" "}
       <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
@@ -398,8 +439,12 @@ const repos: Repo[] = [
       <div class="bench-term" id="bench-term" aria-live="polite" set:html={benchTerm} />
       <div class="bench-foot">
         Messages are verbatim from <code>mz contract</code>, checked against a real
-        run at <a href="https://github.com/mzizi-dev/mzizi/blob/4c61d28/primitives/button.mz">4c61d28</a>.
+        run at <a href="https://github.com/mzizi-dev/mzizi/blob/e9e9233/primitives/button.mz">e9e9233</a>.
         The check is re-implemented in this page's script so you can play with it.
+        Each step changes a size's class and its height together (<code>h-12</code>
+        and 48 to <code>h-11</code> and 44): change the height alone and
+        <code>mz check</code> stops first, with MZ0313, because the class still
+        renders the old height.
         <code>0ms</code> is wall-clock time for the contract check alone, rounded
         down to whole milliseconds; reading the file and starting the process are
         not included.
@@ -511,6 +556,16 @@ const repos: Repo[] = [
     {crate.state === "published" && <>is on crates.io at <code>{crate.version}</code>.</>}
     {crate.state === "absent" && <>is not on crates.io yet, so there is no <code>cargo add</code> to give you.</>}
     {crate.state === "unknown" && <>could not be checked on crates.io when this page was built.</>}{" "}
+    {umbrella.state === "published" && (
+      <>
+        The UI umbrella, <code>mzizi-roots</code> (<code>{umbrella.version}</code>),
+        brings it with the tokens, brand and shell crates in one dependency:
+      </>
+    )}
+  </p>
+  {umbrella.state === "published" && <code class="cmd lead">cargo add mzizi-roots</code>}
+
+  <p class="prose">
     <a href="/cli#install">How to install either build →</a> The React build of
     every component installs with shadcn:
   </p>
@@ -657,7 +712,10 @@ const repos: Repo[] = [
     const resetBtn = document.getElementById("bench-reset");
     if (!srcEl || !termEl || !resetBtn) return;
 
-    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@4c61d28).
+    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@e9e9233,
+    // unchanged since 4c61d28). The class column is left out of the view; a
+    // step stands for editing the class and the height together, since a
+    // height that disagrees with its class is MZ0313 at check time.
     // Line 45's own comment is left out of this abbreviated view only —
     // it doesn't affect the contract, and it ran long enough to force
     // horizontal scroll on a panel this narrow.

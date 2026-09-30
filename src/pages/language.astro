@@ -2,9 +2,10 @@
 import Site from "../layouts/Site.astro";
 
 /**
- * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` (§3 design
- * goals, §4 phasing, §5 non-goals, §6 the resolved benchmark design) and the
- * RFCs in that repository's `design/` directory. Where the charter leaves
+ * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` v0.3 (§3
+ * design goals, §4 phasing, §5 non-goals, §6 the resolved benchmark design),
+ * the RFCs in that repository's `design/` directory (RFC-0009 §6 for the kill
+ * criterion) and `benchmarks/READINESS.md` for what the gating run waits on. Where the charter leaves
  * something open, this page says so rather than rounding it up.
  */
 
@@ -22,6 +23,10 @@ const goals = [
     why: "A human tolerates a few seconds per iteration. An agent iterating hundreds of times per session treats compile latency as the dominant cost of the whole workflow — so it is a Phase 0 success metric, not a later optimisation.",
   },
   {
+    name: "Everything has a contract",
+    why: "Every component, language function, handler, service and standard-library function carries an in-language contract the toolchain checks. A contract may constrain only a value the program renders or returns, never a declared copy of it: pilot 2 caught a touch-height contract checking a number the button does not render.",
+  },
+  {
     name: "Token-efficient representation",
     why: "A codebase that fits more real logic into a context window per token spent is one an agent can reason about with less summarisation loss. It applies to the syntax surface and to the IR the tooling exposes.",
   },
@@ -31,32 +36,38 @@ const phases = [
   {
     n: "Phase 0",
     title: "Prove the core claim, no rendering attached",
-    state: "in progress: two pilots, no advantage shown",
-    body: "A standalone compiler and syntax prototype with zero UI story. Success is a defined benchmark: an agent authors equivalent components in Mzizi syntax versus raw Dioxus or Leptos, scored on tokens consumed, iterations to a clean compile, and defect rate. If that shows no measurable advantage, nothing downstream matters. The owner has since widened the kill criterion (2026-09-29): Mzizi against the best existing language for each kind of task, aiming to rank with the top languages. Not measured yet.",
+    state: "in progress: two pilots, no advantage shown; the gating run has not happened",
+    body: "A standalone compiler and syntax prototype with zero UI story, and a benchmark: an agent authors equivalent code in Mzizi and in the best existing language for each kind of task, scored on tokens consumed, iterations to a clean check, and defect rate. The kinds of task are two gating families, UI components (against Dioxus, Leptos and React/TypeScript) and backend handlers and services (against TypeScript, Python, Go, C++ and Rust). If Mzizi shows no measurable advantage, nothing downstream matters.",
   },
   {
     n: "Phase 1",
-    title: "Rendering interop; WASM and native as the deliverable",
+    title: "Full-stack: mzizi-ui with Cloudflare Workers and Containers",
     state: "not started",
-    body: "Wire the compiler output into Dioxus's existing renderer. The artifact — a WASM bundle, and a native binary for desktop — is the cross-platform product, embeddable from a bare script tag, a mobile WebView, or an edge runtime.",
+    body: "A Mzizi-authored full-stack application actually deployed to Cloudflare: UI through mzizi-ui, rendered by a compatible engine (Dioxus today), and the server from the same Mzizi source, lowered to workers-rs for a Worker or to a native Rust HTTP server for a Container. Its UI also ships as a self-contained artifact, an ES module or custom element with its WASM bundle, usable without the Worker.",
   },
   {
     n: "Phase 2",
-    title: "Edge-first deployment",
-    state: "not started",
-    body: "A native target built on workers-rs. The cheapest phase to execute, because it is the one the team has already shipped against.",
-  },
-  {
-    n: "Phase 3",
     title: "Candle integration",
     state: "not started",
     body: "ML inference declared as a first-class capability inside a component, backed by Candle. Not a competing tensor runtime.",
   },
   {
+    n: "Phase 3",
+    title: "Native mobile: interop first",
+    state: "not started",
+    body: "mzizi-ui rendered through a compatible mobile engine (Dioxus today) first. Generating native Swift, ArkTS or Kotlin from the same Rust core is named but not designed, and needs its own RFC.",
+  },
+  {
     n: "Phase 4",
     title: "Distribution adapters",
     state: "not started",
-    body: "Thin packaging layers over the Phase 1 artifact — Astro first, because it is furthest along, not because Astro is a platform Mzizi targets.",
+    body: "Thin packaging layers over Phase 1's self-contained artifact. Astro with Mzizi Roots underneath is one of the two frontend paths, beside pure Rust, and can ship as soon as that artifact exists.",
+  },
+  {
+    n: "Phase 5",
+    title: "Hardware and embedded",
+    state: "not designed",
+    body: "Named, not designed: no target board, RTOS or use case. Revisited once Phase 1 has a real full-stack deployment.",
   },
 ];
 
@@ -96,6 +107,16 @@ const rfcs = [
     file: "RFC-0008-types-collections-records.md",
     what: "RFC-0007's first tier: name and type resolution, list(T), record, option(T) and for each, and a checker that can say no. Draft.",
   },
+  {
+    id: "RFC-0009",
+    file: "RFC-0009-comparison-benchmark.md",
+    what: "The comparison benchmark: every language arm, the task families, per-language checkers, fairness rules, the kill criterion (§6) and publication (§7). Draft; the kill criterion and the publication rule are owner decisions, and nothing else in it is implemented.",
+  },
+  {
+    id: "RFC-0010",
+    file: "RFC-0010-contracts-everywhere.md",
+    what: "Contracts everywhere: clause forms for functions, handlers, services and records, what is checked statically, by generated tests or at runtime, and how failures reach an agent. Draft; nothing in it is implemented.",
+  },
 ];
 ---
 
@@ -116,12 +137,14 @@ const rfcs = [
   <div class="status">
     <h2>What exists, and what that does not prove</h2>
     <p>
-      Real today: the lexer, a recovering parser, the agent diagnostic protocol,
-      the content-addressed IR, and nine primitives written in Mzizi itself,
-      covered by 269 tests (<code>mzizi-dev/mzizi</code> at <code>a9c928d</code>).
+      Real today: the lexer, a recovering parser, the agent diagnostic protocol
+      and <code>mz fix</code>, the content-addressed IR, and nine primitives
+      written in Mzizi itself, covered by 308 tests in 14 suites
+      (<code>mzizi-dev/mzizi</code> at <code>e9e9233</code>).
       <code>mz contract</code> evaluates contract blocks, and the benchmark
-      harness (<code>mzbench</code>) runs agent episodes against a Mzizi arm and a
-      Dioxus arm and scores each result against the registry's reference.
+      harness (<code>mzbench</code>) runs agent episodes against a Mzizi arm and
+      Dioxus and Leptos arms and scores each result against the registry's
+      reference.
     </p>
     <p>
       <strong>Two pilots have run, and neither shows an advantage for Mzizi.</strong>
@@ -134,9 +157,27 @@ const rfcs = [
       <a
         href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
         >The pilot 2 write-up</a
-      > lists what has to change before a run that tests the kill criterion. The four
+      > lists what has to change before a run that tests the kill criterion. The five
       design goals below are hypotheses with arguments attached, and so far the
       evidence has not backed them.
+    </p>
+    <p>
+      <strong>Phase 0 is not complete: the kill-criterion run has not
+        happened.</strong> Most of pilot 2's fixes are on <code>main</code>:
+      <code>mz fix</code>, diagnostics for <code>...props</code> and
+      <code>asChild</code> (MZ0106, MZ0312), MZ0313 for a declared
+      <code>height</code> that disagrees with its class, relative paths in the
+      diagnostics an agent sees, a <code>slot_set</code> fact and a
+      <code>card</code> task, and a kill-criterion driver that needs a
+      pre-registered <code>PLAN.md</code>.
+      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
+        ><code>benchmarks/READINESS.md</code></a
+      > lists what remains: <code>arm.toml</code>, <code>spec.md</code> input, a
+      React arm and guides balanced to within 5%; held-out tasks in a private
+      repository, written by maintainers or drafted by another vendor's model and
+      reviewed by a person (the owner is to confirm which); the
+      <code>PLAN.md</code>; the Leptos arm run end to end; and a Mzizi backend
+      arm, which needs the language work in RFC-0009 §6.4.
     </p>
   </div>
 
@@ -144,7 +185,7 @@ const rfcs = [
 
   <p>
     The charter insists this be measurable design goals rather than a slogan.
-    There are four.
+    There are five.
   </p>
 
   <div class="scroller">
@@ -172,9 +213,23 @@ const rfcs = [
 
   <div class="panel">
     <p>
+      <strong>Kill criterion</strong>
+      (<a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
+        >RFC-0009</a
+      > §6, owner decision 2026-09-29): Mzizi against the best existing language
+      for each kind of task. Within a gating family (<code>ui-spec</code> or
+      <code>backend</code>), the bar on each metric is the best value any
+      existing language reached. Mzizi must beat it on two of the three metrics,
+      on held-out tasks, with the ~7B open-weight model. A win counts only when a
+      paired bootstrap's 95% interval for the difference excludes zero. Phase 0
+      passes only if both families pass.
+    </p>
+    <p>
       <strong>Task set:</strong> Mzizi's own components — the design system already
       built out in the registry — authored in Mzizi syntax against the existing implementations
-      as ground truth. Explicitly not a port of an external library.
+      as ground truth. Explicitly not a port of an external library. The
+      <code>backend</code> family adds handlers and services, scored by HTTP
+      probes.
     </p>
     <p>
       <strong>Defect:</strong> code that compiles cleanly but is behaviourally wrong
@@ -190,6 +245,13 @@ const rfcs = [
       requirement rather than a secrecy preference: a public task set gets scraped
       into training data, after which the benchmark measures memorisation, a contaminated
       benchmark looks like a successful one, and the kill criterion could never fire.
+    </p>
+    <p>
+      <strong>Publication</strong> (RFC-0009 §7): every run is published,
+      whichever way it falls, with a <code>PLAN.md</code> committed before the
+      first episode and a <code>RUN.md</code> after. A held-out run publishes its
+      scores on the day; its task texts are published when that task set is
+      retired.
     </p>
   </div>
 
@@ -275,10 +337,8 @@ const rfcs = [
   </div>
 
   <p>
-    RFC-0005 is reserved and unwritten. RFC-0009 and RFC-0010 are forthcoming in
-    the same repository; until they land there, nothing on this site describes
-    what they settle. The Mzizi Roots components have their own RFC in the
-    registry:
+    RFC-0005 is reserved and unwritten. The Mzizi Roots components have their own
+    RFC in the registry:
     <a href="https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md"
       ><code>mzizi-registry/docs/roots/RFC-roots.md</code></a
     >.
@@ -303,8 +363,8 @@ const rfcs = [
     <a
       href="https://github.com/mzizi-dev/mzizi/blob/main/examples/connectivity_bar.mz"
       ><code>examples/connectivity_bar.mz</code></a
-    >, one of the nine primitives, at
-    <a href={`https://github.com/mzizi-dev/mzizi/commit/4c61d28`}><code>4c61d28</code></a
+    >, one of the repository's two examples, at
+    <a href={`https://github.com/mzizi-dev/mzizi/commit/e9e9233`}><code>e9e9233</code></a
     >.
   </p>
 
@@ -336,16 +396,18 @@ const rfcs = [
 
   <div class="terminal">
     <p class="terminal-cmd">$ mz hash examples/connectivity_bar.mz</p>
-    <pre><code>{`23a4481ab3db  connectivity_bar  22 nodes`}</code></pre>
+    <pre><code>{`40c3b85d31c1  connectivity_bar  23 nodes`}</code></pre>
   </div>
 
   <p>
-    <code>mz outline</code> and <code>mz ir</code> exist too — see
-    <code>mz --help</code>. What is not there yet: <code>mz fix</code>,
+    <code>mz fix</code> applies every <code>exact</code> fix in one pass and
+    re-checks; <code>mz outline</code> and <code>mz ir</code> exist too. Run
+    <code>mz</code> with no arguments for its usage line. What is not there yet:
     <code>mz refs</code>, <code>mz path</code>, <code>mz patch</code> and
-    <code>mz diff</code> are designed (see the RFCs) but not built. The
-    binary above only dispatches <code>check</code>, <code>contract</code>,
-    <code>outline</code>, <code>hash</code> and <code>ir</code>.
+    <code>mz diff</code> are designed (see the RFCs) but not built. The binary
+    above only dispatches <code>check</code>, <code>fix</code>,
+    <code>contract</code>, <code>outline</code>, <code>hash</code> and
+    <code>ir</code>.
   </p>
 
   <p>

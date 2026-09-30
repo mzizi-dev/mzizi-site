@@ -260,6 +260,12 @@ check("index.html", "the contract bench renders its all-pass result without Java
       "5 contract clauses, 0 failed" in plain)
 check("index.html", "the language-is / isn't section is rendered",
       "What the language is, and what it isn't" in plain)
+check("index.html", "the status panel says Phase 0 is not complete",
+      "Phase 0 is not complete" in plain and "benchmarks/READINESS.md" in plain)
+body = text_without_scripts("language.html", quiet=True)
+for rfc in ("RFC-0009-comparison-benchmark.md", "RFC-0010-contracts-everywhere.md"):
+    check("language.html", f"links {rfc} in mzizi-dev/mzizi design/",
+          f'href="https://github.com/mzizi-dev/mzizi/blob/main/design/{rfc}"' in body)
 
 # --- /.well-known --------------------------------------------------------
 print("\n.well-known")
@@ -309,6 +315,42 @@ built = [p for p in DIST.rglob("*") if p.suffix in (".html", ".txt", ".json") an
 for phrase, why in stale.items():
     hits = [str(p.relative_to(DIST)) for p in built if phrase in p.read_text(encoding="utf-8")]
     check("dist/", f"no page says “{phrase}” — {why}", not hits, ", ".join(hits[:5]))
+
+# The same idea for facts that break across tags or lines, matched against each
+# file as a reader sees it: scripts and tags stripped, entities decoded,
+# whitespace collapsed. Each one was the site's own wording once. When a fact
+# goes stale, add its old wording here so it cannot come back. The live check
+# of the current values is scripts/check-facts.py, which needs the network.
+stale_patterns = {
+    r"\b269 tests\b": "the language has 308 tests in 14 suites (mzizi-dev/mzizi e9e9233)",
+    r"\b12 suites\b": "the language's tests run in 14 suites (e9e9233)",
+    r"\b6,684\b": "compiler/src is 7,454 lines (e9e9233)",
+    r"(RFC-0009|RFC-0010)[^.]{0,120}\bforthcoming\b|\bforthcoming\b[^.]{0,120}(RFC-0009|RFC-0010)":
+        "RFC-0009 and RFC-0010 are merged in mzizi-dev/mzizi design/",
+    r"(RFC-0009|RFC-0010)[^.]{0,120}not in design/ yet": "RFC-0009 and RFC-0010 are in design/",
+    r"not (yet )?built:? mz fix\b|not there yet: mz fix\b": "mz fix is built (e9e9233)",
+    r"Known issue in 0\.6\.0": "@nyuchi/mzizi-cli 0.6.1 fixed the bin-link bug",
+    r"mzizi-cli/dist/cli\.js": "npx mzizi works from 0.6.1; no by-path workaround",
+    r"still says routes read from Supabase": "/openapi no longer says that (checked 2026-09-29)",
+    r"io\.github\.nyuchi/mzizi-mcp": "the MCP Registry entry is io.github.mzizi-dev/mzizi-mcp",
+}
+
+
+def reader_text(path: pathlib.Path) -> str:
+    raw = path.read_text(encoding="utf-8")
+    if path.suffix == ".html":
+        raw = re.sub(r"<script\b.*?</script>", " ", raw, flags=re.S | re.I)
+        raw = re.sub(r"<style\b.*?</style>", " ", raw, flags=re.S | re.I)
+        raw = re.sub(r"<[^>]+>", " ", raw)
+        raw = html.unescape(raw)
+    raw = raw.replace("`", "")
+    return re.sub(r"\s+", " ", raw)
+
+
+readable = {str(p.relative_to(DIST)): reader_text(p) for p in built}
+for pattern, why in stale_patterns.items():
+    hits = [name for name, text in readable.items() if re.search(pattern, text, re.I)]
+    check("dist/", f"nothing matches /{pattern}/ — {why}", not hits, ", ".join(hits[:5]))
 
 # --- result ---------------------------------------------------------------
 if notes:
