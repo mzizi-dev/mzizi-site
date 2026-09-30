@@ -21,6 +21,15 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — agent skills 0.8.5
+
+- **`llms.txt`** names `@nyuchi/mzizi-skills` **0.8.5** (was 0.8.4), which npm, `mcp.mzizi.dev` and `api.mzizi.dev/v1/skills` now all serve.
+- **`/skills` and `/skills/<name>`** are rebuilt from `api.mzizi.dev`, which now serves 0.8.5 (registry #387, gateway #27). The pages now follow language main `62a0f32`:
+  - `mzizi-language` says to check `LANGUAGE-TRACKER.md` before claiming a capability. It teaches the backend `service` (RFC-0011), `mz build` and the MZ08xx codes, and cites RFC-0012 (the harness, a draft) and charter v0.4.
+  - `mzizi-backend` describes the language's one backend slice, with no Workers target and nothing live.
+  - `mzizi-roots` says only a service lowers, not a component.
+  - The skill pages no longer say "nothing lowers yet" or cite charter v0.3.
+
 ### Changed — the site matches language main `62a0f32`
 
 A freshness update. What the language can do is now taken from
