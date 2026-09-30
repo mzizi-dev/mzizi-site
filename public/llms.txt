@@ -79,7 +79,11 @@ Versions on 2026-09-30 (read the registries before repeating one):
 
 - `mzizi-mcp` **0.11.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
   Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.11.0)
-- `@nyuchi/mzizi-skills` **0.7.0**
+- `@nyuchi/mzizi-skills` **0.8.0** on npm: five skills, `mzizi-language`,
+  `mzizi-roots`, `mzizi-design`, `mzizi-backend` and `discoverability`.
+  `api.mzizi.dev/v1/skills` serves an older bundle (0.5.1, nine skills) until
+  the gateway's pin reaches a registry commit that carries 0.8.0; its `meta.version`
+  says which bundle it is serving
 - `@nyuchi/mzizi-cli` **0.6.2**, which ships the installer: `mzizi add <name>`
   for React (writes the TSX) or Rust (records the crate the component's
   `/v1/rs/<name>` document names), plus the `fundi` agent. `npx mzizi` works.
