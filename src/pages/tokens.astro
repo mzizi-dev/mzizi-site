@@ -136,7 +136,7 @@ const specs = brand.componentSpecs;
             </div>
             <div class="family-body">
               <h3>
-                {family.name}
+                {family.name}{" "}
                 <code>{family.cssVar}</code>
               </h3>
               {hasProse(family) ? (
@@ -172,7 +172,7 @@ const specs = brand.componentSpecs;
     <p>
       Ambient to elevated: what a page sits on, what a card sits on, what a menu
       floats above, and what a modal darkens behind it. This page is painted with
-      these exact values — the body is <code>base</code>, every card is
+      these exact values — the body is <code>base</code>, every card is{" "}
       <code>surface</code>, every inset is <code>container</code>.
     </p>
   </div>
@@ -194,7 +194,7 @@ const specs = brand.componentSpecs;
   <h2 id="semantic">Semantic roles</h2>
   <div class="prose">
     <p>
-      The roles, not the pigments. A component asks for <code>--destructive</code>
+      The roles, not the pigments. A component asks for <code>--destructive</code>{" "}
       or <code>--ring</code>; which mineral answers is a decision that lives at
       node N1 and nowhere else. The registry's default <code>--primary</code> is
       tanzanite, the Mukoko/Nyuchi mineral; this site overrides it with copper,
@@ -375,7 +375,7 @@ const specs = brand.componentSpecs;
   <div class="prose">
     <p>
       The whole brand system — every family, container step, semantic role, type
-      step, spacing step, radius and component spec — is served as JSON at
+      step, spacing step, radius and component spec — is served as JSON at{" "}
       <code>{CANONICAL_BASE}/brand</code>. Token files are generated from it, and
       nothing in this ecosystem should be holding its own copy of a hex value.
       This site does not: <code>public/site.css</code> contains no colour at all.

@@ -392,6 +392,43 @@ strays = sorted({f"{p.relative_to(DIST)}: {m}" for p in surfaces
                  if m not in allowed and not (p.name == "security.txt" and m == "security@nyuchi.com")})
 check("dist/", f"no contact address but {CONTACT} and {SECURITY}", not strays, ", ".join(strays[:5]))
 
+# --- spaces around inline elements -------------------------------------------
+# Astro drops the line break between a line that ends in text and a next line
+# that starts with an inline element, so
+#
+#     is lowercase: <code>nyuchi</code>,
+#     <code>mukoko</code>
+#
+# builds as `nyuchi,<code>mukoko` and reads "nyuchi,mukoko". The same happens
+# when a line ends in `</code>` and the next one starts with a word. The fix is
+# a `{" "}` at the end of the first line (or one joined line). This found 58 such
+# places across the site on 2026-09-30.
+#
+# The check reads the built HTML, not the source, because only the build knows
+# which line breaks Astro kept. In rendered prose, a word or a `.,;:!?)` glued
+# to an opening inline tag, or a closing inline tag glued to a word, is wrong
+# whatever the source looked like, so it does not need to see the source.
+# An opening bracket, a quote, a slash, a dash or an arrow before a tag is
+# allowed (`(<code>`, `"<a`, `/<code>`, `→<strong>`). Code in <pre>, scripts,
+# styles and SVG are left out, and so is a skill page's body, which is the
+# registry's Markdown rendered as it is and not this repository's writing.
+print("\nspaces around inline elements")
+INLINE = r"a|abbr|b|cite|code|dfn|em|i|kbd|mark|q|s|samp|small|strong|sub|sup|time|u|var"
+glued_before = re.compile(r"[\w.,;:!?)](?=<(?:" + INLINE + r")[\s>])")
+glued_after = re.compile(r"</(?:" + INLINE.replace("|i|", "|") + r")>(?=\w)")
+skipped = re.compile(
+    r"<(script|style|pre|svg|textarea)\b.*?</\1>|<article class=\"prose skill-body\".*?</article>",
+    flags=re.S | re.I)
+glued: list[str] = []
+for path in html_pages:
+    raw = skipped.sub(" ", path.read_text(encoding="utf-8"))
+    for pattern in (glued_before, glued_after):
+        for m in pattern.finditer(raw):
+            around = re.sub(r"\s+", " ", raw[max(0, m.start() - 40):m.end() + 30])
+            glued.append(f"{path.relative_to(DIST)}: …{around}…")
+check("dist/", "no word or punctuation is glued to an inline tag — end the source line with {\" \"}",
+      not glued, f"{len(glued)} found: " + " | ".join(glued[:8]) if glued else "")
+
 # --- result ---------------------------------------------------------------
 if notes:
     print("\nnotes")

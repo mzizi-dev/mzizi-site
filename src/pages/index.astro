@@ -350,13 +350,13 @@ const repos: Repo[] = [
     </p>
     <p>
       <strong>Phase 0 is not complete, and the kill-criterion run has not
-        happened.</strong> Most of the fixes pilot 2 asked for have landed since:
+        happened.</strong> Most of the fixes pilot 2 asked for have landed since:{" "}
       <code>mz fix</code>; diagnostics for the React idioms Mzizi has no form for
       (MZ0106, MZ0312); a declared <code>height</code> that disagrees with its
       class is now a compile error (MZ0313); relative paths in the diagnostics
       an agent reads; a <code>slot_set</code> fact and a <code>card</code> task;
-      and a kill-criterion driver that will not start without a pre-registered
-      <code>PLAN.md</code>.
+      and a kill-criterion driver that will not start without a pre-registered{" "}
+      <code>PLAN.md</code>.{" "}
       <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
         ><code>benchmarks/READINESS.md</code></a
       > audits each one. The run still waits on five things: the runner's
@@ -376,13 +376,13 @@ const repos: Repo[] = [
       the best value any existing language reached, and Mzizi must beat it on
       two of the three, on held-out tasks, with the ~7B model. A win counts only
       when a paired bootstrap's 95% interval for the difference excludes zero.
-      Phase 0 passes only if both gating families, UI (<code>ui-spec</code>) and
+      Phase 0 passes only if both gating families, UI (<code>ui-spec</code>) and{" "}
       <code>backend</code>, pass. None of that has been measured. If it shows no
       measurable advantage, nothing downstream matters. Treat every claim on
       this site as a design intent with an argument behind it, not a result.
     </p>
     <p>
-      Every run is published, whichever way it falls. Each one lands in
+      Every run is published, whichever way it falls. Each one lands in{" "}
       <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
         ><code>benchmarks/results/</code></a
       > in <code>mzizi-dev/mzizi</code>, raw episodes included. A held-out run
@@ -444,10 +444,10 @@ const repos: Repo[] = [
         Messages are verbatim from <code>mz contract</code>, checked against a real
         run at <a href="https://github.com/mzizi-dev/mzizi/blob/e9e9233/primitives/button.mz">e9e9233</a>.
         The check is re-implemented in this page's script so you can play with it.
-        Each step changes a size's class and its height together (<code>h-12</code>
-        and 48 to <code>h-11</code> and 44): change the height alone and
+        Each step changes a size's class and its height together (<code>h-12</code>{" "}
+        and 48 to <code>h-11</code> and 44): change the height alone and{" "}
         <code>mz check</code> stops first, with MZ0313, because the class still
-        renders the old height.
+        renders the old height.{" "}
         <code>0ms</code> is wall-clock time for the contract check alone, rounded
         down to whole milliseconds; reading the file and starting the process are
         not included.
@@ -533,7 +533,7 @@ const repos: Repo[] = [
   <div class="prose">
     <p>
       The components are part of Mzizi. They are the benchmark corpus the
-      language is scored against (a fixed ground truth of <code>{total}</code>
+      language is scored against (a fixed ground truth of <code>{total}</code>{" "}
       components, each with a TypeScript reference) and where the language's
       output is meant to land.
     </p>
@@ -553,7 +553,7 @@ const repos: Repo[] = [
   </ul>
 
   <p class="prose">
-    A Roots component's Rust source is served at
+    A Roots component's Rust source is served at{" "}
     <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>, and each document names the
     crate its component ships in:
   </p>
@@ -669,7 +669,7 @@ const repos: Repo[] = [
       <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a> names
       the one public MCP server in this ecosystem. It is free and needs no sign-in,
       except for the Fundi tools, which file into the console's issue desk and so
-      need a console user. Discover its tools with the standard
+      need a console user. Discover its tools with the standard{" "}
       <code>tools/list</code> request rather than trusting any list written down
       here, which can go stale.
     </p>
@@ -687,7 +687,7 @@ const repos: Repo[] = [
       >Mzizi the language</strong
     > (the syntax, compiler and IR above) is the research, and it is what this site
     leads with. <strong>Mzizi the design system</strong> (the component registry,
-    Mzizi Roots, the brand system and the DNA-helix architecture) is
+    Mzizi Roots, the brand system and the DNA-helix architecture) is{" "}
     <code>{total}</code> components you can install today. Both are Mzizi, owned
     and operated by Mzizi, in one org. The difference is the state they are in:
     the components ship now, and the language has not yet shown the advantage it

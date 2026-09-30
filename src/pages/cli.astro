@@ -82,7 +82,7 @@ const mzCommands = [
   <h2 id="mz">mz, the language's compiler</h2>
   <div class="prose">
     <p>
-      <code>mz</code> is the binary in
+      <code>mz</code> is the binary in{" "}
       <a href="https://github.com/mzizi-dev/mzizi">mzizi-dev/mzizi</a>. There is no
       release and no published binary yet, so it is built from a checkout, with
       nothing beyond stable Rust:
@@ -109,7 +109,7 @@ const mzCommands = [
     </table>
   </div>
   <p class="prose">
-    Designed but not built: <code>mz refs</code>, <code>mz path</code>,
+    Designed but not built: <code>mz refs</code>, <code>mz path</code>,{" "}
     <code>mz patch</code> and <code>mz diff</code>. Real
     captured output is on <a href="/language#trying-it">the language page</a>.
   </p>
@@ -174,7 +174,7 @@ const mzCommands = [
           </>
         )
       }{" "}
-      It detects whether a project is React or Rust (<code>--target</code>
+      It detects whether a project is React or Rust (<code>--target</code>{" "}
       overrides), resolves registry dependencies by absolute URL, and refuses
       what it cannot install honestly rather than guessing. No API key and no
       sign-in.
@@ -218,16 +218,16 @@ const mzCommands = [
   <div class="prose">
     <p>
       The same package's other binary, <code>fundi</code>, reads your project off
-      disk and plans a Mzizi-aligned change against the registry and skills.
-      <code>explore</code> runs offline. <code>plan</code> and <code>chat</code>
-      read the MCP server; without an <code>ANTHROPIC_API_KEY</code>,
+      disk and plans a Mzizi-aligned change against the registry and skills.{" "}
+      <code>explore</code> runs offline. <code>plan</code> and <code>chat</code>{" "}
+      read the MCP server; without an <code>ANTHROPIC_API_KEY</code>,{" "}
       <code>plan</code> hands its context to the coding agent that ran it instead
       of calling a model itself.
     </p>
     <p>
       The CLI is free, with no gate, and so is the MCP server it reads: nothing
       needs a sign-in except the Fundi tools (<code>mzizi_fundi</code> and{" "}
-      <code>mzizi_report_issue</code>), which act as your console user.
+      <code>mzizi_report_issue</code>), which act as your console user.{" "}
       <code>fundi login</code> exists for those alone.
     </p>
   </div>
