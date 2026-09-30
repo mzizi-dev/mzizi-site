@@ -138,10 +138,12 @@ if design:
 
 # --- npm ---------------------------------------------------------------------
 print("\nnpm (latest dist-tags)")
+npm_latest: dict[str, str] = {}
 for package in NPM:
     latest = upstream(package, lambda: fetch_json(f"https://registry.npmjs.org/{package.replace('/', '%2f')}/latest")["version"])
     if not latest:
         continue
+    npm_latest[package] = latest
     short = package.split("/")[1]
     # llms.txt's dated version list names each package with its version.
     listed = re.findall(rf"{re.escape(short)} ([0-9]+\.[0-9]+\.[0-9]+)\b(?! and later)", pages["llms.txt"])
@@ -214,9 +216,27 @@ if published and all(crate in published for crate in (*CRATES, *named)):
 print("\nthe MCP Registry")
 listing = upstream("the MCP Registry", lambda: fetch_json(MCP_REGISTRY))
 if listing is not None:
-    names = {entry["server"]["name"]: entry["server"]["version"] for entry in listing.get("servers", [])}
+    # The search returns every published version of a server; the one marked
+    # isLatest is the listing a client installs.
+    names: dict[str, str] = {}
+    for entry in listing.get("servers", []):
+        official = entry.get("_meta", {}).get("io.modelcontextprotocol.registry/official", {})
+        if official.get("isLatest", True) or entry["server"]["name"] not in names:
+            names[entry["server"]["name"]] = entry["server"]["version"]
     check(f"{MCP_NAME} is listed", MCP_NAME in names, ", ".join(sorted(names)) or "no entries")
     check(f"llms.txt names {MCP_NAME}", MCP_NAME in pages["llms.txt"])
+    # The Registry entry can trail npm. llms.txt says so, dated, while it does
+    # ("still lists the 0.10.1 release"), and must stop saying so once it catches up.
+    listed_version = names.get(MCP_NAME)
+    trailing = re.findall(r"still lists the ([0-9]+\.[0-9]+\.[0-9]+) release", pages["llms.txt"])
+    npm_mcp = npm_latest.get("@nyuchi/mzizi-mcp")
+    if listed_version and npm_mcp:
+        if listed_version == npm_mcp:
+            check(f"llms.txt does not say the Registry trails npm (both at {npm_mcp})", not trailing,
+                  ", ".join(trailing))
+        else:
+            check(f"llms.txt says the Registry still lists {listed_version} (npm is at {npm_mcp})",
+                  trailing == [listed_version], ", ".join(trailing) or "it says nothing")
     for name in names:
         if name != MCP_NAME:
             check(f"the site does not name the other listing {name}",

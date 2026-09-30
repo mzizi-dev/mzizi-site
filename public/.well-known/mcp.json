@@ -2,7 +2,7 @@
   "comment": [
     "A pointer to the MCP servers this ecosystem operates.",
     "There is no ratified well-known discovery format for 'which MCP servers does this domain run', so this file does not claim conformance to one and deliberately carries no $schema. It is a convenience. The load-bearing agent-facing surface on this site is /llms.txt, and the authority on what a server exposes is the server itself, over the standard tools/list request.",
-    "Authorization: the owner's decision (2026-09-29) is that the server is free with no sign-in, and auth is required only for the Fundi tools. That is live (mzizi-mcp 0.10.1, checked 2026-09-29): initialize and tools/list answer without a token, and only mzizi_fundi and mzizi_report_issue need sign-in."
+    "Authorization: the owner's decision (2026-09-29) is that the server is free with no sign-in, and auth is required only for the Fundi tools. That is live (mzizi-mcp 0.11.0, checked 2026-09-30): initialize and tools/list answer without a token, and only mzizi_fundi and mzizi_report_issue need sign-in."
   ],
   "servers": [
     {
@@ -21,5 +21,6 @@
     }
   ],
   "documentation": "https://mzizi.dev/llms.txt",
+  "contact": "mailto:support@bundu.org",
   "source": "https://github.com/mzizi-dev/mzizi-site"
 }

@@ -66,16 +66,21 @@ been measured against them. Describe all of this as direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.10.1 serves
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.11.0 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
-act as your console user and need sign-in.
+act as your console user and need sign-in. The MCP server is Rust first: where a
+component has a Mzizi Roots implementation, `mzizi_get_component` returns it under
+`rust` (the crate, the `cargo add` line, the contract and the `.rs` source) ahead
+of the React build under `react`, and `lead` says which comes first.
+`mzizi_list_components` takes `rust: true` to list only the components with Rust,
+and its rows and `mzizi_search`'s hits carry `rustCrate`.
 
-Versions on 2026-09-29 (read the registries before repeating one):
+Versions on 2026-09-30 (read the registries before repeating one):
 
-- `mzizi-mcp` **0.10.1** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
-  Registry: `io.github.mzizi-dev/mzizi-mcp`)
+- `mzizi-mcp` **0.11.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
+  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.11.0)
 - `@nyuchi/mzizi-skills` **0.7.0**
-- `@nyuchi/mzizi-cli` **0.6.1**, which ships the installer: `mzizi add <name>`
+- `@nyuchi/mzizi-cli` **0.6.2**, which ships the installer: `mzizi add <name>`
   for React (writes the TSX) or Rust (records the crate the component's
   `/v1/rs/<name>` document names), plus the `fundi` agent. `npx mzizi` works.
 - Mzizi Roots on crates.io, all **0.1.0**: `mzizi-tokens`, `mzizi-ui`,
@@ -100,7 +105,7 @@ Every ecosystem hostname resolves (checked 2026-09-29). Each is a Cloudflare
 Worker, except the docs, which Mintlify hosts:
 
 - `mzizi.dev` — this site (`mzizi-dev/mzizi-site`)
-- `api.mzizi.dev` — the registry API, served by `mzizi-dev/mzizi-api-gateway` from the registry's files
+- `api.mzizi.dev` — the registry API, served by `mzizi-dev/mzizi-api-gateway` from the registry's files at a pinned registry commit. A bot moves the pin to registry `main`, so do not repeat a pin: every response's `x-mzizi-source` header names the commit being served
 - `app.mzizi.dev` — the console (`mzizi-dev/mzizi-console`), behind AuthKit sign-in
 - `mcp.mzizi.dev` — the MCP server (`mzizi-mcp`), serving bundled files and federating the docs MCP
 - `docs.mzizi.dev` — the documentation (`mzizi-dev/mzizi-docs`)
@@ -119,7 +124,7 @@ Hostnames change; resolve one before repeating it.
 - [Observability](/observability): logs belong to the console (app.mzizi.dev); this page shows the file-backed per-node counts
 - [Architecture](/architecture): the DNA double helix the components sit on
 - [Tokens](/tokens): the 21 colour families, type, spacing and component specs
-- [Ecosystem](/ecosystem): every public repository, what it holds, and whether it is routed
+- [Ecosystem](/ecosystem): every public repository, what it holds, whether it is routed, and how to reach Mzizi
 
 ## Source of truth
 
@@ -156,6 +161,11 @@ Hostnames change; resolve one before repeating it.
 - [mcp.mzizi.dev/mcp](https://mcp.mzizi.dev/mcp): the MCP server, Streamable HTTP. Free, no sign-in, except the Fundi tools, which need OAuth (protected-resource metadata at [/.well-known/oauth-protected-resource](https://mcp.mzizi.dev/.well-known/oauth-protected-resource)).
 - [/.well-known/mcp.json](/.well-known/mcp.json): this site's pointer to that server
 - [docs.mzizi.dev](https://docs.mzizi.dev): Mzizi's documentation (Mintlify, from `mzizi-dev/mzizi-docs`) — the one home of the docs
+
+## Contact
+
+- General contact for Mzizi (the language, the components, this site, the docs): [support@bundu.org](mailto:support@bundu.org)
+- Security reports: [security@bundu.org](mailto:security@bundu.org), or a private advisory on the repository concerned ([/.well-known/security.txt](/.well-known/security.txt)). The console at `app.mzizi.dev` routes its own.
 
 ## Rules for anything repeating what it reads here
 
