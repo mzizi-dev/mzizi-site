@@ -142,6 +142,10 @@ stated as a goal, never a result.
   `scripts/changelog-gate.sh`), which fails a pull request that changes a
   non-exempt file without adding to this file. `scripts/changelog-gate.test.sh`
   tests the gate, and the check runs it first.
+- A note beside the inline-spacing check in `scripts/verify-rendered.py`, and
+  in `AGENTS.md`, on why it reads the component and skill pages (#29). Registry
+  text reaches those pages escaped, so a word glued to a tag there is in this
+  site's template and must not be skipped. Nothing on the site changes.
 
 ## [2026-09-30]
 

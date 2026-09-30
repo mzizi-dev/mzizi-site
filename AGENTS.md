@@ -70,7 +70,9 @@ It also fails on a word glued to an inline tag in the built HTML (`nyuchi,<code>
 a next line that starts with `<a>`, `<code>`, `<strong>`, `<em>` and the like (or a line
 that ends in a closing tag and a next line that starts with a word). End the first line
 with `{" "}`, as the rest of the site does. `(<code>`, `"<a` and anything inside `<pre>`
-are allowed.
+are allowed. A skill page's body (the registry's Markdown, set as raw HTML) is skipped;
+every other part of `components/<name>` and `skills/<name>` is checked, because registry
+text there is escaped and any join is in this repo's template.
 
 ## Freshness rule
 
