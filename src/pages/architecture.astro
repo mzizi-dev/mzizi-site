@@ -18,6 +18,8 @@
  * where the taxonomy should be. Reading the public API at build time removes
  * that whole class of failure.)
  */
+import { Badge } from "@bundu/ui/ui/badge";
+import { Separator } from "@bundu/ui/ui/separator";
 import Site from "../layouts/Site.astro";
 import {
   getArchitecture,
@@ -189,7 +191,7 @@ const backbones = [...new Set(strands.map((strand) => strand.backbone))];
     </figcaption>
   </figure>
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2 id="strands">Six strands</h2>
   <div class="prose">
@@ -225,7 +227,7 @@ const backbones = [...new Set(strands.map((strand) => strand.backbone))];
     </>
   ))}
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2 id="nodes">Eight nodes</h2>
   <div class="prose">
@@ -240,7 +242,7 @@ const backbones = [...new Set(strands.map((strand) => strand.backbone))];
     <section class="helix-entry" id={`n${node.node_number}`} style={`--strand: ${colourFor(node)}`}>
       <header>
         <h3>N{node.node_number} · {node.title}</h3>
-        <span class="badge outline">{node.strand}</span>
+        <Badge variant="outline" size="sm">{node.strand}</Badge>
         <span class="count-link">
           <a href={`/components#node-${node.node_number}`}>{node.component_count} components</a>
         </span>
@@ -254,7 +256,7 @@ const backbones = [...new Set(strands.map((strand) => strand.backbone))];
     </section>
   ))}
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2 id="rungs">Four rungs</h2>
   <div class="prose">
@@ -269,7 +271,7 @@ const backbones = [...new Set(strands.map((strand) => strand.backbone))];
     <section class="helix-entry" id={`n${rung.node_number}`}>
       <header>
         <h3>N{rung.node_number} · {rung.title}</h3>
-        <span class="badge outline">rung</span>
+        <Badge variant="outline" size="sm">rung</Badge>
         <span class="count-link">
           {rung.component_count > 0 ? (
             <a href={`/components#node-${rung.node_number}`}>{rung.component_count} components</a>
@@ -287,7 +289,7 @@ const backbones = [...new Set(strands.map((strand) => strand.backbone))];
     </section>
   ))}
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2>Reading this as a machine</h2>
   <div class="prose">

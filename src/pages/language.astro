@@ -1,4 +1,6 @@
 ---
+import { Alert } from "@bundu/ui/ui/alert";
+import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
 
 /**
@@ -134,7 +136,7 @@ const rfcs = [
     Phase 0 its focus.
   </p>
 
-  <div class="status">
+  <Alert variant="warning" role="region" className="status flow text-body p-6">
     <h2>What exists, and what that does not prove</h2>
     <p>
       Real today: the lexer, a recovering parser, the agent diagnostic protocol
@@ -179,7 +181,7 @@ const rfcs = [
       <code>PLAN.md</code>; the Leptos arm run end to end; and a Mzizi backend
       arm, which needs the language work in RFC-0009 §6.4.
     </p>
-  </div>
+  </Alert>
 
   <h2>What "built for machine authorship" cashes out as</h2>
 
@@ -211,7 +213,7 @@ const rfcs = [
 
   <h2>How the benchmark is defined</h2>
 
-  <div class="panel">
+  <Card className="flow my-6">
     <p>
       <strong>Kill criterion</strong>
       (<a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
@@ -253,7 +255,7 @@ const rfcs = [
       scores on the day; its task texts are published when that task set is
       retired.
     </p>
-  </div>
+  </Card>
 
   <h2>Phasing</h2>
 

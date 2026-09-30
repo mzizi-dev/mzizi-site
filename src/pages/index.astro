@@ -1,6 +1,17 @@
 ---
 import Site from "../layouts/Site.astro";
 import RustCrates from "../components/RustCrates.astro";
+import StaticTabs from "../components/StaticTabs";
+import Hero from "@bundu/ui/Hero.astro";
+import Section from "@bundu/ui/Section.astro";
+import SectionHeader from "@bundu/ui/SectionHeader.astro";
+import { Alert } from "@bundu/ui/ui/alert";
+import { Badge } from "@bundu/ui/ui/badge";
+// `buttonVariants` rather than <Button variant=…> in this file: with Hero.astro
+// in the same program, astro check loses Button's variant props (a checker
+// quirk; <Button> type-checks in a file without Hero). Same classes either way.
+import { buttonVariants } from "@bundu/ui/ui/button";
+import { Card } from "@bundu/ui/ui/card";
 import {
   getComponents,
   getComponentRecords,
@@ -48,6 +59,8 @@ const [crates, cli] = await Promise.all([
   npmStatus("@nyuchi/mzizi-cli"),
 ]);
 const cliVersion = cli.state === "published" ? cli.version : null;
+
+const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -116,7 +129,7 @@ const isList = [
   },
   {
     what: "Contracts",
-    note: "A component states what must hold, and mz contract checks it. The bench above is the first instance.",
+    note: "A component states what must hold, and mz contract checks it. The bench at the top of this page is the first instance.",
   },
 ];
 
@@ -304,138 +317,22 @@ const repos: Repo[] = [
 <Site
   title="Mzizi"
   description="Mzizi is a language for the agentic web, in Rust: a syntax, type system and compiler feedback loop designed for machine authorship. Phase 0: two pilots have run, and neither showed an advantage yet."
-  lede="A language for the agentic web, in Rust, designed for machine authorship. The compiler, the benchmark and the components all exist to test that one claim."
-  wide
+  bare
 >
-  <div class="prose">
-    <p>
-      Every web framework in use today was designed on the assumption that a
-      human is typing: reading docs, holding context in their head, tolerating a
-      few seconds per compile. Mzizi starts from a different bottleneck: an agent
-      iterating against a compiler thousands of times, where compile speed, the
-      information density of an error message, and how many tokens a codebase
-      costs to read are first-order metrics rather than nice-to-haves. And it
-      designs for the machines that need the help most: small open-weight models
-      with limited parameters, context and long-range attention.
-    </p>
-    <p>
-      That is the whole of the claim, and it is a narrow one on purpose. It is a
-      design intent with an argument behind it. It is not a result yet.
-    </p>
-    <div class="stamp"><i></i>Phase 0 in progress: two pilots run, no advantage shown yet</div>
-  </div>
-
-  <div class="status">
-    <h2>Status: two pilots, no advantage yet</h2>
-    <p>
-      The compiler front end exists and is tested: a lexer, a recovering parser,
-      an agent diagnostic protocol with <code>mz fix</code> to apply its exact
-      fixes, a content-addressed IR, and nine primitives written in Mzizi
-      itself. Contract blocks are evaluated (see the bench below), and the
-      benchmark harness scores an agent's output against the registry's
-      reference implementation.
-    </p>
-    <p>
-      <strong
-        >Two pilot runs on 2026-09-27 show no measurable advantage for Mzizi.</strong
-      > With a frontier model, the Mzizi and Dioxus arms were indistinguishable on
-      clean compiles and defects, and Mzizi used about 8% fewer tokens. With a ~7B
-      open-weight model, the size the design targets, Mzizi did worse on all
-      three metrics (2 of 6 clean compiles against Dioxus's 4 of 6). Both pilots
-      are tiny (two scored tasks, three seeds), and neither is the Phase 0 number.{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
-        >The write-up</a
-      > names the three failure mechanisms and what has to change before a run
-      that tests the kill criterion.
-    </p>
-    <p>
-      <strong>Phase 0 is not complete, and the kill-criterion run has not
-        happened.</strong> Most of the fixes pilot 2 asked for have landed since:{" "}
-      <code>mz fix</code>; diagnostics for the React idioms Mzizi has no form for
-      (MZ0106, MZ0312); a declared <code>height</code> that disagrees with its
-      class is now a compile error (MZ0313); relative paths in the diagnostics
-      an agent reads; a <code>slot_set</code> fact and a <code>card</code> task;
-      and a kill-criterion driver that will not start without a pre-registered{" "}
-      <code>PLAN.md</code>.{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
-        ><code>benchmarks/READINESS.md</code></a
-      > audits each one. The run still waits on five things: the runner's
-      language-neutral <code>spec.md</code> input, <code>arm.toml</code>, a React
-      arm and guides balanced to within 5%; held-out tasks, in a private
-      repository that does not exist yet; the <code>PLAN.md</code> itself; the
-      Leptos arm run end to end; and a Mzizi backend arm, which needs language
-      work first.
-    </p>
-    <p>
-      <strong>The kill criterion is Mzizi against the best existing language for
-        each kind of task</strong>
-      (<a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
-        >RFC-0009</a
-      > §6). The aim is to rank with the top languages, not only to beat Dioxus
-      or Leptos. Within a task family, the bar on each of the three metrics is
-      the best value any existing language reached, and Mzizi must beat it on
-      two of the three, on held-out tasks, with the ~7B model. A win counts only
-      when a paired bootstrap's 95% interval for the difference excludes zero.
-      Phase 0 passes only if both gating families, UI (<code>ui-spec</code>) and{" "}
-      <code>backend</code>, pass. None of that has been measured. If it shows no
-      measurable advantage, nothing downstream matters. Treat every claim on
-      this site as a design intent with an argument behind it, not a result.
-    </p>
-    <p>
-      Every run is published, whichever way it falls. Each one lands in{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
-        ><code>benchmarks/results/</code></a
-      > in <code>mzizi-dev/mzizi</code>, raw episodes included. A held-out run
-      publishes its scores on the day; its task texts are published when that
-      task set is retired.
-    </p>
-  </div>
-
-  <ul class="figs">
-    <li class="fig"><b>308</b><span>tests passing, 14 suites</span></li>
-    <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-    <li class="fig"><b>7,454</b><span>lines of Rust in the compiler</span></li>
-    <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
-  </ul>
-  <p class="provenance">
-    <span>
-      Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/commit/e9e9233"><code>e9e9233</code></a>{" "}
-      (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;{" "}
-      <code>mz contract</code> over <code>primitives/*.mz</code>). Pilots from{" "}
-      <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
-        ><code>benchmarks/results/</code></a
-      >, both dated 2026-09-27.
-    </span>
-  </p>
-
-  <h2 id="contracts">Everything carries a contract</h2>
-
-  <div class="hero-split">
-    <div>
-      <p>
-        A Mzizi component says what must hold about it, in the same file, in a
-        form the compiler checks. <code>primitives/button.mz</code> declares that
-        every button size is at least 48px tall, that the default is 56 and the
-        small size 48. Break one and <code>mz contract</code> names the line, the
-        clause and the value.
-      </p>
-      <p>
-        This is the first instance of a rule the owner has set for all of Mzizi:
-        everything built carries a contract. Components today; language functions
-        and backend handlers are next, and are design, not code.
-      </p>
-      <p>
-        What contract evaluation does not do yet: it checks a component's
-        declarations against its own contract. It checks nothing rendered. The
-        comparison against a reference implementation is the benchmark harness's
-        job.
-      </p>
-    </div>
-
-    <div class="bench" aria-labelledby="bench-title">
+  <Hero
+    layout="split"
+    variant="showcase"
+    badge="Phase 0 · research prototype"
+    subtitle="The Mzizi language"
+    title="A language designed for machines to write."
+    description="Mzizi is a research language and compiler for machine authorship by small open-weight models. Every component states a contract, and the compiler checks it."
+    primaryCTA={{ text: "Try the contract bench", href: "#bench" }}
+    secondaryCTA={{ text: "Read the charter", href: CHARTER, external: true }}
+    mediaLabel="The contract bench: primitives/button.mz and mz contract"
+  >
+    <div slot="media" id="bench" class="bench" aria-labelledby="bench-title">
       <div class="bench-head">
-        <h3 id="bench-title">primitives/button.mz</h3>
+        <h2 id="bench-title">primitives/button.mz</h2>
         <p>Change a touch height. The contract answers.</p>
       </div>
       <div class="bench-src" id="bench-src" set:html={benchSrc} />
@@ -454,150 +351,334 @@ const repos: Repo[] = [
         <button class="bench-reset" id="bench-reset" type="button">Reset</button>
       </div>
     </div>
-  </div>
+  </Hero>
 
-  <h2 id="what-it-is">What the language is, and what it isn't</h2>
+  <Section bg="secondary" border id="status">
+    <Alert
+      variant="warning"
+      role="region"
+      aria-labelledby="status-title"
+      className="status flow text-body p-6 md:p-8"
+    >
+      <h2 id="status-title">Status: two pilots, no advantage yet</h2>
+      <p>
+        The compiler front end exists and is tested: a lexer, a recovering parser,
+        an agent diagnostic protocol with <code>mz fix</code> to apply its exact
+        fixes, a content-addressed IR, and nine primitives written in Mzizi
+        itself. Contract blocks are evaluated (see the bench above), and the
+        benchmark harness scores an agent's output against the registry's
+        reference implementation.
+      </p>
+      <p>
+        <strong
+          >Two pilot runs on 2026-09-27 show no measurable advantage for Mzizi.</strong
+        > With a frontier model, the Mzizi and Dioxus arms were indistinguishable on
+        clean compiles and defects, and Mzizi used about 8% fewer tokens. With a ~7B
+        open-weight model, the size the design targets, Mzizi did worse on all
+        three metrics (2 of 6 clean compiles against Dioxus's 4 of 6). Both pilots
+        are tiny (two scored tasks, three seeds), and neither is the Phase 0 number.{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
+          >The write-up</a
+        > names the three failure mechanisms and what has to change before a run
+        that tests the kill criterion.
+      </p>
+      <p>
+        <strong>Phase 0 is not complete, and the kill-criterion run has not
+          happened.</strong> Most of the fixes pilot 2 asked for have landed since:{" "}
+        <code>mz fix</code>; diagnostics for the React idioms Mzizi has no form for
+        (MZ0106, MZ0312); a declared <code>height</code> that disagrees with its
+        class is now a compile error (MZ0313); relative paths in the diagnostics
+        an agent reads; a <code>slot_set</code> fact and a <code>card</code> task;
+        and a kill-criterion driver that will not start without a pre-registered{" "}
+        <code>PLAN.md</code>.{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
+          ><code>benchmarks/READINESS.md</code></a
+        > audits each one. The run still waits on five things: the runner's
+        language-neutral <code>spec.md</code> input, <code>arm.toml</code>, a React
+        arm and guides balanced to within 5%; held-out tasks, in a private
+        repository that does not exist yet; the <code>PLAN.md</code> itself; the
+        Leptos arm run end to end; and a Mzizi backend arm, which needs language
+        work first.
+      </p>
+      <p>
+        <strong>The kill criterion is Mzizi against the best existing language for
+          each kind of task</strong>
+        (<a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
+          >RFC-0009</a
+        > §6). The aim is to rank with the top languages, not only to beat Dioxus
+        or Leptos. Within a task family, the bar on each of the three metrics is
+        the best value any existing language reached, and Mzizi must beat it on
+        two of the three, on held-out tasks, with the ~7B model. A win counts only
+        when a paired bootstrap's 95% interval for the difference excludes zero.
+        Phase 0 passes only if both gating families, UI (<code>ui-spec</code>) and{" "}
+        <code>backend</code>, pass. None of that has been measured. If it shows no
+        measurable advantage, nothing downstream matters. Treat every claim on
+        this site as a design intent with an argument behind it, not a result.
+      </p>
+      <p>
+        Every run is published, whichever way it falls. Each one lands in{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
+          ><code>benchmarks/results/</code></a
+        > in <code>mzizi-dev/mzizi</code>, raw episodes included. A held-out run
+        publishes its scores on the day; its task texts are published when that
+        task set is retired.
+      </p>
+    </Alert>
 
-  <div class="ledger">
-    <div class="col have">
-      <h3>It is</h3>
-      <ul>
+    <ul class="figs">
+      <li class="fig"><b>308</b><span>tests passing, 14 suites</span></li>
+      <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
+      <li class="fig"><b>7,454</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
+    </ul>
+    <p class="provenance">
+      <span>
+        Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/commit/e9e9233"><code>e9e9233</code></a>{" "}
+        (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;{" "}
+        <code>mz contract</code> over <code>primitives/*.mz</code>). Pilots from{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
+          ><code>benchmarks/results/</code></a
+        >, both dated 2026-09-27.
+      </span>
+    </p>
+  </Section>
+
+  <Section id="why">
+    <SectionHeader
+      eyebrow="Why"
+      title="Built for the agent in the loop"
+      description="A narrow claim on purpose: a design intent with an argument behind it, not a result yet."
+    />
+    <div class="grid-2">
+      <Card className="flow">
+        <h3>A different bottleneck</h3>
+        <p>
+          Every web framework in use today was designed on the assumption that a
+          human is typing: reading docs, holding context in their head, tolerating
+          a few seconds per compile. Mzizi starts from an agent iterating against a
+          compiler thousands of times, where compile speed, the information density
+          of an error message, and how many tokens a codebase costs to read are
+          first-order metrics rather than nice-to-haves.
+        </p>
+      </Card>
+      <Card className="flow">
+        <h3>The machines that need the help most</h3>
+        <p>
+          It designs for small open-weight models with limited parameters, context
+          and long-range attention. That is the whole of the claim, and it is a
+          narrow one on purpose. It is a design intent with an argument behind it.
+          It is not a result yet.
+        </p>
+      </Card>
+    </div>
+  </Section>
+
+  <Section id="contracts" bg="secondary" border>
+    <SectionHeader
+      eyebrow="Contracts"
+      title="Everything carries a contract"
+      description="A Mzizi component says what must hold about it, in the same file, in a form the compiler checks."
+    />
+    <div class="grid-3">
+      <Card className="flow">
+        <Badge variant="outline" className="mb-3">Today</Badge>
+        <h3>What the bench checks</h3>
+        <p>
+          <code>primitives/button.mz</code> declares that every button size is at
+          least 48px tall, that the default is 56 and the small size 48. Break one
+          and <code>mz contract</code> names the line, the clause and the value.
+        </p>
+      </Card>
+      <Card className="flow">
+        <Badge variant="outline" className="mb-3">The rule</Badge>
+        <h3>All of Mzizi</h3>
+        <p>
+          The owner has set it for all of Mzizi: everything built carries a
+          contract. Components today; language functions and backend handlers are
+          next, and are design, not code.
+        </p>
+      </Card>
+      <Card className="flow">
+        <Badge variant="outline" className="mb-3">Not yet</Badge>
+        <h3>What it does not do</h3>
+        <p>
+          Contract evaluation checks a component's declarations against its own
+          contract. It checks nothing rendered. The comparison against a reference
+          implementation is the benchmark harness's job.
+        </p>
+      </Card>
+    </div>
+    <p class="section-links">
+      <a href="#bench">Try it in the bench ↑</a>
+    </p>
+  </Section>
+
+  <Section id="what-it-is">
+    <SectionHeader
+      eyebrow="The language"
+      title="What the language is, and what it isn't"
+      description="From the charter (§3 and §5) and the language README's “What doesn't exist yet”."
+    />
+    <StaticTabs
+      id="language-tabs"
+      label="What the language is, isn't, and where it is going"
+      tabs={[
+        { value: "is", label: "It is" },
+        { value: "isnt", label: "It isn't" },
+        { value: "direction", label: "Direction, not shipped" },
+      ]}
+    >
+      <ul slot="is" class="card-list">
         {
           isList.map((n) => (
             <li>
-              <div>
+              <Card padding="sm" className="h-full">
                 <strong>{n.what}</strong>
-                <br />
-                <span>{n.note}</span>
-              </div>
+                <p>{n.note}</p>
+              </Card>
             </li>
           ))
         }
       </ul>
-    </div>
-    <div class="col not">
-      <h3>It isn't</h3>
-      <ul>
+      <ul slot="isnt" class="card-list">
         {
           isntList.map((n) => (
             <li>
-              <div>
+              <Card padding="sm" className="h-full">
                 <strong>{n.what}</strong>
-                <br />
-                <span>{n.note}</span>
-              </div>
+                <p>{n.note}</p>
+              </Card>
             </li>
           ))
         }
       </ul>
-    </div>
-  </div>
-
-  <p><a href="/language">The design goals, the phasing and the RFCs →</a></p>
-
-  <h3>Where it is going: direction, not shipped</h3>
-  <ul class="spaced prose">
-    {
-      direction.map((d) => (
-        <li>
-          <strong>{d.what}.</strong> {d.note}
-        </li>
-      ))
-    }
-  </ul>
-
-  <h2 id="toolchain">The toolchain</h2>
-
-  <p class="prose">
-    The compiler is the language. Everything else here makes it stronger: it
-    gives an agent a denser loop, it measures whether the language works, and it
-    puts the corpus within an agent's reach.
-  </p>
-
-  <div class="repos">
-    {
-      toolchain.map((t) => (
-        <div class="repo">
-          <a class="repo-name" href={t.href}>
-            {t.name}
-          </a>
-          <p>{t.note}</p>
-          <span class="lang">{t.kind}</span>
-        </div>
-      ))
-    }
-  </div>
-
-  <h2 id="components">The components: Mzizi Roots</h2>
-
-  <div class="prose">
-    <p>
-      The components are part of Mzizi. They are the benchmark corpus the
-      language is scored against (a fixed ground truth of <code>{total}</code>{" "}
-      components, each with a TypeScript reference) and where the language's
-      output is meant to land.
-    </p>
-    <p>
-      <strong>Mzizi Roots</strong> is the Rust direction for them: Mzizi's own
-      UI and server components for the agentic web, written in Rust (Dioxus),
-      sharing a contract and a token set with their React siblings rather than a
-      source file. Where a Rust implementation exists it is presented first. The
-      React (TSX) builds keep working and stay installable, but new work goes to
-      Rust.
-    </p>
-  </div>
-
-  <ul class="figs">
-    <li class="fig"><b>{rustCount}</b><span>components in Rust, as Mzizi Roots</span></li>
-    <li class="fig"><b>{total}</b><span>components in the corpus, each with a React build</span></li>
-  </ul>
-
-  <p class="prose">
-    A Roots component's Rust source is served at{" "}
-    <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>, and each document names the
-    crate its component ships in:
-  </p>
-  <RustCrates crates={crates} />
-
-  <p class="prose">
-    <a href="/cli#install">How to install either build →</a> The React build of
-    every component installs with shadcn:
-  </p>
-
-  <code class="cmd lead"
-    >npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code
-  >
-
-  <p class="provenance">
-    <span>
-      Counts read from <code>{CANONICAL_BASE}/ui</code> and <code>/rs/&lt;name&gt;</code>, and crates.io checked, when this page was built,{" "}
-      <time datetime={builtAt}>{builtAt}</time>.
-    </span>
-    <a href={`${CANONICAL_BASE}/ui`}>Read the JSON</a>
-  </p>
-
-  <p>
-    <a href="/components#roots">The {rustCount} Roots components →</a>{" · "}
-    <a href="/components">Browse all {total} →</a>{" · "}
-    <a href="/playground">Previews →</a>{" · "}
-    <a href="/architecture">The DNA helix they sit on →</a>{" · "}
-    <a href="/tokens">The tokens they are built from →</a>
-  </p>
-
-  <h2>Where things are</h2>
-
-  <div class="ledger">
-    <div class="col have">
-      <h3>Live today</h3>
-      <ul>
+      <ul slot="direction" class="card-list">
         {
-          surfaces.map((s) => (
+          direction.map((d) => (
             <li>
-              <div>
+              <Card padding="sm" className="h-full">
+                <strong>{d.what}</strong>
+                <p>{d.note}</p>
+              </Card>
+            </li>
+          ))
+        }
+      </ul>
+    </StaticTabs>
+    <p class="section-links">
+      <a href="/language">The design goals, the phasing and the RFCs →</a>
+    </p>
+  </Section>
+
+  <Section id="toolchain" bg="secondary" border>
+    <SectionHeader
+      eyebrow="Toolchain"
+      title="The toolchain"
+      description="The compiler is the language. Everything else here makes it stronger: it gives an agent a denser loop, it measures whether the language works, and it puts the corpus within an agent's reach."
+    />
+    <ul class="card-list">
+      {
+        toolchain.map((t) => (
+          <li>
+            <Card padding="sm" className="h-full">
+              <Badge variant="outline" size="sm" className="mb-2">{t.kind}</Badge>
+              <a class="card-title" href={t.href}>
+                {t.name}
+              </a>
+              <p>{t.note}</p>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="components">
+    <SectionHeader
+      eyebrow="Components"
+      title="The components: Mzizi Roots"
+      description="Part of Mzizi, not a separate product: the benchmark corpus the language is scored against, and where its output is meant to land."
+    />
+    <div class="grid-2">
+      <Card className="flow">
+        <h3>The corpus</h3>
+        <p>
+          The components are the benchmark corpus the language is scored against
+          (a fixed ground truth of <code>{total}</code>{" "}
+          components, each with a TypeScript reference) and where the language's
+          output is meant to land.
+        </p>
+      </Card>
+      <Card className="flow">
+        <h3>Mzizi Roots, Rust first</h3>
+        <p>
+          <strong>Mzizi Roots</strong> is the Rust direction for them: Mzizi's own
+          UI and server components for the agentic web, written in Rust (Dioxus),
+          sharing a contract and a token set with their React siblings rather than
+          a source file. Where a Rust implementation exists it is presented first.
+          The React (TSX) builds keep working and stay installable, but new work
+          goes to Rust.
+        </p>
+      </Card>
+    </div>
+
+    <ul class="figs">
+      <li class="fig"><b>{rustCount}</b><span>components in Rust, as Mzizi Roots</span></li>
+      <li class="fig"><b>{total}</b><span>components in the corpus, each with a React build</span></li>
+    </ul>
+
+    <div class="flow roots-install">
+      <p>
+        A Roots component's Rust source is served at{" "}
+        <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>, and each document names the
+        crate its component ships in:
+      </p>
+      <RustCrates crates={crates} />
+
+      <p>
+        <a href="/cli#install">How to install either build →</a> The React build of
+        every component installs with shadcn:
+      </p>
+
+      <code class="cmd lead"
+        >npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code
+      >
+
+      <p class="provenance">
+        <span>
+          Counts read from <code>{CANONICAL_BASE}/ui</code> and <code>/rs/&lt;name&gt;</code>, and crates.io checked, when this page was built,{" "}
+          <time datetime={builtAt}>{builtAt}</time>.
+        </span>
+        <a href={`${CANONICAL_BASE}/ui`}>Read the JSON</a>
+      </p>
+    </div>
+
+    <div class="button-row">
+      <a class={buttonVariants({ variant: "primary" })} href="/components#roots"
+        >The {rustCount} Roots components</a
+      >
+      <a class={buttonVariants({ variant: "outline" })} href="/components">Browse all {total}</a>
+      <a class={buttonVariants({ variant: "ghost" })} href="/playground">Previews →</a>
+      <a class={buttonVariants({ variant: "ghost" })} href="/architecture">The DNA helix →</a>
+      <a class={buttonVariants({ variant: "ghost" })} href="/tokens">The tokens →</a>
+    </div>
+  </Section>
+
+  <Section id="where" bg="secondary" border>
+    <SectionHeader eyebrow="Status of the estate" title="Where things are" />
+    <div class="grid-2">
+      <Card className="ledger-card">
+        <h3>
+          <Badge variant="success" size="sm">Live today</Badge>
+        </h3>
+        <ul>
+          {
+            surfaces.map((s) => (
+              <li>
                 <strong>
                   <code>{s.host}</code>
                 </strong>
-                <br />
                 <span>
                   {s.what}
                   {s.repo && (
@@ -609,90 +690,97 @@ const repos: Repo[] = [
                   {". "}
                   {s.note}
                 </span>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-    <div class="col not">
-      <h3>Not yet</h3>
-      <ul>
-        {
-          notYet.map((n) => (
-            <li>
-              <div>
+              </li>
+            ))
+          }
+        </ul>
+      </Card>
+      <Card className="ledger-card">
+        <h3>
+          <Badge variant="warning" size="sm">Not yet</Badge>
+        </h3>
+        <ul>
+          {
+            notYet.map((n) => (
+              <li>
                 <strong>{n.what}</strong>
-                <br />
                 <span>{n.note}</span>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
+              </li>
+            ))
+          }
+        </ul>
+      </Card>
     </div>
-  </div>
-
-  <p>
-    <a href="/ecosystem">What each repository actually contains →</a>
-  </p>
-
-  <h2>The org, repository by repository</h2>
-
-  <div class="repos">
-    {
-      repos.map((r) => (
-        <div class={r.lead ? "repo lead-repo" : "repo"}>
-          <a class="repo-name" href={`https://github.com/mzizi-dev/${r.name}`}>
-            {r.name}
-          </a>
-          <p>{r.desc}</p>
-          <span class="lang">
-            <i style={`background:${r.langColor}`} />
-            {r.lang}
-            {r.tag && <span class="badge outline">{r.tag}</span>}
-          </span>
-        </div>
-      ))
-    }
-  </div>
-
-  <h2>For agents</h2>
-
-  <div class="panel">
-    <p>
-      <a href="/llms.txt"><code>/llms.txt</code></a> is the machine-readable
-      summary of this site and the ecosystem it points at: the same facts as
-      these pages, without the chrome.
+    <p class="section-links">
+      <a href="/ecosystem">What each repository actually contains →</a>
     </p>
-    <p>
-      <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a> names
-      the one public MCP server in this ecosystem. It is free and needs no sign-in,
-      except for the Fundi tools, which file into the console's issue desk and so
-      need a console user. Discover its tools with the standard{" "}
-      <code>tools/list</code> request rather than trusting any list written down
-      here, which can go stale.
-    </p>
-    <p>
-      Do not hardcode component counts, versions or token values read from any
-      page. The registry API, built from the registry's repository files, is
-      the only authoritative source for them.
-    </p>
-  </div>
+  </Section>
 
-  <h2>Two things called Mzizi, one project</h2>
+  <Section id="org">
+    <SectionHeader eyebrow="The org" title="The org, repository by repository" />
+    <ul class="card-list">
+      {
+        repos.map((r) => (
+          <li>
+            <Card padding="sm" className={r.lead ? "h-full lead-repo" : "h-full"}>
+              <a class="card-title" href={`https://github.com/mzizi-dev/${r.name}`}>
+                {r.name}
+              </a>
+              <p>{r.desc}</p>
+              <span class="lang">
+                <i style={`background:${r.langColor}`} />
+                {r.lang}
+              </span>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
 
-  <p class="prose">
-    Worth untangling, because sources on the web conflate them. <strong
-      >Mzizi the language</strong
-    > (the syntax, compiler and IR above) is the research, and it is what this site
-    leads with. <strong>Mzizi the design system</strong> (the component registry,
-    Mzizi Roots, the brand system and the DNA-helix architecture) is{" "}
-    <code>{total}</code> components you can install today. Both are Mzizi, owned
-    and operated by Mzizi, in one org. The difference is the state they are in:
-    the components ship now, and the language has not yet shown the advantage it
-    is designed for.
-  </p>
+  <Section id="agents" bg="secondary" border>
+    <div class="grid-2">
+      <div>
+        <SectionHeader eyebrow="For agents" title="For agents" />
+        <Card className="flow mt-6">
+          <p>
+            <a href="/llms.txt"><code>/llms.txt</code></a> is the machine-readable
+            summary of this site and the ecosystem it points at: the same facts as
+            these pages, without the chrome.
+          </p>
+          <p>
+            <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a> names
+            the one public MCP server in this ecosystem. It is free and needs no sign-in,
+            except for the Fundi tools, which file into the console's issue desk and so
+            need a console user. Discover its tools with the standard{" "}
+            <code>tools/list</code> request rather than trusting any list written down
+            here, which can go stale.
+          </p>
+          <p>
+            Do not hardcode component counts, versions or token values read from any
+            page. The registry API, built from the registry's repository files, is
+            the only authoritative source for them.
+          </p>
+        </Card>
+      </div>
+      <div>
+        <SectionHeader eyebrow="Naming" title="Two things called Mzizi, one project" />
+        <Card className="flow mt-6">
+          <p>
+            Worth untangling, because sources on the web conflate them. <strong
+              >Mzizi the language</strong
+            > (the syntax, compiler and IR above) is the research, and it is what this site
+            leads with. <strong>Mzizi the design system</strong> (the component registry,
+            Mzizi Roots, the brand system and the DNA-helix architecture) is{" "}
+            <code>{total}</code> components you can install today. Both are Mzizi, owned
+            and operated by Mzizi, in one org. The difference is the state they are in:
+            the components ship now, and the language has not yet shown the advantage it
+            is designed for.
+          </p>
+        </Card>
+      </div>
+    </div>
+  </Section>
 </Site>
 
 <script is:inline>

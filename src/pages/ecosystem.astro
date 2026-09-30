@@ -1,4 +1,5 @@
 ---
+import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
 
 /**
@@ -80,7 +81,7 @@ const repos = [
 
   {
     repos.map((r) => (
-      <div class="panel">
+      <Card className="flow my-6">
         <h2>
           {r.name} <span class="state">— {r.role}</span>
         </h2>
@@ -101,7 +102,7 @@ const repos = [
             </>
           )}
         </p>
-      </div>
+      </Card>
     ))
   }
 
@@ -151,6 +152,6 @@ const repos = [
     wordmark in this ecosystem is lowercase: <code>nyuchi</code>,{" "}
     <code>mukoko</code>, <code>shamwari</code>, <code>bundu</code>,{" "}
     <code>nhimbe</code>. Package names, hostnames and code identifiers keep
-    their literal spelling. <em>Mzizi</em> is Shona for root.
+    their literal spelling. <em>Mzizi</em> is Swahili for root.
   </p>
 </Site>
