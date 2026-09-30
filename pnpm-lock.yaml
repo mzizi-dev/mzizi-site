@@ -12,8 +12,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(jiti@2.7.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(yaml@2.9.0)
       '@bundu/ui':
-        specifier: github:mukoko-dev/packages-ui#f9903fc&path:packages/bundu-ui
-        version: https://codeload.github.com/mukoko-dev/packages-ui/tar.gz/f9903fc12bf42f3c8e188f5f49ce99cb58ce3d5d#path:packages/bundu-ui(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^0.2.0
+        version: 0.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -245,9 +245,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@bundu/ui@https://codeload.github.com/mukoko-dev/packages-ui/tar.gz/f9903fc12bf42f3c8e188f5f49ce99cb58ce3d5d#path:packages/bundu-ui':
-    resolution: {path: packages/bundu-ui, tarball: https://codeload.github.com/mukoko-dev/packages-ui/tar.gz/f9903fc12bf42f3c8e188f5f49ce99cb58ce3d5d}
-    version: 0.2.0
+  '@bundu/ui@0.2.0':
+    resolution: {integrity: sha512-8R1rf+AN0Eo77Cn/gL/qYDXpc153rto4C0XvGwCdY7OsarMjTBT5TH3l56cXAqLlqqOWBDCDmQwd7+qijEjYLw==}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
@@ -3261,7 +3260,7 @@ snapshots:
   '@bruits/satteri-win32-x64-msvc@0.10.5':
     optional: true
 
-  '@bundu/ui@https://codeload.github.com/mukoko-dev/packages-ui/tar.gz/f9903fc12bf42f3c8e188f5f49ce99cb58ce3d5d#path:packages/bundu-ui(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@bundu/ui@0.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       class-variance-authority: 0.7.1
       clsx: 2.1.1
