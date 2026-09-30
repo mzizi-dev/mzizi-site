@@ -21,6 +21,53 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the site matches language main `62a0f32`
+
+A freshness update. What the language can do is now taken from
+`LANGUAGE-TRACKER.md` in `mzizi-dev/mzizi`, the language's one tracker of what
+it still needs. The facts that moved:
+
+- **Figures:** 425 tests in 18 suites (was 308 in 14) and 12,644 lines in
+  `compiler/src` (was 7,454), from a fresh build at `62a0f32` (was
+  `e9e9233`). The contract bench and the captured `mz check --agent` output
+  on `/language` were re-run at `62a0f32` and are unchanged; they now cite it.
+- **Added: "What still has to be built".** The landing status panel and
+  `/language` link `LANGUAGE-TRACKER.md` under that name. `/language` has a new
+  section summarising it: Mzizi's column against Python, Go, C++, TypeScript
+  and Rust, and milestones M1 (a language that computes) and M2 (a working
+  programming language), neither reached. The landing page, `/language` and
+  `llms.txt` say plainly that Mzizi has no expressions, bindings, callable
+  functions, loops, error handling, modules or standard library yet.
+- **Changed: what lowers.** "Nothing lowers yet" and "no lowering to Rust" are
+  replaced with the narrower truth: `mz build` lowers a `service` (HTTP routes
+  and handlers, RFC-0011) to a local Rust + axum package, which CI compiles,
+  tests and serves. No component lowers, and there are no Workers, Containers
+  or WebAssembly targets. `mz contract` runs a service in process. The `mz`
+  commands are listed as check, fix, contract, outline and build (plus hash and
+  ir for the IR); `/cli` gains a `mz build` row.
+- **Added: RFC-0011 (handlers) and RFC-0012 (the harness)** to the RFC lists on
+  `/language`, `/ecosystem` and `llms.txt`. The harness's design is cited as
+  RFC-0012 (was "its RFC is being written"). RFC-0009's and RFC-0010's notes no
+  longer say nothing in them is implemented.
+- **Changed: charter v0.4.** Every citation of the charter says v0.4 (was
+  v0.3), and `llms.txt` gives its title, "Mzizi: a general-purpose programming
+  language", and its tagline as the goal Phase 0 tests.
+- **Changed: "What Mzizi is measured against"** and the `/language` arms table
+  follow `benchmarks/arms/`: the React arm exists and has never run (was
+  "new"); the Mzizi backend arm, `mzizi-be`, exists with the probe crate
+  `mzprobe` and task B1 and has never run (was "blocked"); the Hono, FastAPI,
+  Go, C++ and axum arms are not added yet (was "new"). What the kill-criterion
+  run still waits on follows `benchmarks/READINESS.md`.
+- **Fixed: `llms.txt`** no longer says `api.mzizi.dev/v1/skills` serves skills
+  0.8.2; it serves 0.8.4, as npm and `mcp.mzizi.dev` do.
+- **Gates:** `verify-rendered.py` now requires the tracker link, the
+  "no expressions, bindings, …" sentence, the narrower lowering claim, RFC-0011
+  and RFC-0012, and the arms' states, and refuses the old figures, "charter
+  v0.3", "nothing lowers yet" and "cannot write or run a handler".
+  `check-facts.py` reads the charter's version, the tracker's rows and the
+  `benchmarks/arms/` listing live, and fails when the site disagrees, including
+  when a tracker row the site calls missing turns ✅.
+
 ### Changed — Mzizi is presented as a programming language, and Phase 0 as its goal
 
 The owner's positioning (2026-09-30): Mzizi is a programming language whose
