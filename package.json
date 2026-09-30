@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^7.0.0",
-    "@bundu/ui": "github:mukoko-dev/packages-ui#f9903fc&path:packages/bundu-ui",
+    "@bundu/ui": "^0.2.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   }
