@@ -6,8 +6,10 @@
 ## What this repo is
 
 Astro, static output, deployed as a Cloudflare Worker with Static Assets, serving the
-`mzizi.dev` apex. No islands, no UI framework — pages render at build time from the public
-registry API (`api.mzizi.dev`). See README's "Where the content comes from" for why build
+`mzizi.dev` apex. No islands, and no UI framework in the browser: pages render at build
+time from the public registry API (`api.mzizi.dev`), styled with Tailwind v4 over
+`@bundu/ui`, whose React primitives render to static HTML through `@astrojs/react` with no
+`client:*` directive. See README's "Where the content comes from" for why build
 time, not the browser.
 
 ## Build, test, run
@@ -35,8 +37,10 @@ Strips every `<script>` from the built HTML and asserts the content is still the
 component cards and 577 component pages (each with its source and install command, Rust
 before React where there is Rust), the Roots list, the eight node titles, the four rung
 titles, the six strands, N2's count of 371, all 21 colour families by CSS variable,
-specific hex values, the landing page's status panel ahead of the components and its
-contract bench, the skills, `/cli`, `/playground` and `/observability`, `security.txt`'s
+specific hex values, the landing page's Hero (with the contract bench as its media and
+the "Phase 0 · research prototype" badge) followed directly by the status panel, ahead of
+the components, and no "faster", "better than" or "outperform" on it, that no page hydrates
+an island or loads the React client, the skills, `/cli`, `/playground` and `/observability`, `security.txt`'s
 `Expires` still in the future, the `/mcp` and `/api/v1` redirects, and no redirect left
 pointing at the registry app. A page that quietly renders nothing fails the build — this is the gate
 `mzizi-console` shipped without, and paid for with a blank production page that passed CI.

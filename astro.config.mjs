@@ -1,5 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
+import tailwindcss from "@tailwindcss/vite";
 
 /**
  * The front door. Astro, static output, no framework islands.
@@ -17,10 +19,20 @@ import { defineConfig } from "astro/config";
  * against an element that was not there. A dated fact beats a blank page, and
  * `scripts/verify-rendered.py` now fails the build if a page renders empty.
  *
- * There is no UI framework here and there will not be one. The doctrine is
- * Astro in front, Rust first and TypeScript second underneath, and no third
- * UI framework (`mzizi-dev/agent-tools#82`; see CHARTER.md in `mzizi-dev/mzizi`).
- * The one script on the site filters cards that are already in the HTML.
+ * No islands, and no client-side UI framework. The doctrine is Astro in
+ * front, Rust first and TypeScript second underneath, and no third UI
+ * framework in the browser (`mzizi-dev/agent-tools#82`; CHARTER.md in
+ * `mzizi-dev/mzizi`). The owner's direction of 2026-09-30 is that this site
+ * is built from `@bundu/ui` as far as it goes, and some of those primitives
+ * (Button, Card, Badge, Tabs, Alert, Separator, Tooltip) are React
+ * components. `@astrojs/react` renders them to static HTML AT BUILD TIME;
+ * no page uses a `client:*` directive, so no React ships to the browser.
+ * `scripts/verify-rendered.py` holds every page to rendering its content
+ * with every <script> removed. The scripts that do ship are the bench, the
+ * component filter and the header's drawer and search.
+ *
+ * Styling is Tailwind v4 over `@bundu/ui/styles/theme.css`, with the Mzizi
+ * brand overlay (hematite, the owner's decision of 2026-09-30).
  *
  * `site` is mzizi.dev, which this site now serves.
  */
@@ -34,5 +46,7 @@ export default defineConfig({
     // mzizi-console, for the same reason.
     format: "file",
   },
+  integrations: [react()],
+  vite: { plugins: [tailwindcss()] },
   devToolbar: { enabled: false },
 });

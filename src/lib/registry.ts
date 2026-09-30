@@ -629,7 +629,7 @@ export function shortType(type: string): string {
  * never a per-swatch colour someone chose by eye. Nothing here invents a
  * colour; it only picks which end of the existing contrast pair to use.
  */
-export function readableInk(hex: string): "#000000" | "#ffffff" {
+export function readableInk(hex: string): "black" | "white" {
   const value = hex.replace("#", "");
   const full =
     value.length === 3
@@ -644,5 +644,6 @@ export function readableInk(hex: string): "#000000" | "#ffffff" {
   };
   const luminance =
     0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
-  return luminance > 0.179 ? "#000000" : "#ffffff";
+  // The two ends of the contrast pair, as CSS keywords: the site types no hex.
+  return luminance > 0.179 ? "black" : "white";
 }

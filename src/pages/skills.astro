@@ -7,6 +7,7 @@
  * into `api.mzizi.dev`; npm serves `@nyuchi/mzizi-skills`. The two can differ,
  * and when they do this page says so rather than picking one quietly.
  */
+import { Alert } from "@bundu/ui/ui/alert";
 import Site from "../layouts/Site.astro";
 import { getSkills, npmStatus, builtAt, CANONICAL_BASE } from "../lib/registry";
 
@@ -54,12 +55,14 @@ const sorted = [...skills].sort((a, b) => a.name.localeCompare(b.name));
 
   {
     npm.state === "published" && npm.version !== version && (
-      <p class="status prose">
+      <Alert variant="warning" role="note" className="status prose text-body p-6">
+        <p>
         The API serves bundle <code>{version}</code>; npm's latest{" "}
         <code>@nyuchi/mzizi-skills</code> is <code>{npm.version}</code>. The pages
         below show what the API serves. If they disagree with npm, the newer
         package is the one being maintained.
       </p>
+      </Alert>
     )
   }
 

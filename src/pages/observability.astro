@@ -7,6 +7,7 @@
  * and no store for any; what it can show is what the registry's files say, and
  * what the public API reports, dated.
  */
+import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
 import { getStats, getArchitecture, getComponents, builtAt, CANONICAL_BASE } from "../lib/registry";
 
@@ -30,14 +31,14 @@ const telemetryZero =
   description="Where Mzizi's logs and telemetry live (the console, app.mzizi.dev), and what the registry's files and public API report."
   lede="The logs live in the console. This page links there, and shows what is file-backed."
 >
-  <div class="panel">
+  <Card className="flow my-6">
     <p>
       <strong>Logs, traces and usage are in the console</strong>, at{" "}
       <a href="https://app.mzizi.dev">app.mzizi.dev</a>, behind sign-in. It is run by
       Nyuchi and holds the one database in the estate. This site is static and
       keeps none.
     </p>
-  </div>
+  </Card>
 
   <h2>What is file-backed</h2>
   <p class="prose">

@@ -18,6 +18,9 @@
  * built out of, so the gallery is not a mock-up of the system, it is a labelled
  * sample of the system the page itself is wearing.
  */
+import { Card } from "@bundu/ui/ui/card";
+import { Badge } from "@bundu/ui/ui/badge";
+import { Separator } from "@bundu/ui/ui/separator";
 import Site from "../layouts/Site.astro";
 import {
   getBrand,
@@ -165,7 +168,7 @@ const specs = brand.componentSpecs;
     </section>
   ))}
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2 id="surfaces">The surface ladder</h2>
   <div class="prose">
@@ -217,7 +220,7 @@ const specs = brand.componentSpecs;
     ))}
   </ul>
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2 id="typography">Typography</h2>
   <div class="prose">
@@ -285,7 +288,7 @@ const specs = brand.componentSpecs;
     ))}
   </ul>
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2 id="specs">Component specs, rendered</h2>
   <div class="prose">
@@ -313,9 +316,9 @@ const specs = brand.componentSpecs;
           {spec.name === "avatar" && <span class="demo-avatar">nz</span>}
           {spec.name === "badge" && (
             <>
-              <span class="badge">ui</span>
-              <span class="badge solid">block</span>
-              <span class="badge outline">lib</span>
+              <Badge size="sm">ui</Badge>
+              <Badge variant="info" size="sm">block</Badge>
+              <Badge variant="outline" size="sm">lib</Badge>
             </>
           )}
           {spec.name === "card" && <span class="demo-card">A card is 14px and 1px.</span>}
@@ -355,7 +358,7 @@ const specs = brand.componentSpecs;
   </ul>
 
   <h2 id="accessibility">What these values are held to</h2>
-  <div class="panel prose">
+  <Card className="flow prose my-6">
     <p>
       <strong>{brand.accessibility.standard}.</strong>
       {" "}{brand.accessibility.contrastDescription}
@@ -367,9 +370,9 @@ const specs = brand.componentSpecs;
       {" "}{brand.accessibility.keyboardNavigation}.
       {" "}{brand.accessibility.screenReaders}.
     </p>
-  </div>
+  </Card>
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2>Reading this as a machine</h2>
   <div class="prose">
@@ -378,7 +381,9 @@ const specs = brand.componentSpecs;
       step, spacing step, radius and component spec — is served as JSON at{" "}
       <code>{CANONICAL_BASE}/brand</code>. Token files are generated from it, and
       nothing in this ecosystem should be holding its own copy of a hex value.
-      This site does not: <code>public/site.css</code> contains no colour at all.
+      This site does not: it takes every value from <code>@bundu/ui</code>, which is
+      generated from this API, and <code>src/styles/site.css</code> types no colour
+      at all.
     </p>
   </div>
 </Site>

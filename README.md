@@ -185,18 +185,17 @@ the whole page, so a component with no demo simply has no picture.
 
 ### Styling
 
-`@bundu/ui` — the same package `bundu-labs/marketing` (three apps) and
-`shamwari-ai/shamwari/site` consume. `src/styles/site.css` imports
-`@bundu/ui/styles/tokens.css` and contains **no colour, size, radius or weight
-of its own**; it is layout and nothing else.
+`@bundu/ui` 0.2.0, the same package `bundu-labs/marketing` (three apps) and
+`shamwari-ai/shamwari/site` consume. `src/styles/site.css` is Tailwind v4 over
+`@bundu/ui/styles/theme.css` (all 21 colour families, the surface ladder, the type
+scale), `globals.css`, `color-scheme.css` (dark mode follows the OS, with no theme
+script) and `brand-mzizi.css`. Mzizi's brand mineral is **hematite**, by the owner's
+decision of 2026-09-30, recorded in canon (`mzizi-registry` `brand.source.ts`). The
+stylesheet types **no colour, size, radius or weight of its own**: its layout rules
+name the package's tokens.
 
-The published `0.1.1` is incomplete — 7 of 21 colour families, no experimental
-set, heritage under a `--heritage-*` namespace, no surface ladder — so
-`src/components/DesignTokens.astro` fills exactly those gaps from `/v1/brand`,
-emitting them **under the same variable names a complete package would use**.
-When `0.2.0` ships, that component is deleted and the import alone stands. That
-is the whole point of generating rather than pasting: the estate is carrying
-four different terracottas because four people typed a hex into a stylesheet.
+Until 0.2.0, `src/components/DesignTokens.astro` generated the missing families and
+the ladder from `/v1/brand`. The package carries them now, so that component is gone.
 
 ## What is here
 
@@ -204,9 +203,10 @@ four different terracottas because four people typed a hex into a stylesheet.
 mzizi-site/
 ├── src/pages/          # the site
 ├── src/layouts/        # one shell
-├── src/components/     # DesignTokens.astro — the palette, generated
+├── src/components/     # RustCrates, StaticTabs (@bundu/ui Tabs, static)
 ├── src/lib/            # registry.ts — the one place that reads the API
-├── src/styles/         # site.css — layout only, imports @bundu/ui tokens
+├── src/scripts/        # tabs.ts — switches the static tab sets
+├── src/styles/         # site.css — Tailwind v4 over @bundu/ui, layout only
 ├── scripts/
 │   ├── verify-rendered.py   # fails the build if a page renders empty
 │   └── check-facts.py       # fails if dist/ disagrees with live upstream facts
@@ -300,26 +300,33 @@ Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-09-30):
 surface on this site is `/llms.txt`; the authority on what that server exposes is
 the server, over a standard `tools/list` request.
 
-## Stack, and why there is no framework in it
+## Stack, and why no framework ships to the browser
 
-Astro renders everything at build time. There are no islands and no UI framework
-— not Svelte, not React, not Vue.
+Astro renders everything at build time. There are no islands, and no UI framework
+runs in the browser: not Svelte, not React, not Vue.
 
-That is doctrine, not taste: the UI is Astro and underneath is Rust first and
-TypeScript second, with no third UI framework (`mzizi-dev/agent-tools#82`, and
-the charter). It has one consequence worth stating plainly: this site cannot
-`npx shadcn@latest add` a registry component, because every one of them is a
-React `.tsx`. What it does instead is build its own pieces to the registry's
-`componentSpecs` — badges 22px and pill, cards 14px with a 1px border, controls
-56px and never below 48px — read from the same API. The dimensions are the
-system's; only the markup is local.
+That is doctrine, not taste. The UI is Astro, and underneath it is Rust first and
+TypeScript second, with no third UI framework (`mzizi-dev/agent-tools#82`, and the
+charter). The owner's direction of 2026-09-30 is that this site is built from
+`@bundu/ui` as far as it goes. The package's Astro components (`Hero`, `Section`,
+`SectionHeader`, `Breadcrumb`, `MineralStrip`, `Icon`, `SocialIcon`) render
+natively. Its React primitives (`Button`, `Card`, `Badge`, `Tabs`, `Alert`,
+`Separator`) render through `@astrojs/react` **at build time**, with no `client:*`
+directive, so their HTML ships and React does not. `scripts/verify-rendered.py`
+fails the build if a page ever loads a framework runtime.
 
-The scripts on the site are progressive enhancement only: the filter on
-`/components`, which sets `hidden` on cards that are already in the HTML, and the
-`mz contract` bench on the landing page, whose unedited file and real all-pass
-result are rendered into the HTML at build time. With JavaScript off, every page
-still carries its content. `scripts/verify-rendered.py` proves that on
-every commit by stripping every `<script>` and then grepping for the content.
+The scripts on the site are progressive enhancement only:
+
+- the filter on `/components`, which sets `hidden` on cards that are already in the
+  HTML;
+- the `mz contract` bench in the landing page's hero, whose unedited file and real
+  all-pass result are rendered into the HTML at build time;
+- the tab switcher, over panels that are all in the HTML;
+- the header's drawer and search.
+
+With JavaScript off, every page still carries its content, and a `<noscript>` style
+shows every tab panel. `scripts/verify-rendered.py` proves that on every commit by
+stripping every `<script>` and then grepping for the content.
 
 ## Working on it
 
