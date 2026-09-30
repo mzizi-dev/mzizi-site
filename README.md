@@ -1,6 +1,6 @@
 # mzizi.dev
 
-> The front door to Mzizi, and it leads with the language: what the language is, what it has and has not shown, and then the toolchain and components (Mzizi Roots) that support it — plus the agent-facing files (`llms.txt`, `.well-known/mcp.json`) that say the same thing to a machine.
+> The front door to Mzizi, a programming language, and it leads with the language: what the language is, what it aims for (to be used instead of TypeScript, Python and C++, with Rust underneath), what it has and has not shown, and then the toolchain and components (Mzizi Roots) that support it — plus the agent-facing files (`llms.txt`, `.well-known/mcp.json`) that say the same thing to a machine.
 
 [![CI](https://github.com/mzizi-dev/mzizi-site/actions/workflows/ci.yml/badge.svg)](https://github.com/mzizi-dev/mzizi-site/actions/workflows/ci.yml)
 [![Lint](https://github.com/mzizi-dev/mzizi-site/actions/workflows/lint.yml/badge.svg)](https://github.com/mzizi-dev/mzizi-site/actions/workflows/lint.yml)
@@ -388,5 +388,6 @@ See [`SECURITY.md`](./SECURITY.md). Reports about this site go to
 
 Licensed under the [Apache License 2.0](LICENSE).
 
-Mzizi is an independent open-architecture project that owns, operates and
-develops its framework, design system and registry.
+Mzizi is a programming language and an independent open-architecture project
+that owns, operates and develops the language, its toolchain and its
+components (the design system and registry).

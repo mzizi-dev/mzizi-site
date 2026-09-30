@@ -19,15 +19,15 @@ const repos = [
     name: "mzizi",
     role: "The language",
     state: "shipping code, not routed",
-    body: "Phase 0 of the research charter (v0.3): the mz compiler front end — lexer, recovering parser, agent diagnostic protocol and mz fix, content-addressed IR — nine primitives written in Mzizi itself, the design RFCs (RFC-0001 to RFC-0010, with 0005 reserved), and the public half of the benchmark harness, including the kill-criterion driver. The kill-criterion run has not happened. Rust.",
+    body: "The Mzizi programming language, and Phase 0 of its research charter (v0.3): the language's design (the charter and the RFCs), and the toolchain that implements it: the mz compiler front end — lexer, recovering parser, agent diagnostic protocol and mz fix, content-addressed IR — nine primitives written in Mzizi itself, the design RFCs (RFC-0001 to RFC-0010, with 0005 reserved), and the public half of the benchmark harness, including the kill-criterion driver. The kill-criterion run has not happened. Rust.",
     href: "/language",
     internal: true,
   },
   {
     name: "mzizi-registry",
-    role: "Design system, registry and portal",
+    role: "The components: design system, registry and portal",
     state: "shipping code; its files are what api.mzizi.dev serves",
-    body: "The canonical component registry for the Mzizi ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and Mzizi Roots, the Rust components: ten crates on crates.io at 0.1.0, with mzizi-roots (UI) and mzizi-roots-server (server) as the umbrellas. Its files are what api.mzizi.dev serves (through mzizi-api-gateway), and it holds no database. TypeScript and Rust.",
+    body: "The components built to support the language, as its UI layer: the canonical component registry for the Mzizi ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and Mzizi Roots, the Rust components: ten crates on crates.io at 0.1.0, with mzizi-roots (UI) and mzizi-roots-server (server) as the umbrellas. Its files are what api.mzizi.dev serves (through mzizi-api-gateway), and it holds no database. TypeScript and Rust.",
   },
   {
     name: "mzizi-api-gateway",
@@ -68,13 +68,13 @@ const repos = [
 
 <Site
   title="Ecosystem"
-  description="Every public repository in the Mzizi ecosystem: the language, the registry, the API gateway, the console, the docs, and this site — with what each one actually holds today."
+  description="Every public repository in the Mzizi ecosystem: the language, then the components, the API gateway, the console, the docs and this site that support it — with what each one actually holds today."
   lede="Seven public repositories. Four serve a live hostname; the rest are code that is built but not routed, or a placeholder. This page says which is which."
 >
   <p>
-    The Mzizi ecosystem is governed by <strong>Mzizi</strong>,
-    which owns the framework outright and operates the registry and
-    tooling day-to-day. Everything listed here is public and Apache-2.0.
+    Mzizi is a programming language. Its ecosystem is governed by{" "}
+    <strong>Mzizi</strong>, which owns the language, its toolchain and its
+    components outright and operates the registry and tooling day-to-day. Everything listed here is public and Apache-2.0.
     There are private repositories in the org too — they are not listed, and
     neither is anything that is not yet real.
   </p>
@@ -119,7 +119,7 @@ const repos = [
     takes a <code>rust</code> filter. It is free with no sign-in, except the
     Fundi tools, which file into the console's issue desk and need a console
     user. That is the owner's decision of 2026-09-29, and it is live:{" "}
-    <code>mzizi-mcp</code> 0.11.1 answers <code>initialize</code>,{" "}
+    <code>mzizi-mcp</code> 0.11.2 answers <code>initialize</code>,{" "}
     <code>tools/list</code> and the component tools with no token, and only{" "}
     <code>mzizi_fundi</code> and <code>mzizi_report_issue</code> ask for
     sign-in (checked 2026-09-30). Its source is not public, so it has no row

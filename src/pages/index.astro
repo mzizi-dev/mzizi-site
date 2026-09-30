@@ -25,16 +25,26 @@ import {
 /**
  * The front door, and it leads with the language.
  *
- * Mzizi's main goal is the language (`mzizi-dev/mzizi`): a syntax, a type
- * system and a compiler feedback loop designed for machine authorship. This
- * page says what that is, what it has and has not shown, and then how the rest
- * of Mzizi (the toolchain, and the components as Mzizi Roots) supports it.
- * The components are part of Mzizi, not a separate product; they sit further
- * down because they serve the language, not the other way round.
+ * Mzizi is a programming language (`mzizi-dev/mzizi`). Its goal (owner,
+ * 2026-09-30) is to be the language people choose instead of TypeScript,
+ * Python and C++, and its edge is machine authorship: syntax, types,
+ * contracts and diagnostics designed for an agent in the compile loop. This
+ * page says what that is, what it has and has not shown, what Phase 0
+ * measures it against, and then how the rest of Mzizi supports it: the
+ * toolchain (the `mz` compiler, the CLI, the MCP server, the skills and the
+ * Phase 0 benchmark harness) and the components (Mzizi Roots and the
+ * registry). Neither of those is the language. The harness at the language's
+ * core (owner, 2026-09-30) is part of the language, designed and not built. They sit further down because they serve the
+ * language, not the other way round.
+ *
+ * The goal is stated as a goal. Nothing on this page may say Mzizi already
+ * beats TypeScript, Python or C++: the comparison section is the benchmark's
+ * question (RFC-0009 §1–§2), not a results table.
  *
  * Every claim here is checkable against a file in this org:
  * `mzizi-dev/mzizi/CHARTER.md` for what Mzizi is and what it has not yet
- * proven, `benchmarks/results/` there for the two pilots that have run,
+ * proven, RFC-0009 there for the arms, families and kill criterion,
+ * `benchmarks/results/` for the two pilots that have run,
  * `benchmarks/READINESS.md` for what the kill-criterion run still waits on,
  * and the repositories themselves for the rest. The status panel is the most
  * important block on the site. It stays second on the page and it stays strict.
@@ -112,28 +122,43 @@ const benchTerm =
   '<div class="cmd">$ mz contract primitives/button.mz</div>' +
   '<div class="ok">mz: 0 errors (0 exact-fixable), 5 contract clauses, 0 failed, 0ms</div>';
 
-// What the language is, and what it deliberately is not. From CHARTER.md §3
-// and §5, and the README's "What doesn't exist yet".
+// What the language is, and what it deliberately is not. From CHARTER.md §1,
+// §3 and §5, and the README's "What doesn't exist yet". The language is its
+// syntax, type system, semantics and contracts. The compiler, the IR and the
+// diagnostics are the toolchain that implements it (owner, 2026-09-30), so
+// they are listed under "It isn't" and described in the toolchain section.
 const isList = [
   {
-    what: "A language",
-    note: "Syntax and a type system that put what an agent reasons about (a variant's touch height, a component's capabilities) in declarations rather than in strings it has to parse back out.",
+    what: "A programming language",
+    note: "Designed to be general-purpose: UI components today, with functions, backend handlers and services designed and not yet built (RFC-0007, RFC-0010). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and nothing lowers yet. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
   },
   {
-    what: "A compiler, mz",
-    note: "Lexer, recovering parser, name and type resolver, and the agent diagnostic protocol. The compiler crate has no dependencies of its own.",
+    what: "Syntax and a type system",
+    note: "They put what an agent reasons about (a variant's touch height, a component's capabilities) in declarations rather than in strings it has to parse back out, with one construct per intent.",
   },
   {
-    what: "An intermediate representation",
-    note: "Content-addressed, so a change has an identity an agent can cache, compare and patch against.",
+    what: "Semantics an agent can check",
+    note: "A declared fact that disagrees with what the code renders is a compile error, not a runtime surprise: a height that disagrees with its class is MZ0313.",
   },
   {
-    what: "Contracts",
-    note: "A component states what must hold, and mz contract checks it. The bench at the top of this page is the first instance.",
+    what: "Contracts, as a language feature",
+    note: "A component states what must hold about it in the same file, in the language itself. The toolchain's mz contract checks it; the bench at the top of this page is the first instance.",
+  },
+  {
+    what: "A harness at its core, by design",
+    note: "The harness is the core of Mzizi: the layer an agent reads and works through. It covers the language as an agent sees it (grammar, types, contracts, canonical form), the agent protocol (mz check --agent, its diagnostics and fixes, RFC-0001 §4), and the plugin host the toolchain, the CLI, the MCP server and plugins attach to natively. Part of it exists today in the toolchain, as mz check --agent's output. The harness as a whole is designed, not built: its RFC is being written. It lives in the language repository, mzizi-dev/mzizi, and the agent-tools packages (the CLI, the MCP server, fundi) are its clients.",
   },
 ];
 
 const isntList = [
+  {
+    what: "Not its toolchain",
+    note: "The mz compiler, its content-addressed IR, mz fix and mz contract implement and support the language, and are meant to attach to its harness. They are not the language. See the toolchain below.",
+  },
+  {
+    what: "Not its components",
+    note: "Mzizi Roots and the registry are built to support the language, as its UI layer and where its output is meant to land. See the components below.",
+  },
   {
     what: "Not a rendering engine",
     note: "Mzizi is designed to lower to Rust and Dioxus. Rendering is interop, not a rebuilt engine.",
@@ -168,18 +193,85 @@ const direction = [
   },
   {
     what: "A wider benchmark",
-    note: "Beyond Dioxus and Leptos, to TypeScript/React, Python, Go and C++, and Rust backends, frontend and backend. RFC-0009 designs it and is a draft; none of those arms has been added, and nothing has been measured against them.",
+    note: "UI against TypeScript with React as well as Dioxus and Leptos; backend against TypeScript, Python, Go, C++ and Rust. RFC-0009 designs it and is a draft; none of those new arms has been added, and nothing has been measured against them.",
   },
 ];
 
-// The toolchain: what makes the language stronger. Each one is a real thing
-// in a public repository (or a live host), described at its current state.
+// What Mzizi is measured against: the benchmark's question, not its answers.
+// Every family, arm, pin and state is RFC-0009 §1 and §2 at mzizi-dev/mzizi
+// e9e9233; "exists" means a directory under benchmarks/arms/ (or the mz
+// checker), "new" means RFC-0009 proposes it and nothing is built. Nothing
+// here has a result; the results are benchmarks/results/.
+type Arm = { lang: string; state: "exists" | "exists, never run" | "new" };
+const families: {
+  id: string;
+  title: string;
+  role: string;
+  gating: boolean;
+  input: string;
+  arms: Arm[];
+  mzizi: string;
+}[] = [
+  {
+    id: "ui-spec",
+    title: "UI components",
+    role: "Gating, on held-out tasks",
+    gating: true,
+    input: "A component written from a language-neutral spec.md: prose and a table of its variants, classes, defaults and slot. No arm is handed code in its own language.",
+    arms: [
+      { lang: "Rust · Dioxus 0.7.10", state: "exists" },
+      { lang: "Rust · Leptos 0.8.21", state: "exists, never run" },
+      { lang: "TypeScript · React", state: "new" },
+    ],
+    mzizi: "The Mzizi arm exists.",
+  },
+  {
+    id: "backend",
+    title: "Backend handlers and services",
+    role: "Gating, on held-out tasks",
+    gating: true,
+    input: "HTTP routing, validation, a small stateful service and error paths, from a spec.md, scored by HTTP probes that do not care what language answered.",
+    arms: [
+      { lang: "TypeScript · Hono", state: "new" },
+      { lang: "Python · FastAPI", state: "new" },
+      { lang: "Go · net/http", state: "new" },
+      { lang: "C++20 · cpp-httplib", state: "new" },
+      { lang: "Rust · axum", state: "new" },
+    ],
+    mzizi: "The Mzizi arm is blocked: Mzizi cannot write or run a handler yet (RFC-0009 §6.4).",
+  },
+  {
+    id: "ui-port",
+    title: "Porting a React component",
+    role: "Development only, never gating",
+    gating: false,
+    input: "A registry component handed over as its spec.tsx, as both pilots were. Kept so a new run can be compared with the pilots.",
+    arms: [
+      { lang: "Rust · Dioxus", state: "exists" },
+      { lang: "Rust · Leptos", state: "exists, never run" },
+    ],
+    mzizi: "Both pilots ran here, against Dioxus only.",
+  },
+  {
+    id: "public",
+    title: "Public suites",
+    role: "Comparability, never gating",
+    gating: false,
+    input: "MultiPL-E, EvalPlus, Aider polyglot and BaxBench, in their own languages (TypeScript, Python, Go, C++ and Rust among them). Their tasks are in every model's training data, so they never decide anything.",
+    arms: [],
+    mzizi: "Blocked until Mzizi has functions, expressions and a way to run them (RFC-0009 §8).",
+  },
+];
+
+// The toolchain: built to support the language, not the language itself.
+// Each one is a real thing in a public repository (or a live host),
+// described at its current state.
 const toolchain = [
   {
     name: "mz",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/compiler",
     kind: "Compiler",
-    note: "check, fix, contract, outline, hash and ir. Built from a checkout with stable Rust; there is no release yet.",
+    note: "The compiler that implements the language: check, fix, contract, outline, hash and ir, over a content-addressed IR. Built from a checkout with stable Rust; there is no release yet.",
   },
   {
     name: "mz check --agent",
@@ -190,14 +282,20 @@ const toolchain = [
   {
     name: "benchmarks/",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/benchmarks",
-    kind: "Benchmark harness",
-    note: "The Phase 0 harness, the runner, the Dioxus and Leptos arms, an open-weight arm and the kill-criterion driver. It scored both pilots. The held-out task set is not written yet, and will be private by design.",
+    kind: "Phase 0 benchmark",
+    note: "The Phase 0 benchmark harness (not the harness at the language's core), the runner, the Dioxus and Leptos arms, an open-weight arm and the kill-criterion driver. It scored both pilots. The held-out task set is not written yet, and will be private by design.",
   },
   {
     name: "mcp.mzizi.dev",
     href: "https://mcp.mzizi.dev/mcp",
     kind: "MCP server",
     note: "The registry, skills and docs as tools an agent can call. Free, no sign-in, except the Fundi tools.",
+  },
+  {
+    name: "Agent skills",
+    href: "/skills",
+    kind: "Skills",
+    note: "@nyuchi/mzizi-skills: written workflows that teach an agent the language, its toolchain and its components. On npm, and served by the MCP server and the API.",
   },
   {
     name: "The CLIs",
@@ -215,7 +313,7 @@ const surfaces = [
     what: "The language",
     host: "github.com/mzizi-dev/mzizi",
     repo: "mzizi",
-    note: "Compiler, primitives, RFCs, benchmark harness and results. Public.",
+    note: "The language's charter and RFCs, the mz compiler that implements it, primitives written in it, and the benchmark harness and results. Public.",
   },
   {
     what: "This site",
@@ -278,14 +376,14 @@ const repos: Repo[] = [
     name: "mzizi",
     lang: "Rust",
     langColor: "var(--color-copper)",
-    desc: "The language: compiler, primitives, RFCs, roadmap, benchmark harness and results.",
+    desc: "The language: its charter and RFCs, the mz compiler that implements it, primitives written in it, and the benchmark harness and results.",
     lead: true,
   },
   {
     name: "mzizi-registry",
     lang: "TypeScript + Rust",
     langColor: "var(--color-cobalt)",
-    desc: `${total} components, the brand system, and the benchmark corpus the language is scored against. Mzizi Roots, the Rust components, are written here.`,
+    desc: `${total} components built to support the language: its UI layer, with Mzizi Roots (the Rust components) written here, and the brand system. The benchmark's public UI tasks come from here too.`,
   },
   {
     name: "mzizi-api-gateway",
@@ -316,18 +414,18 @@ const repos: Repo[] = [
 
 <Site
   title="Mzizi"
-  description="Mzizi is a language for the agentic web, in Rust: a syntax, type system and compiler feedback loop designed for machine authorship. Phase 0: two pilots have run, and neither showed an advantage yet."
+  description="Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better. It has no borrows, lifetimes or ownership in the language you write, and a harness at its core, the layer an agent reads; the aim is that you write Mzizi instead of TypeScript, Python or C++. Phase 0: two pilots have run, and neither showed an advantage yet."
   bare
 >
   <Hero
     layout="split"
     variant="showcase"
     badge="Phase 0 · research prototype"
-    subtitle="The Mzizi language"
-    title="A language designed for machines to write."
-    description="Mzizi is a research language and compiler for machine authorship by small open-weight models. Every component states a contract, and the compiler checks it."
+    subtitle="The Mzizi programming language"
+    title="Mzizi: a general-purpose programming language."
+    description="Built to make Rust better, the way TypeScript makes JavaScript better. How: no borrows, lifetimes or ownership in the language you write, with the harness at the core, the layer an agent reads. That is the goal Phase 0 measures, against the best existing language for each kind of task, not a result."
     primaryCTA={{ text: "Try the contract bench", href: "#bench" }}
-    secondaryCTA={{ text: "Read the charter", href: CHARTER, external: true }}
+    secondaryCTA={{ text: "What it's measured against", href: "#benchmark" }}
     mediaLabel="The contract bench: primitives/button.mz and mz contract"
   >
     <div slot="media" id="bench" class="bench" aria-labelledby="bench-title">
@@ -362,21 +460,34 @@ const repos: Repo[] = [
     >
       <h2 id="status-title">Status: two pilots, no advantage yet</h2>
       <p>
-        The compiler front end exists and is tested: a lexer, a recovering parser,
-        an agent diagnostic protocol with <code>mz fix</code> to apply its exact
-        fixes, a content-addressed IR, and nine primitives written in Mzizi
-        itself. Contract blocks are evaluated (see the bench above), and the
-        benchmark harness scores an agent's output against the registry's
-        reference implementation.
+        <strong>Phase 0 has one goal: to build Mzizi as a programming language,
+          measured against the best existing language for each kind of
+          task</strong>: UI components against Rust (Dioxus, Leptos) and
+        TypeScript (React), and backend handlers against TypeScript, Python, Go,
+        C++ and Rust{" "}(<a href="#benchmark">below</a>). Nothing has been
+        measured against that yet.
+      </p>
+      <p>
+        What exists is the language's front end, in its toolchain: the{" "}
+        <code>mz</code> compiler has a lexer, a recovering parser, an agent
+        diagnostic protocol with <code>mz fix</code> to apply its exact fixes, and
+        a content-addressed IR, and nine primitives are written in Mzizi itself.
+        Contract blocks are evaluated (see the bench above), and the benchmark
+        harness scores an agent's output against the registry's reference
+        implementation.
       </p>
       <p>
         <strong
           >Two pilot runs on 2026-09-27 show no measurable advantage for Mzizi.</strong
-        > With a frontier model, the Mzizi and Dioxus arms were indistinguishable on
-        clean compiles and defects, and Mzizi used about 8% fewer tokens. With a ~7B
-        open-weight model, the size the design targets, Mzizi did worse on all
-        three metrics (2 of 6 clean compiles against Dioxus's 4 of 6). Both pilots
-        are tiny (two scored tasks, three seeds), and neither is the Phase 0 number.{" "}
+        > They were the first tests inside Phase 0, not its goal: each ported
+        registry UI components (a button and a badge were scored) into Mzizi and
+        into Rust with Dioxus. With a frontier model, the two arms were
+        indistinguishable on clean compiles and defects, and Mzizi used about 8%
+        fewer tokens. With a ~7B open-weight model, the size the design targets,
+        Mzizi did worse on all three metrics (2 of 6 clean compiles against
+        Dioxus's 4 of 6). Both pilots are tiny (pilot 1 ran three tasks with one
+        seed; pilot 2 scored two tasks with three seeds), and neither is the
+        Phase 0 number.{" "}
         <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
           >The write-up</a
         > names the three failure mechanisms and what has to change before a run
@@ -444,19 +555,99 @@ const repos: Repo[] = [
     </p>
   </Section>
 
-  <Section id="why">
+  <Section id="benchmark">
+    <SectionHeader
+      eyebrow="The benchmark's question"
+      title="What Mzizi is measured against"
+      description="Mzizi aims to be the language you choose instead of TypeScript, Python or C++. Phase 0 builds it as a programming language, measured against the best existing language for each kind of task. This is the question the benchmark puts, not a table of results: nothing below has been measured yet."
+    />
+    <ul class="card-list families">
+      {
+        families.map((f) => (
+          <li>
+            <Card padding="sm" className="h-full flow">
+              <Badge variant={f.gating ? "default" : "outline"} size="sm">
+                {f.role}
+              </Badge>
+              <h3>
+                {f.title}
+                {f.id !== "public" && (
+                  <>
+                    {" "}
+                    <code>{f.id}</code>
+                  </>
+                )}
+              </h3>
+              <p>{f.input}</p>
+              {f.arms.length > 0 && (
+                <ul class="arms" aria-label={`Languages ${f.id} measures Mzizi against`}>
+                  {f.arms.map((a) => (
+                    <li>
+                      <span>{a.lang}</span>
+                      <span class="state">{a.state}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p class="state">{f.mzizi}</p>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+    <Card className="flow mt-6">
+      <p>
+        <strong>The bar.</strong> Within each gating family, the bar on each of the
+        three metrics (tokens, iterations to a clean check, defect rate) is the best
+        value any of those languages reaches, and Mzizi has to beat it on two of the
+        three, on held-out tasks, with the ~7B open-weight model. Phase 0 passes only
+        if both <code>ui-spec</code> and <code>backend</code> pass. The RFC says what
+        to expect first: on today's compiler, a loss is the likely outcome (§6.5).
+      </p>
+      <p>
+        <strong>Every run is published</strong>, whichever way it falls, in{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
+          ><code>benchmarks/results/</code></a
+        >. The latest is{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
+          >pilot 2's write-up</a
+        >, whose result, stated first, is that “this pilot does not show a measurable
+        advantage for Mzizi.”
+      </p>
+    </Card>
+    <p class="section-links">
+      <a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
+        >RFC-0009, the comparison benchmark →</a
+      >
+      {" "}<a href={CHARTER}>The charter, §4 →</a>
+    </p>
+  </Section>
+
+  <Section id="why" bg="secondary" border>
     <SectionHeader
       eyebrow="Why"
-      title="Built for the agent in the loop"
-      description="A narrow claim on purpose: a design intent with an argument behind it, not a result yet."
+      title="Rust underneath, machine authorship on top"
+      description="Why a new language, rather than a new tool for an old one. A design intent with an argument behind it, not a result yet."
     />
-    <div class="grid-2">
+    <div class="grid-3">
+      <Card className="flow">
+        <h3>Rust is the platform</h3>
+        <p>
+          Mzizi is designed to lower to Rust, the way TypeScript compiles to
+          JavaScript, and Mzizi Roots is its component model, the way React is
+          JavaScript's. Its surface has no borrows, lifetimes or ownership
+          (RFC-0001 §1.8): the compiler is meant to carry that plumbing so an agent
+          never writes it. The aim is that Mzizi does Rust better. That is the goal
+          Phase 0 is measured on, not a result, and nothing lowers yet.
+        </p>
+      </Card>
       <Card className="flow">
         <h3>A different bottleneck</h3>
         <p>
-          Every web framework in use today was designed on the assumption that a
-          human is typing: reading docs, holding context in their head, tolerating
-          a few seconds per compile. Mzizi starts from an agent iterating against a
+          No language in wide use today, TypeScript, Python, C++ and Rust included,
+          was designed for the reader that now writes much of its code. They assume a
+          human is typing: reading docs, holding context in their head, tolerating a
+          few seconds per compile. Mzizi starts from an agent iterating against a
           compiler thousands of times, where compile speed, the information density
           of an error message, and how many tokens a codebase costs to read are
           first-order metrics rather than nice-to-haves.
@@ -466,15 +657,15 @@ const repos: Repo[] = [
         <h3>The machines that need the help most</h3>
         <p>
           It designs for small open-weight models with limited parameters, context
-          and long-range attention. That is the whole of the claim, and it is a
-          narrow one on purpose. It is a design intent with an argument behind it.
-          It is not a result yet.
+          and long-range attention, which is why the benchmark's headline model is a
+          ~7B one. It is a design intent with an argument behind it. It is not a
+          result yet.
         </p>
       </Card>
     </div>
   </Section>
 
-  <Section id="contracts" bg="secondary" border>
+  <Section id="contracts">
     <SectionHeader
       eyebrow="Contracts"
       title="Everything carries a contract"
@@ -514,11 +705,11 @@ const repos: Repo[] = [
     </p>
   </Section>
 
-  <Section id="what-it-is">
+  <Section id="what-it-is" bg="secondary" border>
     <SectionHeader
       eyebrow="The language"
       title="What the language is, and what it isn't"
-      description="From the charter (§3 and §5) and the language README's “What doesn't exist yet”."
+      description="The language is its syntax, type system, semantics and contracts. The tools that implement it and the components that support it are not the language. From the charter (§1, §3 and §5) and the language README's “What doesn't exist yet”."
     />
     <StaticTabs
       id="language-tabs"
@@ -571,11 +762,11 @@ const repos: Repo[] = [
     </p>
   </Section>
 
-  <Section id="toolchain" bg="secondary" border>
+  <Section id="toolchain">
     <SectionHeader
       eyebrow="Toolchain"
-      title="The toolchain"
-      description="The compiler is the language. Everything else here makes it stronger: it gives an agent a denser loop, it measures whether the language works, and it puts the corpus within an agent's reach."
+      title="The toolchain, built to support the language"
+      description="The toolchain is not the language. The mz compiler implements it; the rest gives an agent a denser loop, measures whether the language works, and puts the components and docs within an agent's reach. Each is meant to attach natively to the harness at the core of the language, which is designed and not built yet."
     />
     <ul class="card-list">
       {
@@ -594,20 +785,22 @@ const repos: Repo[] = [
     </ul>
   </Section>
 
-  <Section id="components">
+  <Section id="components" bg="secondary" border>
     <SectionHeader
       eyebrow="Components"
       title="The components: Mzizi Roots"
-      description="Part of Mzizi, not a separate product: the benchmark corpus the language is scored against, and where its output is meant to land."
+      description="Built to support the language, as its UI layer (Rust first) and where its output is meant to land. Supplying the benchmark's UI tasks is one of their jobs, not what they are."
     />
     <div class="grid-2">
       <Card className="flow">
-        <h3>The corpus</h3>
+        <h3>The language's UI layer</h3>
         <p>
-          The components are the benchmark corpus the language is scored against
-          (a fixed ground truth of <code>{total}</code>{" "}
-          components, each with a TypeScript reference) and where the language's
-          output is meant to land.
+          The components are the UI layer Mzizi's output is meant to land on, and the
+          first place the language is meant to ship: Astro with Mzizi Roots
+          underneath, or pure Rust end to end (charter v0.3). They have a second
+          job too. Their <code>{total}</code> components, each with a TypeScript
+          reference, are a fixed ground truth the benchmark's public UI tasks are
+          drawn from.
         </p>
       </Card>
       <Card className="flow">
@@ -625,7 +818,7 @@ const repos: Repo[] = [
 
     <ul class="figs">
       <li class="fig"><b>{rustCount}</b><span>components in Rust, as Mzizi Roots</span></li>
-      <li class="fig"><b>{total}</b><span>components in the corpus, each with a React build</span></li>
+      <li class="fig"><b>{total}</b><span>components in the registry, each with a React build</span></li>
     </ul>
 
     <div class="flow roots-install">
@@ -665,7 +858,7 @@ const repos: Repo[] = [
     </div>
   </Section>
 
-  <Section id="where" bg="secondary" border>
+  <Section id="where">
     <SectionHeader eyebrow="Status of the estate" title="Where things are" />
     <div class="grid-2">
       <Card className="ledger-card">
@@ -716,7 +909,7 @@ const repos: Repo[] = [
     </p>
   </Section>
 
-  <Section id="org">
+  <Section id="org" bg="secondary" border>
     <SectionHeader eyebrow="The org" title="The org, repository by repository" />
     <ul class="card-list">
       {
@@ -738,7 +931,7 @@ const repos: Repo[] = [
     </ul>
   </Section>
 
-  <Section id="agents" bg="secondary" border>
+  <Section id="agents">
     <div class="grid-2">
       <div>
         <SectionHeader eyebrow="For agents" title="For agents" />
@@ -764,18 +957,21 @@ const repos: Repo[] = [
         </Card>
       </div>
       <div>
-        <SectionHeader eyebrow="Naming" title="Two things called Mzizi, one project" />
+        <SectionHeader eyebrow="Naming" title="One language, and what supports it" />
         <Card className="flow mt-6">
           <p>
             Worth untangling, because sources on the web conflate them. <strong
-              >Mzizi the language</strong
-            > (the syntax, compiler and IR above) is the research, and it is what this site
-            leads with. <strong>Mzizi the design system</strong> (the component registry,
-            Mzizi Roots, the brand system and the DNA-helix architecture) is{" "}
-            <code>{total}</code> components you can install today. Both are Mzizi, owned
-            and operated by Mzizi, in one org. The difference is the state they are in:
-            the components ship now, and the language has not yet shown the advantage it
-            is designed for.
+              >Mzizi is a programming language</strong
+            > (its syntax, type system, semantics and contracts), and it is what this
+            site leads with. Two things are built to support it and share its name.{" "}
+            <strong>The toolchain</strong> (the <code>mz</code> compiler, the CLI, the
+            MCP server, the skills and the Phase 0 benchmark harness) implements it and puts it
+            within an agent's reach. <strong>The components</strong> (the registry,
+            Mzizi Roots, the brand system and the DNA-helix architecture) are its UI
+            layer: <code>{total}</code> components you can install today. All of it is
+            Mzizi, owned and operated by Mzizi, in one org. The difference is state: the
+            components ship now, and the language has not yet shown the advantage it is
+            designed for.
           </p>
         </Card>
       </div>
@@ -926,3 +1122,35 @@ const repos: Repo[] = [
     render();
   })();
 </script>
+
+<style>
+  /* The benchmark's arms, one language per row with its state beside it. */
+  .arms {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-body-small);
+  }
+
+  .arms li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-xs, 0.25rem) var(--space-sm, 0.5rem);
+    padding-block: var(--space-xs, 0.25rem);
+    border-block-end: 1px solid var(--border);
+  }
+
+  .arms li:last-child {
+    border-block-end: 0;
+  }
+
+  #benchmark .section-links a + a {
+    margin-inline-start: var(--space-lg, 1.5rem);
+  }
+
+  .families h3 code {
+    font-size: 0.85em;
+    color: var(--muted-foreground);
+  }
+</style>
