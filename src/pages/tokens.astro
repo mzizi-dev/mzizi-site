@@ -199,10 +199,17 @@ const specs = brand.componentSpecs;
     <p>
       The roles, not the pigments. A component asks for <code>--destructive</code>{" "}
       or <code>--ring</code>; which mineral answers is a decision that lives at
-      node N1 and nowhere else. The registry's default <code>--primary</code> is
-      tanzanite, the Mukoko/Nyuchi mineral; this site overrides it with copper,
-      which Mzizi wears. Cobalt stays
-      reserved for links and information — the palette says so itself.
+      node N1 and nowhere else. The ladder below is what <code>/v1/brand</code>{" "}
+      publishes, and its <code>--primary</code> is still tanzanite. The
+      registry's default stylesheet, <code>mzizi-tokens-globals.css</code>,
+      resolves <code>--primary</code> per brand, and its default brand is
+      Mzizi, so <code>--primary</code> is{" "}
+      <code>var(--heritage-hematite-aa)</code>: hematite, Mzizi's brand mineral
+      by the owner's decision of 30 September 2026. This site wears hematite through{" "}
+      <code>@bundu/ui</code>'s <code>brand-mzizi.css</code>, which sets both{" "}
+      <code>--primary</code> and <code>--ring</code> to{" "}
+      <code>--color-hematite</code>. Cobalt stays reserved for links and
+      information — the palette says so itself.
     </p>
   </div>
   <ul class="ladder">

@@ -43,6 +43,13 @@ cut, the Unreleased entries move under it.
 
 ### Fixed
 
+- **`/tokens`, "Semantic roles"** no longer says the registry's default
+  `--primary` is tanzanite and that the site overrides it with copper. It now
+  says what the sources say: `/v1/brand`'s semantic ladder still publishes
+  tanzanite; the registry's `mzizi-tokens-globals.css` defaults to the Mzizi
+  brand, so its `--primary` is `var(--heritage-hematite-aa)`; and this site
+  wears hematite through `@bundu/ui`'s `brand-mzizi.css`, which sets `--primary`
+  and `--ring` to `--color-hematite`.
 - The landing page no longer scrolls sideways on a 375px-wide phone.
 - "Mzizi" is Swahili for root, as the docs and the registry say; `/ecosystem`
   and `llms.txt` said Shona.
