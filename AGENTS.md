@@ -100,6 +100,25 @@ the Static Assets server resolves from `/ecosystem` with no redirect hop.
 multi-page site with no client router, and an unknown path that quietly rendered the
 landing page would be a soft 404.
 
+## Changelog (hard rule)
+
+Owner's rule, 2026-09-30: "changelogs are super important".
+
+- **Every pull request that changes a page, a stated fact, an agent-facing file
+  (`llms.txt`, `/.well-known/*`), a redirect, a dependency or a default adds an
+  entry under `## [Unreleased]` in `CHANGELOG.md`**, in the same pull request.
+  Use the Keep a Changelog headings (Added, Changed, Deprecated, Removed, Fixed,
+  Security), mark anything that breaks a URL **Breaking**, and say what a reader
+  of the site sees differently, not the commit text. A freshness PR is no
+  exception: name the facts that moved.
+- The `changelog / entry required` check (`.github/workflows/changelog.yml`)
+  fails a pull request without one. Pull requests that touch only `.github/`,
+  lockfiles or lint config pass, and pure CI, lint or typo pull requests can
+  carry the `no-changelog` label instead.
+- The logic is `scripts/changelog-gate.sh`, tested by
+  `scripts/changelog-gate.test.sh`. Keep both identical to the copies in the
+  other Mzizi repositories.
+
 ## Deploying — read this before touching `wrangler.jsonc` or `routes`
 
 ```bash
