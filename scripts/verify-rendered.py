@@ -483,6 +483,12 @@ check("dist/", f"no contact address but {CONTACT} and {SECURITY}", not strays, "
 # allowed (`(<code>`, `"<a`, `/<code>`, `→<strong>`). Code in <pre>, scripts,
 # styles and SVG are left out, and so is a skill page's body, which is the
 # registry's Markdown rendered as it is and not this repository's writing.
+#
+# Do not widen that to all of `components/` or `skills/`. Those pages are this
+# repository's templates (`src/pages/*/[name].astro`) with registry text in
+# them, and registry text reaches the HTML escaped, so it can never make a tag
+# of its own: a join on those pages is in the template and renders once per
+# component. The skill body is the only registry content set as raw HTML.
 print("\nspaces around inline elements")
 INLINE = r"a|abbr|b|cite|code|dfn|em|i|kbd|mark|q|s|samp|small|strong|sub|sup|time|u|var"
 glued_before = re.compile(r"[\w.,;:!?)](?=<(?:" + INLINE + r")[\s>])")
