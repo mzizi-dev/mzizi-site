@@ -166,11 +166,12 @@ fifteen seconds). Only the API's own "has no Rust implementation" 404 is read as
 quietly turn every Rust component back into React-only.
 
 Some facts come from public package registries rather than the API: whether
-`mzizi-ui` and the Roots umbrellas (`mzizi-roots`, `mzizi-roots-server`) are on
-crates.io, and the latest npm versions of `@nyuchi/mzizi-cli` and
-`@nyuchi/mzizi-skills`. They are asked at build time too, so "not on
-crates.io yet" stops being printed the build after it stops being true. A
-failure to reach them never fails the build; the page says it could not check.
+each crate the `/v1/rs/<name>` documents name (their `crate` field: `mzizi-ui`
+for the primitives, `mzizi-brand` for the brand components, and so on) and the
+Roots umbrellas (`mzizi-roots`, `mzizi-roots-server`) are on crates.io, and the
+latest npm versions of `@nyuchi/mzizi-cli` and `@nyuchi/mzizi-skills`. They are
+asked at build time too, so a crate's state is never typed in. A failure to
+reach them never fails the build; the page says it could not check.
 
 `/v1/*` is the canonical, documented base; it is what every page prints and the
 only base the build reads. `api.mzizi.dev` is served by `mzizi-api-gateway`.

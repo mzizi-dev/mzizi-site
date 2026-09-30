@@ -47,6 +47,7 @@ CRATES = (
     "mzizi-roots",
     "mzizi-roots-server",
 )
+API = "https://api.mzizi.dev/v1"
 MCP_REGISTRY = "https://registry.modelcontextprotocol.io/v0/servers?search=mzizi-mcp"
 MCP_NAME = "io.github.mzizi-dev/mzizi-mcp"
 
@@ -154,6 +155,7 @@ for package in NPM:
 # --- crates.io ---------------------------------------------------------------
 print("\ncrates.io (Mzizi Roots)")
 # llms.txt gives the Roots crates one version, dated: "Mzizi Roots on crates.io, all 0.1.0".
+published: dict[str, str] = {}
 crate_versions = set(re.findall(r"Mzizi Roots on crates\.io, all ([0-9]+\.[0-9]+\.[0-9]+)", pages["llms.txt"]))
 for crate in CRATES:
     version = upstream(crate, lambda: fetch_json(f"https://crates.io/api/v1/crates/{crate}")["crate"]["max_version"])
@@ -162,11 +164,51 @@ for crate in CRATES:
     check(f"llms.txt names {crate} at {version}",
           re.search(rf"\b{re.escape(crate)}\b", pages["llms.txt"]) is not None and crate_versions == {version},
           f"llms.txt says {sorted(crate_versions) or 'no version'}")
-    if crate in ("mzizi-ui", "mzizi-roots"):
+    published[crate] = version
+    if crate in ("mzizi-ui", "mzizi-brand", "mzizi-roots"):
         check(f"components.html shows {crate} at {version}", f"{version}" in pages["components.html"]
               and "not on crates.io yet" not in pages["components.html"])
         check(f"cli.html shows {crate} at {version}", f"{crate} ({version})" in pages["cli.html"]
               or f"at {version}" in pages["cli.html"])
+
+# --- the Rust documents (api.mzizi.dev /v1/rs/<name>) -------------------------
+# Every component in the Roots list must lead its page with Rust and name the
+# crate its own document names. The crate differs by node (mzizi-ui for the
+# primitives, mzizi-brand for the brand components), so a page that names one
+# crate for all of them has drifted from the gateway's registry pin.
+print("\nthe Rust documents (api.mzizi.dev /v1/rs/<name>)")
+raw_components = (DIST / "components.html").read_text(encoding="utf-8")
+roots_list = re.search(r'<ul class="roots-list">(.*?)</ul>', raw_components, re.S)
+check("components.html has a Roots list", roots_list is not None)
+roots = re.findall(r'href="/components/([^"]+)"', roots_list.group(1)) if roots_list else []
+named: dict[str, list[str]] = {}
+for name in roots:
+    document = upstream(f"/v1/rs/{name}", lambda: fetch_json(f"{API}/rs/{name}"))
+    if not document:
+        continue
+    crate = document["crate"]["name"]
+    named.setdefault(crate, []).append(name)
+    raw_page = (DIST / "components" / f"{name}.html").read_text(encoding="utf-8")
+    rust_at, react_at = raw_page.find('class="impl impl-rust"'), raw_page.find('class="impl impl-react"')
+    check(f"components/{name}.html leads with Rust and names {crate}",
+          0 <= rust_at < react_at and f"The API names the crate {crate}" in reader_text(DIST / "components" / f"{name}.html"))
+for crate, components in sorted(named.items()):
+    print(f"  [note] {crate}: {len(components)} components")
+    if crate not in published:
+        version = upstream(crate, lambda: fetch_json(f"https://crates.io/api/v1/crates/{crate}")["crate"]["max_version"])
+        check(f"{crate}, named by /v1/rs, is in this script's CRATES list", False,
+              f"on crates.io at {version}" if version else "")
+        if version:
+            published[crate] = version
+
+# While every crate the site could name is on crates.io, no page may say one is
+# not. The pages ask crates.io at build time, so this catches wording typed in
+# by hand that the build cannot correct.
+not_published = re.compile(r"not on crates\.io( yet)?|(while|until) (the|a) crate is (unpublished|published)|crate is unpublished", re.I)
+if published and all(crate in published for crate in (*CRATES, *named)):
+    built_text = [p for p in DIST.rglob("*") if p.suffix in (".html", ".txt") and "pagefind" not in p.parts]
+    hits = [str(p.relative_to(DIST)) for p in built_text if not_published.search(reader_text(p))]
+    check("no page says a Roots crate is not on crates.io", not hits, ", ".join(hits[:5]))
 
 # --- the MCP Registry --------------------------------------------------------
 print("\nthe MCP Registry")

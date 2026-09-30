@@ -1,9 +1,11 @@
 ---
 import Site from "../layouts/Site.astro";
+import RustCrates from "../components/RustCrates.astro";
 import {
   getComponents,
   getComponentRecords,
-  crateStatus,
+  rustCrates,
+  rustCrateStates,
   npmStatus,
   builtAt,
   CANONICAL_BASE,
@@ -39,9 +41,10 @@ const [{ total }, records] = await Promise.all([getComponents(), getComponentRec
 const rustCount = [...records.values()].filter((record) => record.rust !== null).length;
 // Asked at build time (and dated in the provenance line below), never typed
 // in: a crate's state and the CLI's version change without an edit here.
-const [crate, umbrella, cli] = await Promise.all([
-  crateStatus("mzizi-ui"),
-  crateStatus("mzizi-roots"),
+// The crates are the ones the Rust documents name, per component; never one
+// crate typed in for all of them.
+const [crates, cli] = await Promise.all([
+  rustCrateStates(rustCrates(records)),
   npmStatus("@nyuchi/mzizi-cli"),
 ]);
 const cliVersion = cli.state === "published" ? cli.version : null;
@@ -551,19 +554,10 @@ const repos: Repo[] = [
 
   <p class="prose">
     A Roots component's Rust source is served at
-    <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>. The crate it names,
-    <code>mzizi-ui</code>,{" "}
-    {crate.state === "published" && <>is on crates.io at <code>{crate.version}</code>.</>}
-    {crate.state === "absent" && <>is not on crates.io yet, so there is no <code>cargo add</code> to give you.</>}
-    {crate.state === "unknown" && <>could not be checked on crates.io when this page was built.</>}{" "}
-    {umbrella.state === "published" && (
-      <>
-        The UI umbrella, <code>mzizi-roots</code> (<code>{umbrella.version}</code>),
-        brings it with the tokens, brand and shell crates in one dependency:
-      </>
-    )}
+    <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>, and each document names the
+    crate its component ships in:
   </p>
-  {umbrella.state === "published" && <code class="cmd lead">cargo add mzizi-roots</code>}
+  <RustCrates crates={crates} />
 
   <p class="prose">
     <a href="/cli#install">How to install either build →</a> The React build of

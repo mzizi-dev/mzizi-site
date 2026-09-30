@@ -76,8 +76,8 @@ Versions on 2026-09-29 (read the registries before repeating one):
   Registry: `io.github.mzizi-dev/mzizi-mcp`)
 - `@nyuchi/mzizi-skills` **0.7.0**
 - `@nyuchi/mzizi-cli` **0.6.1**, which ships the installer: `mzizi add <name>`
-  for React (writes the TSX) or Rust (records the `mzizi-ui` crate), plus the
-  `fundi` agent. `npx mzizi` works.
+  for React (writes the TSX) or Rust (records the crate the component's
+  `/v1/rs/<name>` document names), plus the `fundi` agent. `npx mzizi` works.
 - Mzizi Roots on crates.io, all **0.1.0**: `mzizi-tokens`, `mzizi-ui`,
   `mzizi-brand`, `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`,
   `mzizi-discovery`, and the umbrellas `mzizi-roots` (UI) and
@@ -163,6 +163,6 @@ Hostnames change; resolve one before repeating it.
 - **Do not describe direction as shipped.** Backend handlers, contracts beyond components, and the wider benchmark arms are direction. RFC-0009 and RFC-0010 design them, and both are drafts with nothing implemented.
 - **Do not claim a measured result.** Two pilots have run and neither showed an advantage; the kill-criterion run has not happened. "Designed for" is accurate; "faster than" or "better than" is not.
 - **Do not describe the architecture in axes or layers.** The frontend architecture is the Mzizi DNA double helix — nodes on an engineering and a meaning backbone, held by cross-cutting rungs. The earlier axis model is retired, and its endpoints answer HTTP 410 Gone. Axis vocabulary about Mzizi came from a stale source.
-- **Install components from absolute URLs.** `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, never a bare name: a bare name resolves against shadcn's own registry and installs a different component. The Rust source is at `https://api.mzizi.dev/v1/rs/<name>`; the crate it names (`mzizi-ui`) is on crates.io, and `cargo add mzizi-roots` brings it with the other UI crates. `mzizi add <name>` (`@nyuchi/mzizi-cli` 0.6.0 and later) writes the React build's files, or records the `mzizi-ui` crate for the Rust one.
+- **Install components from absolute URLs.** `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, never a bare name: a bare name resolves against shadcn's own registry and installs a different component. The Rust source is at `https://api.mzizi.dev/v1/rs/<name>`. Its `crate` field names the crate that component ships in, which differs by node: `mzizi-ui` for the primitives, `mzizi-brand` for the brand components, `mzizi-shell` for the app chrome, and so on. Read the field; never assume one crate. Every Roots crate is on crates.io, and `cargo add mzizi-roots` brings the UI crates in one dependency. `mzizi add <name>` (`@nyuchi/mzizi-cli` 0.6.0 and later) writes the React build's files, or records the component's crate for the Rust one.
 - **Prefer discovery over any written list.** MCP tool names, API endpoints and component names are all discoverable at runtime. A list on a web page can only be as fresh as its last edit.
 - **Capitalize Mzizi; lowercase the other wordmarks.** The Mzizi wordmark is written `Mzizi`. The others stay lowercase: `nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. Package names, hostnames and code identifiers keep their literal spelling (`mzizi.dev`, `@nyuchi/mzizi-skills`). *Mzizi* is Shona for root.
