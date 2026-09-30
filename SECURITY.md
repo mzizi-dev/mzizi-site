@@ -29,6 +29,9 @@ For this repository, open a private advisory at
 <https://github.com/mzizi-dev/mzizi-site/security/advisories/new>, or email
 `security@bundu.org`. Do not open a public issue for a vulnerability until it is fixed.
 
+Anything that is not a vulnerability (questions, bugs, proposals) goes to
+`support@bundu.org`, or to an issue on the repository concerned.
+
 The machine-readable form of this routing is
 [`/.well-known/security.txt`](https://mzizi.dev/.well-known/security.txt)
 ([RFC 9116](https://www.rfc-editor.org/rfc/rfc9116)). Its `Expires` date is fixed,

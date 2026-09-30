@@ -33,7 +33,7 @@ const repos = [
     role: "The registry API",
     state: "serving api.mzizi.dev today",
     site: "https://api.mzizi.dev/v1",
-    body: "Serves api.mzizi.dev: the registry API as a Hono Cloudflare Worker (TypeScript). Every route answers from the registry's repository files, generated at a pinned commit and bundled into the Worker. There's no origin, no database and no Supabase. It replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check.",
+    body: "Serves api.mzizi.dev: the registry API as a Hono Cloudflare Worker (TypeScript). Every route answers from the registry's repository files, generated at a pinned registry commit and bundled into the Worker. A bot moves that pin to registry main (checked hourly, merged only when CI and strict parity against production pass; mzizi-api-gateway#16), so the commit changes without an edit here: every response's x-mzizi-source header names the one being served. There's no origin, no database and no Supabase. It replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check.",
   },
   {
     name: "mzizi-console",
@@ -111,12 +111,18 @@ const repos = [
     <code>https://mcp.mzizi.dev/mcp</code> is an MCP server over Streamable HTTP,
     serving the component registry as whole documents — one call returns
     everything about a component rather than several, plus the skills and the
-    docs. It is free with no sign-in, except the Fundi tools, which file into
-    the console's issue desk and need a console user. That is the owner's
-    decision of 2026-09-29, and it is live: <code>mzizi-mcp</code> 0.10.1 answers
-    <code>initialize</code> and <code>tools/list</code> with no token, and only
-    <code>mzizi_fundi</code> and <code>mzizi_report_issue</code> ask for sign-in
-    (checked 2026-09-29). Its source is not public, so it has no row above.
+    docs. It is Rust first: where a component has a Mzizi Roots implementation,{" "}
+    <code>mzizi_get_component</code> leads with it (the crate, the{" "}
+    <code>cargo add</code> line, the contract and the <code>.rs</code> source)
+    and gives the React build second, and <code>mzizi_list_components</code>
+    takes a <code>rust</code> filter. It is free with no sign-in, except the
+    Fundi tools, which file into the console's issue desk and need a console
+    user. That is the owner's decision of 2026-09-29, and it is live:{" "}
+    <code>mzizi-mcp</code> 0.11.0 answers <code>initialize</code>,{" "}
+    <code>tools/list</code> and the component tools with no token, and only{" "}
+    <code>mzizi_fundi</code> and <code>mzizi_report_issue</code> ask for
+    sign-in (checked 2026-09-30). Its source is not public, so it has no row
+    above.
   </p>
 
   <p>
@@ -124,6 +130,18 @@ const repos = [
     list of tool names written on a web page — including this one — can go
     stale, and the server is the only thing that knows what it currently
     exposes.
+  </p>
+
+  <h2>Contact</h2>
+
+  <p>
+    For anything about Mzizi — the language, the components, this site or the
+    docs — write to <a href="mailto:support@bundu.org">support@bundu.org</a>.
+    Security reports go to{" "}
+    <a href="mailto:security@bundu.org">security@bundu.org</a>, as{" "}
+    <a href="/.well-known/security.txt">security.txt</a> says; the console at{" "}
+    <code>app.mzizi.dev</code> routes its own. Bugs and proposals are welcome
+    as issues on the repository concerned.
   </p>
 
   <h2>Naming</h2>

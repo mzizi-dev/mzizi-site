@@ -45,6 +45,12 @@ It also refuses known-stale facts: an old test count ("269 tests"), RFC-0009 or 
 called "forthcoming", `mz fix` listed as unbuilt, the 0.6.0 bin-link workaround, or
 `/openapi` said to read from Supabase. Add a pattern there whenever a fact goes stale.
 
+It also holds the contact addresses: every page's footer links `support@bundu.org` (the
+owner's general contact for Mzizi, 2026-09-30) and `security@bundu.org`; `/ecosystem`,
+`llms.txt` and `.well-known/mcp.json` name `support@bundu.org`; and no page this repo writes
+may carry any other address (the console's `security@nyuchi.com` belongs in `security.txt`'s
+comment and the repository docs only). Never put a person's own address anywhere.
+
 ## Freshness rule
 
 The owner's hard rule (2026-09-30): **mzizi.dev must never lag the language
