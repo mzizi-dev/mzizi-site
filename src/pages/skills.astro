@@ -2,8 +2,8 @@
 /**
  * /skills — the agent skills, from `/v1/skills` at build time.
  *
- * A skill is a written workflow an agent loads for one kind of task (scaffold
- * a component, set up an app, simplify). The API serves the bundle bundled
+ * A skill is a written workflow an agent loads for one kind of task. The set
+ * changes between releases, so this page names none. The API serves the bundle bundled
  * into `api.mzizi.dev`; npm serves `@nyuchi/mzizi-skills`. The two can differ,
  * and when they do this page says so rather than picking one quietly.
  */
@@ -21,7 +21,7 @@ const sorted = [...skills].sort((a, b) => a.name.localeCompare(b.name));
   title="Skills"
   eyebrow="For agents"
   description={`The ${skills.length} Mzizi agent skills: written workflows an agent loads for one kind of task, served by the registry API and the MCP server.`}
-  lede="Written workflows an agent loads for one kind of task: scaffolding a component, setting up an app, simplifying code the Mzizi way. They carry the doctrine; the registry carries the data."
+  lede="Written workflows an agent loads for one kind of task. They carry the doctrine; the registry carries the data."
   wide
 >
   <ul class="stats">
