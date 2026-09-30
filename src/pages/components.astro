@@ -100,7 +100,7 @@ const typeCounts = [
     <RustCrates crates={crateStates} />
     <p class="prose">
       <code>mzizi add</code>, the installer for both targets, records the crate
-      instead of copying files{allPublished ? "" : ", and refuses while the crate is unpublished"}. See
+      instead of copying files{allPublished ? "" : ", and refuses while the crate is unpublished"}. See{" "}
       <a href="/cli#install">the CLI page</a>.
     </p>
   </section>
@@ -242,14 +242,14 @@ const typeCounts = [
   <div class="prose">
     <p>
       The same corpus is served as JSON at <code>{CANONICAL_BASE}/ui</code> — one
-      item per component, eleven fields each — and a single component at
+      item per component, eleven fields each — and a single component at{" "}
       <code>{CANONICAL_BASE}/ui/&lt;name&gt;</code>. An agent should read that
       rather than this page. There is also an MCP server at{" "}
       <a href="https://mcp.mzizi.dev/mcp">mcp.mzizi.dev/mcp</a> that returns a
       component as one whole document instead of several calls, Rust first:
       where there is a Mzizi Roots implementation, it leads with the crate, the
       contract and the <code>.rs</code> source, and the React build follows. Each
-      component's Rust implementation, where there is one, is at
+      component's Rust implementation, where there is one, is at{" "}
       <code>{CANONICAL_BASE}/rs/&lt;name&gt;</code>.
     </p>
   </div>

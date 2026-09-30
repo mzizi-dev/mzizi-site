@@ -140,20 +140,20 @@ const rfcs = [
       Real today: the lexer, a recovering parser, the agent diagnostic protocol
       and <code>mz fix</code>, the content-addressed IR, and nine primitives
       written in Mzizi itself, covered by 308 tests in 14 suites
-      (<code>mzizi-dev/mzizi</code> at <code>e9e9233</code>).
+      (<code>mzizi-dev/mzizi</code> at <code>e9e9233</code>).{" "}
       <code>mz contract</code> evaluates contract blocks, and the benchmark
       harness (<code>mzbench</code>) runs agent episodes against a Mzizi arm and
       Dioxus and Leptos arms and scores each result against the registry's
       reference.
     </p>
     <p>
-      <strong>Two pilots have run, and neither shows an advantage for Mzizi.</strong>
+      <strong>Two pilots have run, and neither shows an advantage for Mzizi.</strong>{" "}
       On 2026-09-27 a frontier model scored the same on both arms, with Mzizi about
       8% cheaper in tokens. A ~7B open-weight model, the size the design targets,
       did worse in Mzizi on all three metrics: 2 of 6 clean compiles against 4 of 6.
       Its repair loop resubmitted the same file 15 times out of 16. It also hit
       React idioms Mzizi has no form for, and a variant table that asks for one
-      fact twice. Both pilots are tiny, and neither is the charter's measurement.
+      fact twice. Both pilots are tiny, and neither is the charter's measurement.{" "}
       <a
         href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
         >The pilot 2 write-up</a
@@ -163,19 +163,19 @@ const rfcs = [
     </p>
     <p>
       <strong>Phase 0 is not complete: the kill-criterion run has not
-        happened.</strong> Most of pilot 2's fixes are on <code>main</code>:
-      <code>mz fix</code>, diagnostics for <code>...props</code> and
-      <code>asChild</code> (MZ0106, MZ0312), MZ0313 for a declared
+        happened.</strong> Most of pilot 2's fixes are on <code>main</code>:{" "}
+      <code>mz fix</code>, diagnostics for <code>...props</code> and{" "}
+      <code>asChild</code> (MZ0106, MZ0312), MZ0313 for a declared{" "}
       <code>height</code> that disagrees with its class, relative paths in the
-      diagnostics an agent sees, a <code>slot_set</code> fact and a
+      diagnostics an agent sees, a <code>slot_set</code> fact and a{" "}
       <code>card</code> task, and a kill-criterion driver that needs a
-      pre-registered <code>PLAN.md</code>.
+      pre-registered <code>PLAN.md</code>.{" "}
       <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
         ><code>benchmarks/READINESS.md</code></a
       > lists what remains: <code>arm.toml</code>, <code>spec.md</code> input, a
       React arm and guides balanced to within 5%; held-out tasks in a private
       repository, written by maintainers or drafted by another vendor's model and
-      reviewed by a person (the owner is to confirm which); the
+      reviewed by a person (the owner is to confirm which); the{" "}
       <code>PLAN.md</code>; the Leptos arm run end to end; and a Mzizi backend
       arm, which needs the language work in RFC-0009 §6.4.
     </p>
@@ -217,7 +217,7 @@ const rfcs = [
       (<a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
         >RFC-0009</a
       > §6, owner decision 2026-09-29): Mzizi against the best existing language
-      for each kind of task. Within a gating family (<code>ui-spec</code> or
+      for each kind of task. Within a gating family (<code>ui-spec</code> or{" "}
       <code>backend</code>), the bar on each metric is the best value any
       existing language reached. Mzizi must beat it on two of the three metrics,
       on held-out tasks, with the ~7B open-weight model. A win counts only when a
@@ -227,7 +227,7 @@ const rfcs = [
     <p>
       <strong>Task set:</strong> Mzizi's own components — the design system already
       built out in the registry — authored in Mzizi syntax against the existing implementations
-      as ground truth. Explicitly not a port of an external library. The
+      as ground truth. Explicitly not a port of an external library. The{" "}
       <code>backend</code> family adds handlers and services, scored by HTTP
       probes.
     </p>
@@ -235,7 +235,7 @@ const rfcs = [
       <strong>Defect:</strong> code that compiles cleanly but is behaviourally wrong
       — it passes the compiler and fails a contract test against the reference. A
       syntax or compile error is not a defect for this metric; it is the ordinary
-      friction the error-density goal exists to reduce. The metric measures what gets
+      friction the error-density goal exists to reduce. The metric measures what gets{" "}
       <em>past</em> the compiler wrong.
     </p>
     <p>
@@ -338,7 +338,7 @@ const rfcs = [
 
   <p>
     RFC-0005 is reserved and unwritten. The Mzizi Roots components have their own
-    RFC in the registry:
+    RFC in the registry:{" "}
     <a href="https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md"
       ><code>mzizi-registry/docs/roots/RFC-roots.md</code></a
     >.
@@ -347,7 +347,7 @@ const rfcs = [
   <h2 id="trying-it">Trying it</h2>
 
   <p>
-    The compiler is the <code>mz</code> binary in
+    The compiler is the <code>mz</code> binary in{" "}
     <a href="https://github.com/mzizi-dev/mzizi">mzizi-dev/mzizi</a>. Building it
     is one command against a checkout — no toolchain beyond stable Rust:
   </p>
@@ -359,11 +359,11 @@ const rfcs = [
     NDJSON in a deterministic order, at most one diagnostic per real error, every
     message written for a reader with no prior context, and machine-applicable
     fixes tagged <code>exact</code> or <code>guess</code>. Below is real, captured
-    output — not a mock-up — from running it against
+    output — not a mock-up — from running it against{" "}
     <a
       href="https://github.com/mzizi-dev/mzizi/blob/main/examples/connectivity_bar.mz"
       ><code>examples/connectivity_bar.mz</code></a
-    >, one of the repository's two examples, at
+    >, one of the repository's two examples, at{" "}
     <a href={`https://github.com/mzizi-dev/mzizi/commit/e9e9233`}><code>e9e9233</code></a
     >.
   </p>
@@ -376,7 +376,7 @@ const rfcs = [
   </div>
 
   <p>
-    The same file with one real mistake — a dropped colon on a typed
+    The same file with one real mistake — a dropped colon on a typed{" "}
     <code>prop</code> — run through the identical command:
   </p>
 
@@ -401,12 +401,12 @@ const rfcs = [
 
   <p>
     <code>mz fix</code> applies every <code>exact</code> fix in one pass and
-    re-checks; <code>mz outline</code> and <code>mz ir</code> exist too. Run
-    <code>mz</code> with no arguments for its usage line. What is not there yet:
-    <code>mz refs</code>, <code>mz path</code>, <code>mz patch</code> and
+    re-checks; <code>mz outline</code> and <code>mz ir</code> exist too. Run{" "}
+    <code>mz</code> with no arguments for its usage line. What is not there yet:{" "}
+    <code>mz refs</code>, <code>mz path</code>, <code>mz patch</code> and{" "}
     <code>mz diff</code> are designed (see the RFCs) but not built. The binary
-    above only dispatches <code>check</code>, <code>fix</code>,
-    <code>contract</code>, <code>outline</code>, <code>hash</code> and
+    above only dispatches <code>check</code>, <code>fix</code>,{" "}
+    <code>contract</code>, <code>outline</code>, <code>hash</code> and{" "}
     <code>ir</code>.
   </p>
 

@@ -51,6 +51,13 @@ owner's general contact for Mzizi, 2026-09-30) and `security@bundu.org`; `/ecosy
 may carry any other address (the console's `security@nyuchi.com` belongs in `security.txt`'s
 comment and the repository docs only). Never put a person's own address anywhere.
 
+It also fails on a word glued to an inline tag in the built HTML (`nyuchi,<code>mukoko`,
+`</code>takes`). Astro drops the line break between a source line that ends in text and
+a next line that starts with `<a>`, `<code>`, `<strong>`, `<em>` and the like (or a line
+that ends in a closing tag and a next line that starts with a word). End the first line
+with `{" "}`, as the rest of the site does. `(<code>`, `"<a` and anything inside `<pre>`
+are allowed.
+
 ## Freshness rule
 
 The owner's hard rule (2026-09-30): **mzizi.dev must never lag the language
