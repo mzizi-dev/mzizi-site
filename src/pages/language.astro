@@ -4,12 +4,39 @@ import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
 
 /**
- * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` v0.3 (§3
+ * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` v0.4 (§3
  * design goals, §4 phasing, §5 non-goals, §6 the resolved benchmark design),
  * the RFCs in that repository's `design/` directory (RFC-0009 §6 for the kill
- * criterion) and `benchmarks/READINESS.md` for what the gating run waits on. Where the charter leaves
- * something open, this page says so rather than rounding it up.
+ * criterion), `benchmarks/READINESS.md` for what the gating run waits on, and
+ * `LANGUAGE-TRACKER.md` for every capability claim: if a row is not ✅ there,
+ * this page does not say Mzizi has it. Where the charter leaves something
+ * open, this page says so rather than rounding it up.
  */
+
+const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
+const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
+// The language commit this page's figures and captured output were read at.
+const LANG_COMMIT = "62a0f32";
+// Captured from `mz build examples/registry.mz --out out/registry` at 62a0f32.
+const buildOutput =
+  "mz: built `service registry` into out/registry (3 routes, 1 fixtures); run it with `cargo run --release --manifest-path out/registry/Cargo.toml`";
+
+// LANGUAGE-TRACKER.md at 62a0f32: the "Against the languages Mzizi aims to
+// replace" table, Mzizi's column, condensed. Mark is the tracker's own.
+const tracker = [
+  { area: "Expressions, variables, functions, loops", mark: "❌", mzizi: "fn is a name plus emit; bodies are not modelled" },
+  { area: "Error handling", mark: "❌", mzizi: "contracts check behaviour; they are not error handling" },
+  { area: "Modules and imports", mark: "❌", mzizi: "one component per file" },
+  { area: "Standard library", mark: "❌", mzizi: "none" },
+  { area: "Numbers", mark: "🟡", mzizi: "int only" },
+  { area: "Text operations", mark: "❌", mzizi: "text is a type only" },
+  { area: "Collections", mark: "🟡", mzizi: "list and option; no map, set or tuple" },
+  { area: "User types", mark: "🟡", mzizi: "enums with data, records; no methods, traits or generics" },
+  { area: "Compiles to something that runs", mark: "🟡", mzizi: "a service lowers to a local Rust + axum package, which CI compiles, tests and serves; no component lowers" },
+  { area: "Rust interop, package manager, editor support, concurrency", mark: "❌", mzizi: "none yet" },
+  { area: "Diagnostics built for agents", mark: "✅", mzizi: "mz check --agent, mz fix" },
+  { area: "Contracts on everything", mark: "✅ 🟡", mzizi: "components ✅; services 🟡, run in process by mz contract, ensure tested over generated requests, not proven" },
+];
 
 const goals = [
   {
@@ -112,28 +139,39 @@ const rfcs = [
   {
     id: "RFC-0009",
     file: "RFC-0009-comparison-benchmark.md",
-    what: "The comparison benchmark: every language arm, the task families, per-language checkers, fairness rules, the kill criterion (§6) and publication (§7). Draft; the kill criterion and the publication rule are owner decisions, and nothing else in it is implemented.",
+    what: "The comparison benchmark: every language arm, the task families, per-language checkers, fairness rules, the kill criterion (§6) and publication (§7). Draft; the kill criterion and the publication rule are owner decisions. Its runner steps are partly built (arm.toml, spec.md input, the React and mzizi-be arms); nothing has been measured.",
   },
   {
     id: "RFC-0010",
     file: "RFC-0010-contracts-everywhere.md",
-    what: "Contracts everywhere: clause forms for functions, handlers, services and records, what is checked statically, by generated tests or at runtime, and how failures reach an agent. Draft; nothing in it is implemented.",
+    what: "Contracts everywhere: clause forms for functions, handlers, services and records, what is checked statically, by generated tests or at runtime, and how failures reach an agent. Draft; a service's contracts run in process through RFC-0011, and nothing else in it is implemented.",
+  },
+  {
+    id: "RFC-0011",
+    file: "RFC-0011-handlers.md",
+    what: "Handlers, the backend measurement slice: a service with HTTP routes and handlers, its checks, running it in process with mz contract, and lowering it to Rust and axum. Draft; the front end, the in-process run and the lowering are built, and nothing has been measured.",
+  },
+  {
+    id: "RFC-0012",
+    file: "RFC-0012-harness.md",
+    what: "The harness, the core of the language, what the agent reads: the language as an agent reads it, the agent protocol and the plugin host, and how the skills fold in. Draft; only the agent protocol and the IR exist today.",
   },
 ];
-// RFC-0009 §1, the arms, at mzizi-dev/mzizi e9e9233. "exists" is a directory
-// under benchmarks/arms/ (or the mz checker); "new" is proposed and not built;
-// "blocked" waits on language work (§6.4). None of the new arms has been added.
+// RFC-0009 §1, the arms; each state is benchmarks/arms/ at mzizi-dev/mzizi
+// 62a0f32. "exists" is a directory there; "not added yet" is proposed by
+// RFC-0009 with no directory. scripts/check-facts.py compares this table with
+// the live directory listing.
 const arms = [
   { id: "mzizi", family: "UI", lang: "Mzizi", state: "exists" },
   { id: "dioxus", family: "UI", lang: "Rust, Dioxus =0.7.10", state: "exists" },
   { id: "leptos", family: "UI", lang: "Rust, Leptos =0.8.21", state: "exists; never run" },
-  { id: "react", family: "UI", lang: "TypeScript, React, class-variance-authority", state: "new" },
-  { id: "mzizi-be", family: "backend", lang: "Mzizi", state: "blocked (§6.4)" },
-  { id: "ts", family: "backend", lang: "TypeScript, Hono on Node", state: "new" },
-  { id: "python", family: "backend", lang: "Python, FastAPI with pydantic v2, served by uvicorn", state: "new" },
-  { id: "go", family: "backend", lang: "Go, net/http from the standard library", state: "new" },
-  { id: "cpp", family: "backend", lang: "C++20, cpp-httplib and nlohmann/json", state: "new" },
-  { id: "rust", family: "backend", lang: "Rust, axum on tokio, serde", state: "new" },
+  { id: "react", family: "UI", lang: "TypeScript, React, class-variance-authority (provisional pins)", state: "exists; never run" },
+  { id: "mzizi-be", family: "backend", lang: "Mzizi, with the probe crate mzprobe and task B1", state: "exists; never run" },
+  { id: "ts", family: "backend", lang: "TypeScript, Hono on Node", state: "not added yet" },
+  { id: "python", family: "backend", lang: "Python, FastAPI with pydantic v2, served by uvicorn", state: "not added yet" },
+  { id: "go", family: "backend", lang: "Go, net/http from the standard library", state: "not added yet" },
+  { id: "cpp", family: "backend", lang: "C++20, cpp-httplib and nlohmann/json", state: "not added yet" },
+  { id: "rust", family: "backend", lang: "Rust, axum on tokio, serde", state: "not added yet" },
 ];
 ---
 
@@ -144,7 +182,10 @@ const arms = [
 >
   <p>
     Mzizi is designed to lower to Rust: Dioxus for UI, and axum or{" "}
-    <code>workers-rs</code> for servers. Nothing lowers yet. The novel part, and
+    <code>workers-rs</code> for servers. Today one thing lowers: a{" "}
+    <code>service</code>, which <code>mz build</code> turns into a local Rust +
+    axum package that CI compiles, tests and serves. No component lowers yet,
+    and there is no Workers, Containers or WebAssembly target. The novel part, and
     the only part worth defending as research, is the language itself: its
     syntax, its type system, its contracts, and the feedback loop its
     diagnostics give an agent. At its core is the harness: the layer an agent
@@ -154,7 +195,10 @@ const arms = [
     and the plugin host the toolchain, the CLI, the MCP server and plugins
     attach to natively. Part of it exists today, in the toolchain, as{" "}
     <code>mz check --agent</code>'s output; the harness as a whole is designed,
-    not built, and its RFC is being written. It lives here, in{" "}
+    not built, in{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0012-harness.md"
+      >RFC-0012</a
+    >, a draft. It lives here, in{" "}
     <code>mzizi-dev/mzizi</code>, and the agent-tools packages (the CLI, the
     MCP server, <code>fundi</code>) are its clients. The <code>mz</code>{" "}
     compiler is the toolchain that implements the language, not the language. Cross-platform rendering is interop
@@ -166,14 +210,21 @@ const arms = [
   <Alert variant="warning" role="region" className="status flow text-body p-6">
     <h2>What exists, and what that does not prove</h2>
     <p>
-      Real today, in the toolchain: the lexer, a recovering parser, the agent
-      diagnostic protocol and <code>mz fix</code>, and the content-addressed IR,
-      plus nine primitives written in Mzizi itself, covered by 308 tests in 14
-      suites (<code>mzizi-dev/mzizi</code> at <code>e9e9233</code>).{" "}
-      <code>mz contract</code> evaluates contract blocks, and the benchmark
-      harness (<code>mzbench</code>) runs agent episodes on a Mzizi arm, a Dioxus
-      arm and a Leptos arm (never yet run) and scores each result against the
-      registry's reference.
+      Real today, in the toolchain: the lexer, a recovering parser, a resolver,
+      the agent diagnostic protocol and <code>mz fix</code>, and the
+      content-addressed IR, plus nine primitives written in Mzizi itself, covered
+      by 425 tests in 18 suites (<code>mzizi-dev/mzizi</code> at{" "}
+      <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>;
+      about 12,600 lines in <code>compiler/src</code>).{" "}
+      <code>mz contract</code> evaluates contract blocks. A <code>service</code>{" "}
+      with HTTP routes and handlers (RFC-0011) is checked by{" "}
+      <code>mz check</code>, run in process by <code>mz contract</code>, and
+      lowered by <code>mz build</code> to a local Rust + axum package. The
+      benchmark harness (<code>mzbench</code>) runs agent episodes on the Mzizi,
+      Dioxus, Leptos and React arms (Leptos and React never yet run) and scores
+      each result against the registry's reference; the Mzizi backend arm,{" "}
+      <code>mzizi-be</code>, has its probe crate and a first task, and has never
+      run.
     </p>
     <p>
       <strong>Two pilots have run, and neither shows an advantage for Mzizi.</strong>{" "}
@@ -201,14 +252,65 @@ const arms = [
       pre-registered <code>PLAN.md</code>.{" "}
       <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
         ><code>benchmarks/READINESS.md</code></a
-      > lists what remains: <code>arm.toml</code>, <code>spec.md</code> input, a
-      React arm and guides balanced to within 5%; held-out tasks in a private
-      repository, written by maintainers or drafted by another vendor's model and
-      reviewed by a person (the owner is to confirm which); the{" "}
-      <code>PLAN.md</code>; the Leptos arm run end to end; and a Mzizi backend
-      arm, which needs the language work in RFC-0009 §6.4.
+      > lists what remains: the React arm's pins taken from the registry's
+      lockfile; held-out tasks in a private repository, written by maintainers or
+      drafted by another vendor's model and reviewed by a person (the owner is to
+      confirm which); the <code>PLAN.md</code>; the Leptos and React arms run end
+      to end; and, for the backend family, probe scoring in the runner, tasks
+      B2–B5 and the other-language backend arms.
     </p>
   </Alert>
+
+  <h2 id="still-to-build">What still has to be built</h2>
+
+  <Card className="flow my-6">
+    <p>
+      <strong>Mzizi is not yet a working programming language.</strong> It has no
+      expressions, bindings, callable functions, loops, error handling, modules
+      or standard library yet, and only a <code>service</code> lowers to Rust.{" "}
+      <a href={TRACKER}><code>LANGUAGE-TRACKER.md</code></a> is the one tracker of
+      what it still needs, row by row against Python, Go, C++, TypeScript and
+      Rust, each with its evidence and the test that turns it ✅. It is where this
+      page takes every capability claim from.
+    </p>
+    <p>
+      <strong>M1, a language that computes:</strong> all of Tier 1 (expressions,
+      bindings, functions, control flow, numbers, text, collections, user types,
+      error handling, a program that runs). That unblocks the public suites.{" "}
+      <strong>M2, a working programming language:</strong> Tier 1 plus modules,
+      a standard library, lowering all code to Rust, <code>mz build</code> and{" "}
+      <code>mz run</code> for a general program, errors mapped back to{" "}
+      <code>.mz</code>, and Rust crate interop. Only at M2 does the tracker say
+      Mzizi is a working programming language. Neither milestone is reached.
+    </p>
+  </Card>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Area</th>
+          <th scope="col">Mzizi today</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          tracker.map((t) => (
+            <tr>
+              <th scope="row">{t.area}</th>
+              <td>
+                {t.mark} {t.mzizi}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    <a href={TRACKER}>What still has to be built: the full tracker →</a>
+  </p>
 
   <h2>What "built for machine authorship" cashes out as</h2>
 
@@ -294,9 +396,11 @@ const arms = [
   <h3>The arms</h3>
 
   <p>
-    What Mzizi is measured against, from RFC-0009 §1. This is the benchmark's
-    design, not a result: nothing has been measured against TypeScript, Python,
-    Go, C++ or a Rust backend.
+    What Mzizi is measured against, from RFC-0009 §1, with each arm's state in{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/arms"
+      ><code>benchmarks/arms/</code></a
+    >. This is the benchmark's design, not a result: nothing has been measured
+    against TypeScript, Python, Go, C++ or a Rust backend.
   </p>
 
   <div class="scroller">
@@ -433,8 +537,8 @@ const arms = [
     <a
       href="https://github.com/mzizi-dev/mzizi/blob/main/examples/connectivity_bar.mz"
       ><code>examples/connectivity_bar.mz</code></a
-    >, one of the repository's two examples, at{" "}
-    <a href={`https://github.com/mzizi-dev/mzizi/commit/e9e9233`}><code>e9e9233</code></a
+    >, one of the repository's two component examples, at{" "}
+    <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a
     >.
   </p>
 
@@ -474,17 +578,43 @@ const arms = [
     re-checks; <code>mz outline</code> and <code>mz ir</code> exist too. Run{" "}
     <code>mz</code> with no arguments for its usage line. What is not there yet:{" "}
     <code>mz refs</code>, <code>mz path</code>, <code>mz patch</code> and{" "}
-    <code>mz diff</code> are designed (see the RFCs) but not built. The binary
-    above only dispatches <code>check</code>, <code>fix</code>,{" "}
-    <code>contract</code>, <code>outline</code>, <code>hash</code> and{" "}
-    <code>ir</code>.
+    <code>mz diff</code> are designed (see the RFCs) but not built, and so are{" "}
+    <code>mz run</code>, <code>mz test</code> and <code>mz fmt</code>. The binary
+    above dispatches <code>check</code>, <code>fix</code>,{" "}
+    <code>contract</code>, <code>outline</code> and <code>build</code>, plus{" "}
+    <code>hash</code> and <code>ir</code> for reading the IR.
   </p>
 
   <p>
-    Start with <a href="https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md"
-      >CHARTER.md</a
-    >, which carries the full thesis, the phasing, the resolved benchmark
-    decisions and the questions still open.
+    <code>mz build</code> takes a service only. Against the repository's example
+    service,{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/blob/main/examples/registry.mz"
+      ><code>examples/registry.mz</code></a
+    >, at <code>{LANG_COMMIT}</code>:
+  </p>
+
+  <div class="terminal">
+    <p class="terminal-cmd">$ mz contract examples/registry.mz</p>
+    <pre><code>{`mz: 0 errors (0 exact-fixable), 22 contract clauses, 0 failed, tested over 61 generated requests, 1ms`}</code></pre>
+  </div>
+
+  <div class="terminal">
+    <p class="terminal-cmd">$ mz build examples/registry.mz --out out/registry</p>
+    <pre><code>{buildOutput}</code></pre>
+  </div>
+
+  <p>
+    The output is an ordinary Cargo package on axum and tokio, which CI builds,
+    tests and serves. It runs locally; there is no Workers, Containers or
+    WebAssembly target yet, and no component lowers.
+  </p>
+
+  <p>
+    Start with <a href={CHARTER}>CHARTER.md</a> (v0.4, "Mzizi: a
+    general-purpose programming language"), which carries the full thesis, the
+    phasing, the resolved benchmark decisions and the questions still open, and
+    then <a href={TRACKER}>LANGUAGE-TRACKER.md</a> for what still has to be
+    built.
   </p>
 </Site>
 

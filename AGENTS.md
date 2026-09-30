@@ -57,7 +57,17 @@ put "What Mzizi is measured against" (every RFC-0009 family and arm, as the benc
 question, not a results table) directly after the status panel; `llms.txt` must say which
 things are toolchain and which are components. No page may say "the compiler is the
 language", call the components "the corpus the language is scored against", call Mzizi a
-"framework for the agentic" web, or say Mzizi lowers or compiles to Rust today.
+"framework for the agentic" web, or say Mzizi lowers or compiles to Rust today: only a
+`service` lowers, to a local Rust + axum package (`mz build`), and no component does.
+
+It also holds the language tracker (owner, 2026-09-30): `LANGUAGE-TRACKER.md` in
+`mzizi-dev/mzizi` is the one list of what Mzizi still needs, and **every capability claim
+on this site comes from it**. The landing status panel and `/language` link it as "What
+still has to be built", RFC-0011 and RFC-0012 are in every RFC list, and the landing page,
+`/language` and `llms.txt` say plainly that Mzizi has no expressions, bindings, callable
+functions, loops, error handling, modules or standard library yet. `check-facts.py` reads
+the tracker, the charter's version and `benchmarks/arms/`, and fails when that sentence, a
+charter version or an arm's state no longer matches upstream.
 
 It also holds the contact addresses: every page's footer links `support@bundu.org` (the
 owner's general contact for Mzizi, 2026-09-30) and `security@bundu.org`; `/ecosystem`,
@@ -86,7 +96,8 @@ crates.io, and the `@nyuchi/` npm packages built in `agent-tools`).
 - Anyone changing the language or the components must expect a site update to follow,
   and should say so in their PR body.
 - `scripts/check-facts.py dist` reads the live facts — the language README's test and
-  suite counts, the npm `latest` versions, the crates.io versions, the crate each
+  suite counts, the charter's version, `LANGUAGE-TRACKER.md`'s rows, the arms in
+  `benchmarks/arms/`, the npm `latest` versions, the crates.io versions, the crate each
   `/v1/rs/<name>` document names (every Roots page must lead with Rust and name that
   crate), the MCP Registry listing — and fails when the built site disagrees. While the
   Roots crates are on crates.io, it also fails on any page saying one is not. It needs the network, so it runs in

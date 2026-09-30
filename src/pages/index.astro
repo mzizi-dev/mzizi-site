@@ -34,8 +34,13 @@ import {
  * toolchain (the `mz` compiler, the CLI, the MCP server, the skills and the
  * Phase 0 benchmark harness) and the components (Mzizi Roots and the
  * registry). Neither of those is the language. The harness at the language's
- * core (owner, 2026-09-30) is part of the language, designed and not built. They sit further down because they serve the
- * language, not the other way round.
+ * core (owner, 2026-09-30) is part of the language, designed in RFC-0012 and
+ * not built. They sit further down because they serve the language, not the
+ * other way round.
+ *
+ * What the language can and cannot do is taken from the language repo's
+ * LANGUAGE-TRACKER.md, the one tracker of what Mzizi still needs (owner,
+ * 2026-09-30). If a capability is not ✅ there, this page does not claim it.
  *
  * The goal is stated as a goal. Nothing on this page may say Mzizi already
  * beats TypeScript, Python or C++: the comparison section is the benchmark's
@@ -71,6 +76,10 @@ const [crates, cli] = await Promise.all([
 const cliVersion = cli.state === "published" ? cli.version : null;
 
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
+const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
+// The language commit the figures below were read at: a fresh build, not the
+// README. scripts/check-facts.py notes when main has moved past it.
+const LANG_COMMIT = "62a0f32";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -130,7 +139,7 @@ const benchTerm =
 const isList = [
   {
     what: "A programming language",
-    note: "Designed to be general-purpose: UI components today, with functions, backend handlers and services designed and not yet built (RFC-0007, RFC-0010). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and nothing lowers yet. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
+    note: "Designed to be general-purpose. Today it can declare UI components, and one kind of backend program: a service with HTTP routes and handlers (RFC-0011). It has no expressions, bindings, callable functions, loops, error handling, modules or standard library yet (LANGUAGE-TRACKER.md). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and today only a service does, to a local Rust + axum package. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
   },
   {
     what: "Syntax and a type system",
@@ -146,7 +155,7 @@ const isList = [
   },
   {
     what: "A harness at its core, by design",
-    note: "The harness is the core of Mzizi: the layer an agent reads and works through. It covers the language as an agent sees it (grammar, types, contracts, canonical form), the agent protocol (mz check --agent, its diagnostics and fixes, RFC-0001 §4), and the plugin host the toolchain, the CLI, the MCP server and plugins attach to natively. Part of it exists today in the toolchain, as mz check --agent's output. The harness as a whole is designed, not built: its RFC is being written. It lives in the language repository, mzizi-dev/mzizi, and the agent-tools packages (the CLI, the MCP server, fundi) are its clients.",
+    note: "The harness is the core of Mzizi: the layer an agent reads and works through. It covers the language as an agent sees it (grammar, types, contracts, canonical form), the agent protocol (mz check --agent, its diagnostics and fixes, RFC-0001 §4), and the plugin host the toolchain, the CLI, the MCP server and plugins attach to natively. Part of it exists today in the toolchain, as mz check --agent's output. The harness as a whole is designed, not built: RFC-0012, a draft, is its design. It lives in the language repository, mzizi-dev/mzizi, and the agent-tools packages (the CLI, the MCP server, fundi) are its clients.",
   },
 ];
 
@@ -173,7 +182,7 @@ const isntList = [
   },
   {
     what: "Not yet a release",
-    note: "No lowering to Rust, no code generation, no runtime, no published compiler crate or binary. mz is built from a checkout.",
+    note: "Only a service lowers, to a local Rust + axum package (mz build). No component lowers yet, and there is no Workers, Containers or WebAssembly target, no mz run, and no published compiler crate or binary. mz is built from a checkout.",
   },
 ];
 
@@ -181,7 +190,7 @@ const isntList = [
 const direction = [
   {
     what: "The backend, too",
-    note: "Mzizi is meant to build its entire backend infrastructure as well as its UI. Backend handlers are the next thing a contract has to describe.",
+    note: "Mzizi is meant to build its entire backend infrastructure as well as its UI. The first slice exists: a service with HTTP routes and handlers, which mz check checks, mz contract runs in process and mz build lowers to a local Rust + axum package (RFC-0011). No Mzizi backend is ported, and none will be until the backend family passes the kill criterion.",
   },
   {
     what: "Two frontend shapes",
@@ -189,20 +198,20 @@ const direction = [
   },
   {
     what: "Everything carries a contract",
-    note: "Components, language functions and backend handlers. The mz contract bench on this page is the first instance; the rest is design, in RFC-0010, a draft with nothing implemented.",
+    note: "Components, services, language functions and records. Components and services carry contracts today: the mz contract bench on this page is a component's, and a service's run in process, with each ensure tested over generated requests, not proven. Contracts for functions and records are design, in RFC-0010, a draft.",
   },
   {
     what: "A wider benchmark",
-    note: "UI against TypeScript with React as well as Dioxus and Leptos; backend against TypeScript, Python, Go, C++ and Rust. RFC-0009 designs it and is a draft; none of those new arms has been added, and nothing has been measured against them.",
+    note: "UI against TypeScript with React as well as Dioxus and Leptos; backend against TypeScript, Python, Go, C++ and Rust. RFC-0009 designs it and is a draft. The React arm and the Mzizi backend arm are added and have never run; the other-language backend arms are not added yet, and nothing has been measured against any of them.",
   },
 ];
 
 // What Mzizi is measured against: the benchmark's question, not its answers.
-// Every family, arm, pin and state is RFC-0009 §1 and §2 at mzizi-dev/mzizi
-// e9e9233; "exists" means a directory under benchmarks/arms/ (or the mz
-// checker), "new" means RFC-0009 proposes it and nothing is built. Nothing
-// here has a result; the results are benchmarks/results/.
-type Arm = { lang: string; state: "exists" | "exists, never run" | "new" };
+// Every family and pin is RFC-0009 §1 and §2; every state is benchmarks/arms/
+// at mzizi-dev/mzizi 62a0f32. "exists" means a directory under
+// benchmarks/arms/, "not added yet" means RFC-0009 proposes it and there is no
+// directory. Nothing here has a result; the results are benchmarks/results/.
+type Arm = { lang: string; state: "exists" | "exists, never run" | "not added yet" };
 const families: {
   id: string;
   title: string;
@@ -221,9 +230,9 @@ const families: {
     arms: [
       { lang: "Rust · Dioxus 0.7.10", state: "exists" },
       { lang: "Rust · Leptos 0.8.21", state: "exists, never run" },
-      { lang: "TypeScript · React", state: "new" },
+      { lang: "TypeScript · React", state: "exists, never run" },
     ],
-    mzizi: "The Mzizi arm exists.",
+    mzizi: "The Mzizi arm exists. The React arm's pins are provisional until they are taken from the registry's lockfile.",
   },
   {
     id: "backend",
@@ -232,13 +241,13 @@ const families: {
     gating: true,
     input: "HTTP routing, validation, a small stateful service and error paths, from a spec.md, scored by HTTP probes that do not care what language answered.",
     arms: [
-      { lang: "TypeScript · Hono", state: "new" },
-      { lang: "Python · FastAPI", state: "new" },
-      { lang: "Go · net/http", state: "new" },
-      { lang: "C++20 · cpp-httplib", state: "new" },
-      { lang: "Rust · axum", state: "new" },
+      { lang: "TypeScript · Hono", state: "not added yet" },
+      { lang: "Python · FastAPI", state: "not added yet" },
+      { lang: "Go · net/http", state: "not added yet" },
+      { lang: "C++20 · cpp-httplib", state: "not added yet" },
+      { lang: "Rust · axum", state: "not added yet" },
     ],
-    mzizi: "The Mzizi arm is blocked: Mzizi cannot write or run a handler yet (RFC-0009 §6.4).",
+    mzizi: "The Mzizi arm, mzizi-be, exists, with the probe crate (mzprobe) and the first backend task, B1. It has never run: the runner does not score an episode with probes yet, and tasks B2–B5 are not written.",
   },
   {
     id: "ui-port",
@@ -259,7 +268,7 @@ const families: {
     gating: false,
     input: "MultiPL-E, EvalPlus, Aider polyglot and BaxBench, in their own languages (TypeScript, Python, Go, C++ and Rust among them). Their tasks are in every model's training data, so they never decide anything.",
     arms: [],
-    mzizi: "Blocked until Mzizi has functions, expressions and a way to run them (RFC-0009 §8).",
+    mzizi: "Blocked: Mzizi has no functions yet. These suites need expressions, functions and a program that runs (RFC-0009 §8; LANGUAGE-TRACKER.md, Tier 1).",
   },
 ];
 
@@ -271,7 +280,7 @@ const toolchain = [
     name: "mz",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/compiler",
     kind: "Compiler",
-    note: "The compiler that implements the language: check, fix, contract, outline, hash and ir, over a content-addressed IR. Built from a checkout with stable Rust; there is no release yet.",
+    note: "The compiler that implements the language: check, fix, contract, outline and build, with hash and ir for reading its content-addressed IR. mz build lowers a service only, to a local Rust + axum package. Built from a checkout with stable Rust; there is no release yet.",
   },
   {
     name: "mz check --agent",
@@ -283,7 +292,7 @@ const toolchain = [
     name: "benchmarks/",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/benchmarks",
     kind: "Phase 0 benchmark",
-    note: "The Phase 0 benchmark harness (not the harness at the language's core), the runner, the Dioxus and Leptos arms, an open-weight arm and the kill-criterion driver. It scored both pilots. The held-out task set is not written yet, and will be private by design.",
+    note: "The Phase 0 benchmark harness (not the harness at the language's core), the runner, the mzizi, dioxus, leptos, react and mzizi-be arms, the backend probe crate (mzprobe) with task B1, an open-weight setup and the kill-criterion driver. It scored both pilots. The held-out task set is not written yet, and will be private by design.",
   },
   {
     name: "mcp.mzizi.dev",
@@ -350,15 +359,15 @@ const surfaces = [
 const notYet = [
   {
     what: "The Phase 0 measurement",
-    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed; it still needs the runner's spec and React arm, held-out tasks, a pre-registered PLAN.md, the Leptos arm run end to end, and a Mzizi backend arm (benchmarks/READINESS.md).",
+    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed; it still needs the React arm's pins from the registry's lockfile, held-out tasks, a pre-registered PLAN.md, the Leptos and React arms run end to end, and for the backend family, probe scoring in the runner, tasks B2–B5 and the other-language arms (benchmarks/READINESS.md).",
   },
   {
-    what: "Lowering, code generation, a runtime, a release",
-    note: "The language has a front end and contract evaluation. Nothing it compiles runs yet.",
+    what: "Most of a programming language, and a release",
+    note: "Mzizi has no expressions, bindings, callable functions, loops, error handling, modules or standard library yet. Only a service lowers, to a local Rust + axum package; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust.",
   },
   {
-    what: "The wider benchmark and the backend",
-    note: "TypeScript/React, Python, Go, C++ and Rust-backend arms (RFC-0009), and contracts for functions and backend handlers (RFC-0010), are direction. Both RFCs are drafts; nothing in them is implemented.",
+    what: "The wider benchmark",
+    note: "The Hono, FastAPI, Go, C++ and axum backend arms (RFC-0009) are not added yet, and the React and mzizi-be arms have never run. Contracts for functions and records (RFC-0010) are design. Both RFCs are drafts.",
   },
 ];
 
@@ -437,7 +446,7 @@ const repos: Repo[] = [
       <div class="bench-term" id="bench-term" aria-live="polite" set:html={benchTerm} />
       <div class="bench-foot">
         Messages are verbatim from <code>mz contract</code>, checked against a real
-        run at <a href="https://github.com/mzizi-dev/mzizi/blob/e9e9233/primitives/button.mz">e9e9233</a>.
+        run at <a href={`https://github.com/mzizi-dev/mzizi/blob/${LANG_COMMIT}/primitives/button.mz`}>{LANG_COMMIT}</a>.
         The check is re-implemented in this page's script so you can play with it.
         Each step changes a size's class and its height together (<code>h-12</code>{" "}
         and 48 to <code>h-11</code> and 44): change the height alone and{" "}
@@ -468,13 +477,26 @@ const repos: Repo[] = [
         measured against that yet.
       </p>
       <p>
-        What exists is the language's front end, in its toolchain: the{" "}
-        <code>mz</code> compiler has a lexer, a recovering parser, an agent
-        diagnostic protocol with <code>mz fix</code> to apply its exact fixes, and
-        a content-addressed IR, and nine primitives are written in Mzizi itself.
-        Contract blocks are evaluated (see the bench above), and the benchmark
-        harness scores an agent's output against the registry's reference
-        implementation.
+        What exists is the front end of a language whose first domain is UI
+        components, in its toolchain: the <code>mz</code> compiler has a lexer, a
+        recovering parser, a resolver, an agent diagnostic protocol with{" "}
+        <code>mz fix</code> to apply its exact fixes, and a content-addressed IR,
+        and nine primitives are written in Mzizi itself. Contract blocks are
+        evaluated (see the bench above). The first backend slice is in too: a{" "}
+        <code>service</code> with HTTP routes and handlers, which{" "}
+        <code>mz contract</code> runs in process and <code>mz build</code> lowers
+        to a local Rust + axum package that CI compiles, tests and serves. No
+        component lowers yet, and there is no Workers, Containers or WebAssembly
+        target.
+      </p>
+      <p>
+        <strong>Mzizi is not yet a working programming language.</strong> It has
+        no expressions, bindings, callable functions, loops, error handling,
+        modules or standard library yet.{" "}
+        <a href={TRACKER}><strong>What still has to be built</strong></a>{" "}
+        (<code>LANGUAGE-TRACKER.md</code>) is the one list, stacked against
+        Python, Go, C++, TypeScript and Rust, with two milestones: M1, a language
+        that computes, and M2, a working programming language.
       </p>
       <p>
         <strong
@@ -504,12 +526,14 @@ const repos: Repo[] = [
         <code>PLAN.md</code>.{" "}
         <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
           ><code>benchmarks/READINESS.md</code></a
-        > audits each one. The run still waits on five things: the runner's
-        language-neutral <code>spec.md</code> input, <code>arm.toml</code>, a React
-        arm and guides balanced to within 5%; held-out tasks, in a private
+        > audits each one. The runner now reads every arm from{" "}
+        <code>arm.toml</code>, hands the <code>ui-spec</code> family a
+        language-neutral <code>spec.md</code>, and has a React arm, with the UI
+        guides balanced to within 5%. The run still waits on: the React arm's pins
+        taken from the registry's lockfile; held-out tasks, in a private
         repository that does not exist yet; the <code>PLAN.md</code> itself; the
-        Leptos arm run end to end; and a Mzizi backend arm, which needs language
-        work first.
+        Leptos and React arms run end to end; and, for the backend family, probe
+        scoring in the runner, tasks B2–B5 and the other-language arms.
       </p>
       <p>
         <strong>The kill criterion is Mzizi against the best existing language for
@@ -537,15 +561,15 @@ const repos: Repo[] = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>308</b><span>tests passing, 14 suites</span></li>
+      <li class="fig"><b>425</b><span>tests passing, 18 suites</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>7,454</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>12,644</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
       <span>
         Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
-        <a href="https://github.com/mzizi-dev/mzizi/commit/e9e9233"><code>e9e9233</code></a>{" "}
+        <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>{" "}
         (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;{" "}
         <code>mz contract</code> over <code>primitives/*.mz</code>). Pilots from{" "}
         <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
@@ -619,7 +643,8 @@ const repos: Repo[] = [
       <a href="https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md"
         >RFC-0009, the comparison benchmark →</a
       >
-      {" "}<a href={CHARTER}>The charter, §4 →</a>
+      {" "}<a href={CHARTER}>The charter, v0.4 §4 →</a>
+      {" "}<a href={TRACKER}>What still has to be built →</a>
     </p>
   </Section>
 
@@ -638,7 +663,8 @@ const repos: Repo[] = [
           JavaScript's. Its surface has no borrows, lifetimes or ownership
           (RFC-0001 §1.8): the compiler is meant to carry that plumbing so an agent
           never writes it. The aim is that Mzizi does Rust better. That is the goal
-          Phase 0 is measured on, not a result, and nothing lowers yet.
+          Phase 0 is measured on, not a result. Today only a service lowers, to a
+          local Rust + axum package; no component lowers yet.
         </p>
       </Card>
       <Card className="flow">
@@ -686,8 +712,9 @@ const repos: Repo[] = [
         <h3>All of Mzizi</h3>
         <p>
           The owner has set it for all of Mzizi: everything built carries a
-          contract. Components today; language functions and backend handlers are
-          next, and are design, not code.
+          contract. Components and services today (a service's contract runs in
+          process, tested over generated requests, not proven); language functions
+          and records are design, not code.
         </p>
       </Card>
       <Card className="flow">
@@ -797,7 +824,7 @@ const repos: Repo[] = [
         <p>
           The components are the UI layer Mzizi's output is meant to land on, and the
           first place the language is meant to ship: Astro with Mzizi Roots
-          underneath, or pure Rust end to end (charter v0.3). They have a second
+          underneath, or pure Rust end to end (charter v0.4, §2). They have a second
           job too. Their <code>{total}</code> components, each with a TypeScript
           reference, are a fixed ground truth the benchmark's public UI tasks are
           drawn from.
@@ -990,8 +1017,8 @@ const repos: Repo[] = [
     const resetBtn = document.getElementById("bench-reset");
     if (!srcEl || !termEl || !resetBtn) return;
 
-    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@e9e9233,
-    // unchanged since 4c61d28). The class column is left out of the view; a
+    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@62a0f32,
+    // unchanged since 0d91ccd). The class column is left out of the view; a
     // step stands for editing the class and the height together, since a
     // height that disagrees with its class is MZ0313 at check time.
     // Line 45's own comment is left out of this abbreviated view only —
