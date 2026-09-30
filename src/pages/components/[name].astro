@@ -71,6 +71,8 @@ const registryDeps = detail.registryDependencies.map((url) => ({
 }));
 
 const rsUrl = `${CANONICAL_BASE}/rs/${item.name}`;
+// `https://github.com/mzizi-dev/mzizi-registry` → `mzizi-dev/mzizi-registry`.
+const repoLabel = (url: string) => url.replace(/^https:\/\/github\.com\//, "");
 const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
 ---
 
@@ -181,7 +183,7 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
         <div class="prose">
           <p>
             The API names the crate <code>{rust.crate.name}</code> on{" "}
-            <code>{rust.crate.registry}</code>.{" "}
+            <code>{rust.crate.registry}</code>{rust.crate.git && <>, built from <a href={rust.crate.git}>{repoLabel(rust.crate.git)}</a></>}.{" "}
             {crate?.state === "published" && (
               <>
                 It is published, at <code>{crate.version}</code>:

@@ -1,0 +1,58 @@
+---
+/**
+ * The crates the Rust documents at `/v1/rs/<name>` name, each with its
+ * crates.io state as read at build time, then the two umbrellas. Shared by the
+ * home page, /components and /cli so all three say the same thing, and none of
+ * them names one crate for every component: the API's `crate` field differs by
+ * node (`mzizi-ui` for the primitives, `mzizi-brand` for the brand components,
+ * and so on).
+ */
+import { crateStatus, type PackageStatus, type RustCrate } from "../lib/registry";
+
+interface Props {
+  crates: (RustCrate & { status: PackageStatus })[];
+}
+
+const { crates } = Astro.props;
+const [ui, server] = await Promise.all([crateStatus("mzizi-roots"), crateStatus("mzizi-roots-server")]);
+---
+
+<ul class="prose">
+  {
+    crates.map(({ name, components, status }) => (
+      <li>
+        <code>{name}</code>: {components.length}{" "}
+        {components.length === 1 ? "component" : "components"},{" "}
+        {status.state === "published" && (
+          <>
+            on crates.io at <code>{status.version}</code>.
+          </>
+        )}
+        {status.state === "absent" && <>not on crates.io yet, so there is no <code>cargo add</code> for it today.</>}
+        {status.state === "unknown" && <>crates.io could not be checked when this page was built.</>}
+      </li>
+    ))
+  }
+</ul>
+{
+  (ui.state === "published" || server.state === "published") && (
+    <p class="prose">
+      Or take an umbrella, which re-exports the node crates in one dependency:{" "}
+      {ui.state === "published" && (
+        <>
+          <code>mzizi-roots</code> (<code>{ui.version}</code>) for the UI side, the
+          tokens, primitives, brand and shell
+        </>
+      )}
+      {ui.state === "published" && server.state === "published" && "; "}
+      {server.state === "published" && (
+        <>
+          <code>mzizi-roots-server</code> (<code>{server.version}</code>) for the
+          server side, assurance, fundi, docs and discovery
+        </>
+      )}
+      .
+    </p>
+  )
+}
+{ui.state === "published" && <code class="cmd lead">cargo add mzizi-roots</code>}

@@ -333,6 +333,12 @@ stale_patterns = {
     r"mzizi-cli/dist/cli\.js": "npx mzizi works from 0.6.1; no by-path workaround",
     r"still says routes read from Supabase": "/openapi no longer says that (checked 2026-09-29)",
     r"io\.github\.nyuchi/mzizi-mcp": "the MCP Registry entry is io.github.mzizi-dev/mzizi-mcp",
+    # One crate for every Rust component. The gateway pin 9b86e03 serves each
+    # document's own crate (mzizi-ui for primitives, mzizi-brand for brand).
+    r"The document names the crate mzizi-ui|The crate it names, mzizi-ui|module of the mzizi-ui crate|records the mzizi-ui crate":
+        "/v1/rs/<name> names each component's own crate (gateway pin 9b86e03)",
+    r"did not yet serve the twelve brand components|named mzizi-ui for every component":
+        "api.mzizi.dev serves the brand components at registry 9b86e03",
 }
 
 

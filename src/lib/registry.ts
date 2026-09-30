@@ -362,8 +362,12 @@ export interface RustImplementation {
   /** The rendering target the source is written for — `dioxus` today. */
   target: string;
   description: string;
-  /** The crate the API says this source belongs to. */
-  crate: { name: string; registry: string };
+  /**
+   * The crate the API says this source belongs to. It differs by node:
+   * `mzizi-ui` for the N2 primitives, `mzizi-brand` for the N3 brand
+   * components, and so on. Never assume one crate for all of them.
+   */
+  crate: { name: string; registry: string; git?: string };
   files: RegistryFile[];
 }
 
@@ -413,6 +417,34 @@ export function getComponentRecords(): Promise<Map<string, ComponentRecord>> {
     return new Map(entries);
   })();
   return allRecords;
+}
+
+/** One crate that `/v1/rs/<name>` names, and the components it holds. */
+export interface RustCrate {
+  name: string;
+  registry: string;
+  git?: string;
+  components: string[];
+}
+
+/**
+ * The distinct crates the Rust documents name, largest first. Read from the
+ * API's `crate` field per component, never typed in: the set grows as Roots
+ * batches land in new crates.
+ */
+export function rustCrates(records: Map<string, ComponentRecord>): RustCrate[] {
+  const crates = new Map<string, RustCrate>();
+  for (const [name, record] of records) {
+    if (!record.rust) continue;
+    const { crate } = record.rust;
+    const entry = crates.get(crate.name) ?? { ...crate, components: [] };
+    entry.components.push(name);
+    crates.set(crate.name, entry);
+  }
+  return [...crates.values()].sort(
+    (a, b) =>
+      b.components.length - a.components.length || a.name.localeCompare(b.name),
+  );
 }
 
 /**
@@ -478,8 +510,8 @@ export async function getStats(): Promise<Stats> {
 /**
  * Whether a package exists on a public registry, asked at build time.
  *
- * Used for claims like "`mzizi-ui` is not on crates.io yet", which are true
- * today and will not be forever. Asking at build time makes it a dated fact
+ * Used for claims like "this crate is on crates.io at 0.1.0", which change
+ * without an edit here. Asking at build time makes it a dated fact
  * rather than a sentence someone has to remember to delete. Unlike the
  * registry API, these hosts are not this site's data source, so a failure to
  * reach them never fails the build: it reports `unknown`, and the page says so.
@@ -525,6 +557,18 @@ export function crateStatus(name: string): Promise<PackageStatus> {
   return checkPackage(
     `https://crates.io/api/v1/crates/${encodeURIComponent(name)}`,
     (body) => (body as { crate?: { max_version?: string } }).crate?.max_version,
+  );
+}
+
+/** Each Rust crate with its crates.io state, asked at build time. */
+export function rustCrateStates(
+  crates: RustCrate[],
+): Promise<(RustCrate & { status: PackageStatus })[]> {
+  return Promise.all(
+    crates.map(async (crate) => ({
+      ...crate,
+      status: await crateStatus(crate.name),
+    })),
   );
 }
 

@@ -12,9 +12,11 @@
  * and crate states are read at build time and dated, never typed in here.
  */
 import Site from "../layouts/Site.astro";
+import RustCrates from "../components/RustCrates.astro";
 import {
   getComponentRecords,
-  crateStatus,
+  rustCrates,
+  rustCrateStates,
   npmStatus,
   installCommand,
   builtAt,
@@ -23,10 +25,11 @@ import {
 
 const records = await getComponentRecords();
 const rustCount = [...records.values()].filter((r) => r.rust).length;
-const [crate, umbrella, serverUmbrella, cli] = await Promise.all([
-  crateStatus("mzizi-ui"),
-  crateStatus("mzizi-roots"),
-  crateStatus("mzizi-roots-server"),
+// Every crate the Rust documents name, from each document's own `crate` field:
+// the primitives are in `mzizi-ui`, the brand components in `mzizi-brand`, and
+// a new Roots batch may land in another. Never one crate typed in for all.
+const [crates, cli] = await Promise.all([
+  rustCrateStates(rustCrates(records)),
   npmStatus("@nyuchi/mzizi-cli"),
 ]);
 
@@ -41,6 +44,13 @@ const atLeast = (version: string, floor: string) => {
   }
   return true;
 };
+const allPublished = crates.length > 0 && crates.every(({ status }) => status.state === "published");
+// Examples for the two largest crates, read from the API: `mzizi add <component>`
+// records that component's crate.
+const crateExamples = crates.slice(0, 2).map(({ name, components }) => ({
+  crate: name,
+  component: [...components].sort()[0],
+}));
 const installerShipped = cli.state === "published" && atLeast(cli.version, INSTALLER_SINCE);
 
 const mzCommands = [
@@ -116,35 +126,21 @@ const mzCommands = [
   <code class="cmd lead">curl {CANONICAL_BASE}/rs/&lt;name&gt;</code>
   <div class="prose">
     <p>
-      The document names the crate <code>mzizi-ui</code> on crates.io.{" "}
-      {crate.state === "published" && <>It is published, at <code>{crate.version}</code>: <code>cargo add mzizi-ui</code>.</>}
-      {umbrella.state === "published" && (
+      Each document names the crate its component ships in, and the crate is
+      the install path, not the source. The crates the documents name today:
+    </p>
+  </div>
+  <RustCrates crates={crates} />
+  <div class="prose">
+    <p>
+      {!allPublished && (
         <>
-          {" "}Or take the UI umbrella, <code>mzizi-roots</code>
-          (<code>{umbrella.version}</code>), which brings <code>mzizi-ui</code>
-          with the tokens, brand and shell crates in one dependency:
-          <code>cargo add mzizi-roots</code>.
+          Until a crate is published, build against the source from the API or from{" "}
+          <a href="https://github.com/mzizi-dev/mzizi-registry/tree/main/mzizi-rs"
+            ><code>mzizi-registry/mzizi-rs</code></a
+          >.
         </>
       )}
-      {serverUmbrella.state === "published" && (
-        <>
-          {" "}The server side is <code>mzizi-roots-server</code>
-          (<code>{serverUmbrella.version}</code>).
-        </>
-      )}
-      {
-        crate.state === "absent" && (
-          <>
-            <strong>That crate is not on crates.io yet</strong>, so there is no{" "}
-            <code>cargo add</code> that works today. Until it is published, build
-            against the source from the API or from{" "}
-            <a href="https://github.com/mzizi-dev/mzizi-registry/tree/main/mzizi-rs"
-              ><code>mzizi-registry/mzizi-rs</code></a
-            >.
-          </>
-        )
-      }
-      {crate.state === "unknown" && <>Whether it is on crates.io could not be checked when this page was built.</>}
       {" "}<code>npx shadcn add</code> cannot install a Rust document: it rejects the
       schema.
     </p>
@@ -190,12 +186,25 @@ const mzCommands = [
       </li>
       <li>
         <strong>Rust:</strong> copies no <code>.rs</code> files, because a Roots
-        component is a module of the <code>mzizi-ui</code> crate, not a file to
-        fork. It records the crate and checks crates.io first.{" "}
-        {crate.state !== "published" && (
+        component is a module of a crate, not a file to fork. It records the
+        crate the component's document names
+        {crateExamples.length > 0 && (
           <>
-            While <code>mzizi-ui</code> is unpublished, it exits 1 and says so: a
-            Rust install is blocked on the crate, not on the tool.
+            {" "}(
+            {crateExamples.map((example, i) => (
+              <>
+                {i > 0 && "; "}
+                <code>mzizi add {example.component}</code> records <code>{example.crate}</code>
+              </>
+            ))}
+            )
+          </>
+        )}{" "}
+        and checks crates.io first.{" "}
+        {!allPublished && (
+          <>
+            While a crate is unpublished, it exits 1 and says so: a Rust install
+            is blocked on the crate, not on the tool.
           </>
         )}
       </li>

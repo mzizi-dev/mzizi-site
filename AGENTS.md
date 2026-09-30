@@ -57,8 +57,10 @@ crates.io, and the `@nyuchi/` npm packages built in `agent-tools`).
 - Anyone changing the language or the components must expect a site update to follow,
   and should say so in their PR body.
 - `scripts/check-facts.py dist` reads the live facts — the language README's test and
-  suite counts, the npm `latest` versions, the crates.io versions, the MCP Registry
-  listing — and fails when the built site disagrees. It needs the network, so it runs in
+  suite counts, the npm `latest` versions, the crates.io versions, the crate each
+  `/v1/rs/<name>` document names (every Roots page must lead with Rust and name that
+  crate), the MCP Registry listing — and fails when the built site disagrees. While the
+  Roots crates are on crates.io, it also fails on any page saying one is not. It needs the network, so it runs in
   the `Freshness` workflow (manual and daily), never in the required CI path. When it
   fails, update the site from the upstream source, not the check.
 - Facts the build can read (component counts, crate states, npm versions) are read at
