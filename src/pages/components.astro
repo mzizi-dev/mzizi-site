@@ -14,6 +14,8 @@
  * The node is derived from the directory a component sits in, so the grouping
  * is a fact about the repository, not a taxonomy invented here.
  */
+import { Badge } from "@bundu/ui/ui/badge";
+import { Separator } from "@bundu/ui/ui/separator";
 import Site from "../layouts/Site.astro";
 import RustCrates from "../components/RustCrates.astro";
 import {
@@ -89,7 +91,7 @@ const typeCounts = [
           <a href={`/components/${item.name}`}>
             <code>{item.name}</code>
           </a>
-          <span class="badge outline">N{item.node}</span>
+          <Badge variant="outline" size="sm">N{item.node}</Badge>
         </li>
       ))}
     </ul>
@@ -184,7 +186,7 @@ const typeCounts = [
         <div class="node-head">
           <span class="node-n">N{group.node}</span>
           <h2>{entry?.title ?? group.nodeLabel}</h2>
-          <span class="badge outline">{group.items.length} components</span>
+          <Badge variant="outline" size="sm">{group.items.length} components</Badge>
           <span class="count-link">
             <a href={`/architecture#n${group.node}`}>what this node is</a>
           </span>
@@ -217,14 +219,14 @@ const typeCounts = [
                   <a href={`/components/${item.name}`}>{item.name}</a>
                   <span class="title">{item.title}</span>
                 </h3>
-                {rustNames.has(item.name) && <span class="badge solid">Rust</span>}
-                <span class="badge">{shortType(item.type)}</span>
+                {rustNames.has(item.name) && <Badge variant="info" size="sm">Rust</Badge>}
+                <Badge size="sm">{shortType(item.type)}</Badge>
               </header>
               <p>{item.description}</p>
               {item.categories.length > 0 && (
                 <ul class="badges">
                   {item.categories.map((category) => (
-                    <li class="badge outline">{category}</li>
+                    <li><Badge variant="outline" size="sm">{category}</Badge></li>
                   ))}
                 </ul>
               )}
@@ -236,7 +238,7 @@ const typeCounts = [
     );
   })}
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <h2>Reading this as a machine</h2>
   <div class="prose">

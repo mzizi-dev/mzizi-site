@@ -4,6 +4,7 @@
  * build time. The body is remote input and goes through `renderMarkdown`,
  * which escapes raw HTML and drops unsafe link schemes.
  */
+import { Separator } from "@bundu/ui/ui/separator";
 import Site from "../../layouts/Site.astro";
 import { getSkills, getSkill, builtAt, CANONICAL_BASE } from "../../lib/registry";
 import { renderMarkdown } from "../../lib/markdown";
@@ -28,7 +29,7 @@ const url = `${CANONICAL_BASE}/skills/${skill.name}`;
     <a href={url}>Read the JSON</a>
   </p>
 
-  <hr class="rule" />
+  <Separator className="my-12" />
 
   <article class="prose skill-body" set:html={body} />
 

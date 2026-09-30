@@ -8,6 +8,8 @@
  * committed, each one dated. Nothing on this page is interactive, and it says
  * so up front.
  */
+import { Alert } from "@bundu/ui/ui/alert";
+import { Badge } from "@bundu/ui/ui/badge";
 import Site from "../layouts/Site.astro";
 import { getComponents, getComponentRecords, shortType, builtAt, CANONICAL_BASE } from "../lib/registry";
 import { previews, previewsGeneratedAt, previewsSource } from "../lib/previews";
@@ -34,7 +36,7 @@ const without = total - shown.length;
   lede="Static previews, each linked to its component's source. Nothing here is interactive yet."
   wide
 >
-  <div class="status prose">
+  <Alert variant="warning" role="region" className="status flow prose text-body p-6">
     <h2>What this is, and what it isn't yet</h2>
     <p>
       <strong>Not interactive.</strong> Every preview is a screenshot of the
@@ -58,7 +60,7 @@ const without = total - shown.length;
       The one interactive thing on this site is the{" "}
       <a href="/#contracts"><code>mz contract</code> bench</a> on the front page.
     </p>
-  </div>
+  </Alert>
 
   {
     shown.length === 0 ? (
@@ -80,8 +82,8 @@ const without = total - shown.length;
                 <a href={`/components/${item.name}`}>{item.name}</a>
                 <span class="title">{item.title}</span>
               </h3>
-              {hasRust(item.name) && <span class="badge solid">Rust</span>}
-              <span class="badge">{shortType(item.type)}</span>
+              {hasRust(item.name) && <Badge variant="info" size="sm">Rust</Badge>}
+              <Badge size="sm">{shortType(item.type)}</Badge>
             </header>
             <p>
               <a href={`/components/${item.name}#${hasRust(item.name) ? "rust" : "react"}`}>

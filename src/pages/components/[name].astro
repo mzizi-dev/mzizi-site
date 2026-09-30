@@ -12,6 +12,7 @@
  * so the whole component, source included, is in the HTML with no script.
  * The page says when it read each document and links it.
  */
+import { Badge } from "@bundu/ui/ui/badge";
 import Site from "../../layouts/Site.astro";
 import {
   getComponents,
@@ -84,10 +85,10 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
   wide
 >
   <ul class="badges component-badges">
-    {rust && <li class="badge solid">Rust · {rust.target}</li>}
-    <li class="badge">{shortType(item.type)}</li>
-    <li class="badge outline">N{item.node} {nodeTitle}</li>
-    {item.categories.map((category) => <li class="badge outline">{category}</li>)}
+    {rust && <li><Badge variant="info" size="sm">Rust · {rust.target}</Badge></li>}
+    <li><Badge size="sm">{shortType(item.type)}</Badge></li>
+    <li><Badge variant="outline" size="sm">N{item.node} {nodeTitle}</Badge></li>
+    {item.categories.map((category) => <li><Badge variant="outline" size="sm">{category}</Badge></li>)}
   </ul>
 
   <div class="detail-grid">
@@ -217,7 +218,7 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
           <figure class="source" data-pagefind-ignore>
             <figcaption>
               <code>{file.path}</code>
-              <span class="badge outline">{file.type}</span>
+              <Badge variant="outline" size="sm">{file.type}</Badge>
             </figcaption>
             <pre><code>{file.content}</code></pre>
           </figure>
@@ -293,7 +294,7 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
                 → <code>{file.target}</code>
               </span>
             )}
-            <span class="badge outline">{file.type}</span>
+            <Badge variant="outline" size="sm">{file.type}</Badge>
           </summary>
           <pre><code>{file.content}</code></pre>
         </details>

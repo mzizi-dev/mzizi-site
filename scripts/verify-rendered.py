@@ -267,10 +267,36 @@ check("index.html", "the language-is / isn't section is rendered",
       "What the language is, and what it isn't" in plain)
 check("index.html", "the status panel says Phase 0 is not complete",
       "Phase 0 is not complete" in plain and "benchmarks/READINESS.md" in plain)
+# The hero leads, carries the bench as its media, and is honest about Phase 0;
+# the status panel is the very next block (owner decision, 2026-09-30).
+raw_index = (DIST / "index.html").read_text(encoding="utf-8")
+hero_at = raw_index.find('data-slot="hero"')
+media_at = raw_index.find('data-slot="hero-media"')
+bench_at = raw_index.find('id="bench-src"')
+check("index.html", "the page opens on the Hero", 0 <= hero_at < raw_index.find('id="status"'))
+check("index.html", "the contract bench is the Hero's media", 0 <= hero_at < media_at < bench_at)
+check("index.html", "the Hero's status badge says Phase 0 is a research prototype",
+      "Phase 0 · research prototype" in html.unescape(raw_index))
+after_hero = re.search(r'data-slot="hero".*?</section>\s*<section\b[^>]*\bid="([^"]+)"', raw_index, re.S)
+check("index.html", "the status panel is the block directly after the Hero",
+      after_hero is not None and after_hero.group(1) == "status",
+      after_hero.group(1) if after_hero else "no section after the hero")
+for claim in (r"\bfaster\b", r"\bbetter than\b", r"\boutperform"):
+    check("index.html", f"the landing page makes no /{claim}/ claim", re.search(claim, plain, re.I) is None)
 body = text_without_scripts("language.html", quiet=True)
 for rfc in ("RFC-0009-comparison-benchmark.md", "RFC-0010-contracts-everywhere.md"):
     check("language.html", f"links {rfc} in mzizi-dev/mzizi design/",
           f'href="https://github.com/mzizi-dev/mzizi/blob/main/design/{rfc}"' in body)
+
+# --- no framework in the browser -------------------------------------------
+# @bundu/ui's React primitives render to HTML at build time. A `client:*`
+# directive would ship React and hydrate an island; the doctrine is no third UI
+# framework in the browser, so no page may load one.
+print("\nno framework runtime")
+all_html = sorted(DIST.rglob("*.html"))
+islands = [str(p.relative_to(DIST)) for p in all_html
+           if re.search(r"<astro-island\b|renderer-url=|/_astro/client\.[^\"']*\.js", p.read_text(encoding="utf-8"))]
+check("dist/", "no page hydrates an island or loads the React client", not islands, ", ".join(islands[:5]))
 
 # --- /.well-known --------------------------------------------------------
 print("\n.well-known")
@@ -337,7 +363,10 @@ stale_patterns = {
     r"Known issue in 0\.6\.0": "@nyuchi/mzizi-cli 0.6.1 fixed the bin-link bug",
     r"mzizi-cli/dist/cli\.js": "npx mzizi works from 0.6.1; no by-path workaround",
     r"still says routes read from Supabase": "/openapi no longer says that (checked 2026-09-29)",
-    r"io\.github\.nyuchi/mzizi-mcp": "the MCP Registry entry is io.github.mzizi-dev/mzizi-mcp",
+    # Naming the old entry AS the old one is right (the mzizi-backend skill
+    # says "the old io.github.nyuchi/mzizi-mcp entry is stale"); presenting
+    # it as current is not.
+    r"(?<!old )io\.github\.nyuchi/mzizi-mcp": "the MCP Registry entry is io.github.mzizi-dev/mzizi-mcp",
     # One crate for every Rust component. From registry 9b86e03 on, the gateway
     # serves each document's own crate (mzizi-ui for primitives, mzizi-brand for
     # brand). The pin moves by itself now, so none is named here as current.

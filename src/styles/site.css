@@ -1,30 +1,103 @@
 /* mzizi.dev — the stylesheet.
  *
  * ============================================================================
- * THERE IS NOT ONE COLOUR, SIZE, RADIUS OR WEIGHT IN THIS FILE.
+ * THERE IS NOT ONE COLOUR, SIZE, RADIUS OR WEIGHT TYPED INTO THIS FILE.
  * ============================================================================
  *
- * The estate's styling source is `@bundu/ui`, which `bundu-labs/marketing`
- * (three apps) and `shamwari-ai/shamwari/site` already consume. This site now
- * consumes it too: the import below is the same one they use, and every value
- * in this file is a `var(--…)` from that token contract. A fourth styling
- * approach for mzizi.dev is exactly the drift being eliminated.
+ * Tailwind v4 over `@bundu/ui`, the estate's styling source: the palette
+ * (all 21 families), the surface ladder, the type scale and the Mzizi brand
+ * overlay (hematite, the owner's decision of 2026-09-30) all come from the
+ * package. Until `@bundu/ui` 0.2.0 this site generated its own copy of them
+ * from the brand API (`src/components/DesignTokens.astro`); that copy is gone.
  *
- * `@bundu/ui@0.1.1` covers seven of the twenty-one colour families and has no
- * surface ladder, so `src/components/DesignTokens.astro` fills the gap from the
- * live brand API — under THESE SAME NAMES, so the 0.2.0 upgrade is deleting
- * that component and keeping this import, not rewriting this file. Read its
- * header for exactly what it supplies and why.
+ * `color-scheme.css` makes the palette follow the reader's OS setting, since
+ * the site ships no theme script. An explicit `data-theme="light"` still wins.
  *
- * If a dimension looks arbitrary — 56px controls, 22px badges, 14px card
- * radius, pill buttons — it is not: those are `componentSpecs` from the same
- * source, which is what the registry's own React components are built to.
+ * The aliases below map the names this file's layout rules were written
+ * against onto the package's tokens and Tailwind's spacing unit. Each is an
+ * expression over a token, never a value.
  *
  * The one thing this file owns is LAYOUT: grids, flow, sticky behaviour, where
- * things sit. That is not a token and never was.
+ * things sit. That is not a token and never was. Everything is layered, so a
+ * Tailwind utility on a `@bundu/ui` component always wins over it.
  */
 
-@import "@bundu/ui/styles/tokens.css";
+@import "tailwindcss";
+@import "@bundu/ui/styles/theme.css";
+@import "@bundu/ui/styles/globals.css";
+@import "@bundu/ui/styles/color-scheme.css";
+@import "@bundu/ui/styles/brand-mzizi.css";
+@source "../../node_modules/@bundu/ui/src";
+
+:root {
+  /* Spacing: the brand API's steps, which sit on Tailwind's 0.25rem unit. */
+  --space-xxs: var(--spacing-xxs);
+  --space-xs: calc(var(--spacing) * 1);
+  --space-sm: calc(var(--spacing) * 2);
+  --space-md: calc(var(--spacing) * 3);
+  --space-base: calc(var(--spacing) * 4);
+  --space-lg: calc(var(--spacing) * 6);
+  --space-xl: calc(var(--spacing) * 8);
+  --space-2xl: calc(var(--spacing) * 12);
+  --space-3xl: calc(var(--spacing) * 16);
+  --space-4xl: calc(var(--spacing) * 20);
+  --space-5xl: calc(var(--spacing) * 24);
+
+  /* Type: the package's scale (theme.css, read from its preset). */
+  --text-body-small: var(--text-body-sm);
+  --text-body-large: var(--text-body-lg);
+  --text-code: var(--text-body-sm);
+  --leading-h1: var(--text-h1--line-height);
+  --leading-h2: var(--text-h2--line-height);
+  --leading-h4: var(--text-h4--line-height);
+  --leading-h5: var(--text-h5--line-height);
+  --leading-h6: var(--text-h6--line-height);
+  --leading-body: var(--text-body--line-height);
+  --leading-body-large: var(--text-body-lg--line-height);
+  --leading-body-small: var(--text-body-sm--line-height);
+  --leading-caption: var(--text-caption--line-height);
+  --leading-code: var(--text-body--line-height);
+  --weight-h1: var(--text-h1--font-weight);
+  --weight-h2: var(--text-h2--font-weight);
+  --weight-h4: var(--text-h4--font-weight);
+  --weight-h5: var(--text-h5--font-weight);
+  --weight-h6: var(--text-h6--font-weight);
+  --weight-body: var(--font-weight-normal);
+  --family-h1: var(--font-serif);
+  --family-h2: var(--font-serif);
+  --family-h4: var(--font-sans);
+  --family-h5: var(--font-sans);
+
+  /* The surface ladder under the names the layout rules use. */
+  --surface-pitch: var(--pitch);
+  --surface-void: var(--void);
+  --surface-container: var(--container);
+  --surface-overlay: var(--overlay);
+  --surface-raised: var(--raised);
+  --surface-scrim: var(--scrim);
+
+  /* componentSpecs, onto the package's radii and touch targets. */
+  --spec-button-radius: var(--radius-full);
+  --spec-input-radius: var(--radius-full);
+  --spec-avatar-radius: var(--radius-full);
+  --spec-badge-radius: var(--radius-full);
+  --spec-toggle-radius: var(--radius-full);
+  --spec-card-radius: var(--radius-lg);
+  --spec-dialog-radius: var(--radius-xl);
+  --spec-tabs-radius: var(--radius-xl);
+  --spec-checkbox-radius: var(--radius-sm);
+  --spec-button-default: var(--touch-target);
+  --spec-button-sm: var(--touch-target-sm);
+  --spec-input-default: var(--touch-target);
+  --spec-tabs-default: var(--touch-target-sm);
+  --spec-avatar-default: calc(var(--spacing) * 10);
+  --spec-badge-default: calc(var(--spacing) * 5.5);
+  --spec-toggle-default: calc(var(--spacing) * 6);
+  --spec-checkbox-default: calc(var(--spacing) * 5);
+}
+
+@layer base {
+
 
 *,
 *::before,
@@ -74,15 +147,15 @@ body {
 
 /* ---------------------------------------------------------------- type --- */
 
-h1,
-h2,
-h3,
-h4 {
+/* Headings and paragraphs are styled only inside `.flow`, the reading column
+ * of a page's own prose. `@bundu/ui`'s Hero, Section and SectionHeader bring
+ * their own type, and a bare `h2 { margin }` here would fight them. */
+:where(.flow) :is(h1, h2, h3, h4) {
   margin: 0;
   text-wrap: balance;
 }
 
-h1 {
+:where(.flow) h1 {
   font-family: var(--family-h1);
   font-size: clamp(var(--text-h2), 6vw, var(--text-h1));
   line-height: var(--leading-h1);
@@ -90,7 +163,7 @@ h1 {
   letter-spacing: -0.02em;
 }
 
-h2 {
+:where(.flow) h2 {
   font-family: var(--family-h2);
   font-size: clamp(var(--text-h3), 4.5vw, var(--text-h2));
   line-height: var(--leading-h2);
@@ -99,7 +172,7 @@ h2 {
   margin-block: var(--space-3xl) var(--space-md);
 }
 
-h3 {
+:where(.flow) h3 {
   font-family: var(--family-h4);
   font-size: var(--text-h4);
   line-height: var(--leading-h4);
@@ -107,7 +180,7 @@ h3 {
   margin-block: var(--space-xl) var(--space-sm);
 }
 
-h4 {
+:where(.flow) h4 {
   font-family: var(--family-h5);
   font-size: var(--text-h5);
   line-height: var(--leading-h5);
@@ -115,10 +188,38 @@ h4 {
   margin-block: var(--space-lg) var(--space-sm);
 }
 
-p {
+:where(.flow) p {
   margin-block: 0 var(--space-base);
 }
 
+/* A block's first heading sits at the block's top edge, and a badge above a
+ * heading keeps it close. */
+:where(.flow) > :first-child,
+:where(.flow) [data-slot="badge"] + :is(h2, h3, h4) {
+  margin-block-start: 0;
+}
+
+:where(.flow) > :last-child {
+  margin-block-end: 0;
+}
+
+/* Tailwind's preflight strips list markers; prose lists keep theirs. Lists
+ * with a class of their own (stats, cards, badges) style themselves. */
+:where(.flow) :is(ul, ol):where(:not([class]), .spaced) {
+  padding-inline-start: 1.25em;
+  margin-block: 0 var(--space-base);
+}
+
+:where(.flow) ul:where(:not([class]), .spaced) {
+  list-style: disc;
+}
+
+:where(.flow) ol:where(:not([class]), .spaced) {
+  list-style: decimal;
+}
+}
+
+@layer components {
 /* Capitalized — "Mzizi", not "mzizi". The voice-guide's lowercase rule is
  * written down, but bundu.org's own live header/footer render "Bundu
  * Foundation" in title case regardless, and this site follows what the
@@ -162,24 +263,6 @@ p {
   border: 0;
 }
 
-/* The seven-mineral identity strip. Vertical, always: a fixed 3px bar on the
- * left edge of the page, running the full viewport height, present once per
- * page rather than duplicated per section. */
-.mineral-strip {
-  position: fixed;
-  inset-block: 0;
-  inset-inline-start: 0;
-  z-index: 60;
-  display: flex;
-  flex-direction: column;
-  inline-size: 3px;
-  pointer-events: none;
-}
-
-.mineral-strip span {
-  flex: 1;
-}
-
 .mineral-dots {
   display: flex;
   gap: var(--space-xs);
@@ -191,52 +274,26 @@ p {
   border-radius: 50%;
 }
 
-.mineral-strip .m-cobalt,
 .mineral-dots .m-cobalt {
   background: var(--color-cobalt);
 }
-.mineral-strip .m-tanzanite,
 .mineral-dots .m-tanzanite {
   background: var(--color-tanzanite);
 }
-.mineral-strip .m-malachite,
 .mineral-dots .m-malachite {
   background: var(--color-malachite);
 }
-.mineral-strip .m-gold,
 .mineral-dots .m-gold {
   background: var(--color-gold);
 }
-.mineral-strip .m-terracotta,
 .mineral-dots .m-terracotta {
   background: var(--color-terracotta);
 }
-.mineral-strip .m-sodalite,
 .mineral-dots .m-sodalite {
   background: var(--color-sodalite);
 }
-.mineral-strip .m-copper,
 .mineral-dots .m-copper {
   background: var(--color-copper);
-}
-
-.eyebrow {
-  display: block;
-  font-size: var(--text-caption);
-  line-height: var(--leading-caption);
-  font-weight: var(--weight-h6);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-terracotta);
-  margin-block-end: var(--space-md);
-}
-
-.lede {
-  font-size: var(--text-body-large);
-  line-height: var(--leading-body-large);
-  color: var(--muted-foreground);
-  max-width: 54ch;
-  margin-block: var(--space-base) var(--space-lg);
 }
 
 .prose {
@@ -681,23 +738,25 @@ samp {
   font-size: var(--text-body-small);
 }
 
-main {
+/* One column width for an inner page's header band and its body, so the
+ * breadcrumb, the title and the prose share a left edge. */
+.frame {
   max-width: 48rem;
   margin-inline: auto;
-  padding: var(--space-4xl) var(--space-lg) var(--space-5xl);
+  padding-inline: var(--space-lg);
 }
 
-body.wide main,
+body.wide .frame,
 body.wide .footer-inner {
   max-width: 78rem;
 }
 
-/* A hairline between a page's hero and its content, and between sections. The
- * old apex used exactly this device and it is worth keeping. */
-.rule {
-  border: 0;
-  border-block-start: 1px solid var(--border);
-  margin-block: var(--space-2xl);
+.page-body {
+  padding-block: var(--space-2xl) var(--space-5xl);
+}
+
+.page-head .eyebrow {
+  color: var(--primary);
 }
 
 footer {
@@ -766,6 +825,12 @@ footer {
   text-decoration: underline;
 }
 
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: var(--space-base);
+}
+
 .footer-bottom {
   display: flex;
   flex-wrap: wrap;
@@ -779,38 +844,10 @@ footer {
 
 /* ------------------------------------------------------- system pieces --- */
 /*
- * These are the registry's components, built to `componentSpecs` rather than
- * installed: this site is Astro with no UI framework by charter, so a React
- * `<Badge>` cannot be dropped in. What CAN be honoured — and is, here — is the
- * spec every one of those components is built against. A badge is 22px and
- * fully pill because the spec says a badge is; a card is 14px radius with a
- * 1px border because the spec says a card is.
+ * Badges, cards, alerts and separators are `@bundu/ui` components now,
+ * rendered to static HTML. What stays here is what the package does not
+ * carry: the badge row, the panel, the install command.
  */
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--spec-badge-default);
-  padding-inline: var(--space-sm);
-  border-radius: var(--spec-badge-radius);
-  background: var(--surface-container);
-  color: var(--muted-foreground);
-  font-size: var(--text-caption);
-  line-height: 1;
-  font-weight: var(--weight-h6);
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-}
-
-.badge.outline {
-  background: none;
-  border: 1px solid var(--border);
-}
-
-.badge.solid {
-  background: var(--accent);
-  color: var(--info);
-}
 
 .badges {
   display: flex;
@@ -819,29 +856,6 @@ footer {
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--spec-card-radius);
-  padding: var(--space-base);
-}
-
-.panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--spec-dialog-radius);
-  padding: var(--space-lg);
-  margin-block: var(--space-lg);
-}
-
-.panel > :first-child {
-  margin-block-start: 0;
-}
-
-.panel > :last-child {
-  margin-block-end: 0;
 }
 
 /* An install command is the point of the whole registry, so it gets the
@@ -901,6 +915,13 @@ footer {
 .provenance code {
   background: none;
   padding: 0;
+}
+
+/* Inline code in small print sits at the print's size, not the body's. */
+.provenance code,
+.bench-foot code,
+.card-list p code {
+  font-size: inherit;
 }
 
 .stats {
@@ -979,9 +1000,10 @@ ul.spaced li {
   margin-block-end: var(--space-sm);
 }
 
-/* The status panel on the landing page carries the claim this site most needs
- * to get right — that nothing has been measured yet — so it is styled to be
- * read rather than skipped. Warning is a served semantic role. */
+/* The status panel carries the claim this site most needs to get right —
+ * that nothing has been measured yet — so it is styled to be read rather than
+ * skipped. On the landing page it is `@bundu/ui`'s Alert (warning), directly
+ * under the hero; inner pages use the same class on a plain block. */
 .status {
   background: color-mix(in oklab, var(--warning) 12%, var(--card));
   border: 1px solid color-mix(in oklab, var(--warning) 45%, var(--card));
@@ -991,7 +1013,7 @@ ul.spaced li {
 }
 
 .status h2 {
-  margin-block-start: 0;
+  margin-block: 0 var(--space-md);
   font-family: var(--font-sans);
   font-size: var(--text-h6);
   letter-spacing: 0;
@@ -999,6 +1021,11 @@ ul.spaced li {
 
 .status p:last-child {
   margin-block-end: 0;
+}
+
+.status a {
+  color: inherit;
+  text-decoration-thickness: 1px;
 }
 
 /* ================================================== /components ========= */
@@ -1831,49 +1858,6 @@ ul.spaced li {
   color: var(--muted-foreground);
 }
 
-/* --------------------------------------------------------------- hero --- */
-/*
- * The homepage's only two-column section. Everything else on the page reads
- * top to bottom in the `main` column; this one earns the width because the
- * right-hand side is not prose — it is a working instance of `mz contract`,
- * and a reading column would crush it into a single file of narrow lines.
- */
-
-.hero-split {
-  display: grid;
-  gap: var(--space-2xl);
-  grid-template-columns: 1fr;
-  align-items: start;
-  margin-block: var(--space-xl) var(--space-2xl);
-}
-
-@media (min-width: 860px) {
-  .hero-split {
-    grid-template-columns: 1fr 1.05fr;
-  }
-}
-
-.stamp {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-block-start: var(--space-lg);
-  padding: var(--space-xs) var(--space-base);
-  border-radius: 999px;
-  background: var(--color-gold-container, var(--surface-container));
-  color: var(--color-gold, var(--muted-foreground));
-  font-size: var(--text-caption);
-  font-weight: var(--weight-h6);
-}
-
-.stamp i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  display: block;
-}
-
 /* --------------------------------------------------------- contract bench --- */
 /*
  * A live instance of the compiler's own contract check, against the real
@@ -1903,7 +1887,7 @@ ul.spaced li {
   border-block-end: 1px solid var(--border);
 }
 
-.bench-head h3 {
+.bench-head h2 {
   margin: 0;
   font-family: var(--font-mono);
   font-size: var(--text-body-small);
@@ -1931,7 +1915,8 @@ ul.spaced li {
   white-space: pre;
 }
 
-.bench-src .ln b {
+.bench-src .ln b,
+.bench-size > b {
   font-weight: 400;
   color: var(--muted-foreground);
   opacity: 0.55;
@@ -1940,8 +1925,10 @@ ul.spaced li {
   user-select: none;
 }
 
+/* Copper on the card is 4.44:1 in light; 15% of the ink takes it past AA
+ * (and lightens it further in dark), still a token expression. */
 .bench-src .kw {
-  color: var(--color-copper);
+  color: color-mix(in oklab, var(--color-copper) 85%, var(--foreground));
 }
 .bench-src .ty {
   color: var(--color-cobalt);
@@ -2084,139 +2071,6 @@ ul.spaced li {
 .fig span {
   font-size: var(--text-caption);
   color: var(--muted-foreground);
-}
-
-/* --------------------------------------------------------------- ledger --- */
-
-.ledger {
-  display: grid;
-  gap: var(--space-md);
-  grid-template-columns: 1fr;
-  margin-block: var(--space-xl);
-}
-
-@media (min-width: 760px) {
-  .ledger {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.ledger .col {
-  border-radius: var(--spec-dialog-radius);
-  padding: var(--space-lg);
-}
-
-.ledger .col.have {
-  background: var(--color-malachite-container, var(--surface-container));
-}
-
-.ledger .col.not {
-  background: var(--surface-container);
-}
-
-.ledger .col h3 {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.ledger .col ul {
-  list-style: none;
-  padding: 0;
-  margin: var(--space-md) 0 0;
-  display: grid;
-  gap: var(--space-sm);
-}
-
-.ledger .col li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-sm);
-  align-items: baseline;
-}
-
-.ledger .col.have li::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-malachite, var(--info));
-  transform: translateY(-1px);
-}
-
-.ledger .col.not li::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 2px solid var(--muted-foreground);
-  transform: translateY(-1px);
-}
-
-.ledger .col li span {
-  color: var(--muted-foreground);
-  font-size: var(--text-body-small);
-}
-
-/* ---------------------------------------------------------------- repos --- */
-
-.repos {
-  display: grid;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--spec-dialog-radius);
-  overflow: hidden;
-  background: var(--card);
-  margin-block: var(--space-xl);
-}
-
-.repo {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-xs);
-  padding: var(--space-base) var(--space-lg);
-  border-block-end: 1px solid var(--border);
-}
-
-.repo:last-child {
-  border-block-end: 0;
-}
-
-@media (min-width: 760px) {
-  .repo {
-    grid-template-columns: 11rem 1fr auto;
-    gap: var(--space-lg);
-    align-items: baseline;
-  }
-}
-
-.repo a.repo-name {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: var(--text-body-small);
-}
-
-.repo p {
-  margin: 0;
-  color: var(--muted-foreground);
-  font-size: var(--text-body-small);
-}
-
-.repo .lang {
-  font-size: var(--text-caption);
-  display: flex;
-  gap: var(--space-xs);
-  align-items: center;
-  color: var(--muted-foreground);
-  white-space: nowrap;
-}
-
-.repo .lang i {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: block;
 }
 
 /* ============================================ /components/<name> ========= */
@@ -2408,4 +2262,151 @@ ul.spaced li {
   padding-inline-start: var(--space-base);
   border-inline-start: var(--space-xs) solid var(--border);
   color: var(--muted-foreground);
+}
+/* `@bundu/ui`'s Tooltip renders statically with its bubble `hidden`; with no
+ * hydration, hover and keyboard focus reveal it. The control it labels keeps
+ * its own aria-label, so the bubble is visual only. */
+[data-slot="tooltip"]:is(:hover, :focus-within) > [role="tooltip"][hidden] {
+  /* !important: Tailwind's preflight hides [hidden] with !important. */
+  display: block !important;
+}
+
+/* ------------------------------------------------------ landing page --- */
+/*
+ * The landing page is `@bundu/ui` bands: a split Hero with the bench as its
+ * media, then Sections. These are the few layout pieces the package does not
+ * carry: card grids and a row of links under a section.
+ */
+
+.grid-2,
+.grid-3,
+.card-list {
+  display: grid;
+  gap: var(--space-base);
+  grid-template-columns: 1fr;
+  margin-block: var(--space-xl) 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 760px) {
+  .grid-2,
+  .card-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .card-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Inside a tab panel the list sits right under the tabs. */
+[data-slot="tabs-content"] > .card-list {
+  margin-block-start: 0;
+}
+
+.card-list li {
+  min-width: 0;
+}
+
+.card-list p,
+.ledger-card span {
+  margin: var(--space-xs) 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body-small);
+}
+
+.card-title {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-body-small);
+}
+
+.lead-repo {
+  border-color: var(--primary);
+}
+
+.lang {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-block-start: var(--space-sm);
+  font-size: var(--text-caption);
+  color: var(--muted-foreground);
+}
+
+.lang i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+}
+
+.ledger-card h3 {
+  margin: 0;
+}
+
+.ledger-card ul {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-md) 0 0;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.ledger-card li {
+  display: grid;
+  gap: var(--space-xxs);
+  min-width: 0;
+}
+
+.ledger-card li span {
+  margin: 0;
+}
+
+.section-links {
+  margin-block: var(--space-xl) 0;
+  font-weight: 500;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-block-start: var(--space-xl);
+}
+
+.roots-install {
+  max-width: 68ch;
+}
+
+/* The bench as the hero's media: it keeps its own card surface, and holds
+ * the page width on a phone by scrolling its source inside itself. */
+[data-slot="hero-media"] .bench {
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent),
+    0 12px 32px -12px color-mix(in oklab, var(--foreground) 22%, transparent);
+}
+
+
+}
+
+/* Unlayered on purpose, and the only rule that is: `SocialIcon` sets its own
+ * size and colour with utilities, which beat every layer. Inside the header's
+ * primary pill it has to match the pill's other icon buttons. */
+.icon-group [data-social-platform] {
+  inline-size: var(--touch-target-sm);
+  block-size: var(--touch-target-sm);
+  color: var(--primary-foreground);
+}
+
+.icon-group [data-social-platform]:hover {
+  background: color-mix(in oklab, var(--primary-foreground) 20%, transparent);
+  color: var(--primary-foreground);
 }

@@ -2,19 +2,25 @@
 /**
  * The site shell.
  *
- * Static HTML, one stylesheet, and a generated token block. No island, no
- * framework — the doctrine that governs this ecosystem is Astro in front, Rust
- * first and TypeScript second underneath, and no third UI framework
- * (`mzizi-dev/agent-tools#82`; CHARTER.md in `mzizi-dev/mzizi`).
+ * Static HTML and one stylesheet: Tailwind v4 over `@bundu/ui` (see
+ * `src/styles/site.css`). Built from the package's components wherever one
+ * fits: `MineralStrip`, `Icon` and `SocialIcon` in the chrome, and on inner
+ * pages a `Section` band carrying the `Breadcrumb` (with its BreadcrumbList
+ * JSON-LD) and a `SectionHeader`. The React primitives render to HTML at build
+ * time. No page ships a framework to the browser: the doctrine is Astro in
+ * front, Rust first and TypeScript second underneath, and no third UI
+ * framework (`mzizi-dev/agent-tools#82`; CHARTER.md in `mzizi-dev/mzizi`).
  *
- * `DesignTokens` is emitted for EVERY page, not just the three that render
- * registry data. This site is the design system's front door, so a landing page
- * in default Astro styling next to a component gallery in the real palette
- * would be the contradiction the whole site exists to disprove. The cost is
- * that every page's build reads the brand API — which the data pages already
- * required, so the failure mode is unchanged.
+ * The landing page passes `bare` and composes its own `Hero` and sections.
  */
-import DesignTokens from "../components/DesignTokens.astro";
+import MineralStrip from "@bundu/ui/MineralStrip.astro";
+import Icon from "@bundu/ui/Icon.astro";
+import SocialIcon from "@bundu/ui/SocialIcon.astro";
+import Section from "@bundu/ui/Section.astro";
+import SectionHeader from "@bundu/ui/SectionHeader.astro";
+import Breadcrumb from "@bundu/ui/Breadcrumb.astro";
+import { deriveBreadcrumbs } from "@bundu/ui";
+import { Tooltip } from "@bundu/ui/ui/tooltip";
 import "../styles/site.css";
 
 interface Props {
@@ -29,9 +35,24 @@ interface Props {
    * reading column crushes them into a single file of narrow boxes.
    */
   wide?: boolean;
+  /** The landing page: no header band, the page composes its own hero. */
+  bare?: boolean;
+  /** Breadcrumb trail on inner pages (default on). Off for the 404 page. */
+  breadcrumb?: boolean;
+  /** Label for the trail's last crumb when the title is not the right one. */
+  crumb?: string;
 }
 
-const { title, description, eyebrow, lede, wide = false } = Astro.props;
+const {
+  title,
+  description,
+  eyebrow,
+  lede,
+  wide = false,
+  bare = false,
+  breadcrumb = true,
+  crumb,
+} = Astro.props;
 
 // The owner's general contact for Mzizi (2026-09-30), and the security address
 // that `/.well-known/security.txt` and SECURITY.md route reports to. The console
@@ -107,6 +128,22 @@ const minerals = [
 // forms, and so `astro preview` highlights the same link production does.
 const here = Astro.url.pathname.replace(/\.html$/, "") || "/";
 const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
+
+const crumbLabels = {
+  language: "The language",
+  cli: "CLI",
+  components: "Components",
+  playground: "Playground",
+  architecture: "Architecture",
+  tokens: "Tokens",
+  skills: "Skills",
+  observability: "Observability",
+  ecosystem: "Ecosystem",
+};
+const crumbs =
+  !bare && breadcrumb && here !== "/"
+    ? deriveBreadcrumbs(here, crumbLabels, "Mzizi", crumb ?? title)
+    : [];
 ---
 
 <!doctype html>
@@ -137,15 +174,28 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
     />
 
-    <DesignTokens />
+    <!--
+      The tab sets render every panel into the HTML and a small script
+      switches them (src/scripts/tabs.ts). With scripts off, show every panel
+      and drop the tab list, which would do nothing.
+    -->
+    <noscript>
+      <style>
+        /* !important: Tailwind's preflight hides [hidden] with !important. */
+        [data-slot="tabs-content"][hidden] {
+          display: block !important;
+        }
+        [data-slot="tabs-list"] {
+          display: none;
+        }
+      </style>
+    </noscript>
     <slot name="head" />
   </head>
   <body class={wide ? "wide" : undefined}>
     <a class="skip" href="#main">Skip to content</a>
 
-    <div class="mineral-strip" aria-hidden="true">
-      {minerals.map((name) => <span class={`m-${name}`} />)}
-    </div>
+    <MineralStrip />
 
     <header class="site-nav">
       <a class="wordmark wordmark-lg" href="/">
@@ -178,39 +228,19 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
           <span class="bar" aria-hidden="true" />
         </button>
         <div class="icon-group">
-          <button type="button" id="search-trigger" aria-label="Search (⌘K)">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.34-4.34" />
-            </svg>
-          </button>
-          <a href="https://github.com/mzizi-dev" aria-label="GitHub">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.22.66-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.07.63-1.32-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.68.92.68 1.85v2.74c0 .27.16.56.67.48A10.02 10.02 0 0 0 22 12c0-5.52-4.48-10-10-10z" />
-            </svg>
-          </a>
-          <a href="https://api.mzizi.dev/v1/ui" aria-label="Registry API">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <polyline points="16 18 22 12 16 6" />
-              <polyline points="8 6 2 12 8 18" />
-            </svg>
-          </a>
+          <Tooltip content="Search (⌘K)" side="bottom">
+            <button type="button" id="search-trigger" aria-label="Search (⌘K)">
+              <Icon name="search" />
+            </button>
+          </Tooltip>
+          <Tooltip content="github.com/mzizi-dev" side="bottom">
+            <SocialIcon url="https://github.com/mzizi-dev" label="GitHub" size={20} />
+          </Tooltip>
+          <Tooltip content="Registry API" side="bottom">
+            <a href="https://api.mzizi.dev/v1/ui" aria-label="Registry API">
+              <Icon name="code" />
+            </a>
+          </Tooltip>
         </div>
       </div>
     </header>
@@ -225,19 +255,7 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
       hidden
     >
       <div class="search-box">
-        <svg
-          class="search-box-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.34-4.34" />
-        </svg>
+        <Icon name="search" class="search-box-icon" />
         <input
           id="search-input"
           type="search"
@@ -297,10 +315,32 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
     </div>
 
     <main id="main">
-      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
-      <h1>{title}</h1>
-      {lede && <p class="lede">{lede}</p>}
-      <slot />
+      {
+        bare ? (
+          <slot />
+        ) : (
+          <>
+            <Section space="tight" border container={false} class="page-head">
+              <div class="frame">
+                {crumbs.length > 1 && (
+                  <Breadcrumb items={crumbs} origin={canonical.origin} class="mb-6" />
+                )}
+                <SectionHeader
+                  as="h1"
+                  size="h1"
+                  eyebrow={eyebrow}
+                  title={title}
+                  description={lede}
+                  max="max-w-3xl"
+                />
+              </div>
+            </Section>
+            <div class="frame flow page-body">
+              <slot />
+            </div>
+          </>
+        )
+      }
     </main>
 
     <footer>
@@ -344,12 +384,19 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
         </div>
         <div class="footer-bottom">
           <span>© {new Date().getFullYear()} Bundu Foundation</span>
-          <div class="mineral-dots" aria-hidden="true">
-            {minerals.map((name) => <span class={`m-${name}`} />)}
+          <div class="footer-social">
+            <SocialIcon url="https://github.com/mzizi-dev" label="Mzizi on GitHub" />
+            <div class="mineral-dots" aria-hidden="true">
+              {minerals.map((name) => <span class={`m-${name}`} />)}
+            </div>
           </div>
         </div>
       </div>
     </footer>
+
+    <script>
+      import "../scripts/tabs.ts";
+    </script>
 
     <script>
       // The header is intentionally not the full nav (see the comment above
