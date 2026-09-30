@@ -33,6 +33,12 @@ interface Props {
 
 const { title, description, eyebrow, lede, wide = false } = Astro.props;
 
+// The owner's general contact for Mzizi (2026-09-30), and the security address
+// that `/.well-known/security.txt` and SECURITY.md route reports to. The console
+// at app.mzizi.dev takes its own security reports; that routing lives there.
+const CONTACT_EMAIL = "support@bundu.org";
+const SECURITY_EMAIL = "security@bundu.org";
+
 // "Mzizi · Mzizi" in a browser tab is a stutter that reads as a bug, so the
 // landing page gets a real document title instead of its own name twice.
 const documentTitle =
@@ -310,6 +316,12 @@ const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
               which owns the framework, its components and its logic outright,
               and operates the design system and registry day-to-day.
               Everything public is Apache-2.0.
+            </p>
+            <p class="footer-contact">
+              Contact:{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Security
+              reports:{" "}
+              <a href={`mailto:${SECURITY_EMAIL}`}>{SECURITY_EMAIL}</a>.
             </p>
             <div class="mineral-dots" aria-hidden="true">
               {minerals.map((name) => <span class={`m-${name}`} />)}

@@ -306,7 +306,7 @@ for page in ("cli", "skills", "playground", "observability"):
 # that still says one of them is wrong, however well it renders.
 print("\nstale claims")
 stale = {
-    "invalid_token": "the MCP server answers without a token (mzizi-mcp 0.10.1)",
+    "invalid_token": "the MCP server answers without a token (since mzizi-mcp 0.10.1)",
     "until it deploys": "the no-sign-in MCP change has deployed",
     "written but not published": "mzizi add ships in @nyuchi/mzizi-cli 0.6.0",
     "mzizi-registry.nyuchi.workers.dev/components": "component pages are served here",
@@ -333,12 +333,13 @@ stale_patterns = {
     r"mzizi-cli/dist/cli\.js": "npx mzizi works from 0.6.1; no by-path workaround",
     r"still says routes read from Supabase": "/openapi no longer says that (checked 2026-09-29)",
     r"io\.github\.nyuchi/mzizi-mcp": "the MCP Registry entry is io.github.mzizi-dev/mzizi-mcp",
-    # One crate for every Rust component. The gateway pin 9b86e03 serves each
-    # document's own crate (mzizi-ui for primitives, mzizi-brand for brand).
+    # One crate for every Rust component. From registry 9b86e03 on, the gateway
+    # serves each document's own crate (mzizi-ui for primitives, mzizi-brand for
+    # brand). The pin moves by itself now, so none is named here as current.
     r"The document names the crate mzizi-ui|The crate it names, mzizi-ui|module of the mzizi-ui crate|records the mzizi-ui crate":
-        "/v1/rs/<name> names each component's own crate (gateway pin 9b86e03)",
+        "/v1/rs/<name> names each component's own crate (since registry 9b86e03)",
     r"did not yet serve the twelve brand components|named mzizi-ui for every component":
-        "api.mzizi.dev serves the brand components at registry 9b86e03",
+        "api.mzizi.dev serves the brand components (since registry 9b86e03)",
 }
 
 
@@ -357,6 +358,34 @@ readable = {str(p.relative_to(DIST)): reader_text(p) for p in built}
 for pattern, why in stale_patterns.items():
     hits = [name for name, text in readable.items() if re.search(pattern, text, re.I)]
     check("dist/", f"nothing matches /{pattern}/ — {why}", not hits, ", ".join(hits[:5]))
+
+# --- contact ----------------------------------------------------------------
+# The owner's general contact for Mzizi (2026-09-30) is support@bundu.org, and
+# security reports go to security@bundu.org. The footer carries both on every
+# page; /ecosystem, llms.txt and the MCP card carry the general one. No other
+# address may appear: the console's security@nyuchi.com is named in
+# security.txt's comment and the repository docs, never on a page, and a
+# personal or retired address (conduct@, a person's own) must not come back.
+print("\ncontact")
+CONTACT, SECURITY = "support@bundu.org", "security@bundu.org"
+html_pages = [p for p in built if p.suffix == ".html"]
+no_footer = [str(p.relative_to(DIST)) for p in html_pages
+             if f'href="mailto:{CONTACT}"' not in p.read_text(encoding="utf-8")
+             or f'href="mailto:{SECURITY}"' not in p.read_text(encoding="utf-8")]
+check("footer", f"every page links {CONTACT} and {SECURITY}", not no_footer,
+      f"{len(no_footer)} without: {', '.join(no_footer[:5])}")
+for name in ("ecosystem.html", "llms.txt", ".well-known/mcp.json"):
+    check(name, f"names {CONTACT}", CONTACT in (DIST / name).read_text(encoding="utf-8"))
+address = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+allowed = {CONTACT, SECURITY}
+# Only what this repository writes. Component and skill pages render registry
+# source, whose demo data (you@example.com, a sample sign-in) is not a contact
+# point; their footers are covered by the check above.
+surfaces = [p for p in built if p.relative_to(DIST).parts[0] not in ("components", "skills")]
+strays = sorted({f"{p.relative_to(DIST)}: {m}" for p in surfaces
+                 for m in address.findall(reader_text(p))
+                 if m not in allowed and not (p.name == "security.txt" and m == "security@nyuchi.com")})
+check("dist/", f"no contact address but {CONTACT} and {SECURITY}", not strays, ", ".join(strays[:5]))
 
 # --- result ---------------------------------------------------------------
 if notes:

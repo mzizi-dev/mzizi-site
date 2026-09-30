@@ -732,6 +732,11 @@ footer {
   margin-block: var(--space-base) var(--space-base);
 }
 
+/* An address is one long token; let it wrap rather than push the column wide. */
+.footer-contact a {
+  overflow-wrap: anywhere;
+}
+
 .footer-heading {
   display: block;
   margin-block-end: var(--space-base);

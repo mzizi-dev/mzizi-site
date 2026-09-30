@@ -293,8 +293,8 @@ operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
 MCP server and the CLI are free with no gate: auth is required only for the Fundi
 tools (anything that files into the Fundi issue desk or needs a console user), and
-the card says so. That change is live (`mzizi-mcp` 0.10.1, listed in the MCP
-Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-09-29):
+the card says so. That change is live (`mzizi-mcp` 0.11.0, listed in the MCP
+Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-09-30):
 `initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
 `mzizi_report_issue` ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
@@ -362,6 +362,14 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
   failure this whole approach exists to avoid.
 - **Any link to a private repository.** One exists in this org and operates the
   MCP server. The endpoint is public and is named; the source is not.
+
+## Contact
+
+For anything about Mzizi (the language, the components, this site or the docs),
+write to `support@bundu.org`. The site gives the same address in its footer, on
+`/ecosystem`, in `/llms.txt` and in `/.well-known/mcp.json`, and
+`scripts/verify-rendered.py` fails the build if one of them loses it. Bugs and
+proposals for this site are welcome as issues here.
 
 ## Security
 
