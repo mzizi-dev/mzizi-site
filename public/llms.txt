@@ -66,7 +66,7 @@ been measured against them. Describe all of this as direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.11.0 serves
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.11.1 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
 act as your console user and need sign-in. The MCP server is Rust first: where a
 component has a Mzizi Roots implementation, `mzizi_get_component` returns it under
@@ -77,13 +77,12 @@ and its rows and `mzizi_search`'s hits carry `rustCrate`.
 
 Versions on 2026-09-30 (read the registries before repeating one):
 
-- `mzizi-mcp` **0.11.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
-  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.11.0)
+- `mzizi-mcp` **0.11.1** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
+  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.11.1)
 - `@nyuchi/mzizi-skills` **0.8.1** on npm: five skills, `mzizi-language`,
   `mzizi-roots`, `mzizi-design`, `mzizi-backend` and `discoverability`.
-  `api.mzizi.dev/v1/skills` serves the 0.8.0 bundle (the same five) until the
-  gateway's pin reaches a registry commit that carries 0.8.1; its `meta.version`
-  says which bundle it is serving
+  `api.mzizi.dev/v1/skills` and `mcp.mzizi.dev` serve the same 0.8.1 bundle;
+  `meta.version` says which bundle is served
 - `@nyuchi/mzizi-cli` **0.6.3**, which ships the installer: `mzizi add <name>`
   for React (writes the TSX) or Rust (records the crate the component's
   `/v1/rs/<name>` document names), plus the `fundi` agent. `npx mzizi` works.

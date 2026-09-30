@@ -21,6 +21,38 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the site is rebuilt on `@bundu/ui` 0.2.0, with a hero (#31)
+
+- **The landing page opens on a hero.** The headline is "A language designed
+  for machines to write." It carries a "Phase 0 · research prototype" badge,
+  two calls to action (try the contract bench, read the charter), and the live
+  contract bench beside it. The status panel follows directly, word for word.
+  The long text below it is now short sections with cards and tabs; no content
+  was removed.
+- **Every page is built from `@bundu/ui` 0.2.0.** Each page has a header band
+  with a breadcrumb (and BreadcrumbList structured data), and the site's own
+  badges, panels, status blocks and rules are now the package's `Badge`,
+  `Card`, `Alert` and `Separator`. They render to static HTML: no framework
+  JavaScript ships to the browser.
+- **Mzizi's colour is now hematite**, the owner's brand decision (2026-09-30),
+  replacing the copper the site wore before. Styling is Tailwind v4 over
+  `@bundu/ui`, and dark mode still follows the operating system.
+- `llms.txt`: `@nyuchi/mzizi-skills` 0.8.1 (five skills), now served by
+  `/v1/skills` and the MCP alike; `mzizi-mcp` 0.11.1 (also on `/ecosystem`);
+  `@nyuchi/mzizi-cli` 0.6.3.
+
+### Fixed
+
+- The landing page no longer scrolls sideways on a 375px-wide phone.
+- "Mzizi" is Swahili for root, as the docs and the registry say; `/ecosystem`
+  and `llms.txt` said Shona.
+- The contract bench's keywords meet WCAG AA contrast in light mode.
+
+### Removed
+
+- `src/components/DesignTokens.astro`, the site's generated copy of the palette,
+  which `@bundu/ui` 0.2.0 now carries.
+
 ### Added
 
 - `CHANGELOG.md`, backfilled from every merged pull request since the site
