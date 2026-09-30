@@ -64,11 +64,12 @@ const SECURITY_EMAIL = "security@bundu.org";
 // landing page gets a real document title instead of its own name twice.
 const documentTitle =
   title === "Mzizi"
-    ? "Mzizi — a language for the agentic web, in Rust"
+    ? "Mzizi — a general-purpose programming language, built to make Rust better"
     : `${title} · Mzizi`;
 
-// A reading order, not an alphabet: the language and its toolchain first, then
-// the components that support it, then the wider estate.
+// A reading order, not an alphabet: the language first, then the toolchain and
+// the components built to support it, then the wider estate. The toolchain and
+// the components are not the language (owner, 2026-09-30).
 const nav = [
   { href: "/", label: "Overview" },
   { href: "/language", label: "The language" },
@@ -352,9 +353,9 @@ const crumbs =
               Mzizi
             </a>
             <p>
-              <strong>Mzizi</strong> is an independent research project,
-              which owns the framework, its components and its logic outright,
-              and operates the design system and registry day-to-day.
+              <strong>Mzizi</strong> is a programming language and an independent
+              research project. It owns the language, its toolchain and its
+              components outright, and operates the registry day-to-day.
               Everything public is Apache-2.0.
             </p>
             <p class="footer-contact">

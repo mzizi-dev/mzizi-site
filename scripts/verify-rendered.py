@@ -283,6 +283,36 @@ check("index.html", "the status panel is the block directly after the Hero",
       after_hero.group(1) if after_hero else "no section after the hero")
 for claim in (r"\bfaster\b", r"\bbetter than\b", r"\boutperform"):
     check("index.html", f"the landing page makes no /{claim}/ claim", re.search(claim, plain, re.I) is None)
+# Positioning (owner, 2026-09-30): Mzizi is a programming language whose goal
+# is to be used instead of TypeScript, Python and C++, with Rust as its
+# platform. The page says so as a goal, and puts the benchmark's question, per
+# task family, straight after the status panel: never a results table.
+check("index.html", "the landing page states the goal against TypeScript, Python and C++",
+      "instead of TypeScript, Python or C++" in plain)
+check("index.html", "the hero carries the owner's tagline, as a goal: built to make Rust better, the way TypeScript makes JavaScript better",
+      "Built to make Rust better, the way TypeScript makes JavaScript better" in plain
+      and "That is the goal Phase 0 measures" in plain)
+check("index.html", "the benchmark's question is rendered, and says nothing is measured",
+      "What Mzizi is measured against" in plain and "nothing below has been measured yet" in plain)
+for fam in ("ui-spec", "backend", "ui-port"):
+    check("index.html", f"the benchmark section names the {fam} family", fam in plain)
+for arm in ("TypeScript · React", "TypeScript · Hono", "Python · FastAPI", "Go · net/http",
+            "C++20 · cpp-httplib", "Rust · axum", "Rust · Dioxus 0.7.10", "Rust · Leptos 0.8.21"):
+    check("index.html", f"the benchmark section lists the {arm} arm", arm in plain)
+after_status = re.search(r'id="status".*?</section>\s*<section\b[^>]*\bid="([^"]+)"', raw_index, re.S)
+check("index.html", "the benchmark's question is the block directly after the status panel",
+      after_status is not None and after_status.group(1) == "benchmark",
+      after_status.group(1) if after_status else "no section after the status panel")
+llms = (DIST / "llms.txt").read_text(encoding="utf-8")
+check("llms.txt", "says Mzizi is a programming language, and what its goal is",
+      "general-purpose programming language" in llms and "instead of TypeScript, Python and C++" in llms)
+check("llms.txt", "says which things are toolchain and components, not the language",
+      "**The toolchain, which implements and supports the language:**" in llms
+      and "**The components, which support the language:**" in llms)
+# The harness is the core of Mzizi by design (owner, 2026-09-30), and not
+# built yet: llms.txt says both, and never confuses it with benchmarks/harness/.
+check("llms.txt", "says the harness is the core of the language, and not built yet",
+      "**The harness is the core of Mzizi**" in llms and "The harness as a whole is not built" in llms)
 body = text_without_scripts("language.html", quiet=True)
 for rfc in ("RFC-0009-comparison-benchmark.md", "RFC-0010-contracts-everywhere.md"):
     check("language.html", f"links {rfc} in mzizi-dev/mzizi design/",
@@ -374,6 +404,18 @@ stale_patterns = {
         "/v1/rs/<name> names each component's own crate (since registry 9b86e03)",
     r"did not yet serve the twelve brand components|named mzizi-ui for every component":
         "api.mzizi.dev serves the brand components (since registry 9b86e03)",
+    # Positioning (owner, 2026-09-30). The toolchain and the components support
+    # the language; neither is the language, and nothing lowers yet.
+    r"\bthe compiler is the language\b":
+        "the mz compiler is the toolchain that implements the language",
+    r"corpus the language is scored against":
+        "the components are built to support the language; supplying benchmark tasks is one job",
+    r"\b(general-purpose|Rust) framework for the agentic|a language for the agentic web, in Rust":
+        "Mzizi is a programming language, with Rust as its platform",
+    r"\bMzizi (lowers|compiles) to Rust\b":
+        "Mzizi is designed to lower to Rust; nothing lowers yet (mzizi-dev/mzizi AGENTS.md)",
+    r"\bPhase 0\b[^.]{0,40}\bProve the core claim, no rendering attached":
+        "Phase 0's one goal is building Mzizi as a programming language, measured against the best existing language for each kind of task (RFC-0009)",
 }
 
 

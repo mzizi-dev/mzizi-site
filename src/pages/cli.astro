@@ -3,7 +3,8 @@
  * /cli — Mzizi on the command line, as it actually is today.
  *
  * Three things, in the order that matters to the language:
- *   1. `mz`, the language's compiler. Built from a checkout; no release.
+ *   1. `mz`, the compiler that implements the language. It is toolchain,
+ *      not the language itself. Built from a checkout; no release.
  *   2. Installing components. React through `npx shadcn add`; Rust read from
  *      `/v1/rs`; `mzizi add` (both targets) in `@nyuchi/mzizi-cli` 0.6.0+.
  *   3. `fundi`, the agent CLI in the same package.
@@ -76,10 +77,10 @@ const mzCommands = [
 <Site
   title="CLI"
   eyebrow="Toolchain"
-  description="Mzizi on the command line: the mz compiler, installing components (React with shadcn, Rust from /v1/rs), and the agent CLI. Free, with no gate."
-  lede="Free, with no gate. The compiler first, because the language is the point; then installing components; then the agent CLI."
+  description="The Mzizi toolchain on the command line: the mz compiler that implements the language, installing components (React with shadcn, Rust from /v1/rs), and the agent CLI. Free, with no gate."
+  lede="The toolchain that supports the language, free with no gate. The compiler first, because it implements the language and the language is the point; then installing components; then the agent CLI."
 >
-  <h2 id="mz">mz, the language's compiler</h2>
+  <h2 id="mz">mz, the compiler that implements the language</h2>
   <div class="prose">
     <p>
       <code>mz</code> is the binary in{" "}
