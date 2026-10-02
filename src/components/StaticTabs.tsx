@@ -28,7 +28,12 @@ export interface StaticTabsProps {
   [panel: string]: unknown;
 }
 
-export default function StaticTabs({ id, label, tabs, ...panels }: StaticTabsProps) {
+export default function StaticTabs({
+  id,
+  label,
+  tabs,
+  ...panels
+}: StaticTabsProps) {
   return (
     <Tabs id={id} defaultValue={tabs[0]?.value} className="static-tabs">
       <TabsList aria-label={label} className="mt-8 max-w-full flex-wrap">
@@ -39,7 +44,12 @@ export default function StaticTabs({ id, label, tabs, ...panels }: StaticTabsPro
         ))}
       </TabsList>
       {tabs.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value} forceMount className="mt-6">
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          forceMount
+          className="mt-6"
+        >
           {panels[tab.value] as React.ReactNode}
         </TabsContent>
       ))}
