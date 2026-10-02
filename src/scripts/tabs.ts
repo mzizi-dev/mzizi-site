@@ -10,8 +10,12 @@
 const SELECTED = ["bg-background", "text-foreground", "shadow-sm"];
 const UNSELECTED = ["text-muted-foreground", "hover:text-foreground"];
 
-for (const root of document.querySelectorAll<HTMLElement>('[data-slot="tabs"]')) {
-  const triggers = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+for (const root of document.querySelectorAll<HTMLElement>(
+  '[data-slot="tabs"]',
+)) {
+  const triggers = Array.from(
+    root.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+  );
   const select = (next: HTMLButtonElement, focus: boolean) => {
     for (const trigger of triggers) {
       const on = trigger === next;
@@ -20,7 +24,9 @@ for (const root of document.querySelectorAll<HTMLElement>('[data-slot="tabs"]'))
       trigger.dataset.state = on ? "active" : "inactive";
       trigger.classList.remove(...(on ? UNSELECTED : SELECTED));
       trigger.classList.add(...(on ? SELECTED : UNSELECTED));
-      const panel = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+      const panel = document.getElementById(
+        trigger.getAttribute("aria-controls") ?? "",
+      );
       if (panel) {
         panel.hidden = !on;
         panel.dataset.state = on ? "active" : "inactive";
