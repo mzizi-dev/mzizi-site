@@ -20,14 +20,13 @@ In scope:
 
 ## Where to report
 
-| What                                             | Where                                                                   |
-| ------------------------------------------------ | ----------------------------------------------------------------------- |
-| This site, and anything else Mzizi operates      | `security@bundu.org`, or a private advisory on the repository concerned |
-| The console at `app.mzizi.dev` (`mzizi-console`) | `security@nyuchi.com`                                                   |
+| What                                                                        | Where                                                                    |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| This site, the console at `app.mzizi.dev`, and anything else Mzizi operates | `security@nyuchi.com`, or a private advisory on the repository concerned |
 
 For this repository, open a private advisory at
 <https://github.com/mzizi-dev/mzizi-site/security/advisories/new>, or email
-`security@bundu.org`. Do not open a public issue for a vulnerability until it is fixed.
+`security@nyuchi.com`. Do not open a public issue for a vulnerability until it is fixed.
 
 Anything that is not a vulnerability (questions, bugs, proposals) goes to
 `support@bundu.org`, or to an issue on the repository concerned.
