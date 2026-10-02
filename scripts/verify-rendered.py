@@ -365,7 +365,7 @@ check("dist/", "no page hydrates an island or loads the React client", not islan
 print("\n.well-known")
 security = (DIST / ".well-known" / "security.txt").read_text(encoding="utf-8")
 check(".well-known/security.txt", "has a Contact line",
-      re.search(r"^Contact: mailto:security@bundu\.org$", security, re.M) is not None)
+      re.search(r"^Contact: mailto:security@nyuchi\.com$", security, re.M) is not None)
 expires = re.search(r"^Expires: (\d{4}-\d\d-\d\dT[\d:]+Z)$", security, re.M)
 check(".well-known/security.txt", "has an ISO 8601 Expires line", expires is not None)
 if expires:
@@ -494,13 +494,12 @@ for pattern, why in language_state_patterns.items():
 
 # --- contact ----------------------------------------------------------------
 # The owner's general contact for Mzizi (2026-09-30) is support@bundu.org, and
-# security reports go to security@bundu.org. The footer carries both on every
-# page; /ecosystem, llms.txt and the MCP card carry the general one. No other
-# address may appear: the console's security@nyuchi.com is named in
-# security.txt's comment and the repository docs, never on a page, and a
-# personal or retired address (conduct@, a person's own) must not come back.
+# security reports go to security@nyuchi.com (owner, 2026-10-03). The footer
+# carries both on every page; /ecosystem, llms.txt and the MCP card carry the
+# general one. No other address may appear: a personal or retired address
+# (conduct@, security@bundu.org, a person's own) must not come back.
 print("\ncontact")
-CONTACT, SECURITY = "support@bundu.org", "security@bundu.org"
+CONTACT, SECURITY = "support@bundu.org", "security@nyuchi.com"
 html_pages = [p for p in built if p.suffix == ".html"]
 no_footer = [str(p.relative_to(DIST)) for p in html_pages
              if f'href="mailto:{CONTACT}"' not in p.read_text(encoding="utf-8")

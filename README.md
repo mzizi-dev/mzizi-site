@@ -384,8 +384,8 @@ proposals for this site are welcome as issues here.
 
 ## Security
 
-See [`SECURITY.md`](./SECURITY.md). Reports about this site go to
-`security@bundu.org`; the console at `app.mzizi.dev` uses `security@nyuchi.com`.
+See [`SECURITY.md`](./SECURITY.md). Reports about this site, and about the
+console at `app.mzizi.dev`, go to `security@nyuchi.com`.
 `/.well-known/security.txt` carries the same routing for machines.
 
 ## Licence
