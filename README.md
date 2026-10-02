@@ -43,9 +43,11 @@ in `public/`. `mzizi.dev` is served by this Worker.
 ### What that cost, and what has been rebuilt since
 
 The registry's human-facing portal did not move anywhere when the apex changed
-hands, and most of it still has no live address. Three of its highest-value
-pages are the exception — `mzizi-site#5` rebuilt them here, on this site, on
-`@bundu/ui`:
+hands. Its pages have since been rebuilt here, on this site, on `@bundu/ui`
+(`mzizi-site#5` first), all but `/brand` and `/r/`. The registry's Next.js app
+that served the portal was removed on 2026-10-02 (`mzizi-registry#389` and
+`#391`), so the "Was" column below is history: none of these pages has an
+address anywhere else.
 
 | Path on `mzizi.dev`                                       | Today                        | Was                                            |
 | --------------------------------------------------------- | ---------------------------- | ---------------------------------------------- |
@@ -125,11 +127,13 @@ reconstruct it:
 
 1. **Decide, retroactively, what the apex serves.** It is currently a
    several-page site by accident rather than by decision. Either that is
-   ratified, or the registry portal comes back in full.
-2. **Finish giving the registry portal an address.** Everything but
-   `/brand` and `/r/` lives here now: `/components`, `/architecture` and
-   `/tokens` (`mzizi-site#5`), then `/components/<name>`, `/skills`, `/cli`,
-   `/playground` and `/observability`.
+   ratified, or something else replaces it. The registry portal cannot come
+   back as it was: the registry's app was removed on 2026-10-02.
+2. **Decide on `/brand` and `/r/`.** They are the only portal pages not rebuilt
+   here: `/components`, `/architecture` and `/tokens` (`mzizi-site#5`), then
+   `/components/<name>`, `/skills`, `/cli`, `/playground` and `/observability`
+   are. Their old home, the registry's app, is gone, so they come back here or
+   not at all.
 3. **Fix the hardcoded apex URLs in `mzizi-registry`'s API responses**
    (`registryDependencies`, `homepage`, `docs` — found by `mzizi-site#3`)
    before anyone relies on `npx shadcn add` following a transitive dependency.

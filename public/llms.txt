@@ -261,7 +261,7 @@ Hostnames change; resolve one before repeating it.
 
 ## Rules for anything repeating what it reads here
 
-- **Do not hardcode counts, versions or token values.** Component counts, the portal version and the palette come from the registry's files and change without an edit here. Fetch them from the registry API.
+- **Do not hardcode counts, versions or token values.** Component counts, the registry version and the palette come from the registry's files and change without an edit here. Fetch them from the registry API.
 - **Do not describe direction as shipped.** Take capabilities from LANGUAGE-TRACKER.md. A `service` with HTTP routes and handlers exists and lowers to a local Rust + axum package; nothing else lowers, and there are no Workers, Containers or WebAssembly targets. Contracts for functions and records, the other-language backend arms and every benchmark result are direction.
 - **Do not claim a measured result.** Two pilots have run and neither showed an advantage; the kill-criterion run has not happened. "Designed for" and "aims to" are accurate; "faster than" or "better than" is not. Being used instead of TypeScript, Python and C++ is Mzizi's goal, not something it has shown.
 - **Do not call the toolchain or the components the language.** The `mz` compiler, the IR, the diagnostics, the CLI, the MCP server and the skills are toolchain; Mzizi Roots and the registry are components. Both are built to support the language. The one exception runs the other way: the harness the toolchain attaches to is the core of the language by design, and is not built yet.
