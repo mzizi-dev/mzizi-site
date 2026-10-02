@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — lint runs once, from the org-required workflow (2026-10-03)
+
+- **Removed `.github/workflows/lint.yml`.** The `mzizi-dev` org ruleset now runs the shared lint on every pull request through `mzizi-dev/.github`'s `org-lint.yml`, publishing the same five `lint / …` checks, so the repo's own caller only ran lint a second time.
+
 ### Changed — agent skills 0.8.5
 
 - **`llms.txt`** names `@nyuchi/mzizi-skills` **0.8.5** (was 0.8.4), which npm, `mcp.mzizi.dev` and `api.mzizi.dev/v1/skills` now all serve.
