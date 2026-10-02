@@ -257,7 +257,7 @@ Hostnames change; resolve one before repeating it.
 ## Contact
 
 - General contact for Mzizi (the language, the components, this site, the docs): [support@bundu.org](mailto:support@bundu.org)
-- Security reports: [security@bundu.org](mailto:security@bundu.org), or a private advisory on the repository concerned ([/.well-known/security.txt](/.well-known/security.txt)). The console at `app.mzizi.dev` routes its own.
+- Security reports: [security@nyuchi.com](mailto:security@nyuchi.com), or a private advisory on the repository concerned ([/.well-known/security.txt](/.well-known/security.txt)). The console at `app.mzizi.dev` uses the same address.
 
 ## Rules for anything repeating what it reads here
 

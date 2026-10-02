@@ -70,10 +70,10 @@ the tracker, the charter's version and `benchmarks/arms/`, and fails when that s
 charter version or an arm's state no longer matches upstream.
 
 It also holds the contact addresses: every page's footer links `support@bundu.org` (the
-owner's general contact for Mzizi, 2026-09-30) and `security@bundu.org`; `/ecosystem`,
-`llms.txt` and `.well-known/mcp.json` name `support@bundu.org`; and no page this repo writes
-may carry any other address (the console's `security@nyuchi.com` belongs in `security.txt`'s
-comment and the repository docs only). Never put a person's own address anywhere.
+owner's general contact for Mzizi, 2026-09-30) and `security@nyuchi.com` (the one security
+contact for every repository, owner, 2026-10-03); `/ecosystem`, `llms.txt` and
+`.well-known/mcp.json` name `support@bundu.org`; and no page this repo writes may carry any
+other address. Never put a person's own address anywhere.
 
 It also fails on a word glued to an inline tag in the built HTML (`nyuchi,<code>mukoko`,
 `</code>takes`). Astro drops the line break between a source line that ends in text and

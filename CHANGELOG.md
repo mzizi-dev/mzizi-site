@@ -21,6 +21,15 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — security reports go to `security@nyuchi.com` (2026-10-03)
+
+- **Every page's footer, `/ecosystem`, `llms.txt` and `/.well-known/security.txt`'s `Contact`
+  name `security@nyuchi.com`**, in place of `security@bundu.org` (owner decision,
+  2026-10-03: one security contact for every repository, the console included).
+  `SECURITY.md`'s routing table becomes one row; private advisories on the repository
+  concerned still work. `scripts/verify-rendered.py` checks for the new address.
+  `Expires` (2027-09-29) is unchanged.
+
 ### Changed — Vite+ 1.0 checks and type checks the site (2026-10-03)
 
 - **`vite-plus` 1.0.0** (was 0.3), with a `vite.config.ts` that turns on type-aware linting and type checking and carries the org format settings. `pnpm run check` now runs `astro check` and then `vp check`. No page changes: three source files were re-indented by the formatter.

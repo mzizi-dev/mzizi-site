@@ -1,10 +1,10 @@
 # Security contact for mzizi.dev (RFC 9116).
 #
 # mzizi.dev is a static site built from github.com/mzizi-dev/mzizi-site. Reports
-# about the console at app.mzizi.dev go to security@nyuchi.com instead; see the
-# Policy link below.
+# about the console at app.mzizi.dev go to the same address; see the Policy link
+# below.
 
-Contact: mailto:security@bundu.org
+Contact: mailto:security@nyuchi.com
 Contact: https://github.com/mzizi-dev/mzizi-site/security/advisories/new
 Expires: 2027-09-29T00:00:00Z
 Preferred-Languages: en
