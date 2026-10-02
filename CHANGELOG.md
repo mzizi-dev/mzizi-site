@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — Vite+ 1.0 checks and type checks the site (2026-10-03)
+
+- **`vite-plus` 1.0.0** (was 0.3), with a `vite.config.ts` that turns on type-aware linting and type checking and carries the org format settings. `pnpm run check` now runs `astro check` and then `vp check`. No page changes: three source files were re-indented by the formatter.
+
 ### Changed — the registry has no app any more (2026-10-02)
 
 mzizi-registry removed its Next.js app on 2026-10-02 (mzizi-registry #389 and #391), so the site stops describing one.
