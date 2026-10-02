@@ -38,13 +38,23 @@ const MANIFEST_PATH = path.join(
 
 // Where the components list comes from, and where the actual rendering
 // happens. These are deliberately two different hosts: the registry API is
-// the stable data source (`src/lib/registry.ts` reads the same one), but the
-// interactive playground that renders a live instance of each component only
-// exists on the registry's own Next.js app, not on the API surface.
+// the stable data source (`src/lib/registry.ts` reads the same one), and the
+// rendering needs a `/playground/<name>` page that draws a live instance of
+// each component. The registry's own Next.js app used to be that page, on
+// mzizi-registry.nyuchi.workers.dev. mzizi-registry removed the app on
+// 2026-10-02, and its Worker is being deleted, so there is no default any
+// more: the committed screenshots stay as they are (each manifest is dated),
+// and regenerating them needs a renderer named in MZIZI_PLAYGROUND_ORIGIN.
 const API_ORIGIN = process.env.MZIZI_API_ORIGIN ?? "https://api.mzizi.dev";
-const PLAYGROUND_ORIGIN =
-  process.env.MZIZI_PLAYGROUND_ORIGIN ??
-  "https://mzizi-registry.nyuchi.workers.dev";
+const PLAYGROUND_ORIGIN = process.env.MZIZI_PLAYGROUND_ORIGIN;
+if (!PLAYGROUND_ORIGIN) {
+  console.error(
+    "generate-previews: set MZIZI_PLAYGROUND_ORIGIN to a host that serves\n" +
+      "  /playground/<name>. The registry app that used to (mzizi-registry's\n" +
+      "  Next.js app) was removed on 2026-10-02, so there is no default.",
+  );
+  process.exit(1);
+}
 
 const CHROMIUM_PATH =
   process.env.PLAYWRIGHT_CHROMIUM_PATH ?? "/opt/pw-browsers/chromium";

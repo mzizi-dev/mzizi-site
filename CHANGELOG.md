@@ -21,6 +21,16 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the registry has no app any more (2026-10-02)
+
+mzizi-registry removed its Next.js app on 2026-10-02 (mzizi-registry #389 and #391), so the site stops describing one.
+
+- **`/ecosystem`:** mzizi-registry's role is "The components: design system and registry". It was "…registry and portal"; the portal pages are this site's (`/components/<name>` and the rest).
+- **`llms.txt`:** "the portal version" is now "the registry version" in the rule about not hardcoding counts. The skills version is unchanged here.
+- **`_redirects`:** the comment on the ported portal pages says the registry app itself is gone. No redirect changes.
+- **`scripts/generate-previews.mjs`:** it no longer defaults to the registry app's `/playground/<name>` on `mzizi-registry.nyuchi.workers.dev`, which was removed and whose Worker is being deleted. It exits with a message unless `MZIZI_PLAYGROUND_ORIGIN` names a renderer. The committed screenshots are unchanged.
+- **README:** the cutover history says the portal pages are rebuilt here (all but `/brand` and `/r/`) and that their old home is gone, and the owed items no longer ask for the registry portal to come back.
+
 ### Changed — lint runs once, from the org-required workflow (2026-10-03)
 
 - **Removed `.github/workflows/lint.yml`.** The `mzizi-dev` org ruleset now runs the shared lint on every pull request through `mzizi-dev/.github`'s `org-lint.yml`, publishing the same five `lint / …` checks, so the repo's own caller only ran lint a second time.

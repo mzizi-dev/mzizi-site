@@ -29,7 +29,9 @@
 # ---------------------------------------------------------------------------
 # The registry portal's pages are all ported now (/components/<name>, /skills,
 # /skills/<name>, /cli, /playground, /observability), so their 302s to the
-# registry app are gone.
+# registry app are gone. The registry app itself is gone too: mzizi-registry
+# removed its Next.js app on 2026-10-02, so there is nothing left to send a
+# reader to.
 #
 # /playground/<name> was the registry's per-component live preview. Its content
 # (a preview and the source) is on /components/<name> here. 302, not 301: a
