@@ -21,6 +21,14 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — the published design system is linked (2026-10-04)
+
+- **`llms.txt`, `AGENTS.md` and `README.md` link the Design System artifact**
+  (<https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc>), the Mzizi design system published on
+  claude.ai. `llms.txt` lists it under "Source of truth". All three name its source, the
+  `design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418), as the copy
+  to edit. No page changes.
+
 ### Changed — nhimbe leaves the wordmark list (2026-10-04)
 
 - **`/ecosystem`, `llms.txt` and `AGENTS.md` no longer list `nhimbe` as a lowercase wordmark.**
