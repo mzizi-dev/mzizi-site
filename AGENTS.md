@@ -199,7 +199,7 @@ don't add one without reading why first.
 ## Naming
 
 The Mzizi wordmark is capitalised in prose: `Mzizi`. The other wordmarks stay lowercase:
-`nyuchi`, `mukoko`, `shamwari`, `bundu`, `nhimbe`. Package names, hostnames and code
+`nyuchi`, `mukoko`, `shamwari`, `bundu`. Package names, hostnames and code
 identifiers keep their literal spelling. This is `mzizi.dev`
 itself — the front door — not to be confused with `mzizi-registry` (the component source)
 or `mzizi-console` (`app.mzizi.dev`).

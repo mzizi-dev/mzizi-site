@@ -21,6 +21,12 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — nhimbe leaves the wordmark list (2026-10-04)
+
+- **`/ecosystem`, `llms.txt` and `AGENTS.md` no longer list `nhimbe` as a lowercase wordmark.**
+  The owner's decision of 4 October 2026 retires the brand. The events platform is Mukoko
+  Events at events.mukoko.com (mukoko-dev/nhimbe#155).
+
 ### Changed — the registry's component contracts are listed (2026-10-04)
 
 - **`/ecosystem` and `llms.txt` say what the registry holds now, including the component
