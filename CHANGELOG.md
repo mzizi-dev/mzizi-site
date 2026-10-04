@@ -21,6 +21,15 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the registry's component contracts are listed (2026-10-04)
+
+- **`/ecosystem` and `llms.txt` say what the registry holds now, including the component
+  contracts.** mzizi-registry#406 added `contracts/`: a versioned, machine-readable contract
+  for each of the Mzizi Dashboard Standard's 31 `@bundu/ui` app components. The
+  `mzizi-registry` entry on `/ecosystem` and under "Public repositories" in `llms.txt` now
+  names it beside Mzizi Roots, and `llms.txt` links the Dashboard Standard page on
+  docs.mzizi.dev.
+
 ### Changed — security reports go to `security@nyuchi.com` (2026-10-03)
 
 - **Every page's footer, `/ecosystem`, `llms.txt` and `/.well-known/security.txt`'s `Contact`
