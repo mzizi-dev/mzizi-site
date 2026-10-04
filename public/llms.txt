@@ -232,6 +232,7 @@ Hostnames change; resolve one before repeating it.
 - [RFC-0012 — the harness](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0012-harness.md): the harness, the core of the language, what the agent reads: the language as an agent reads it, the agent protocol, the plugin host, and how the skills fold in. Draft; only the agent protocol and the IR exist today
 - RFC-0005 is reserved and unwritten
 - [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, as Dioxus UI components and host-agnostic server components. Proposed
+- [Design System](https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc): the published Mzizi design system on claude.ai — voice and content fundamentals, visual foundations, the marks, and component previews. It is built file for file from the `design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418), which is the source of truth: change the folder, never the artifact page
 - [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results): both pilot write-ups and their raw episodes
 - [benchmarks/READINESS.md](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md): the audit of pilot 2's fixes, and what the kill-criterion run still waits on
 

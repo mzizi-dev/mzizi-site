@@ -201,6 +201,11 @@ name the package's tokens.
 Until 0.2.0, `src/components/DesignTokens.astro` generated the missing families and
 the ladder from `/v1/brand`. The package carries them now, so that component is gone.
 
+The Mzizi design system itself is published as the Design System artifact at
+<https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc>. Its source of truth is the
+`design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418): change the
+folder, never the artifact page.
+
 ## What is here
 
 ```text
