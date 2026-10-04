@@ -238,7 +238,7 @@ Hostnames change; resolve one before repeating it.
 ## Public repositories
 
 - [mzizi-dev/mzizi](https://github.com/mzizi-dev/mzizi): the language, and Mzizi's main goal: the charter, the RFCs and LANGUAGE-TRACKER.md, the `mz` compiler front end that implements it, nine primitives and an example service written in it, the benchmark harness and the pilot results. Rust. Public.
-- [mzizi-dev/mzizi-registry](https://github.com/mzizi-dev/mzizi-registry): the components built to support the language: the design system and component registry, including the Mzizi Roots Rust components (`mzizi-rs/`). Its files are the source of the registry API; it holds no database.
+- [mzizi-dev/mzizi-registry](https://github.com/mzizi-dev/mzizi-registry): the components built to support the language: the design system and component registry, including the Mzizi Roots Rust components (`mzizi-rs/`) and the component contracts (`contracts/`: a versioned, machine-readable contract for each of the Mzizi Dashboard Standard's 31 `@bundu/ui` app components; [docs](https://docs.mzizi.dev/patterns/dashboard-standard)). Its files are the source of the registry API; it holds no database.
 - [mzizi-dev/mzizi-api-gateway](https://github.com/mzizi-dev/mzizi-api-gateway): the registry API as a Hono Cloudflare Worker, serving [api.mzizi.dev](https://api.mzizi.dev/v1) from the registry's files bundled at a pinned commit.
 - [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome, Rust/Dioxus islands over the registry API. Live at [app.mzizi.dev](https://app.mzizi.dev), behind AuthKit sign-in.
 - [mzizi-dev/mzizi-site](https://github.com/mzizi-dev/mzizi-site): this site, serving [mzizi.dev](https://mzizi.dev).
