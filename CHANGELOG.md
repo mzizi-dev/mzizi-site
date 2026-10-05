@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — the rendered-page check expects the registry's live counts (2026-10-06)
+
+- **`scripts/verify-rendered.py` expects 655 components (N2 387, N6 90), not 577 (N2 371, N6 52).**
+  The site builds from api.mzizi.dev, which now serves registry v4.3.0's 655 components, so CI
+  failed on every branch. `AGENTS.md`, `README.md` and two code comments state the same count.
+  No page changes.
+
 ### Added — the published design system is linked (2026-10-04)
 
 - **`llms.txt`, `AGENTS.md` and `README.md` link the Design System artifact**
