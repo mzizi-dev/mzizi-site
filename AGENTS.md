@@ -33,10 +33,10 @@ and a gitleaks scan.
 
 ### The rendered-content gate
 
-Strips every `<script>` from the built HTML and asserts the content is still there: 577
-component cards and 577 component pages (each with its source and install command, Rust
+Strips every `<script>` from the built HTML and asserts the content is still there: 655
+component cards and 655 component pages (each with its source and install command, Rust
 before React where there is Rust), the Roots list, the eight node titles, the four rung
-titles, the six strands, N2's count of 371, all 21 colour families by CSS variable,
+titles, the six strands, N2's count of 387, all 21 colour families by CSS variable,
 specific hex values, the landing page's Hero (with the contract bench as its media and
 the "Phase 0 · research prototype" badge) followed directly by the status panel, ahead of
 the components, and no "faster", "better than" or "outperform" on it, that no page hydrates
