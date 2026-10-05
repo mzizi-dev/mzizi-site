@@ -204,6 +204,16 @@ identifiers keep their literal spelling. This is `mzizi.dev`
 itself — the front door — not to be confused with `mzizi-registry` (the component source)
 or `mzizi-console` (`app.mzizi.dev`).
 
+## The published design system
+
+The Mzizi design system is published on claude.ai as the Design System artifact,
+<https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc>: voice and content fundamentals, visual
+foundations (surfaces, ink and accent, status colours), the marks, and component previews.
+Its source of truth is the `design-system/` folder in `mzizi-registry` (arriving with
+mzizi-registry#418), which the artifact is built from file for file. Edit the folder, never
+the artifact page; the artifact is republished from registry `main` after a merge that
+touches it.
+
 ## Track big work in GitHub issues
 
 Any substantial build, migration, investigation or multi-step task gets a GitHub issue in the repo that owns it — before or as work starts — so another session, agent or person can pick it up.
