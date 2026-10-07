@@ -1,6 +1,7 @@
 ---
 import Site from "../layouts/Site.astro";
 import RustCrates from "../components/RustCrates.astro";
+import Progress from "../components/Progress.astro";
 import StaticTabs from "../components/StaticTabs";
 import Hero from "@bundu/ui/Hero.astro";
 import Section from "@bundu/ui/Section.astro";
@@ -79,7 +80,7 @@ const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 // The language commit the figures below were read at: a fresh build, not the
 // README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "9a88e1d";
+const LANG_COMMIT = "0653903";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -182,7 +183,7 @@ const isntList = [
   },
   {
     what: "Not yet a release",
-    note: "Only a service lowers, to a local Rust + axum package (mz build). No component lowers yet, and there is no Workers, Containers or WebAssembly target, no mz run, and no published compiler crate or binary. mz is built from a checkout.",
+    note: "Only a service lowers, to a local Rust + axum package (mz build). No component lowers yet, and there is no Workers, Containers or WebAssembly target and no published compiler crate or binary. mz run is on the staging branch (#80), not yet released to main. mz is built from a checkout.",
   },
 ];
 
@@ -359,11 +360,11 @@ const surfaces = [
 const notYet = [
   {
     what: "The Phase 0 measurement",
-    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed; it still needs the React arm's pins from the registry's lockfile, held-out tasks, a pre-registered PLAN.md, the Leptos and React arms run end to end, and for the backend family, probe scoring in the runner, tasks B2–B5 and the other-language arms (benchmarks/READINESS.md).",
+    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed, and the React arm's pins now come from the registry's lockfile; it still needs held-out tasks, a pre-registered PLAN.md, the Leptos and React arms run end to end, and for the backend family, probe scoring in the runner, tasks B2–B5 and the other-language arms (benchmarks/READINESS.md).",
   },
   {
     what: "Most of a programming language, and a release",
-    note: "Mzizi has no expressions, bindings, callable functions, loops, error handling, modules or standard library yet. Only a service lowers, to a local Rust + axum package; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust.",
+    note: "Mzizi has no expressions, bindings, callable functions, loops, error handling, modules or standard library yet. Only a service lowers, to a local Rust + axum package; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. Work toward M1 has started: RFC-0013 and a first program slice with mz run are on the staging branch, not yet released to main, and the next waves are open pull requests (see the status panel).",
   },
   {
     what: "The wider benchmark",
@@ -496,7 +497,12 @@ const repos: Repo[] = [
         <a href={TRACKER}><strong>What still has to be built</strong></a>{" "}
         (<code>LANGUAGE-TRACKER.md</code>) is the one list, stacked against
         Python, Go, C++, TypeScript and Rust, with two milestones: M1, a language
-        that computes, and M2, a working programming language.
+        that computes, and M2, a working programming language. Work toward M1 has
+        started: RFC-0013 and a first slice of programs with <code>mz run</code>{" "}
+        are on the <code>staging</code> branch, not yet released, and the next
+        waves are open pull requests (<a href="#toward-m1">in progress toward
+        M1</a>, below). Until a tracker row turns ✅ on <code>main</code>, Mzizi
+        does not have it.
       </p>
       <p>
         <strong
@@ -528,9 +534,9 @@ const repos: Repo[] = [
           ><code>benchmarks/READINESS.md</code></a
         > audits each one. The runner now reads every arm from{" "}
         <code>arm.toml</code>, hands the <code>ui-spec</code> family a
-        language-neutral <code>spec.md</code>, and has a React arm, with the UI
-        guides balanced to within 5%. The run still waits on: the React arm's pins
-        taken from the registry's lockfile; held-out tasks, in a private
+        language-neutral <code>spec.md</code>, and has a React arm, whose pins
+        now come from the registry's lockfile, with the UI guides balanced to
+        within 5%. The run still waits on: held-out tasks, in a private
         repository that does not exist yet; the <code>PLAN.md</code> itself; the
         Leptos and React arms run end to end; and, for the backend family, probe
         scoring in the runner, tasks B2–B5 and the other-language arms.
@@ -561,9 +567,9 @@ const repos: Repo[] = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>428</b><span>tests passing, 18 suites</span></li>
+      <li class="fig"><b>437</b><span>tests passing, 19 suites</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>12,706</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>12,916</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
@@ -577,6 +583,9 @@ const repos: Repo[] = [
         >, both dated 2026-09-27.
       </span>
     </p>
+
+    <h2 class="progress-title" id="where">Where it stands: shipped, next, and in progress</h2>
+    <Progress />
   </Section>
 
   <Section id="benchmark">
@@ -1174,6 +1183,10 @@ const repos: Repo[] = [
 
   #benchmark .section-links a + a {
     margin-inline-start: var(--space-lg, 1.5rem);
+  }
+
+  .progress-title {
+    margin-block-start: var(--space-xl);
   }
 
   .families h3 code {

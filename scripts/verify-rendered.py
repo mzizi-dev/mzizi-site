@@ -351,6 +351,39 @@ check("index.html", "the other-language backend arms are not added yet",
 check("index.html", "the Mzizi backend arm is mzizi-be, with the probe crate and task B1",
       "mzizi-be" in plain and "mzprobe" in plain and "B1" in plain)
 
+# Progress (owner, 2026-10-07: "We also need to be updating docs and the site
+# with progress and where we are"). The landing page's status section and
+# /language show what is on main, what is on staging, and what is in progress
+# toward M1, and the in-progress column is labelled as not available and links
+# the tracking issue and its open pull requests. src/lib/progress.ts holds the
+# data; scripts/check-facts.py checks each linked pull request is still open.
+LANG = "https://github.com/mzizi-dev/mzizi"
+M1_LINKS = (f"{LANG}/issues/69", f"{LANG}/pull/76", f"{LANG}/pull/80", f"{LANG}/pull/81", f"{LANG}/pull/83", f"{LANG}/pull/85")
+for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
+                  ("language.html", (DIST / "language.html").read_text(encoding="utf-8"))):
+    text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw)))
+    check(name, "shows what is on main, on staging, and in progress toward M1",
+          all(h in text for h in ("On main today", "Landing on staging", "In progress toward M1")))
+    check(name, "labels the in-progress work as open pull requests, not available yet",
+          "Not available yet" in text and "None of this is in Mzizi today" in text)
+    for link in M1_LINKS:
+        check(name, f"links {link.removeprefix(LANG + '/')}", f'href="{link}"' in raw)
+    # In progress is never presented as shipped: the column order is fixed.
+    at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M1")]
+    check(name, "the three columns read main, then staging, then in progress", -1 < at[0] < at[1] < at[2])
+# RFC-0013 is on staging (#76), not on main: link its file on staging and the
+# pull request, never a design/ file on main that does not exist yet. When it
+# reaches main, link design/RFC-0013-*.md on main (check-facts.py then
+# requires it) and drop this check.
+RFC13 = f"{LANG}/blob/staging/design/RFC-0013-core-language.md"
+for name in ("language.html", "llms.txt"):
+    raw = (DIST / name).read_text(encoding="utf-8")
+    check(name, "lists RFC-0013 on staging, with its pull request #76",
+          RFC13 in raw and f"{LANG}/pull/76" in raw
+          and f"{LANG}/blob/main/design/RFC-0013" not in raw)
+check("language.html", "links the language survey on staging",
+      f"{LANG}/blob/staging/design/LANGUAGE-SURVEY.md" in (DIST / "language.html").read_text(encoding="utf-8"))
+
 # --- no framework in the browser -------------------------------------------
 # @bundu/ui's React primitives render to HTML at build time. A `client:*`
 # directive would ship React and hydrate an island; the doctrine is no third UI
@@ -416,9 +449,13 @@ for phrase, why in stale.items():
 # goes stale, add its old wording here so it cannot come back. The live check
 # of the current values is scripts/check-facts.py, which needs the network.
 stale_patterns = {
-    r"\b(269|308) tests\b": "the language has 428 tests in 18 suites (mzizi-dev/mzizi 9a88e1d)",
-    r"\b(12|14) suites\b": "the language's tests run in 18 suites (9a88e1d)",
-    r"\b(6,684|7,454)\b": "compiler/src is 12,706 lines (9a88e1d)",
+    r"\b(269|308|428) tests\b": "the language has 437 tests in 19 suites (mzizi-dev/mzizi 0653903)",
+    r"\b(12|14|18) suites\b": "the language's tests run in 19 suites (0653903)",
+    r"\b(6,684|7,454|12,706)\b|about 12,700 lines": "compiler/src is 12,916 lines (0653903)",
+    # The React arm's pins came from the registry's lockfile on 2026-10-07
+    # (released to mzizi-dev/mzizi main in 0653903; benchmarks/READINESS.md item 1).
+    r"waits on:? the React arm's pins|still needs the React arm's pins":
+        "the React arm's pins come from the registry's lockfile (READINESS.md item 1, done 2026-10-07)",
     r"(RFC-0009|RFC-0010)[^.]{0,120}\bforthcoming\b|\bforthcoming\b[^.]{0,120}(RFC-0009|RFC-0010)":
         "RFC-0009 and RFC-0010 are merged in mzizi-dev/mzizi design/",
     r"(RFC-0009|RFC-0010)[^.]{0,120}not in design/ yet": "RFC-0009 and RFC-0010 are in design/",

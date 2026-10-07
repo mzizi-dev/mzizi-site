@@ -2,6 +2,8 @@
 import { Alert } from "@bundu/ui/ui/alert";
 import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
+import Progress from "../components/Progress.astro";
+import { decisions, DECISIONS_FIRST_HREF, DECISIONS_HREF, M1_ISSUE } from "../lib/progress";
 
 /**
  * The language page. Sourced from `mzizi-dev/mzizi/CHARTER.md` v0.4 (§3
@@ -16,12 +18,12 @@ import Site from "../layouts/Site.astro";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 // The language commit this page's figures and captured output were read at.
-const LANG_COMMIT = "9a88e1d";
-// Captured from `mz build examples/registry.mz --out out/registry` at 9a88e1d.
+const LANG_COMMIT = "0653903";
+// Captured from `mz build examples/registry.mz --out out/registry` at 0653903.
 const buildOutput =
   "mz: built `service registry` into out/registry (3 routes, 1 fixtures); run it with `cargo run --release --manifest-path out/registry/Cargo.toml`";
 
-// LANGUAGE-TRACKER.md at 9a88e1d: the "Against the languages Mzizi aims to
+// LANGUAGE-TRACKER.md at 0653903: the "Against the languages Mzizi aims to
 // replace" table, Mzizi's column, condensed. Mark is the tracker's own.
 const tracker = [
   { area: "Expressions, variables, functions, loops", mark: "❌", mzizi: "fn is a name plus emit; bodies are not modelled" },
@@ -154,11 +156,16 @@ const rfcs = [
   {
     id: "RFC-0012",
     file: "RFC-0012-harness.md",
-    what: "The harness, the core of the language, what the agent reads: the language as an agent reads it, the agent protocol and the plugin host, and how the skills fold in. Draft; only the agent protocol and the IR exist today.",
+    what: "The harness, the core of the language, what the agent reads: the language as an agent reads it, the agent protocol and the plugin host, and how the skills fold in. §8 compares it with seven outside systems (the Language Server Protocol, Roslyn, the TypeScript language service, rustc's JSON output, MCP servers, Unison, Go's analysis framework). Draft for review; only the agent protocol and the IR exist today.",
+  },
+  {
+    id: "RFC-0013",
+    href: "https://github.com/mzizi-dev/mzizi/blob/staging/design/RFC-0013-core-language.md",
+    what: "The core language, all of Tier 1: a program file kind, expressions, numbers, bindings, functions, control flow, collections, text, methods on records, errors, mz run and lowering. Merged to the staging branch (#76), not yet on main. A draft for review: the foundation slice (#80, also on staging) is built, and the rest is design. Its amendments from the language survey (#81) are on staging too.",
   },
 ];
 // RFC-0009 §1, the arms; each state is benchmarks/arms/ at mzizi-dev/mzizi
-// 9a88e1d. "exists" is a directory there; "not added yet" is proposed by
+// 0653903. "exists" is a directory there; "not added yet" is proposed by
 // RFC-0009 with no directory. scripts/check-facts.py compares this table with
 // the live directory listing.
 const arms = [
@@ -213,9 +220,11 @@ const arms = [
       Real today, in the toolchain: the lexer, a recovering parser, a resolver,
       the agent diagnostic protocol and <code>mz fix</code>, and the
       content-addressed IR, plus nine primitives written in Mzizi itself, covered
-      by 428 tests in 18 suites (<code>mzizi-dev/mzizi</code> at{" "}
+      by 437 tests in 19 suites (<code>mzizi-dev/mzizi</code> at{" "}
       <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>;
-      about 12,700 lines in <code>compiler/src</code>).{" "}
+      about 12,900 lines in <code>compiler/src</code>). Blocks nest at most 64
+      deep (MZ0411), and robustness tests hold every command to ending with a
+      diagnostic on random and deeply nested input.{" "}
       <code>mz contract</code> evaluates contract blocks. A <code>service</code>{" "}
       with HTTP routes and handlers (RFC-0011) is checked by{" "}
       <code>mz check</code>, run in process by <code>mz contract</code>, and
@@ -252,8 +261,8 @@ const arms = [
       pre-registered <code>PLAN.md</code>.{" "}
       <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"
         ><code>benchmarks/READINESS.md</code></a
-      > lists what remains: the React arm's pins taken from the registry's
-      lockfile; held-out tasks in a private repository, written by maintainers or
+      > lists what remains. The React arm's pins now come from the registry's
+      lockfile. Still to come: held-out tasks in a private repository, written by maintainers or
       drafted by another vendor's model and reviewed by a person (the owner is to
       confirm which); the <code>PLAN.md</code>; the Leptos and React arms run end
       to end; and, for the backend family, probe scoring in the runner, tasks
@@ -284,6 +293,46 @@ const arms = [
       Mzizi is a working programming language. Neither milestone is reached.
     </p>
   </Card>
+
+  <h2 id="toward-m1-work">Progress toward M1</h2>
+
+  <p>
+    The work toward M1 is tracked in{" "}
+    <a href={M1_ISSUE.href}>mzizi-dev/mzizi{M1_ISSUE.label}</a>. It is built
+    in waves: first RFC-0013, the design of all of Tier 1, and a foundation
+    slice that the later waves extend. Both are on <code>staging</code>, not
+    yet released to <code>main</code>. Everything in the third column below is
+    in open pull requests, not merged. Mzizi does not have any of it until its
+    tracker row turns ✅ on <code>main</code>.
+  </p>
+
+  <Progress />
+
+  <h3>The owner's decisions, 2026-10-07</h3>
+
+  <p>
+    From the tracking issue's{" "}
+    <a href={DECISIONS_FIRST_HREF}>first</a> and{" "}
+    <a href={DECISIONS_HREF}>second</a> rounds of decisions, as decided, not
+    as built:
+  </p>
+
+  <ul class="spaced">
+    {decisions.map((d) => <li>{d}</li>)}
+  </ul>
+
+  <p>
+    <strong>One informal timing, not a benchmark.</strong>{" "}
+    <a href={DECISIONS_HREF}>The issue records</a> <code>fib(40)</code> timed
+    on one 4-core virtual machine, about five runs each, with high noise: Rust
+    in release mode about 390 ms, Rust with overflow checks on about 690 ms,
+    and the program the foundation slice lowers from Mzizi about 730 ms. On
+    that machine Mzizi was slower than Rust's default, and about level with
+    Rust under the same overflow checks. It is context for the overflow
+    decision above, not a result: the performance suite does not exist yet,
+    and the lowering it timed is on <code>staging</code>, not yet on{" "}
+    <code>main</code>.
+  </p>
 
   <div class="scroller">
     <table>
@@ -496,7 +545,7 @@ const arms = [
             <tr>
               <th scope="row">
                 <a
-                  href={`https://github.com/mzizi-dev/mzizi/blob/main/design/${r.file}`}
+                  href={r.href ?? `https://github.com/mzizi-dev/mzizi/blob/main/design/${r.file}`}
                 >
                   {r.id}
                 </a>
@@ -510,7 +559,16 @@ const arms = [
   </div>
 
   <p>
-    RFC-0005 is reserved and unwritten. The Mzizi Roots components have their own
+    RFC-0005 is reserved and unwritten. RFC-0013 is the one RFC not on{" "}
+    <code>main</code>: it is on <code>staging</code> (<a
+      href="https://github.com/mzizi-dev/mzizi/pull/76">#76</a
+    >), waiting for the next release, and it stays a draft until the owner
+    accepts it. Beside the RFCs,{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/blob/staging/design/LANGUAGE-SURVEY.md"
+      ><code>design/LANGUAGE-SURVEY.md</code></a
+    >, on <code>staging</code>, surveys the top 10 languages feature by feature
+    as design input for RFC-0013 and the tier RFCs after it. Nothing in it is
+    implemented or measured. The Mzizi Roots components have their own
     RFC in the registry:{" "}
     <a href="https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md"
       ><code>mzizi-registry/docs/roots/RFC-roots.md</code></a
@@ -579,7 +637,9 @@ const arms = [
     <code>mz</code> with no arguments for its usage line. What is not there yet:{" "}
     <code>mz refs</code>, <code>mz path</code>, <code>mz patch</code> and{" "}
     <code>mz diff</code> are designed (see the RFCs) but not built, and so are{" "}
-    <code>mz run</code>, <code>mz test</code> and <code>mz fmt</code>. The binary
+    <code>mz run</code> (on <code>staging</code>,{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/pull/80">#80</a>, not yet on{" "}
+    <code>main</code>), <code>mz test</code> and <code>mz fmt</code>. The binary
     above dispatches <code>check</code>, <code>fix</code>,{" "}
     <code>contract</code>, <code>outline</code> and <code>build</code>, plus{" "}
     <code>hash</code> and <code>ir</code> for reading the IR.

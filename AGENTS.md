@@ -69,6 +69,15 @@ functions, loops, error handling, modules or standard library yet. `check-facts.
 the tracker, the charter's version and `benchmarks/arms/`, and fails when that sentence, a
 charter version or an arm's state no longer matches upstream.
 
+It also holds the progress block (owner, 2026-10-07: "We also need to be updating docs and
+the site with progress and where we are"). The landing page's status section and
+`/language` show, in this order, what is on the language's `main` ("On main today"), what is
+on its `staging` ("Landing on staging"), and what is in open pull requests ("In progress
+toward M1", labelled "Not available yet"), linking the tracking issue
+(`mzizi-dev/mzizi#69`) and its pull requests. RFC-0013 is linked on `staging` (with its pull
+request, #76) until it reaches `main`. The data is `src/lib/progress.ts`; `check-facts.py` fails when a pull
+request listed as in progress has merged or closed, so move it in the same update.
+
 It also holds the contact addresses: every page's footer links `support@bundu.org` (the
 owner's general contact for Mzizi, 2026-09-30) and `security@nyuchi.com` (the one security
 contact for every repository, owner, 2026-10-03); `/ecosystem`, `llms.txt` and
