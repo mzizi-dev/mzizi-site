@@ -33,16 +33,21 @@ The owner asked on 2026-10-07 for the site to show progress and where the langua
     `match` in a view as `MZ0410`, RFC-0012 §8, the React arm's pins, pinned workflows) and
     mzizi#79 (`0653903`: the nesting cap `MZ0411`, escaped file names in `mz build`'s
     comments, robustness tests, no `unsafe` in the compiler).
-  - **Landing on staging** (`509bc2f`), not yet released: RFC-0013, the core language, a
+  - **Landing on staging** (`9254ef4`), not yet released: RFC-0013, the core language, a
     draft (mzizi#76), with its amendments from the language survey (mzizi#81); the foundation slice, with `program`, `fn`, `let`/`var`, `int`/`bool`/
     `text` expressions, `when`/`else`, `print` and `mz run` (mzizi#80), whose tracker rows
     stay 🟡 until it reaches `main`; `design/LANGUAGE-SURVEY.md` (design input); release
-    notes from the changelog (mzizi#82); and `CLAUDE.md` (mzizi#77).
+    notes from the changelog (mzizi#82); `CLAUDE.md` (mzizi#77); and a pre-commit hook
+    (mzizi#86, which superseded the closed mzizi#84) that refuses a commit without a
+    `CHANGELOG.md` entry and runs `cargo fmt --check` on staged Rust, installed with
+    `scripts/install-hooks.sh`, with a test CI's `compiler` job runs.
   - **In progress toward M1**, labelled "Not available yet": the tracking issue mzizi#69,
     Wave 1's numbers (mzizi#83), the performance suite against hand-written Rust
     (mzizi#85, the benchmark only; no result is committed to the repository, and its pull
-    request's description records one informal run on one machine) and a pre-commit hook (mzizi#84), all open and
-    unmerged.
+    request's description records one informal run on one machine) and Wave 1's errors
+    (mzizi#87: enums in a program, `result(T, E)`, `return error(e)`, prefix `try`, a
+    `match` on a result, and `main` returning a result, with `MZ0992`), all open and
+    unmerged. The "next" line no longer lists a result type, which mzizi#87 now covers.
 - **`/language` adds "Progress toward M1"** with the owner's decisions of 2026-10-07 from
   mzizi#69, and the one informal `fib(40)` timing recorded there, stated as one noisy run on
   one machine: slower than Rust's default build, about level with Rust under the same

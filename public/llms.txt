@@ -115,7 +115,7 @@ the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
 **Where it stands, 2026-10-07: shipped, next, and in progress.** Read from
-`mzizi-dev/mzizi`'s `main` (`0653903`), `staging` (`509bc2f`) and its open pull
+`mzizi-dev/mzizi`'s `main` (`0653903`), `staging` (`9254ef4`) and its open pull
 requests.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md): UI components
@@ -147,6 +147,11 @@ requests.
     in it is implemented or measured); release notes generated from
     `CHANGELOG.md`, with a changelog entry in every pull request
     ([#82](https://github.com/mzizi-dev/mzizi/pull/82)); and a `CLAUDE.md`.
+  - A pre-commit hook ([#86](https://github.com/mzizi-dev/mzizi/pull/86),
+    which superseded the closed #84): `.githooks/pre-commit`, installed with
+    `scripts/install-hooks.sh`, refuses a commit without a `CHANGELOG.md`
+    entry and runs `cargo fmt --check` on staged Rust; CI's `compiler` job
+    runs its test. Tooling, not the language.
 - **In progress toward M1, not available:** open pull requests, not merged.
   Never describe any of this as something Mzizi has.
   - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
@@ -157,10 +162,12 @@ requests.
     against hand-written Rust (`benchmarks/perf/`): the benchmark only, with
     no overflow check removed yet. No result is committed to the repository;
     the pull request's description records one informal run on one machine.
-  - [#84](https://github.com/mzizi-dev/mzizi/pull/84), a pre-commit hook that
-    refuses a commit without a changelog entry (tooling, not the language).
-  - Next, with no pull request open yet: loops and `match`, a result type,
-    maps and collection operations, methods on records.
+  - [#87](https://github.com/mzizi-dev/mzizi/pull/87), Wave 1's errors: enums
+    in a program, `result(T, E)`, `return error(e)`, prefix `try`, a `match`
+    on a result, and `main` returning a result (an escaped error is MZ0992,
+    and `mz run` exits 1). Only the `match` on a result is built.
+  - Next, with no pull request open yet: loops and a general `match`, maps
+    and collection operations, methods on records.
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
   one RFC per tier; `mz run` is to compile a program to Rust and run it; methods on records now,
   generics after M1; integer overflow checks stay in every build, removed only

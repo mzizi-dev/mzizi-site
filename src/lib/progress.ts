@@ -12,8 +12,9 @@
  *   CHANGELOG.md, not in a dated section. Every capability here is a tracker
  *   row that is ✅, or the narrow form a 🟡 row names.
  * - "On staging": the commits on `staging` that are not on `main`, up to
- *   509bc2f (the survey, CLAUDE.md #77, release notes #82, RFC-0013 #76 and
- *   its amendments #81, and the foundation slice #80). The tracker on staging still marks C1–C5 and
+ *   9254ef4 (the survey, CLAUDE.md #77, release notes #82, RFC-0013 #76 and
+ *   its amendments #81, the foundation slice #80, and the pre-commit hook
+ *   #86, which superseded the closed #84). The tracker on staging still marks C1–C5 and
  *   C10 🟡: they turn ✅ only when the slice reaches `main`.
  * - "In progress": the open pull requests and tracking issue #69. Nothing in
  *   that list is available. When one merges, move it, and when it reaches
@@ -25,7 +26,7 @@ export const LANG = "https://github.com/mzizi-dev/mzizi";
 export const PROGRESS_DATE = "2026-10-07";
 // The language's main and staging commits this file was written from.
 export const MAIN_COMMIT = "0653903";
-export const STAGING_COMMIT = "509bc2f";
+export const STAGING_COMMIT = "9254ef4";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -88,6 +89,10 @@ export const onStaging: Item[] = [
     links: [pr(82)],
   },
   {
+    text: "A pre-commit hook (.githooks/pre-commit, installed with scripts/install-hooks.sh) that refuses a commit without a CHANGELOG.md entry and runs cargo fmt --check on staged Rust, with a test that CI's compiler job runs. Tooling, not the language. It supersedes #84, which was closed.",
+    links: [pr(86)],
+  },
+  {
     text: "A CLAUDE.md for agents working in the repository. Docs only.",
     links: [pr(77)],
   },
@@ -107,11 +112,11 @@ export const inProgress: Item[] = [
     links: [pr(85)],
   },
   {
-    text: "A pre-commit hook that refuses a commit without a changelog entry. Tooling, not the language.",
-    links: [pr(84)],
+    text: "Wave 1, errors: enums in a program, a result(T, E) type, return error(e), prefix try, a match on a result, and main returning a result (an escaped error is MZ0992, and mz run exits 1). Only the match on a result is built; a general match is control flow's.",
+    links: [pr(87)],
   },
   {
-    text: "Next in Wave 1, with no pull request open yet: loops and match, a result type, maps and collection operations, and methods on records.",
+    text: "Next in Wave 1, with no pull request open yet: loops and a general match, maps and collection operations, and methods on records.",
   },
 ];
 
