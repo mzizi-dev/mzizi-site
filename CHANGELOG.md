@@ -21,16 +21,55 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — versions from the 5–7 October releases, and the language at `9a88e1d` (2026-10-07)
+
+A freshness update. The scheduled Freshness check (`scripts/check-facts.py`) failed on the
+versions below. While they were being fixed, `@nyuchi/mzizi-cli` 0.7.0 reached npm and the
+language released to `main` (`9a88e1d`).
+
+- **`llms.txt`'s dated version list moves to 2026-10-07:**
+  - `mzizi-mcp` 0.13.0, not 0.11.2, on npm and in the MCP Registry.
+  - `@nyuchi/mzizi-skills` 0.11.0, not 0.8.5: seven skills in four categories, including the
+    `dev` skills `digital-hygiene` and `progress-report`. A note says that
+    `api.mzizi.dev/v1/skills` and the `/skills` pages still serve the earlier five-skill bundle.
+  - `@nyuchi/mzizi-cli` 0.7.0, not 0.6.3, with its Astro target.
+  - Every Mzizi Roots crate at 0.3.0, not 0.1.0.
+
+  Its MCP paragraph adds the `astro` build in `mzizi_get_component`, the `astro` filter and
+  `astroFile`, and `mzizi_get_skills`' `category`. The installer lines (the `/cli` entry and
+  "Install components from absolute URLs") cover every target, Astro included, and the
+  api.mzizi.dev route list adds `/v1/astro` and `/v1/astro/<name>`.
+
+- **`/ecosystem` reads its versions at build time:** the MCP server's from npm, and the Roots
+  crates' from crates.io. The registry card said the crates were at 0.1.0; it now shows 0.3.0.
+  The MCP paragraph gives the Rust, Astro, React order and both filters. `/.well-known/mcp.json`
+  and README's MCP card section name `mzizi-mcp` 0.13.0, checked 2026-10-07.
+- **Fixed: `/cli` no longer says `mzizi add` refuses Astro.** From `@nyuchi/mzizi-cli` 0.7.0,
+  `--target astro` (inferred in an Astro project) installs a component's pure `.astro` from
+  `/v1/astro/<name>` into `src/components/mzizi/`. The heading, the detection sentence and the
+  Astro line follow the npm version read at build time. When npm cannot be reached, the page
+  says so. A prerelease such as `0.7.0-beta.1` counts as below `0.7.0`. `/components` calls
+  `mzizi add` the installer for every target.
+- **The language figures move from `62a0f32` to `9a88e1d`** (`/`, `/language`, `llms.txt`), from
+  a fresh build at `9a88e1d`. `cargo test --workspace` gives 428 tests in 18 suites (was 425),
+  and `compiler/src` is 12,706 lines (was 12,644). `mz contract` gives 29 clauses over the nine
+  primitives. The captured `mz check --agent`, `mz hash`, `mz contract` and `mz build` outputs
+  on `/language`, and the `button.mz` excerpt, are unchanged. The React arm's pins come from
+  the registry's lockfile, no longer provisional.
+- **`check-facts.py` checks more, and counts lines in the source.**
+  - It counts `compiler/src` in the language's source (anonymous git) instead of reading the
+    README, which still says 12,644.
+  - It fails when `/ecosystem` names the Roots crates at any version but crates.io's.
+  - `/.well-known/mcp.json` is now among the files that may not name an older `mzizi-mcp`.
+- **Fixed: the rendered-page check expects 656 components (N2 388), not 655 (N2 387).** The
+  registry's v4.6.0 added `markdown-parse` (installed with `markdown-renderer`), and
+  api.mzizi.dev now serves it, so `scripts/verify-rendered.py` failed on every build.
+  `AGENTS.md`, `README.md`, `scripts/generate-previews.mjs` and a code comment state the same
+  count.
+
 ### Added — `CLAUDE.md` for Claude Code (2026-10-07)
 
 - **`CLAUDE.md` imports `AGENTS.md`** and adds what it does not spell out: pull requests target `staging`, every `staging` merge is tagged as a patch, `pnpm run lint` needs `astro sync` types first, how `src/lib/registry.ts` feeds the pages at build time, and which files are generated (committed or not) versus hand-written. Docs only: no page, fact or behaviour changes.
-
-### Fixed — rendered-content gate counts the 656th component (2026-10-07)
-
-The registry now serves 656 components (N2 primitives went from 387 to 388), so
-the rendered-content gate expected 655 and failed on every pull request. The
-gate and `AGENTS.md` now expect 656 components and N2's 388. Nothing on the
-site changes; the pages already rendered the live count.
 
 ### Added — `AGENTS.md` loads the Mzizi dev skills (2026-10-06)
 

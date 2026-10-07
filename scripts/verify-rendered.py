@@ -416,9 +416,9 @@ for phrase, why in stale.items():
 # goes stale, add its old wording here so it cannot come back. The live check
 # of the current values is scripts/check-facts.py, which needs the network.
 stale_patterns = {
-    r"\b(269|308) tests\b": "the language has 425 tests in 18 suites (mzizi-dev/mzizi 62a0f32)",
-    r"\b(12|14) suites\b": "the language's tests run in 18 suites (62a0f32)",
-    r"\b(6,684|7,454)\b": "compiler/src is 12,644 lines (62a0f32)",
+    r"\b(269|308) tests\b": "the language has 428 tests in 18 suites (mzizi-dev/mzizi 9a88e1d)",
+    r"\b(12|14) suites\b": "the language's tests run in 18 suites (9a88e1d)",
+    r"\b(6,684|7,454)\b": "compiler/src is 12,706 lines (9a88e1d)",
     r"(RFC-0009|RFC-0010)[^.]{0,120}\bforthcoming\b|\bforthcoming\b[^.]{0,120}(RFC-0009|RFC-0010)":
         "RFC-0009 and RFC-0010 are merged in mzizi-dev/mzizi design/",
     r"(RFC-0009|RFC-0010)[^.]{0,120}not in design/ yet": "RFC-0009 and RFC-0010 are in design/",

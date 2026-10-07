@@ -146,7 +146,7 @@ reconstruct it:
 The registry pages are rendered from the public API **at build time**:
 
 ```
-https://api.mzizi.dev/v1/ui            655 components, 11 fields each
+https://api.mzizi.dev/v1/ui            656 components, 11 fields each
 https://api.mzizi.dev/v1/ui/<name>     one component, with its React source
 https://api.mzizi.dev/v1/rs/<name>     its Rust implementation, or a 404 saying there is none
 https://api.mzizi.dev/v1/architecture  8 nodes, 4 rungs, 6 strands, live counts
@@ -235,7 +235,7 @@ mzizi-site/
 | `/`                  | The language first: the thesis, the status panel, the `mz contract` bench, what it is and isn't, then the toolchain and components  |
 | `/language`          | The five machine-authorship design goals, the Phase 0 benchmark and kill criterion, the phases (0 to 5), the non-goals and the RFCs |
 | `/cli`               | `mz`'s commands, the real install paths (React with shadcn, Rust from `/v1/rs`), and the agent CLI. Free, no gate                   |
-| `/components`        | Mzizi Roots (the Rust components) first, then all 655 grouped by DNA node, with a Rust filter                                       |
+| `/components`        | Mzizi Roots (the Rust components) first, then all 656 grouped by DNA node, with a Rust filter                                       |
 | `/components/<name>` | One component: its Rust source first where there is one, then the React build, install command, deps, node, owner                   |
 | `/playground`        | Static, dated screenshots of React builds, each linked to its source. Says plainly that none of it is interactive                   |
 | `/architecture`      | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
@@ -302,8 +302,8 @@ operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
 MCP server and the CLI are free with no gate: auth is required only for the Fundi
 tools (anything that files into the Fundi issue desk or needs a console user), and
-the card says so. That change is live (`mzizi-mcp` 0.11.0, listed in the MCP
-Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-09-30):
+the card says so. That change is live (`mzizi-mcp` 0.13.0, listed in the MCP
+Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-10-07):
 `initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
 `mzizi_report_issue` ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
