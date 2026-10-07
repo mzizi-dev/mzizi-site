@@ -6,9 +6,11 @@
  * disagree. `public/llms.txt` says the same in its own words.
  *
  * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-07:
- * - "On main": `LANGUAGE-TRACKER.md` and `CHANGELOG.md` at `main` (0653903,
- *   the release of 2026-10-07, #79). Every capability here is a tracker row
- *   that is ✅, or the narrow form a 🟡 row names.
+ * - "On main": `LANGUAGE-TRACKER.md` and `CHANGELOG.md` at `main` (0653903).
+ *   Two releases reached `main` on 2026-10-07: #72 (9a88e1d) and #79
+ *   (0653903). Their entries are still under `## [Unreleased]` in `main`'s
+ *   CHANGELOG.md, not in a dated section. Every capability here is a tracker
+ *   row that is ✅, or the narrow form a 🟡 row names.
  * - "On staging": the commits on `staging` that are not on `main`, up to
  *   509bc2f (the survey, CLAUDE.md #77, release notes #82, RFC-0013 #76 and
  *   its amendments #81, and the foundation slice #80). The tracker on staging still marks C1–C5 and
@@ -43,11 +45,16 @@ export const onMain: Item[] = [
     text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, and mz build for a service only.",
   },
   {
-    text: "New in the 7 October release: blocks nest at most 64 deep (MZ0411, where deep nesting used to crash mz), match in a view is MZ0410, mz build escapes file names in the comments it writes, robustness tests, and no unsafe code in the compiler. 437 tests.",
-    links: [{ href: `${LANG}/blob/main/CHANGELOG.md`, label: "CHANGELOG.md" }],
+    text: "From the 7 October releases (#72, #79), as listed under [Unreleased] in CHANGELOG.md on main. #79: blocks nest at most 64 deep (MZ0411, where deep nesting used to crash mz), mz build escapes file names in the comments it writes, robustness tests, and no unsafe code in the compiler. 437 tests.",
+    links: [
+      pr(72),
+      pr(79),
+      { href: `${LANG}/blob/main/CHANGELOG.md`, label: "CHANGELOG.md" },
+    ],
   },
   {
-    text: "Design and benchmark work in the same release: RFC-0012 (the harness, a draft) surveys prior art in §8; the React arm's pins come from the registry's lockfile; the workflows are pinned to commit SHAs and audited.",
+    text: "#72: match in a view is MZ0410; RFC-0012 (the harness, a draft) surveys prior art in §8; the React arm's pins come from the registry's lockfile; the workflows are pinned to commit SHAs and audited.",
+    links: [pr(72)],
   },
 ];
 
@@ -96,7 +103,7 @@ export const inProgress: Item[] = [
     links: [pr(83)],
   },
   {
-    text: "A performance suite against hand-written Rust: four programs in the foundation slice, each with a Rust reference built with and without overflow checks. It builds the benchmark only; no overflow check is removed yet, and no result is published.",
+    text: "A performance suite against hand-written Rust: four programs in the foundation slice, each with a Rust reference built with and without overflow checks. It builds the benchmark only; no overflow check is removed yet. No result is committed to the repository; the pull request's description records one informal run on one machine.",
     links: [pr(85)],
   },
   {
