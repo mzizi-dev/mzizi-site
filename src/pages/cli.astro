@@ -6,7 +6,8 @@
  *   1. `mz`, the compiler that implements the language. It is toolchain,
  *      not the language itself. Built from a checkout; no release.
  *   2. Installing components. React through `npx shadcn add`; Rust read from
- *      `/v1/rs`; `mzizi add` (both targets) in `@nyuchi/mzizi-cli` 0.6.0+.
+ *      `/v1/rs`; `mzizi add` (React and Rust from `@nyuchi/mzizi-cli` 0.6.0,
+ *      Astro from 0.7.0).
  *   3. `fundi`, the agent CLI in the same package.
  *
  * The owner's decision (2026-09-29): the CLI is free, with no gate. Versions
@@ -53,6 +54,10 @@ const crateExamples = crates.slice(0, 2).map(({ name, components }) => ({
   component: [...components].sort()[0],
 }));
 const installerShipped = cli.state === "published" && atLeast(cli.version, INSTALLER_SINCE);
+// `--target astro` shipped in 0.7.0: it installs a component's pure `.astro`
+// from `/v1/astro/<name>`. Before that the CLI refused Astro projects.
+const ASTRO_SINCE = "0.7.0";
+const astroShipped = cli.state === "published" && atLeast(cli.version, ASTRO_SINCE);
 
 const mzCommands = [
   { cmd: "mz check <file.mz>", what: "Does it compile. Human-readable diagnostics." },
@@ -167,7 +172,7 @@ const mzCommands = [
   <code class="cmd lead">npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code>
   <p class="prose">For example: <code>{installCommand("button")}</code></p>
 
-  <h3 id="mzizi-add"><code>mzizi add</code>: both targets, one command</h3>
+  <h3 id="mzizi-add"><code>mzizi add</code>: every target, one command</h3>
   <div class="prose">
     <p>
       {
@@ -183,7 +188,7 @@ const mzCommands = [
           </>
         )
       }{" "}
-      It detects whether a project is React or Rust (<code>--target</code>{" "}
+      It detects whether a project is React, Rust or Astro (<code>--target</code>{" "}
       overrides), resolves registry dependencies by absolute URL, and refuses
       what it cannot install honestly rather than guessing. No API key and no
       sign-in.
@@ -217,7 +222,26 @@ const mzCommands = [
           </>
         )}
       </li>
-      <li><strong>Astro:</strong> refused, because the registry serves no <code>.astro</code> files.</li>
+      <li>
+        {
+          astroShipped ? (
+            <>
+              <strong>Astro</strong> (from <code>{ASTRO_SINCE}</code>): installs the
+              component's pure <code>.astro</code> from{" "}
+              <code>{CANONICAL_BASE}/astro/&lt;name&gt;</code>, with every registry
+              file it imports, into <code>src/components/mzizi/</code>, and refuses by
+              name a component that has no <code>.astro</code> rather than install its
+              TSX.
+            </>
+          ) : (
+            <>
+              <strong>Astro:</strong> <code>--target astro</code> ships from{" "}
+              <code>{ASTRO_SINCE}</code>, which npm did not have when this page was
+              built; earlier versions refuse an Astro project.
+            </>
+          )
+        }
+      </li>
     </ul>
   </div>
   <code class="cmd lead">npm install --save-dev @nyuchi/mzizi-cli</code>
