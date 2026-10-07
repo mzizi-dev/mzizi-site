@@ -96,7 +96,8 @@ crates.io, and the `@nyuchi/` npm packages built in `agent-tools`).
 - Anyone changing the language or the components must expect a site update to follow,
   and should say so in their PR body.
 - `scripts/check-facts.py dist` reads the live facts — the language README's test and
-  suite counts, the charter's version, `LANGUAGE-TRACKER.md`'s rows, the arms in
+  suite counts, `compiler/src`'s line count (counted in the source, because the README can
+  lag), the charter's version, `LANGUAGE-TRACKER.md`'s rows, the arms in
   `benchmarks/arms/`, the npm `latest` versions, the crates.io versions, the crate each
   `/v1/rs/<name>` document names (every Roots page must lead with Rust and name that
   crate), the MCP Registry listing — and fails when the built site disagrees. While the

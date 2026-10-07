@@ -16,12 +16,12 @@ import Site from "../layouts/Site.astro";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 // The language commit this page's figures and captured output were read at.
-const LANG_COMMIT = "62a0f32";
-// Captured from `mz build examples/registry.mz --out out/registry` at 62a0f32.
+const LANG_COMMIT = "9a88e1d";
+// Captured from `mz build examples/registry.mz --out out/registry` at 9a88e1d.
 const buildOutput =
   "mz: built `service registry` into out/registry (3 routes, 1 fixtures); run it with `cargo run --release --manifest-path out/registry/Cargo.toml`";
 
-// LANGUAGE-TRACKER.md at 62a0f32: the "Against the languages Mzizi aims to
+// LANGUAGE-TRACKER.md at 9a88e1d: the "Against the languages Mzizi aims to
 // replace" table, Mzizi's column, condensed. Mark is the tracker's own.
 const tracker = [
   { area: "Expressions, variables, functions, loops", mark: "❌", mzizi: "fn is a name plus emit; bodies are not modelled" },
@@ -158,14 +158,14 @@ const rfcs = [
   },
 ];
 // RFC-0009 §1, the arms; each state is benchmarks/arms/ at mzizi-dev/mzizi
-// 62a0f32. "exists" is a directory there; "not added yet" is proposed by
+// 9a88e1d. "exists" is a directory there; "not added yet" is proposed by
 // RFC-0009 with no directory. scripts/check-facts.py compares this table with
 // the live directory listing.
 const arms = [
   { id: "mzizi", family: "UI", lang: "Mzizi", state: "exists" },
   { id: "dioxus", family: "UI", lang: "Rust, Dioxus =0.7.10", state: "exists" },
   { id: "leptos", family: "UI", lang: "Rust, Leptos =0.8.21", state: "exists; never run" },
-  { id: "react", family: "UI", lang: "TypeScript, React, class-variance-authority (provisional pins)", state: "exists; never run" },
+  { id: "react", family: "UI", lang: "TypeScript, React, class-variance-authority (pins from the registry's lockfile)", state: "exists; never run" },
   { id: "mzizi-be", family: "backend", lang: "Mzizi, with the probe crate mzprobe and task B1", state: "exists; never run" },
   { id: "ts", family: "backend", lang: "TypeScript, Hono on Node", state: "not added yet" },
   { id: "python", family: "backend", lang: "Python, FastAPI with pydantic v2, served by uvicorn", state: "not added yet" },
@@ -213,9 +213,9 @@ const arms = [
       Real today, in the toolchain: the lexer, a recovering parser, a resolver,
       the agent diagnostic protocol and <code>mz fix</code>, and the
       content-addressed IR, plus nine primitives written in Mzizi itself, covered
-      by 425 tests in 18 suites (<code>mzizi-dev/mzizi</code> at{" "}
+      by 428 tests in 18 suites (<code>mzizi-dev/mzizi</code> at{" "}
       <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>;
-      about 12,600 lines in <code>compiler/src</code>).{" "}
+      about 12,700 lines in <code>compiler/src</code>).{" "}
       <code>mz contract</code> evaluates contract blocks. A <code>service</code>{" "}
       with HTTP routes and handlers (RFC-0011) is checked by{" "}
       <code>mz check</code>, run in process by <code>mz contract</code>, and

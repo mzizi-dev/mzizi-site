@@ -38,13 +38,16 @@ const [crates, cli] = await Promise.all([
 // `mzizi add` first shipped in @nyuchi/mzizi-cli 0.6.0. Whether the latest on
 // npm is at least that is asked at build time, not assumed.
 const INSTALLER_SINCE = "0.6.0";
+// Semver order on the release numbers; a prerelease (`0.7.0-beta.1`) sorts
+// below its own release, so it never counts as having shipped what 0.7.0 ships.
 const atLeast = (version: string, floor: string) => {
-  const a = version.split(/[.-]/).map(Number);
+  const [core, prerelease] = version.split(/-(.*)/s);
+  const a = core.split(".").map(Number);
   const b = floor.split(".").map(Number);
   for (let i = 0; i < 3; i++) {
     if ((a[i] ?? 0) !== b[i]) return (a[i] ?? 0) > b[i];
   }
-  return true;
+  return !prerelease;
 };
 const allPublished = crates.length > 0 && crates.every(({ status }) => status.state === "published");
 // Examples for the two largest crates, read from the API: `mzizi add <component>`
@@ -172,7 +175,7 @@ const mzCommands = [
   <code class="cmd lead">npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code>
   <p class="prose">For example: <code>{installCommand("button")}</code></p>
 
-  <h3 id="mzizi-add"><code>mzizi add</code>: every target, one command</h3>
+  <h3 id="mzizi-add"><code>mzizi add</code>: {astroShipped ? "every target" : "React and Rust"}, one command</h3>
   <div class="prose">
     <p>
       {
@@ -188,8 +191,8 @@ const mzCommands = [
           </>
         )
       }{" "}
-      It detects whether a project is React, Rust or Astro (<code>--target</code>{" "}
-      overrides), resolves registry dependencies by absolute URL, and refuses
+      It detects whether a project is {astroShipped ? "React, Rust or Astro" : "React or Rust"}{" "}
+      (<code>--target</code> overrides), resolves registry dependencies by absolute URL, and refuses
       what it cannot install honestly rather than guessing. No API key and no
       sign-in.
     </p>
@@ -232,6 +235,12 @@ const mzCommands = [
               file it imports, into <code>src/components/mzizi/</code>, and refuses by
               name a component that has no <code>.astro</code> rather than install its
               TSX.
+            </>
+          ) : cli.state === "unknown" ? (
+            <>
+              <strong>Astro:</strong> <code>--target astro</code> ships from{" "}
+              <code>{ASTRO_SINCE}</code>; npm could not be checked when this page was
+              built, so this page cannot say whether the latest has it.
             </>
           ) : (
             <>

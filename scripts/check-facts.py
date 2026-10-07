@@ -24,7 +24,9 @@ import json
 import os
 import pathlib
 import re
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 
@@ -88,6 +90,31 @@ def reader_text(path: pathlib.Path) -> str:
     return re.sub(r"\s+", " ", raw.replace("`", "").replace("*", ""))
 
 
+def compiler_lines() -> str:
+    """compiler/src's line count at the language's main, counted in the source.
+
+    Not read from the README: the README can lag its code (it said 12,644 at
+    9a88e1d, where the code is 12,706), and the landing page's figure is from a
+    fresh build, not the README. Anonymous git, so no API rate limit. Lines are
+    counted as `git grep -c ''` counts them.
+    """
+    with tempfile.TemporaryDirectory(prefix="mzizi-lang-") as tmp:
+        try:
+            git = lambda *args: subprocess.run(["git", "-C", tmp, *args], check=True,
+                                               capture_output=True, text=True, timeout=120).stdout
+            subprocess.run(["git", "clone", "--quiet", "--depth", "1", "--filter=blob:none", "--no-checkout",
+                            "https://github.com/mzizi-dev/mzizi", tmp],
+                           check=True, capture_output=True, text=True, timeout=120)
+            git("checkout", "--quiet", "HEAD", "--", "compiler/src")
+            total = 0
+            for name in filter(None, git("ls-files", "compiler/src").split("\n")):
+                text = (pathlib.Path(tmp) / name).read_text(encoding="utf-8")
+                total += 0 if text == "" else text.count("\n") + (0 if text.endswith("\n") else 1)
+        except (subprocess.SubprocessError, OSError) as error:
+            raise ValueError(f"could not count compiler/src: {error}") from error
+    return f"{total:,}"
+
+
 def upstream(label: str, get):
     """Read one upstream fact. A source that cannot be read is a failure, not a pass."""
     try:
@@ -99,7 +126,8 @@ def upstream(label: str, get):
 
 pages = {
     name: reader_text(DIST / name)
-    for name in ("index.html", "language.html", "ecosystem.html", "cli.html", "components.html", "llms.txt")
+    for name in ("index.html", "language.html", "ecosystem.html", "cli.html", "components.html", "llms.txt",
+                 ".well-known/mcp.json")
 }
 
 # --- the language -------------------------------------------------------------
@@ -107,9 +135,7 @@ print("the language (mzizi-dev/mzizi main)")
 readme = upstream("the language README", lambda: fetch(LANGUAGE_README))
 if readme:
     tests = re.search(r"\b([\d,]+) tests in (\d+) suites\b", readme)
-    lines = re.search(r"`compiler/src` is ([\d,]+) lines", readme)
     check("the README states a test and suite count", tests is not None)
-    check("the README states compiler/src's line count", lines is not None)
     if tests:
         n, suites = tests.group(1), tests.group(2)
         check(f"index.html shows {n} tests in {suites} suites",
@@ -117,9 +143,10 @@ if readme:
         for page in ("language.html", "llms.txt"):
             check(f"{page} says {n} tests in {suites} suites",
                   f"{n} tests in {suites} suites" in pages[page])
-    if lines:
-        check(f"index.html shows {lines.group(1)} lines in the compiler",
-              f"{lines.group(1)} lines of Rust in the compiler" in pages["index.html"])
+lines = upstream("the language's compiler/src", compiler_lines)
+if lines:
+    check(f"index.html shows {lines} lines in the compiler (counted in the source)",
+          f"{lines} lines of Rust in the compiler" in pages["index.html"])
 
 # The commit the figures cite. A newer main is not by itself drift (the figures
 # may still hold), so this is a note for the freshness agent, not a failure.
@@ -238,7 +265,7 @@ for package in NPM:
     check(f"llms.txt lists {package} at {latest}", latest in listed, f"llms.txt says {sorted(set(listed)) or 'nothing'}")
     if short == "mzizi-mcp":
         # Every "mzizi-mcp <version>" anywhere on the site is a claim about the live server.
-        for name in ("index.html", "ecosystem.html", "llms.txt"):
+        for name in ("index.html", "ecosystem.html", "llms.txt", ".well-known/mcp.json"):
             stale = sorted(set(re.findall(r"mzizi-mcp ([0-9]+\.[0-9]+\.[0-9]+)", pages[name])) - {latest})
             check(f"{name} names no older mzizi-mcp than {latest}", not stale, ", ".join(stale))
 
@@ -255,6 +282,11 @@ for crate in CRATES:
           re.search(rf"\b{re.escape(crate)}\b", pages["llms.txt"]) is not None and crate_versions == {version},
           f"llms.txt says {sorted(crate_versions) or 'no version'}")
     published[crate] = version
+    if crate == "mzizi-roots":
+        # /ecosystem's registry card gives the ten crates one version, read at build time.
+        stated_eco = set(re.findall(r"ten crates on crates\.io at ([0-9]+\.[0-9]+\.[0-9]+)", pages["ecosystem.html"]))
+        check(f"ecosystem.html names the Roots crates at {version}", stated_eco == {version},
+              f"ecosystem.html says {sorted(stated_eco) or 'no version'}")
     if crate in ("mzizi-ui", "mzizi-brand", "mzizi-roots"):
         check(f"components.html shows {crate} at {version}", f"{version}" in pages["components.html"]
               and "not on crates.io yet" not in pages["components.html"])
