@@ -25,6 +25,13 @@ cut, the Unreleased entries move under it.
 
 - **`CLAUDE.md` imports `AGENTS.md`** and adds what it does not spell out: pull requests target `staging`, every `staging` merge is tagged as a patch, `pnpm run lint` needs `astro sync` types first, how `src/lib/registry.ts` feeds the pages at build time, and which files are generated (committed or not) versus hand-written. Docs only: no page, fact or behaviour changes.
 
+### Fixed — rendered-content gate counts the 656th component (2026-10-07)
+
+The registry now serves 656 components (N2 primitives went from 387 to 388), so
+the rendered-content gate expected 655 and failed on every pull request. The
+gate and `AGENTS.md` now expect 656 components and N2's 388. Nothing on the
+site changes; the pages already rendered the live count.
+
 ### Added — `AGENTS.md` loads the Mzizi dev skills (2026-10-06)
 
 - **`AGENTS.md` gains "Dev skills, progress reports and the merge gate"**, the canonical rule block from nyuchi/.github#87, after "Track big work in GitHub issues": load the Mzizi dev skills (`digital-hygiene` and `progress-report`), clone only into a directory unique to the agent, run dev work on a 10-minute progress-report loop whose ticks never publish, release, merge or deploy without the owner's approval, and merge only through the merge gate. Docs only: no behaviour changes, and CI is unchanged.
