@@ -67,6 +67,10 @@ language released to `main` (`9a88e1d`).
   `AGENTS.md`, `README.md`, `scripts/generate-previews.mjs` and a code comment state the same
   count.
 
+### Added — `CLAUDE.md` for Claude Code (2026-10-07)
+
+- **`CLAUDE.md` imports `AGENTS.md`** and adds what it does not spell out: pull requests target `staging`, every `staging` merge is tagged as a patch, `pnpm run lint` needs `astro sync` types first, how `src/lib/registry.ts` feeds the pages at build time, and which files are generated (committed or not) versus hand-written. Docs only: no page, fact or behaviour changes.
+
 ### Added — `AGENTS.md` loads the Mzizi dev skills (2026-10-06)
 
 - **`AGENTS.md` gains "Dev skills, progress reports and the merge gate"**, the canonical rule block from nyuchi/.github#87, after "Track big work in GitHub issues": load the Mzizi dev skills (`digital-hygiene` and `progress-report`), clone only into a directory unique to the agent, run dev work on a 10-minute progress-report loop whose ticks never publish, release, merge or deploy without the owner's approval, and merge only through the merge gate. Docs only: no behaviour changes, and CI is unchanged.
