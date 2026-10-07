@@ -150,27 +150,36 @@ direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.11.2 serves
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.13.0 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
-act as your console user and need sign-in. The MCP server is Rust first: where a
-component has a Mzizi Roots implementation, `mzizi_get_component` returns it under
-`rust` (the crate, the `cargo add` line, the contract and the `.rs` source) ahead
-of the React build under `react`, and `lead` says which comes first.
-`mzizi_list_components` takes `rust: true` to list only the components with Rust,
-and its rows and `mzizi_search`'s hits carry `rustCrate`.
+act as your console user and need sign-in (checked 2026-10-07). The MCP server is
+Rust first: where a component has a Mzizi Roots implementation,
+`mzizi_get_component` returns it under `rust` (the crate, the `cargo add` line,
+the contract and the `.rs` source), then the pure Astro build under `astro` where
+there is one, then the React build under `react`, and `lead` says which comes
+first. `mzizi_list_components` takes `rust: true` or `astro: true` to list only
+the components with that build, and its rows and `mzizi_search`'s hits carry
+`rustCrate` and `astroFile`. `mzizi_get_skills` takes `category` (`dev`,
+`design`, `language` or `build`) and returns every skill in it in full.
 
-Versions on 2026-09-30 (read the registries before repeating one):
+Versions on 2026-10-07 (read the registries before repeating one):
 
-- `mzizi-mcp` **0.11.2** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
-  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.11.2)
-- `@nyuchi/mzizi-skills` **0.8.5** on npm: five skills, `mzizi-language`,
-  `mzizi-roots`, `mzizi-design`, `mzizi-backend` and `discoverability`.
-  `mcp.mzizi.dev` and `api.mzizi.dev/v1/skills` serve the same 0.8.5
-  bundle. `/v1/skills`' `meta.version` says which bundle is served
-- `@nyuchi/mzizi-cli` **0.6.3**, which ships the installer: `mzizi add <name>`
-  for React (writes the TSX) or Rust (records the crate the component's
-  `/v1/rs/<name>` document names), plus the `fundi` agent. `npx mzizi` works.
-- Mzizi Roots on crates.io, all **0.1.0**: `mzizi-tokens`, `mzizi-ui`,
+- `mzizi-mcp` **0.13.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
+  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.13.0)
+- `@nyuchi/mzizi-skills` **0.11.0** on npm: seven skills in four categories,
+  `mzizi-language` (language), `mzizi-design` (design), `mzizi-roots`,
+  `mzizi-backend` and `discoverability` (build), and `digital-hygiene` and
+  `progress-report` (dev: how every agent works, loaded before any dev work).
+  `mcp.mzizi.dev` serves the same bundle; `api.mzizi.dev/v1/skills` and the
+  `/skills` pages here still serve the earlier five-skill bundle until the
+  registry's dependency moves. `/v1/skills`' `meta.version` says which bundle
+  is served
+- `@nyuchi/mzizi-cli` **0.7.0**, which ships the installer: `mzizi add <name>`
+  for React (writes the TSX), Rust (records the crate the component's
+  `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
+  Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
+  `src/components/mzizi/`), plus the `fundi` agent. `npx mzizi` works.
+- Mzizi Roots on crates.io, all **0.3.0**: `mzizi-tokens`, `mzizi-ui`,
   `mzizi-brand`, `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`,
   `mzizi-discovery`, and the umbrellas `mzizi-roots` (UI) and
   `mzizi-roots-server` (server). `cargo add mzizi-roots` works.

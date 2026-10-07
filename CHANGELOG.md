@@ -21,6 +21,33 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — versions from the 7 October 2026 releases (2026-10-07)
+
+A freshness update: the scheduled Freshness check (`scripts/check-facts.py`) failed on the
+versions below, and `@nyuchi/mzizi-cli` 0.7.0 reached npm while this was being fixed.
+
+- **`llms.txt`'s dated version list moves to 2026-10-07:** `mzizi-mcp` 0.13.0, not 0.11.2 (npm
+  and the MCP Registry); `@nyuchi/mzizi-skills` 0.11.0, not 0.8.5, with seven skills in four
+  categories, including the `dev` skills `digital-hygiene` and `progress-report`, and a note that
+  `api.mzizi.dev/v1/skills` and the `/skills` pages still serve the earlier five-skill bundle;
+  `@nyuchi/mzizi-cli` 0.7.0, not 0.6.3, with its Astro target; and every Mzizi Roots crate at
+  0.3.0, not 0.1.0. Its MCP paragraph adds the `astro` build in `mzizi_get_component`, the
+  `astro` filter and `astroFile`, and `mzizi_get_skills`' `category`.
+- **`/ecosystem` and `/.well-known/mcp.json`** name `mzizi-mcp` 0.13.0, not 0.11.2, as the
+  server that answers without a token except for the Fundi tools, re-checked on 2026-10-07.
+- **Fixed: `/cli` no longer says `mzizi add` refuses Astro.** From `@nyuchi/mzizi-cli` 0.7.0,
+  `--target astro` (inferred in an Astro project) installs a component's pure `.astro` from
+  `/v1/astro/<name>` into `src/components/mzizi/`. The page reads the npm version at build time
+  and says which applies; the heading reads "every target" instead of "both targets".
+- **Fixed: the rendered-page check expects 656 components (N2 388), not 655 (N2 387).** The
+  registry's v4.6.0 added `markdown-parse` (installed with `markdown-renderer`), and api.mzizi.dev
+  now serves it, so `scripts/verify-rendered.py` failed on every build. `AGENTS.md`, `README.md`
+  and a code comment state the same count.
+- `index.html`'s compiler figures still cite language `62a0f32`. Re-run at `main` `a8d5f55`:
+  `cargo test --workspace` gives 425 tests in 18 suites and `mz contract` 29 clauses over the
+  nine primitives, all passing, but `compiler/src` is 12,645 lines while the language README,
+  which `check-facts.py` compares with, still says 12,644. The commit moves once the README does.
+
 ### Added — `AGENTS.md` loads the Mzizi dev skills (2026-10-06)
 
 - **`AGENTS.md` gains "Dev skills, progress reports and the merge gate"**, the canonical rule block from nyuchi/.github#87, after "Track big work in GitHub issues": load the Mzizi dev skills (`digital-hygiene` and `progress-report`), clone only into a directory unique to the agent, run dev work on a 10-minute progress-report loop whose ticks never publish, release, merge or deploy without the owner's approval, and merge only through the merge gate. Docs only: no behaviour changes, and CI is unchanged.
