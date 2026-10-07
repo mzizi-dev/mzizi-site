@@ -241,6 +241,60 @@ if arms:
           react is not None and (react.group(1).startswith("exists") == ("react" in present)),
           react.group(1) if react else "missing")
 
+# Progress toward M1 (owner, 2026-10-07). The landing page and /language list
+# the pull requests that are in progress, labelled as not available. One that
+# has merged or closed is no longer in progress: move it (to "Landing on
+# staging", or "On main today" once released) in src/lib/progress.ts and
+# llms.txt. A pull request that merges into main and turns a tracker row ✅
+# also changes what the site says Mzizi lacks (the tracker check above).
+print("\nprogress toward M1 (open pull requests)")
+PULL = r'https://github\.com/mzizi-dev/mzizi/pull/(\d+)'
+raw_index = (DIST / "index.html").read_text(encoding="utf-8")
+column = raw_index.split('id="toward-m1"', 1)
+check("index.html has the “In progress toward M1” column (id toward-m1)", len(column) == 2)
+listed = sorted({int(n) for n in re.findall(r'href="' + PULL + '"', column[1].split("</ul>", 1)[0])}) if len(column) == 2 else []
+# llms.txt carries the same list by hand, under its "In progress toward M1" item.
+llms_raw = (DIST / "llms.txt").read_text(encoding="utf-8")
+llms_block = re.search(r"\*\*In progress toward M1, not available:\*\*(.*?)\n- \*\*", llms_raw, re.S)
+check("llms.txt has its “In progress toward M1” list", llms_block is not None)
+llms_listed = sorted({int(n) for n in re.findall(PULL, llms_block.group(1))}) if llms_block else []
+check("llms.txt lists the same pull requests in progress as index.html", llms_listed == listed,
+      f"llms.txt {llms_listed}, index.html {listed}")
+check("index.html lists pull requests in progress toward M1", bool(listed))
+for number in sorted(set(listed) | set(llms_listed)):
+    state = upstream(f"mzizi-dev/mzizi#{number}",
+                     lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/pulls/{number}"))
+    if state:
+        merged = state.get("merged_at")
+        is_open = state["state"] == "open"
+        check(f"#{number} is still open, as the site says", is_open,
+              "" if is_open else
+              f"merged into {state['base']['ref']} on {merged[:10]}: move it out of “In progress”"
+              if merged else "closed: take it out of “In progress”")
+# Every open pull request that works toward M1 (its body refers to #69) is listed.
+open_prs = upstream("the language's open pull requests",
+                    lambda: fetch_json("https://api.github.com/repos/mzizi-dev/mzizi/pulls?state=open&per_page=100"))
+if open_prs is not None:
+    for pr in open_prs:
+        if re.search(r"(?<![\w/])#69\b|issues/69\b", pr.get("body") or ""):
+            check(f"#{pr['number']} (open, refs #69) is listed in progress toward M1",
+                  pr["number"] in listed, pr["title"])
+# Staging released: RFC-0013 reaching main's design/ means the "Landing on
+# staging" column has shipped. Move its items to "On main today", and re-read
+# the tracker (C1–C5 and C10 may be ✅, which changes what the site says Mzizi
+# lacks).
+if design and any(entry["name"].startswith("RFC-0013") for entry in design):
+    hits = [name for name in pages
+            if "mzizi/blob/staging/design/RFC-0013" in (DIST / name).read_text(encoding="utf-8")
+            or re.search(r"RFC-0013[^.]{0,200}\bnot yet (on|released to) main\b", pages[name], re.I)]
+    check("no page still places RFC-0013 on staging (it is in main's design/)", not hits, ", ".join(hits))
+# mz run reaching main (tracker C10 ✅): no page may still say it is not there.
+if tracker and rows.get("C10") == "✅":
+    hits = [name for name, text in pages.items()
+            if re.search(r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)|\bno mz run\b",
+                         text, re.I)]
+    check("no page says mz run is not on main (tracker C10 is ✅)", not hits, ", ".join(hits))
+
 # The skill pages carry @nyuchi/mzizi-skills as /v1/skills serves it. Language
 # facts in them that went stale upstream are the skills-freshness agent's to
 # fix, not this site's, so they are notes here, not failures.

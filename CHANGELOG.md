@@ -21,6 +21,61 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — where Mzizi stands: shipped, next, and in progress toward M1 (2026-10-07)
+
+The owner asked on 2026-10-07 for the site to show progress and where the language is.
+
+- **The landing page's status section and `/language` gain three columns**, from one source
+  (`src/lib/progress.ts`, rendered by `src/components/Progress.astro`):
+  - **On main today**: what Mzizi can do on `mzizi-dev/mzizi` `main` (`0653903`), taken from
+    `LANGUAGE-TRACKER.md`, and what the 7 October release added (the nesting cap `MZ0411`,
+    `match` in a view as `MZ0410`, escaped file names in `mz build`'s comments, robustness
+    tests, no `unsafe` in the compiler, RFC-0012 §8, the React arm's pins, pinned workflows).
+  - **Landing on staging** (`509bc2f`), not yet released: RFC-0013, the core language, a
+    draft (mzizi#76), with its amendments from the language survey (mzizi#81); the foundation slice, with `program`, `fn`, `let`/`var`, `int`/`bool`/
+    `text` expressions, `when`/`else`, `print` and `mz run` (mzizi#80), whose tracker rows
+    stay 🟡 until it reaches `main`; `design/LANGUAGE-SURVEY.md` (design input); release
+    notes from the changelog (mzizi#82); and `CLAUDE.md` (mzizi#77).
+  - **In progress toward M1**, labelled "Not available yet": the tracking issue mzizi#69,
+    Wave 1's numbers (mzizi#83), the performance suite against hand-written Rust
+    (mzizi#85, the benchmark only, no result) and a pre-commit hook (mzizi#84), all open and
+    unmerged.
+- **`/language` adds "Progress toward M1"** with the owner's decisions of 2026-10-07 from
+  mzizi#69, and the one informal `fib(40)` timing recorded there, stated as one noisy run on
+  one machine: slower than Rust's default build, about level with Rust under the same
+  overflow checks, and not a benchmark.
+- **RFC-0013 is in the RFC lists** on `/language` and in `llms.txt`, linked to its file on
+  `staging` and its pull request, not to a file on `main`. `/language` and `llms.txt` link the
+  language survey on `staging`. `/`, `/cli` and `/language` say `mz run` is on `staging`, not
+  yet on `main`.
+- **`llms.txt` gains "Where it stands"**, with the same three lists, the owner's decisions,
+  and an instruction never to describe the in-progress work as something Mzizi has.
+
+### Changed — the language figures move from `9a88e1d` to `0653903` (2026-10-07)
+
+- From a fresh `cargo test --workspace` at `0653903`: **437 tests in 19 suites** (was 428 in
+  18), 306 of them in the compiler crate, and **12,916 lines** in `compiler/src` (was
+  12,706). `mz contract` still gives 29 clauses over the nine primitives, and the captured
+  `mz check --agent`, `mz hash`, `mz contract` and `mz build` outputs on `/language` are
+  unchanged at the new commit.
+- **The kill-criterion run no longer "waits on" the React arm's pins** (`/`, `/language`,
+  `llms.txt`): they come from the registry's lockfile since 2026-10-07
+  (`benchmarks/READINESS.md`, item 1). The rest of the list is unchanged.
+- RFC-0012's row says "draft for review", as the RFC does, and names §8's seven prior-art systems.
+
+### Changed — the rendered-content gate and the freshness check follow the progress block
+
+- **`scripts/verify-rendered.py`** requires the three columns, in order, on `/` (inside the
+  status section) and `/language`; the "Not available yet" label; links to mzizi#69, #76,
+  #80, #81, #83 and #85; RFC-0013 linked on `staging` with #76, and never on `main`, on
+  `/language` and in `llms.txt`; and the survey link. It now refuses "428 tests", "18 suites", "12,706" and a run that still "waits on" the
+  React arm's pins.
+- **`scripts/check-facts.py`** fails when a pull request listed as in progress has merged or
+  closed, when an open pull request that refers to mzizi#69 is not listed, when `llms.txt`'s
+  in-progress list differs from the landing page's, once RFC-0013 is in `main`'s `design/`
+  when a page still says it is not on `main`, and once the tracker marks C10 ✅ when a page
+  still says `mz run` is not on `main`. `AGENTS.md` describes the progress block.
+
 ### Changed — versions from the 5–7 October releases, and the language at `9a88e1d` (2026-10-07)
 
 A freshness update. The scheduled Freshness check (`scripts/check-facts.py`) failed on the

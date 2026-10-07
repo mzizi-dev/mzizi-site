@@ -83,8 +83,9 @@ and `react`. The pilots below are tests inside Phase 0, not its goal.
 **Status: two pilots run, no advantage shown; Phase 0 is not complete.** The
 compiler front end exists and is tested — a lexer, a recovering parser, an agent
 diagnostic protocol with `mz fix`, a content-addressed IR, and nine primitives
-written in Mzizi itself, covered by 428 tests in 18 suites (`mzizi-dev/mzizi` at
-`9a88e1d`; about 12,700 lines in `compiler/src`). `mz contract` evaluates
+written in Mzizi itself, covered by 437 tests in 19 suites (`mzizi-dev/mzizi` at
+`0653903`; about 12,900 lines in `compiler/src`). Blocks nest at most 64 deep
+(MZ0411), and robustness tests hold every command to ending with a diagnostic. `mz contract` evaluates
 contract blocks. A `service` with HTTP routes and handlers is checked by
 `mz check`, run in process by `mz contract` and lowered by `mz build` to a
 local Rust + axum package (RFC-0011).
@@ -108,10 +109,65 @@ pre-registered `PLAN.md`
 ([benchmarks/READINESS.md](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md)).
 The runner now reads every arm from `arm.toml`, hands `ui-spec` a
 language-neutral `spec.md`, and has a React arm, with the UI guides balanced to
-within 5%. The run still waits on: the React arm's pins taken from the
-registry's lockfile; held-out tasks in a private repository (not yet created);
+within 5%; the React arm's pins now come from the registry's lockfile. The run
+still waits on: held-out tasks in a private repository (not yet created);
 the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
+
+**Where it stands, 2026-10-07: shipped, next, and in progress.** Read from
+`mzizi-dev/mzizi`'s `main` (`0653903`), `staging` (`509bc2f`) and its open pull
+requests.
+
+- **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md): UI components
+  and their contracts, and a `service` that `mz build` lowers to a local
+  Rust + axum package. The 7 October release added the nesting cap (MZ0411),
+  `match` in a view as MZ0410, escaped file names in `mz build`'s comments,
+  robustness tests, no `unsafe` in the compiler, RFC-0012 §8's prior-art
+  survey (design), the React arm's pins from the registry's lockfile, and
+  workflows pinned to commit SHAs.
+- **On `staging`, not yet released to `main`** (so not yet something Mzizi
+  has, by the tracker's rule):
+  - [RFC-0013](https://github.com/mzizi-dev/mzizi/blob/staging/design/RFC-0013-core-language.md),
+    the core language ([#76](https://github.com/mzizi-dev/mzizi/pull/76)), with
+    the amendments from the language survey
+    ([#81](https://github.com/mzizi-dev/mzizi/pull/81)): one RFC for all of
+    Tier 1, a draft for review, with 29 questions for the owner.
+  - The foundation slice ([#80](https://github.com/mzizi-dev/mzizi/pull/80)): a
+    `program` file kind with `fn main`, functions with parameters and returns,
+    `let`/`var`, `int`/`bool`/`text` expressions, `when`/`else`, `return`,
+    `print`, and `mz run`, which lowers a program to a Rust package with no
+    dependencies, builds it and runs it. The tracker on `staging` still marks
+    these rows 🟡; they turn ✅ when the slice reaches `main`.
+  - [design/LANGUAGE-SURVEY.md](https://github.com/mzizi-dev/mzizi/blob/staging/design/LANGUAGE-SURVEY.md),
+    a survey of the top 10 languages feature by feature (design input; nothing
+    in it is implemented or measured); release notes generated from
+    `CHANGELOG.md`, with a changelog entry in every pull request
+    ([#82](https://github.com/mzizi-dev/mzizi/pull/82)); and a `CLAUDE.md`.
+- **In progress toward M1, not available:** open pull requests, not merged.
+  Never describe any of this as something Mzizi has.
+  - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
+    M1, every Tier 1 row (C1–C10) ✅ on `main`, built in waves.
+  - [#83](https://github.com/mzizi-dev/mzizi/pull/83), Wave 1's numbers: a
+    `float` type, numeric methods and the rest of the operators in a program.
+  - [#85](https://github.com/mzizi-dev/mzizi/pull/85), a performance suite
+    against hand-written Rust (`benchmarks/perf/`): the benchmark only, with
+    no overflow check removed yet and no result published.
+  - [#84](https://github.com/mzizi-dev/mzizi/pull/84), a pre-commit hook that
+    refuses a commit without a changelog entry (tooling, not the language).
+  - Next, with no pull request open yet: loops and `match`, a result type,
+    maps and collection operations, methods on records.
+- **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
+  one RFC per tier; `mz run` is to compile a program to Rust and run it; methods on records now,
+  generics after M1; integer overflow checks stay in every build, removed only
+  where the compiler proves them unnecessary; a performance suite against
+  hand-written Rust, with results in a private benchmarks repository; release
+  notes from the changelog, and a changelog entry in every pull request.
+- One informal timing is recorded in #69, and it is not a benchmark:
+  `fib(40)` on one 4-core VM, about five runs, noisy. Rust release ~390 ms,
+  Rust with overflow checks ~690 ms, the foundation slice's lowered Mzizi
+  ~730 ms: slower than Rust's default, about level with Rust under the same
+  overflow checks. The lowering it timed is on `staging`. Do not cite it as a
+  performance result.
 
 **The kill criterion is Mzizi against the best existing language for each kind of
 task** (owner, 2026-09-29;
@@ -238,7 +294,9 @@ Hostnames change; resolve one before repeating it.
 - [RFC-0009 — the comparison benchmark](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0009-comparison-benchmark.md): every language arm, the task families, per-language checkers, fairness rules, the kill criterion (§6) and publication (§7). Draft: the kill criterion and publication rule are owner decisions; its runner steps are partly built (`arm.toml`, `spec.md` input, the React and `mzizi-be` arms), and nothing has been measured
 - [RFC-0010 — contracts everywhere](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0010-contracts-everywhere.md): contracts for functions, handlers, services and records, and how they are checked and lowered. Draft; a service's contracts run in process (through RFC-0011), and nothing else in it is implemented
 - [RFC-0011 — handlers](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0011-handlers.md): the backend measurement slice: a `service` with HTTP routes and handlers, its checks, `mz contract` running it in process, and `mz build` lowering it to Rust and axum. Draft; those parts are built, and nothing has been measured
-- [RFC-0012 — the harness](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0012-harness.md): the harness, the core of the language, what the agent reads: the language as an agent reads it, the agent protocol, the plugin host, and how the skills fold in. Draft; only the agent protocol and the IR exist today
+- [RFC-0012 — the harness](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0012-harness.md): the harness, the core of the language, what the agent reads: the language as an agent reads it, the agent protocol, the plugin host, and how the skills fold in; §8 surveys prior art. Draft for review; only the agent protocol and the IR exist today
+- [RFC-0013 — the core language](https://github.com/mzizi-dev/mzizi/blob/staging/design/RFC-0013-core-language.md): all of Tier 1. On `staging` ([#76](https://github.com/mzizi-dev/mzizi/pull/76)), not yet on `main`: a draft for review; its foundation slice ([#80](https://github.com/mzizi-dev/mzizi/pull/80)) is built on `staging`, and the rest is design. Its amendments from the language survey ([#81](https://github.com/mzizi-dev/mzizi/pull/81)) are on `staging` too
+- [design/LANGUAGE-SURVEY.md](https://github.com/mzizi-dev/mzizi/blob/staging/design/LANGUAGE-SURVEY.md) (on `staging`): the top 10 languages, feature by feature, as design input. Nothing in it is implemented or measured
 - RFC-0005 is reserved and unwritten
 - [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, as Dioxus UI components and host-agnostic server components. Proposed
 - [Design System](https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc): the published Mzizi design system on claude.ai — voice and content fundamentals, visual foundations, the marks, and component previews. It is built file for file from the `design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418), which is the source of truth: change the folder, never the artifact page
