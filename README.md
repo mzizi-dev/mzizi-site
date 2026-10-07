@@ -302,8 +302,8 @@ operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
 MCP server and the CLI are free with no gate: auth is required only for the Fundi
 tools (anything that files into the Fundi issue desk or needs a console user), and
-the card says so. That change is live (`mzizi-mcp` 0.11.0, listed in the MCP
-Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-09-30):
+the card says so. That change is live (`mzizi-mcp` 0.13.0, listed in the MCP
+Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-10-07):
 `initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
 `mzizi_report_issue` ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is

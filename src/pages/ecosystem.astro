@@ -1,6 +1,13 @@
 ---
 import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
+import { crateStatus, npmStatus } from "../lib/registry";
+
+// Versions are read at build time, never typed in: the MCP server's from npm,
+// the Roots crates' from crates.io (they move together, so the umbrella's
+// version stands for all ten). scripts/check-facts.py checks the built page.
+const [mcp, roots] = await Promise.all([npmStatus("@nyuchi/mzizi-mcp"), crateStatus("mzizi-roots")]);
+const rootsAt = roots.state === "published" ? ` at ${roots.version}` : "";
 
 /**
  * The map. One row per public repository in `mzizi-dev`, with what it holds and
@@ -27,7 +34,7 @@ const repos = [
     name: "mzizi-registry",
     role: "The components: design system and registry",
     state: "shipping code; its files are what api.mzizi.dev serves",
-    body: "The components built to support the language, as its UI layer: the canonical component registry for the Mzizi ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and Mzizi Roots, the Rust components: ten crates on crates.io at 0.1.0, with mzizi-roots (UI) and mzizi-roots-server (server) as the umbrellas. It also holds the component contracts (contracts/): a versioned, machine-readable contract for each of the Mzizi Dashboard Standard's 31 app components in @bundu/ui. Its files are what api.mzizi.dev serves (through mzizi-api-gateway), and it holds no database. TypeScript and Rust.",
+    body: `The components built to support the language, as its UI layer: the canonical component registry for the Mzizi ecosystem, shadcn-compatible and installable with the shadcn CLI. Also the brand system, the design tokens, the DNA double helix the frontend architecture is organised around, and Mzizi Roots, the Rust components: ten crates on crates.io${rootsAt}, with mzizi-roots (UI) and mzizi-roots-server (server) as the umbrellas. It also holds the component contracts (contracts/): a versioned, machine-readable contract for each of the Mzizi Dashboard Standard's 31 app components in @bundu/ui. Its files are what api.mzizi.dev serves (through mzizi-api-gateway), and it holds no database. TypeScript and Rust.`,
   },
   {
     name: "mzizi-api-gateway",
@@ -115,14 +122,23 @@ const repos = [
     docs. It is Rust first: where a component has a Mzizi Roots implementation,{" "}
     <code>mzizi_get_component</code> leads with it (the crate, the{" "}
     <code>cargo add</code> line, the contract and the <code>.rs</code> source)
-    and gives the React build second, and <code>mzizi_list_components</code>{" "}
-    takes a <code>rust</code> filter. It is free with no sign-in, except the
+    then the pure Astro build where there is one, and the React build last, and{" "}
+    <code>mzizi_list_components</code> takes <code>rust</code> and{" "}
+    <code>astro</code> filters. It is free with no sign-in, except the
     Fundi tools, which file into the console's issue desk and need a console
     user. That is the owner's decision of 2026-09-29, and it is live:{" "}
-    <code>mzizi-mcp</code> 0.13.0 answers <code>initialize</code>,{" "}
-    <code>tools/list</code> and the component tools with no token, and only{" "}
-    <code>mzizi_fundi</code> and <code>mzizi_report_issue</code> ask for
-    sign-in (checked 2026-10-07). Its source is not public, so it has no row
+    {
+      mcp.state === "published" ? (
+        <>
+          <code>mzizi-mcp</code> {mcp.version}, the latest on npm when this page was built,
+        </>
+      ) : (
+        <>the server (npm could not be checked when this page was built)</>
+      )
+    }{" "}
+    answers <code>initialize</code>, <code>tools/list</code> and the component
+    tools with no token, and only <code>mzizi_fundi</code> and{" "}
+    <code>mzizi_report_issue</code> ask for sign-in (checked 2026-10-07). Its source is not public, so it has no row
     above.
   </p>
 
