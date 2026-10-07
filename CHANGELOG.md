@@ -28,9 +28,11 @@ The owner asked on 2026-10-07 for the site to show progress and where the langua
 - **The landing page's status section and `/language` gain three columns**, from one source
   (`src/lib/progress.ts`, rendered by `src/components/Progress.astro`):
   - **On main today**: what Mzizi can do on `mzizi-dev/mzizi` `main` (`0653903`), taken from
-    `LANGUAGE-TRACKER.md`, and what the 7 October release added (the nesting cap `MZ0411`,
-    `match` in a view as `MZ0410`, escaped file names in `mz build`'s comments, robustness
-    tests, no `unsafe` in the compiler, RFC-0012 §8, the React arm's pins, pinned workflows).
+    `LANGUAGE-TRACKER.md`, and what the two 7 October releases added, split by release and
+    taken from the `[Unreleased]` section of `main`'s `CHANGELOG.md`: mzizi#72 (`9a88e1d`:
+    `match` in a view as `MZ0410`, RFC-0012 §8, the React arm's pins, pinned workflows) and
+    mzizi#79 (`0653903`: the nesting cap `MZ0411`, escaped file names in `mz build`'s
+    comments, robustness tests, no `unsafe` in the compiler).
   - **Landing on staging** (`509bc2f`), not yet released: RFC-0013, the core language, a
     draft (mzizi#76), with its amendments from the language survey (mzizi#81); the foundation slice, with `program`, `fn`, `let`/`var`, `int`/`bool`/
     `text` expressions, `when`/`else`, `print` and `mz run` (mzizi#80), whose tracker rows
@@ -38,7 +40,8 @@ The owner asked on 2026-10-07 for the site to show progress and where the langua
     notes from the changelog (mzizi#82); and `CLAUDE.md` (mzizi#77).
   - **In progress toward M1**, labelled "Not available yet": the tracking issue mzizi#69,
     Wave 1's numbers (mzizi#83), the performance suite against hand-written Rust
-    (mzizi#85, the benchmark only, no result) and a pre-commit hook (mzizi#84), all open and
+    (mzizi#85, the benchmark only; no result is committed to the repository, and its pull
+    request's description records one informal run on one machine) and a pre-commit hook (mzizi#84), all open and
     unmerged.
 - **`/language` adds "Progress toward M1"** with the owner's decisions of 2026-10-07 from
   mzizi#69, and the one informal `fib(40)` timing recorded there, stated as one noisy run on

@@ -120,11 +120,15 @@ requests.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md): UI components
   and their contracts, and a `service` that `mz build` lowers to a local
-  Rust + axum package. The 7 October release added the nesting cap (MZ0411),
-  `match` in a view as MZ0410, escaped file names in `mz build`'s comments,
-  robustness tests, no `unsafe` in the compiler, RFC-0012 §8's prior-art
+  Rust + axum package. Two releases reached `main` on 7 October, and
+  `main`'s `CHANGELOG.md` still lists both under `[Unreleased]`, not in a
+  dated section. [#72](https://github.com/mzizi-dev/mzizi/pull/72)
+  (`9a88e1d`) added `match` in a view as MZ0410, RFC-0012 §8's prior-art
   survey (design), the React arm's pins from the registry's lockfile, and
   workflows pinned to commit SHAs.
+  [#79](https://github.com/mzizi-dev/mzizi/pull/79) (`0653903`) added the
+  nesting cap (MZ0411), escaped file names in `mz build`'s comments,
+  robustness tests, and no `unsafe` in the compiler.
 - **On `staging`, not yet released to `main`** (so not yet something Mzizi
   has, by the tracker's rule):
   - [RFC-0013](https://github.com/mzizi-dev/mzizi/blob/staging/design/RFC-0013-core-language.md),
@@ -151,7 +155,8 @@ requests.
     `float` type, numeric methods and the rest of the operators in a program.
   - [#85](https://github.com/mzizi-dev/mzizi/pull/85), a performance suite
     against hand-written Rust (`benchmarks/perf/`): the benchmark only, with
-    no overflow check removed yet and no result published.
+    no overflow check removed yet. No result is committed to the repository;
+    the pull request's description records one informal run on one machine.
   - [#84](https://github.com/mzizi-dev/mzizi/pull/84), a pre-commit hook that
     refuses a commit without a changelog entry (tooling, not the language).
   - Next, with no pull request open yet: loops and `match`, a result type,
