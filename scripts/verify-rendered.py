@@ -420,14 +420,25 @@ check("dist/", "no page hydrates an island or loads the React client", not islan
 # --- The share card ------------------------------------------------------
 # Without an og:image, a link preview picks any image on the page or none.
 print("\nshare card")
-og_png = DIST / "og.png"
-check("og.png", "is in dist/ and is a 1200 x 630 PNG",
-      og_png.is_file() and og_png.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
-      and int.from_bytes(og_png.read_bytes()[16:20], "big") == 1200
-      and int.from_bytes(og_png.read_bytes()[20:24], "big") == 630)
+import json as _json
+_og_manifest = pathlib.Path(__file__).resolve().parent.parent / "src" / "data" / "og-cards.json"
+og_cards = _json.loads(_og_manifest.read_text(encoding="utf-8")) if _og_manifest.is_file() else {}
+check("og-cards.json", "lists a card for the landing page and each top-level page",
+      "index" in og_cards and all(p.stem in og_cards for p in DIST.glob("*.html") if p.name != "404.html"),
+      ", ".join(p.stem for p in DIST.glob("*.html") if p.name != "404.html" and p.stem not in og_cards))
+def _is_card(f: pathlib.Path) -> bool:
+    b = f.read_bytes() if f.is_file() else b""
+    return b[:8] == b"\x89PNG\r\n\x1a\n" and int.from_bytes(b[16:20], "big") == 1200 and int.from_bytes(b[20:24], "big") == 630
+bad_png = [s for s in [*og_cards, "index-light"] if not _is_card(DIST / "og" / f"{s}.png")]
+check("og/", "every card is in dist/ as a 1200 x 630 PNG", not bad_png, ", ".join(bad_png))
+def _want_card(p: pathlib.Path) -> str:
+    rel = p.relative_to(DIST).with_suffix("").as_posix()
+    first = rel.split("/")[0]
+    return first if first in og_cards else "index"
 no_card = [p.relative_to(DIST).as_posix() for p in DIST.rglob("*.html")
-           if p.name != "404.html" and 'property="og:image" content="https://mzizi.dev/og.png"' not in p.read_text(encoding="utf-8")]
-check("dist/", "every page names the share card as its absolute og:image", not no_card, ", ".join(no_card[:5]))
+           if p.name != "404.html" and not p.relative_to(DIST).as_posix().startswith("pagefind/")
+           and f'property="og:image" content="https://mzizi.dev/og/{_want_card(p)}.png"' not in p.read_text(encoding="utf-8")]
+check("dist/", "every page names its own section's card as its absolute og:image", not no_card, ", ".join(no_card[:5]))
 check("index.html", "asks for a large-image card on X", 'name="twitter:card" content="summary_large_image"' in raw_index)
 
 # --- /.well-known --------------------------------------------------------
