@@ -1,17 +1,21 @@
 <!doctype html>
 <!--
   The share card for mzizi.dev (og:image / twitter:image), rendered by
-  scripts/generate-og.mjs at 1200 x 630: `card.html?theme=dark` to
-  public/og.png (what every page names) and `?theme=light` to
-  public/og-light.png (for posts on a light background).
+  scripts/generate-og.mjs at 1200 x 630, one per top-level page:
+  card.html?theme=dark|light&title=<page heading>&path=<url path>&fig=<n>.
 
   The blueprint layout follows the Bundu Foundation's card, so the estate's
-  cards read as one family. Mzizi's accent is hematite, its brand mineral
-  (owner, 2026-09-30); the colours are @bundu/ui's tokens, copied as values
-  because this page renders outside the site build. Mzizi is Swahili for
-  "root", so the figure is a root system where Bundu's is a tree.
-  The tagline is the landing page's, the goal Phase 0 measures, which is why
-  the figure label and the footer both say Phase 0.
+  cards read as one family. Mzizi's colour is hematite, its brand mineral
+  (owner, 2026-09-30): the surface, the grid, the rules and the figure are
+  all hematite. The seven-mineral strip is the site's own (@bundu/ui
+  MineralStrip). Colours are @bundu/ui's tokens, copied as values because
+  this page renders outside the site build. Mzizi is Swahili for "root", so
+  the figure is a root system where Bundu's is a tree.
+
+  The words are the language repo's own: the README's headline ("built to
+  make Rust better, the way TypeScript makes JavaScript better") and the
+  charter's one sharp edge (§1: designed for machine authorship). Both are
+  the design and the goal Phase 0 measures, which the footer says.
 -->
 <html lang="en">
   <head>
@@ -22,24 +26,38 @@
     />
     <style>
       :root {
-        --bg: #1a1a17;
-        --fg: #f0efe9;
-        --sub: #c9c7c0;
+        --bg: #141b1e;
+        --fg: #eceff1;
+        --sub: #b0bec5;
         --accent: #90a4ae;
-        --accent-strong: #b0bec5;
-        --grid-fine: rgb(240 239 233 / 0.035);
-        --grid-major: rgb(240 239 233 / 0.07);
-        --mark-bg: #263238;
+        --grid-fine: rgb(144 164 174 / 0.06);
+        --grid-major: rgb(144 164 174 / 0.13);
+        --mark-bg: #546e7a;
+        --mark-fg: #eceff1;
+        --cobalt: #00b0ff;
+        --tanzanite: #b388ff;
+        --malachite: #64ffda;
+        --gold: #ffd740;
+        --terracotta: #e1b07e;
+        --sodalite: #3d5afe;
+        --copper: #ff8a65;
       }
       :root[data-theme="light"] {
-        --bg: #f8f7f3;
-        --fg: #1a1a17;
-        --sub: #3d3c38;
+        --bg: #eef1f2;
+        --fg: #1c262b;
+        --sub: #37474f;
         --accent: #546e7a;
-        --accent-strong: #37474f;
-        --grid-fine: rgb(26 26 23 / 0.06);
-        --grid-major: rgb(26 26 23 / 0.16);
-        --mark-bg: #eceff1;
+        --grid-fine: rgb(84 110 122 / 0.08);
+        --grid-major: rgb(84 110 122 / 0.2);
+        --mark-bg: #546e7a;
+        --mark-fg: #eceff1;
+        --cobalt: #0047ab;
+        --tanzanite: #4b0082;
+        --malachite: #004d40;
+        --gold: #5d4037;
+        --terracotta: #a0522d;
+        --sodalite: #283593;
+        --copper: #bf5a36;
       }
       * {
         box-sizing: border-box;
@@ -63,13 +81,22 @@
           120px 120px,
           24px 24px,
           24px 24px;
-        background-position: 0 0;
         color: var(--fg);
         font-family: "Noto Sans", system-ui, sans-serif;
         position: relative;
       }
       .mono {
         font-family: "JetBrains Mono", ui-monospace, monospace;
+      }
+      .strip {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 12px;
+        display: flex;
+        flex-direction: column;
+      }
+      .strip span {
+        flex: 1;
       }
       .cross {
         position: absolute;
@@ -96,7 +123,7 @@
       }
       .handle {
         position: absolute;
-        left: 80px;
+        left: 84px;
         top: 84px;
         display: flex;
         align-items: center;
@@ -105,21 +132,24 @@
         color: var(--sub);
       }
       .mark {
-        width: 44px;
-        height: 44px;
+        width: 46px;
+        height: 46px;
         border-radius: 50%;
         background: var(--mark-bg);
-        border: 3px solid var(--accent);
+        box-shadow:
+          0 0 0 3px var(--bg),
+          0 0 0 4.5px var(--accent);
         display: grid;
         place-items: center;
       }
       .fig {
         position: absolute;
-        left: 80px;
+        left: 84px;
         top: 166px;
         font-size: 15px;
         letter-spacing: 0.14em;
         color: var(--accent);
+        text-transform: uppercase;
       }
       .fig .rule {
         margin-top: 12px;
@@ -140,25 +170,26 @@
       }
       h1 {
         position: absolute;
-        left: 76px;
-        top: 228px;
+        left: 80px;
+        top: 226px;
         font-weight: 700;
-        font-size: 80px;
-        letter-spacing: -0.01em;
+        font-size: 84px;
+        letter-spacing: -0.015em;
         line-height: 1.05;
+        white-space: nowrap;
       }
       .sub {
         position: absolute;
-        left: 80px;
+        left: 84px;
         top: 346px;
-        width: 780px;
+        width: 760px;
         font-size: 28px;
         line-height: 1.5;
         color: var(--sub);
       }
       .tags {
         position: absolute;
-        left: 80px;
+        left: 84px;
         top: 520px;
         display: flex;
         gap: 30px;
@@ -184,16 +215,18 @@
         font-size: 24px;
         color: var(--accent);
       }
+      .url b {
+        color: var(--fg);
+        font-weight: 500;
+      }
       svg.root {
         position: absolute;
         left: 922px;
         top: 112px;
       }
-      svg.root line,
-      svg.root path {
+      svg.root line {
         stroke: var(--accent);
         stroke-width: 1.5;
-        fill: none;
       }
       svg.root .ground {
         stroke-dasharray: 3 6;
@@ -201,26 +234,61 @@
       svg.root circle {
         fill: var(--accent);
       }
+      svg.root circle.heart {
+        fill: var(--mark-bg);
+        stroke: var(--accent);
+        stroke-width: 2;
+      }
     </style>
     <script>
+      const q = new URLSearchParams(location.search);
       document.documentElement.dataset.theme =
-        new URLSearchParams(location.search).get("theme") === "light"
-          ? "light"
-          : "dark";
+        q.get("theme") === "light" ? "light" : "dark";
+      addEventListener("DOMContentLoaded", () => {
+        const title = q.get("title") || "Mzizi";
+        const path = q.get("path") || "/";
+        const fig = String(q.get("fig") || "1").padStart(2, "0");
+        document.querySelector("h1").textContent = title;
+        document.querySelector(".fig .label").textContent =
+          `Fig. ${fig} — designed for machine authorship`;
+        const url = document.querySelector(".url");
+        url.textContent = "mzizi.dev";
+        if (path !== "/") {
+          const b = document.createElement("b");
+          b.textContent = path;
+          url.append(b);
+        }
+        // A long heading steps down until it fits the column beside the figure.
+        const h1 = document.querySelector("h1");
+        let size = 84;
+        while (h1.scrollWidth > 800 && size > 48) {
+          size -= 2;
+          h1.style.fontSize = `${size}px`;
+        }
+      });
     </script>
   </head>
   <body>
-    <div class="cross" style="left: 26px; top: 26px"></div>
+    <div class="strip" aria-hidden="true">
+      <span style="background: var(--cobalt)"></span>
+      <span style="background: var(--tanzanite)"></span>
+      <span style="background: var(--malachite)"></span>
+      <span style="background: var(--gold)"></span>
+      <span style="background: var(--terracotta)"></span>
+      <span style="background: var(--sodalite)"></span>
+      <span style="background: var(--copper)"></span>
+    </div>
+    <div class="cross" style="left: 34px; top: 26px"></div>
     <div class="cross" style="right: 26px; top: 26px"></div>
-    <div class="cross" style="left: 26px; bottom: 26px"></div>
+    <div class="cross" style="left: 34px; bottom: 26px"></div>
     <div class="cross" style="right: 26px; bottom: 26px"></div>
 
     <div class="handle mono">
       <span class="mark" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24">
+        <svg width="26" height="26" viewBox="0 0 24 24">
           <g
-            stroke="var(--accent-strong)"
-            stroke-width="1.6"
+            stroke="var(--mark-fg)"
+            stroke-width="1.7"
             fill="none"
             stroke-linecap="round"
           >
@@ -234,23 +302,22 @@
     </div>
 
     <div class="fig mono">
-      FIG. 01 — A PROGRAMMING LANGUAGE
+      <span class="label"></span>
       <div class="rule"></div>
     </div>
 
-    <h1>The Mzizi Language</h1>
+    <h1></h1>
 
     <p class="sub">
-      Built to make Rust better, the way TypeScript makes JavaScript better,
-      with a harness at its core.
+      Built to make Rust better, the way TypeScript makes JavaScript better.
     </p>
 
     <div class="tags mono">
       <span>Apache-2.0</span>
       <span>Compiler in Rust</span>
-      <span>Phase 0 prototype</span>
+      <span>Phase 0</span>
     </div>
-    <div class="url mono">mzizi.dev</div>
+    <div class="url mono"></div>
 
     <!--
       A root system: a stem above a dashed ground line, then roots that fork
@@ -279,7 +346,7 @@
       <circle cx="155" cy="18" r="5" />
       <circle cx="155" cy="80" r="5" />
       <circle cx="155" cy="140" r="5" />
-      <circle cx="155" cy="205" r="9" />
+      <circle class="heart" cx="155" cy="205" r="11" />
       <circle cx="70" cy="270" r="5" />
       <circle cx="240" cy="270" r="5" />
       <circle cx="155" cy="330" r="5" />
