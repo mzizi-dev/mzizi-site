@@ -193,26 +193,29 @@ if charter:
 # on main in at least a narrow form (🟡 or ✅), that sentence is wrong and this
 # fails until it is rewritten.
 tracker = upstream("the language's LANGUAGE-TRACKER.md", lambda: fetch(LANGUAGE_TRACKER))
-PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow and error handling"
-MISSING = "no modules, standard library, text operations, maps or sets, methods on records or concurrency yet"
+PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, collections and records with methods"
+MISSING = "no modules, standard library or concurrency yet, and text operations are only partly built"
 if tracker:
     rows = dict(re.findall(r"^\|\s*([A-Z]\d+)\s*\|[^|]*\|\s*(✅|🟡|📝|❌)\s*\|", tracker, re.M))
-    # C1 expressions, C2 bindings, C3 functions, C4 control flow, C9 error handling.
+    # C1 expressions, C2 bindings, C3 functions, C4 control flow, C7 collections,
+    # C8 records and methods, C9 error handling (the program's rows that are on main).
     present = {"C1": "expressions", "C2": "bindings", "C3": "functions", "C4": "control flow",
-               "C9": "error handling"}
-    # P1 modules, P2 standard library, C6 text operations, C7 maps and sets,
-    # C8 methods on records, P9 concurrency.
-    named = {"P1": "modules", "P2": "standard library", "C6": "text operations", "C7": "maps or sets",
-             "C8": "methods on records", "P9": "concurrency"}
-    check("the tracker has every row the site's sentences name", all(r in rows for r in (*present, *named)),
-          ", ".join(r for r in (*present, *named) if r not in rows))
-    done = [named[r] for r in named if rows.get(r) == "✅"]
+               "C7": "collections", "C8": "records and methods", "C9": "error handling"}
+    # P1 modules, P2 standard library, P9 concurrency: none of them built.
+    # C6 text operations: partly built (🟡), so the sentence must not say "none".
+    absent_rows = {"P1": "modules", "P2": "standard library", "P9": "concurrency"}
+    check("the tracker has every row the site's sentences name", all(r in rows for r in (*present, *absent_rows, "C6")),
+          ", ".join(r for r in (*present, *absent_rows, "C6") if r not in rows))
+    # The sentence says a row is missing: it must not be ✅ (or 🟡 for P-rows).
+    turned = [f"{absent_rows[r]} ({r} {rows.get(r)})" for r in absent_rows if rows.get(r) != "❌"]
+    # The sentence says text operations are partly built: C6 must be 🟡 (not ✅, not ❌).
+    c6_ok = rows.get("C6") == "🟡"
+    # What a program has: each named row must be ✅ or 🟡 on main.
     absent = [f"{present[r]} ({r} {rows.get(r, 'missing')})" for r in present if rows.get(r) not in ("✅", "🟡")]
     for name in ("index.html", "language.html", "llms.txt"):
-        says = MISSING in pages[name]
-        check(f"{name} says Mzizi has {MISSING}", says)
-        check(f"{name}'s list of what Mzizi lacks matches the tracker", not (says and done),
-              f"the tracker marks {', '.join(done)} ✅" if done else "")
+        check(f"{name} says Mzizi has {MISSING}", MISSING in pages[name])
+        check(f"{name}'s list of what Mzizi lacks matches the tracker", not turned and c6_ok,
+              (f"the tracker has {', '.join(turned)} not ❌" if turned else f"C6 reads {rows.get('C6')}, not 🟡"))
         has = PRESENT in pages[name]
         check(f"{name} says “{PRESENT}”", has)
         check(f"{name}'s list of what a program has matches the tracker", not (has and absent),
