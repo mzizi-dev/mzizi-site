@@ -364,7 +364,8 @@ check("index.html", "the Mzizi backend arm is mzizi-be, with the probe crate and
 LANG = "https://github.com/mzizi-dev/mzizi"
 M1_LINKS = (f"{LANG}/issues/69", f"{LANG}/pull/76", f"{LANG}/pull/80", f"{LANG}/pull/81", f"{LANG}/pull/83",
             f"{LANG}/pull/85", f"{LANG}/pull/87", f"{LANG}/pull/88", f"{LANG}/pull/89", f"{LANG}/pull/91",
-            f"{LANG}/pull/92", f"{LANG}/pull/93", f"{LANG}/pull/95", f"{LANG}/pull/96")
+            f"{LANG}/pull/92", f"{LANG}/pull/93", f"{LANG}/pull/95", f"{LANG}/pull/96",
+            f"{LANG}/pull/97", f"{LANG}/pull/98", f"{LANG}/pull/99")
 for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
                   ("language.html", (DIST / "language.html").read_text(encoding="utf-8"))):
     text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw)))
@@ -513,6 +514,10 @@ stale_patterns = {
     # Programs reached main in the 8 October release (#91).
     r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":
         "mz run is on main since the 8 October release (#91)",
+    # Text operations (C6) and collections (C7) are merged to staging (6e67658), not
+    # main: no page may still list them as M1's open work with no pull request.
+    r"M1 still needs collections, text operations and methods\s+on records|maps, sets and collection operations \(C7\), and text operations \(C6\)":
+        "C6 and C7 are on staging (#98, #99), not released; M1 still needs methods on records (C8)",
     r"\bMzizi has no functions\b|\bno expressions, bindings, callable functions\b":
         "a program has functions, expressions, bindings, control flow and errors (tracker C1–C4, C9)",
     # The React arm's pins came from the registry's lockfile on 2026-10-07
