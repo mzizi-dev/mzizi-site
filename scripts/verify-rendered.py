@@ -417,6 +417,19 @@ islands = [str(p.relative_to(DIST)) for p in all_html
            if re.search(r"<astro-island\b|renderer-url=|/_astro/client\.[^\"']*\.js", p.read_text(encoding="utf-8"))]
 check("dist/", "no page hydrates an island or loads the React client", not islands, ", ".join(islands[:5]))
 
+# --- The share card ------------------------------------------------------
+# Without an og:image, a link preview picks any image on the page or none.
+print("\nshare card")
+og_png = DIST / "og.png"
+check("og.png", "is in dist/ and is a 1200 x 630 PNG",
+      og_png.is_file() and og_png.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+      and int.from_bytes(og_png.read_bytes()[16:20], "big") == 1200
+      and int.from_bytes(og_png.read_bytes()[20:24], "big") == 630)
+no_card = [p.relative_to(DIST).as_posix() for p in DIST.rglob("*.html")
+           if p.name != "404.html" and 'property="og:image" content="https://mzizi.dev/og.png"' not in p.read_text(encoding="utf-8")]
+check("dist/", "every page names the share card as its absolute og:image", not no_card, ", ".join(no_card[:5]))
+check("index.html", "asks for a large-image card on X", 'name="twitter:card" content="summary_large_image"' in raw_index)
+
 # --- /.well-known --------------------------------------------------------
 print("\n.well-known")
 security = (DIST / ".well-known" / "security.txt").read_text(encoding="utf-8")
