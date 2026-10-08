@@ -21,56 +21,33 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
-### Changed — the 8 October language release: programs, `mz run` and the language harness are on main (2026-10-08)
+### Changed — the 8 October release (#96) is on main: the tracker's C1–C5, C9 and C10 rows read ✅, the harness has 70 codes, and #95 is on staging (2026-10-08)
 
-Read from `mzizi-dev/mzizi` on 2026-10-08, after its release pull request #91 merged as
-`be88017` and was tagged `v0.5.0`; its tree is `staging`'s `6a96e41` (both hold tree `cae0231`).
+Read from `mzizi-dev/mzizi` on 2026-10-08: the release pull request #96 merged as `dc156c5`, which
+carries `staging` at `8ac7b55` to `main` tree for tree. After it, `staging` moved to `0d25354`
+with #95 (a tracker change). No `v0.6` tag existed when this was read (`main-release.yml` tags after CI
+passes), so no page names one.
 
-- **Progress** (`src/lib/progress.ts`, the landing page, `/language`, `llms.txt`): everything
-  that was "Landing on staging" moves to "On main today": RFC-0013 (#76, #81), the foundation
-  slice and `mz run` (#80), numbers (#83), control flow (#89), errors (#87), the language
-  harness (#88), the performance suite (#85), the survey, release notes, the pre-commit hook
-  and `CLAUDE.md` (#82, #86, #77). C4 (#89) and C9 (#87), listed as in progress, merged and
-  are on `main` too. "In progress toward M1"
-  keeps the tracking issue #69 and lists the next wave (C6, C7, C8), which has no pull request
-  open. "Landing on staging" (`2240347`) lists #92: the tracker marks C1–C5, C9 and C10 ✅, on
-  `main` in the next release; the site still says the tracker on `main` marks them 🟡.
-- **What Mzizi can do**: the landing page, `/language` and `llms.txt` no longer say Mzizi has
-  no expressions, bindings, functions, loops or error handling. They say a program has them,
-  over `int`, `float`, `bool`, `text` and enums, that the tracker still marks those rows 🟡,
-  and that Mzizi has no modules, standard library, text operations, maps or sets, methods on
-  records or concurrency yet. A program lowers to a Rust package with no dependencies, beside
-  the service's axum package; no component lowers. The public suites stay blocked, now on
-  collections, text operations and a standard library rather than on functions.
-- **Real programs on three pages**: the landing page shows `examples/errors.mz`, `/language`
-  shows `examples/numbers.mz` and `/cli` shows `examples/control.mz`, each unedited, beside
-  what `mz run` printed for it at `be88017` (`src/lib/programs.ts`, new; byte for byte the
-  `.expected` files CI compares).
-- **`mz run` and `mz harness`**: `/cli` lists both as commands, with `mz build` taking a
-  service or a program, and drops `mz run` from "designed but not built". `/language` gains
-  "A program, with `mz run`" and "The language harness, with `mz harness`", with the real
-  `mz harness version` output. The harness is described as the spine of the language: what
-  tests enforce (every code has an entry or is on a frozen pending list; triggers and
-  examples still do what their entries say) and what is written by hand and not compared
-  with the checker (`say` and teaching text). Whether it helps an agent is a hypothesis the
-  benchmark is designed to test; nothing has measured it.
-- **Figures**: 643 tests in 24 suites (was 437 in 19), 512 of them in the compiler crate, and
-  26,811 lines in `compiler/src` (was 12,916), from a fresh `cargo test` and a line count at
-  `6a96e41`. The figures, the bench and the captured output now cite `be88017`; the captured
-  `mz check --agent`, `mz hash`, `mz contract` and `mz build` output was re-run and is
-  unchanged.
-- **Links**: RFC-0013 and `design/LANGUAGE-SURVEY.md` link `blob/main`, and RFC-0012's link in
-  the progress column moves from `staging` to `main`. `/ecosystem`'s language card names
-  RFC-0001 to RFC-0013, `mz run`, `mz harness` and the example programs.
-- **Checks**: `scripts/verify-rendered.py` requires RFC-0013 and the survey on `main` and no
-  `design/` link on `staging`, links to #87, #88, #89 and #91, a real program with its output
-  on the landing page, `/language` and `/cli`, and `mz run` and `mz harness` in `/cli`'s
-  command table; it refuses the old counts (437, 534, 19 suites, 12,916 lines), `mz run`
-  placed on `staging`, and "no functions" or the old missing-capabilities sentence.
-  `scripts/check-facts.py` checks the new present and missing sentences against the live
-  tracker (a missing row turning ✅, or a present row not on `main`, fails), skips a release
-  pull request when it requires every open pull request that refers to #69 to be listed, and
-  requires the in-progress column to link #69 instead of at least one pull request.
+- **Progress** (`src/lib/progress.ts`, the landing page, `/language`, `llms.txt`): #92 (the
+  tracker's C1–C5, C9 and C10 rows ✅) and #93 (the language harness registers every code a program
+  can raise) are on `main`, so they move to "On main today". #95 is on `staging`, so it moves to
+  "Landing on staging". "In progress toward M1" is down to the tracking issue #69 and the next
+  wave: no pull request is open toward M1 on 2026-10-08. Every "the tracker still marks those rows
+  🟡" sentence reads ✅ on `main`, on the landing page, `/language` and `llms.txt`.
+- **Staging**: #95 splits tracker row C8 into "User types: records and methods" (M1) and a new
+  Tier 2 row, P12, "Generics and interfaces", after M1. It changes the tracker only; it is not on
+  `main` until the next release.
+- **Figures**: 644 tests in 24 suites, 513 of them in the compiler crate (`cargo test --workspace`),
+  and 26,850 lines in `compiler/src`, from a fresh build at `dc156c5`. `mz harness definition` has
+  137 entries, 70 diagnostic codes (45 `MZ09xx` and 25 shared) and 51 pending codes; it had 133,
+  66 and 55. Every figure that cites a commit now cites `dc156c5`.
+- **Programs**: `examples/errors.mz`, `numbers.mz` and `control.mz` are unchanged since `be88017`,
+  and `mz run` at `dc156c5` prints the same bytes as their `.expected` files; `src/lib/programs.ts`
+  cites `dc156c5`.
+- **Checks**: `scripts/verify-rendered.py` requires the progress column to link #92, #93, #95 and
+  #96, and refuses the old counts (643 tests, 512 of them, 26,811 lines, 133 entries, 66 codes,
+  55 pending) and "still marks … 🟡" for C1–C5. `scripts/check-facts.py` fails when a page says the
+  tracker still marks C1–C5, C9 and C10 🟡 while the upstream tracker reads ✅.
 
 ### Changed — progress: numbers, the performance suite and the language harness land on staging; C4 in progress (2026-10-08)
 
