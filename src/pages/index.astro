@@ -82,7 +82,7 @@ const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 // The language commit the figures below were read at: a fresh build, not the
 // README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "4d0cdc3";
+const LANG_COMMIT = "1d5e578";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -142,7 +142,7 @@ const benchTerm =
 const isList = [
   {
     what: "A programming language",
-    note: "Designed to be general-purpose. Today it can declare UI components, one kind of backend program (a service with HTTP routes and handlers, RFC-0011), and programs that compute (RFC-0013). In a program, Mzizi has expressions, bindings, functions, control flow, error handling, collections and records with methods, over int, float, bool, text and enums; the tracker marks those rows ✅ (C1–C5, C7–C10). On main it has no modules, standard library or concurrency yet, and text operations are only partly built (C6 🟡; LANGUAGE-TRACKER.md). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and today a service lowers to a local Rust + axum package and a program to a Rust package with no dependencies. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
+    note: "Designed to be general-purpose. Today it can declare UI components, one kind of backend program (a service with HTTP routes and handlers, RFC-0011), and programs that compute (RFC-0013). In a program, Mzizi has expressions, bindings, functions, control flow, error handling, text operations, collections and records with methods, over int, float, bool, text and enums; the tracker marks those rows ✅ (C1–C10). On main it has no modules, standard library or concurrency yet (P1, P2, P9; LANGUAGE-TRACKER.md). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and today a service lowers to a local Rust + axum package and a program to a Rust package with no dependencies. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
   },
   {
     what: "Syntax and a type system",
@@ -271,7 +271,7 @@ const families: {
     gating: false,
     input: "MultiPL-E, EvalPlus, Aider polyglot and BaxBench, in their own languages (TypeScript, Python, Go, C++ and Rust among them). Their tasks are in every model's training data, so they never decide anything.",
     arms: [],
-    mzizi: "Blocked. A program with functions runs since the 8 October release, and it has lists, maps, sets and records with methods on main since the third release (C7, C8). These suites still need text operations that return an option or a list, and a standard library in a program, which Mzizi does not have on main yet (RFC-0009 §8; LANGUAGE-TRACKER.md, Tier 1).",
+    mzizi: "Blocked. A program with functions runs since the 8 October release, and it has text operations (C6, complete since v0.8.0), lists, maps, sets and records with methods (C7, C8). These suites still need a standard library in a program (P2), which Mzizi does not have on main yet (RFC-0009 §8; LANGUAGE-TRACKER.md).",
   },
 ];
 
@@ -366,7 +366,7 @@ const notYet = [
   },
   {
     what: "Most of a programming language, and a release",
-    note: "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, collections and records with methods, since the third 8 October release (#104, tagged v0.7.0); on main it has no modules, standard library or concurrency yet, and text operations are only partly built (C6). A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 needs the rest of text operations next, which waits on the standard library (see the status panel).",
+    note: "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, text operations, collections and records with methods, on main since the fourth 8 October release (#106, tagged v0.8.0); on main it has no modules, standard library or concurrency yet. A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 is met; M2 needs modules and the standard library first (see the status panel).",
   },
   {
     what: "The wider benchmark",
@@ -497,23 +497,21 @@ const repos: Repo[] = [
       <p>
         <strong>Mzizi is not yet a working programming language.</strong> In a
         program, Mzizi has expressions, bindings, functions, control flow, error
-        handling, collections and records with methods, over <code>int</code>,{" "}
+        handling, text operations, collections and records with methods, over <code>int</code>,{" "}
         <code>float</code>, <code>bool</code>, <code>text</code> and enums. The
-        tracker marks C1–C5 and C7–C10 ✅ on <code>main</code>, and C6 🟡. On main
-        it has no modules, standard library or concurrency yet, and text
-        operations are only partly built: slicing, search, split and parsing are
-        not. <a href={TRACKER}><strong>What still has to be built</strong></a>{" "}
+        tracker marks C1–C10 ✅ on <code>main</code>, so M1, a language that
+        computes, is met. On main it has no modules, standard library or
+        concurrency yet. <a href={TRACKER}><strong>What still has to be built</strong></a>{" "}
         (<code>LANGUAGE-TRACKER.md</code>) is the one list, stacked against
         Python, Go, C++, TypeScript and Rust, with two milestones: M1, a language
-        that computes, and M2, a working programming language. Neither is
-        reached: M1 still needs the rest of text operations (C6), which waits on
-        the standard library and an owner decision (<a href="#toward-m1">in progress toward M1</a>, below).
+        that computes (met), and M2, a working programming language. M2 is not
+        reached: it needs modules and a standard library first (<a href="#toward-m2">in progress toward M2</a>, below).
       </p>
       <p>
         <strong>The language harness is the spine of the language.</strong> Every
         feature a program has registers an entry in the compiler, and{" "}
-        on <code>main</code>, <code>mz harness definition</code> prints them as JSON: 191 entries,
-        80 of them diagnostic codes, at <code>4d0cdc3</code> (v0.7.0); 49 codes are pending. Tests enforce that every code the compiler
+        on <code>main</code>, <code>mz harness definition</code> prints them as JSON: 197 entries,
+        80 of them diagnostic codes, at <code>1d5e578</code> (v0.8.0); 49 codes are pending. Tests enforce that every code the compiler
         can emit has an entry (or, for a component's or a service's codes, is on
         a frozen pending list) and that every entry's examples and triggers still
         do what they say. Each code's <code>say</code> text and each feature's
@@ -585,9 +583,9 @@ const repos: Repo[] = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>744</b><span>tests passing, 27 suites</span></li>
+      <li class="fig"><b>760</b><span>tests passing, 27 suites</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>33,138</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>33,438</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
