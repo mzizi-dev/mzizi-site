@@ -15,10 +15,11 @@
  *   program prints its `.expected` file under `mz run`. The tracker at
  *   6a96e41 still marks C1–C5, C9 and C10 🟡, each saying it turns ✅ when
  *   it reaches `main`; until a tracker edit flips them, the site says 🟡.
- * - "On staging": nothing beyond `main`. The release took all of it.
+ * - "On staging": #92 (2240347), the one commit past 6a96e41: the tracker
+ *   marks C1–C5, C9 and C10 ✅. `main`'s tracker still marks them 🟡 until
+ *   the next release.
  * - "In progress": the open pull requests that refer to tracking issue #69,
- *   apart from the release itself: #92 (the tracker's rows turning ✅) on
- *   2026-10-08. When one
+ *   apart from a release: none on 2026-10-08. When one
  *   opens, list it here and in llms.txt (scripts/check-facts.py fails until
  *   you do); when one merges, move it.
  */
@@ -27,10 +28,11 @@ export const LANG = "https://github.com/mzizi-dev/mzizi";
 export const PROGRESS_DATE = "2026-10-08";
 // The release, and the language commits this file was written from: `main`
 // after #91 (be88017, tagged v0.5.0 by main-release.yml) holds the same tree
-// as `staging` at 6a96e41.
+// as `staging` at 6a96e41 (RELEASED_STAGING). `staging` has since moved on.
 export const RELEASE = "8 October";
 export const MAIN_COMMIT = "be88017";
-export const STAGING_COMMIT = "6a96e41";
+export const RELEASED_STAGING = "6a96e41";
+export const STAGING_COMMIT = "2240347";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -42,7 +44,7 @@ export const RELEASE_PR: Link = pr(91);
 
 export const onMain: Item[] = [
   {
-    text: "Programs that compute (RFC-0013, released to main on 8 October in #91, tagged v0.5.0). A program file kind with fn main and print; functions with typed parameters and returns, calls and recursion; let, var and assignment; int, float, bool and text expressions, the numeric methods and interpolation; when, else when, match (exhaustive, and usable as a value), for each over a range, while, break, continue and early return; enums, with columns; and errors as values: result(T, E), return error(e), a prefix try that propagates, and a match on a result. Integer overflow and division by zero stop the program (MZ0991, exit 101); a float never traps. The tracker's C1–C5, C9 and C10 rows meet their \"Done when\" tests and still read 🟡: each says it turns ✅ when it reaches main.",
+    text: 'Programs that compute (RFC-0013, released to main on 8 October in #91, tagged v0.5.0). A program file kind with fn main and print; functions with typed parameters and returns, calls and recursion; let, var and assignment; int, float, bool and text expressions, the numeric methods and interpolation; when, else when, match (exhaustive, and usable as a value), for each over a range, while, break, continue and early return; enums, with columns; and errors as values: result(T, E), return error(e), a prefix try that propagates, and a match on a result. Integer overflow and division by zero stop the program (MZ0991, exit 101); a float never traps. The tracker\'s C1–C5, C9 and C10 rows meet their "Done when" tests and still read 🟡: each says it turns ✅ when it reaches main.',
     links: [pr(80), pr(83), pr(89), pr(87), RELEASE_PR],
   },
   {
@@ -53,13 +55,19 @@ export const onMain: Item[] = [
     text: "The language harness, the spine of the language: every built feature of a program registers an entry in compiler/src/harness.rs, and mz harness version, definition and entry print the definition as JSON (133 entries, 66 of them diagnostic codes, at 6a96e41). Enforced by tests: every code the compiler can emit has an entry or is on the pending list, every trigger still raises its code with a declared fix kind, every example still checks, and every program example still prints its stated output. Written by hand and not compared with the checker: each code's say text and each feature's teaching text. component and service are registered at kind level only, with 55 codes pending. The plugin host and the generated skills are not built; tracker row H1 is 🟡.",
     links: [
       pr(88),
-      { href: `${LANG}/blob/main/design/RFC-0012-harness.md`, label: "RFC-0012" },
+      {
+        href: `${LANG}/blob/main/design/RFC-0012-harness.md`,
+        label: "RFC-0012",
+      },
     ],
   },
   {
     text: "RFC-0013, the core language: one RFC for all of Tier 1 (C1–C10), with the amendments from the language survey. A draft for review, with 29 questions for the owner: design, apart from what is built above.",
     links: [
-      { href: `${LANG}/blob/main/design/RFC-0013-core-language.md`, label: "RFC-0013" },
+      {
+        href: `${LANG}/blob/main/design/RFC-0013-core-language.md`,
+        label: "RFC-0013",
+      },
       pr(76),
       pr(81),
     ],
@@ -80,7 +88,10 @@ export const onMain: Item[] = [
   {
     text: "Also in the 8 October release: a survey of the top 10 languages as design input (nothing in it is implemented or measured), release notes generated from CHANGELOG.md, a pre-commit hook that asks for a changelog entry, and a CLAUDE.md. Tooling and docs, not the language.",
     links: [
-      { href: `${LANG}/blob/main/design/LANGUAGE-SURVEY.md`, label: "design/LANGUAGE-SURVEY.md" },
+      {
+        href: `${LANG}/blob/main/design/LANGUAGE-SURVEY.md`,
+        label: "design/LANGUAGE-SURVEY.md",
+      },
       pr(82),
       pr(86),
       pr(77),
@@ -94,8 +105,8 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: "Nothing yet. The 8 October release (#91) took all of staging to main: after it, the two hold the same tree (6a96e41). Work merged to staging from now on is listed here until the next release.",
-    links: [RELEASE_PR],
+    text: "The tracker marks C1–C5, C9 and C10 ✅; on main in the next release. The work those rows describe is already on main from the 8 October release (#91); this is the tracker catching up, and the tracker on main still marks those rows 🟡 until then.",
+    links: [pr(92)],
   },
 ];
 
@@ -103,10 +114,6 @@ export const inProgress: Item[] = [
   {
     text: "M1, a language that computes: every Tier 1 row of the tracker (C1–C10) ✅ on main, built in waves. The tracking issue.",
     links: [M1_ISSUE],
-  },
-  {
-    text: "The tracker catching up with the release: C1–C5, C9 and C10 marked ✅, now that their work is on main. A tracker edit, open to staging; until it merges and is released, the tracker on main still reads 🟡.",
-    links: [pr(92)],
   },
   {
     text: "Next in Wave 1, with no pull request open on 8 October: maps, sets and collection operations (C7), text operations (C6), and methods on records (C8). RFC-0013 designs them; none is built.",

@@ -131,8 +131,8 @@ family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
 **Where it stands, 2026-10-08: shipped, next, and in progress.** Read from
 `mzizi-dev/mzizi`'s `main` (`be88017`, tagged `v0.5.0`, after the 8 October release,
-[#91](https://github.com/mzizi-dev/mzizi/pull/91)), `staging` (`6a96e41`, the
-same tree) and its open pull requests.
+[#91](https://github.com/mzizi-dev/mzizi/pull/91)), `staging` (`2240347`, one tracker
+commit past the released `6a96e41`) and its open pull requests.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md):
   - Programs that compute, from RFC-0013's waves
@@ -185,16 +185,15 @@ same tree) and its open pull requests.
     contracts, a `service` that `mz build` lowers to a local Rust + axum
     package, the nesting cap (MZ0411), robustness tests, no `unsafe` in the
     compiler, and `match` in a view as MZ0410.
-- **On `staging`, not yet released to `main`:** nothing. The 8 October
-  release took all of `staging` to `main`.
+- **On `staging`, not yet released to `main`** (`2240347`):
+  - [#92](https://github.com/mzizi-dev/mzizi/pull/92): the tracker marks
+    C1–C5, C9 and C10 ✅; on `main` in the next release. The work those rows
+    describe is already on `main`; the tracker on `main` still marks those
+    rows 🟡 until then.
 - **In progress toward M1, not available:** open pull requests, not merged.
   Never describe any of this as something Mzizi has.
   - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
     M1, every Tier 1 row (C1–C10) ✅ on `main`, built in waves.
-  - [#92](https://github.com/mzizi-dev/mzizi/pull/92), open to `staging`:
-    the tracker marks C1–C5, C9 and C10 ✅, now that their work is on
-    `main`. Until it merges and is released, the tracker on `main` still
-    reads 🟡.
   - Next, with no pull request open on 8 October: maps, sets and collection
     operations (C7), text operations (C6), and methods on records (C8).
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
