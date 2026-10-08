@@ -31,9 +31,10 @@ Read from `mzizi-dev/mzizi` on 2026-10-08, after its release pull request #91 me
   slice and `mz run` (#80), numbers (#83), control flow (#89), errors (#87), the language
   harness (#88), the performance suite (#85), the survey, release notes, the pre-commit hook
   and `CLAUDE.md` (#82, #86, #77). C4 (#89) and C9 (#87), listed as in progress, merged and
-  are on `main` too. "Landing on staging" now says nothing is there. "In progress toward M1"
-  keeps the tracking issue #69, adds #92 (the tracker marking C1–C5, C9 and C10 ✅, open to
-  `staging`), and lists the next wave (C6, C7, C8), which has no pull request open.
+  are on `main` too. "In progress toward M1"
+  keeps the tracking issue #69 and lists the next wave (C6, C7, C8), which has no pull request
+  open. "Landing on staging" (`2240347`) lists #92: the tracker marks C1–C5, C9 and C10 ✅, on
+  `main` in the next release; the site still says the tracker on `main` marks them 🟡.
 - **What Mzizi can do**: the landing page, `/language` and `llms.txt` no longer say Mzizi has
   no expressions, bindings, functions, loops or error handling. They say a program has them,
   over `int`, `float`, `bool`, `text` and enums, that the tracker still marks those rows 🟡,
