@@ -1,6 +1,9 @@
 ---
 import Site from "../layouts/Site.astro";
 import RustCrates from "../components/RustCrates.astro";
+import Progress from "../components/Progress.astro";
+import ProgramRun from "../components/ProgramRun.astro";
+import { errorsProgram } from "../lib/programs";
 import StaticTabs from "../components/StaticTabs";
 import Hero from "@bundu/ui/Hero.astro";
 import Section from "@bundu/ui/Section.astro";
@@ -79,7 +82,7 @@ const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 // The language commit the figures below were read at: a fresh build, not the
 // README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "62a0f32";
+const LANG_COMMIT = "be88017";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -139,7 +142,7 @@ const benchTerm =
 const isList = [
   {
     what: "A programming language",
-    note: "Designed to be general-purpose. Today it can declare UI components, and one kind of backend program: a service with HTTP routes and handlers (RFC-0011). It has no expressions, bindings, callable functions, loops, error handling, modules or standard library yet (LANGUAGE-TRACKER.md). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and today only a service does, to a local Rust + axum package. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
+    note: "Designed to be general-purpose. Today it can declare UI components, one kind of backend program (a service with HTTP routes and handlers, RFC-0011), and programs that compute (RFC-0013). In a program, Mzizi has expressions, bindings, functions, control flow and error handling, over int, float, bool and text and enums; the tracker marks those rows 🟡. It has no modules, standard library, text operations, maps or sets, methods on records or concurrency yet (LANGUAGE-TRACKER.md). Rust is its platform, the way JavaScript is TypeScript's: it is designed to lower to Rust, and today a service lowers to a local Rust + axum package and a program to a Rust package with no dependencies. Its goal is to be the language you choose instead of TypeScript, Python or C++.",
   },
   {
     what: "Syntax and a type system",
@@ -155,7 +158,7 @@ const isList = [
   },
   {
     what: "A harness at its core, by design",
-    note: "The harness is the core of Mzizi: the layer an agent reads and works through. It covers the language as an agent sees it (grammar, types, contracts, canonical form), the agent protocol (mz check --agent, its diagnostics and fixes, RFC-0001 §4), and the plugin host the toolchain, the CLI, the MCP server and plugins attach to natively. Part of it exists today in the toolchain, as mz check --agent's output. The harness as a whole is designed, not built: RFC-0012, a draft, is its design. It lives in the language repository, mzizi-dev/mzizi, and the agent-tools packages (the CLI, the MCP server, fundi) are its clients.",
+    note: "The harness is the core of Mzizi: the layer an agent reads and works through. It covers the language as an agent sees it (grammar, types, contracts, canonical form), the agent protocol (mz check --agent, its diagnostics and fixes, RFC-0001 §4), and the plugin host the toolchain, the CLI, the MCP server and plugins attach to natively. Part of it exists today: mz check --agent's output, and the language harness's first slice, an entry for every feature a program has, which mz harness prints. The harness as a whole is designed, not built: RFC-0012, a draft, is its design, and its plugin host is not built. It lives in the language repository, mzizi-dev/mzizi, and the agent-tools packages (the CLI, the MCP server, fundi) are its clients.",
   },
 ];
 
@@ -182,7 +185,7 @@ const isntList = [
   },
   {
     what: "Not yet a release",
-    note: "Only a service lowers, to a local Rust + axum package (mz build). No component lowers yet, and there is no Workers, Containers or WebAssembly target, no mz run, and no published compiler crate or binary. mz is built from a checkout.",
+    note: "A service lowers, to a local Rust + axum package (mz build), and a program to a Rust package with no dependencies, which mz run builds and runs. No component lowers yet, and there is no Workers, Containers or WebAssembly target and no published compiler crate or binary. A release is a git tag, not a package: mz is built from a checkout.",
   },
 ];
 
@@ -208,7 +211,7 @@ const direction = [
 
 // What Mzizi is measured against: the benchmark's question, not its answers.
 // Every family and pin is RFC-0009 §1 and §2; every state is benchmarks/arms/
-// at mzizi-dev/mzizi 62a0f32. "exists" means a directory under
+// at mzizi-dev/mzizi 9a88e1d. "exists" means a directory under
 // benchmarks/arms/, "not added yet" means RFC-0009 proposes it and there is no
 // directory. Nothing here has a result; the results are benchmarks/results/.
 type Arm = { lang: string; state: "exists" | "exists, never run" | "not added yet" };
@@ -232,7 +235,7 @@ const families: {
       { lang: "Rust · Leptos 0.8.21", state: "exists, never run" },
       { lang: "TypeScript · React", state: "exists, never run" },
     ],
-    mzizi: "The Mzizi arm exists. The React arm's pins are provisional until they are taken from the registry's lockfile.",
+    mzizi: "The Mzizi arm exists. The React arm's pins are taken from the registry's lockfile.",
   },
   {
     id: "backend",
@@ -268,7 +271,7 @@ const families: {
     gating: false,
     input: "MultiPL-E, EvalPlus, Aider polyglot and BaxBench, in their own languages (TypeScript, Python, Go, C++ and Rust among them). Their tasks are in every model's training data, so they never decide anything.",
     arms: [],
-    mzizi: "Blocked: Mzizi has no functions yet. These suites need expressions, functions and a program that runs (RFC-0009 §8; LANGUAGE-TRACKER.md, Tier 1).",
+    mzizi: "Blocked. A program with functions runs since the 8 October release, but these suites also need lists, maps, text operations and a standard library in a program, which Mzizi does not have yet (RFC-0009 §8; LANGUAGE-TRACKER.md, Tier 1).",
   },
 ];
 
@@ -280,7 +283,7 @@ const toolchain = [
     name: "mz",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/compiler",
     kind: "Compiler",
-    note: "The compiler that implements the language: check, fix, contract, outline and build, with hash and ir for reading its content-addressed IR. mz build lowers a service only, to a local Rust + axum package. Built from a checkout with stable Rust; there is no release yet.",
+    note: "The compiler that implements the language: check, fix, contract, outline, build, run and harness, with hash and ir for reading its content-addressed IR. mz build lowers a service to a local Rust + axum package, or a program to a Rust package with no dependencies; mz run builds a program and runs it. mz harness prints the language harness's definition. Built from a checkout with stable Rust; there is no published binary.",
   },
   {
     name: "mz check --agent",
@@ -359,11 +362,11 @@ const surfaces = [
 const notYet = [
   {
     what: "The Phase 0 measurement",
-    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed; it still needs the React arm's pins from the registry's lockfile, held-out tasks, a pre-registered PLAN.md, the Leptos and React arms run end to end, and for the backend family, probe scoring in the runner, tasks B2–B5 and the other-language arms (benchmarks/READINESS.md).",
+    note: "Two pilots have run (see the status above). The run that tests the kill criterion has not. Most of the fixes pilot 2 named have landed, and the React arm's pins now come from the registry's lockfile; it still needs held-out tasks, a pre-registered PLAN.md, the Leptos and React arms run end to end, and for the backend family, probe scoring in the runner, tasks B2–B5 and the other-language arms (benchmarks/READINESS.md).",
   },
   {
     what: "Most of a programming language, and a release",
-    note: "Mzizi has no expressions, bindings, callable functions, loops, error handling, modules or standard library yet. Only a service lowers, to a local Rust + axum package; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust.",
+    note: "In a program, Mzizi has expressions, bindings, functions, control flow and error handling, since the 8 October release; it has no modules, standard library, text operations, maps or sets, methods on records or concurrency yet. A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 needs collections, text operations and methods on records next (see the status panel).",
   },
   {
     what: "The wider benchmark",
@@ -485,18 +488,39 @@ const repos: Repo[] = [
         evaluated (see the bench above). The first backend slice is in too: a{" "}
         <code>service</code> with HTTP routes and handlers, which{" "}
         <code>mz contract</code> runs in process and <code>mz build</code> lowers
-        to a local Rust + axum package that CI compiles, tests and serves. No
-        component lowers yet, and there is no Workers, Containers or WebAssembly
-        target.
+        to a local Rust + axum package that CI compiles, tests and serves. Since
+        the v0.5.0 release (8 October), a <code>program</code> computes:{" "}
+        <code>mz run</code> checks it, lowers it to a Rust package with no
+        dependencies, builds it and runs it (an example is below). No component
+        lowers yet, and there is no Workers, Containers or WebAssembly target.
       </p>
       <p>
-        <strong>Mzizi is not yet a working programming language.</strong> It has
-        no expressions, bindings, callable functions, loops, error handling,
-        modules or standard library yet.{" "}
+        <strong>Mzizi is not yet a working programming language.</strong> In a
+        program, Mzizi has expressions, bindings, functions, control flow and
+        error handling, over <code>int</code>, <code>float</code>,{" "}
+        <code>bool</code>, <code>text</code> and enums. The tracker still marks
+        those rows 🟡, partly there, though each says it turns ✅ when it
+        reaches <code>main</code>. It has no modules, standard library, text operations,
+        maps or sets, methods on records or concurrency yet.{" "}
         <a href={TRACKER}><strong>What still has to be built</strong></a>{" "}
         (<code>LANGUAGE-TRACKER.md</code>) is the one list, stacked against
         Python, Go, C++, TypeScript and Rust, with two milestones: M1, a language
-        that computes, and M2, a working programming language.
+        that computes, and M2, a working programming language. Neither is
+        reached: M1 still needs collections, text operations and methods on
+        records (<a href="#toward-m1">in progress toward M1</a>, below).
+      </p>
+      <p>
+        <strong>The language harness is the spine of the language.</strong> Every
+        feature a program has registers an entry in the compiler, and{" "}
+        <code>mz harness definition</code> prints them as JSON: 133 entries,
+        66 of them diagnostic codes. Tests enforce that every code the compiler
+        can emit has an entry (or, for a component's or a service's codes, is on
+        a frozen pending list) and that every entry's examples and triggers still
+        do what they say. Each code's <code>say</code> text and each feature's
+        teaching text are written by hand and not compared with the checker, and
+        the plugin host and the generated skills are not built. Whether an agent
+        taught by the harness writes Mzizi more reliably is a hypothesis the
+        benchmark is designed to test; nothing has measured it.
       </p>
       <p>
         <strong
@@ -528,9 +552,9 @@ const repos: Repo[] = [
           ><code>benchmarks/READINESS.md</code></a
         > audits each one. The runner now reads every arm from{" "}
         <code>arm.toml</code>, hands the <code>ui-spec</code> family a
-        language-neutral <code>spec.md</code>, and has a React arm, with the UI
-        guides balanced to within 5%. The run still waits on: the React arm's pins
-        taken from the registry's lockfile; held-out tasks, in a private
+        language-neutral <code>spec.md</code>, and has a React arm, whose pins
+        now come from the registry's lockfile, with the UI guides balanced to
+        within 5%. The run still waits on: held-out tasks, in a private
         repository that does not exist yet; the <code>PLAN.md</code> itself; the
         Leptos and React arms run end to end; and, for the backend family, probe
         scoring in the runner, tasks B2–B5 and the other-language arms.
@@ -561,9 +585,9 @@ const repos: Repo[] = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>425</b><span>tests passing, 18 suites</span></li>
+      <li class="fig"><b>643</b><span>tests passing, 24 suites</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>12,644</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>26,811</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
@@ -577,6 +601,18 @@ const repos: Repo[] = [
         >, both dated 2026-09-27.
       </span>
     </p>
+
+    <h2 class="progress-title" id="program">A program, on main since the 8 October release</h2>
+    <p>
+      One of the example programs CI runs, unedited: a function that fails with
+      an error, a caller that handles it with <code>match</code>, one that
+      propagates it with <code>try</code>, and a <code>main</code> that returns
+      a result. The output is what <code>mz run</code> printed.
+    </p>
+    <ProgramRun program={errorsProgram} />
+
+    <h2 class="progress-title" id="where">Where it stands: shipped, next, and in progress</h2>
+    <Progress />
   </Section>
 
   <Section id="benchmark">
@@ -793,7 +829,7 @@ const repos: Repo[] = [
     <SectionHeader
       eyebrow="Toolchain"
       title="The toolchain, built to support the language"
-      description="The toolchain is not the language. The mz compiler implements it; the rest gives an agent a denser loop, measures whether the language works, and puts the components and docs within an agent's reach. Each is meant to attach natively to the harness at the core of the language, which is designed and not built yet."
+      description="The toolchain is not the language. The mz compiler implements it; the rest gives an agent a denser loop, measures whether the language works, and puts the components and docs within an agent's reach. Each is meant to attach natively to the harness at the core of the language, whose first slice (mz harness) is built and whose plugin host is not."
     />
     <ul class="card-list">
       {
@@ -1017,7 +1053,7 @@ const repos: Repo[] = [
     const resetBtn = document.getElementById("bench-reset");
     if (!srcEl || !termEl || !resetBtn) return;
 
-    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@62a0f32,
+    // The real button.mz, lines 17-23 and 46-52 (mzizi-dev/mzizi@9a88e1d,
     // unchanged since 0d91ccd). The class column is left out of the view; a
     // step stands for editing the class and the height together, since a
     // height that disagrees with its class is MZ0313 at check time.
@@ -1174,6 +1210,10 @@ const repos: Repo[] = [
 
   #benchmark .section-links a + a {
     margin-inline-start: var(--space-lg, 1.5rem);
+  }
+
+  .progress-title {
+    margin-block-start: var(--space-xl);
   }
 
   .families h3 code {

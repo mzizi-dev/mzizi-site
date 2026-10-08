@@ -1,0 +1,84 @@
+---
+import { Badge } from "@bundu/ui/ui/badge";
+import { Card } from "@bundu/ui/ui/card";
+import {
+  inProgress,
+  MAIN_COMMIT,
+  RELEASE,
+  onMain,
+  onStaging,
+  PROGRESS_DATE,
+  RELEASED_STAGING,
+  STAGING_COMMIT,
+  LANG,
+  type Item,
+} from "../lib/progress";
+
+/**
+ * Three columns: on `main`, on `staging`, and in open pull requests. Rendered
+ * on the landing page (inside the status section) and on /language. The data
+ * and its sources are in src/lib/progress.ts.
+ */
+
+const columns: { id: string; badge: string; title: string; lede: string; items: Item[] }[] = [
+  {
+    id: "on-main",
+    badge: "Shipped",
+    title: "On main today",
+    lede: `What Mzizi can do, from LANGUAGE-TRACKER.md and CHANGELOG.md on main (${MAIN_COMMIT}) after the ${RELEASE} release (#91, tagged v0.5.0), whose tree is staging's ${RELEASED_STAGING}.`,
+    items: onMain,
+  },
+  {
+    id: "on-staging",
+    badge: "Next release",
+    title: "Landing on staging",
+    lede: `Merged to staging and not yet released to main, as of ${STAGING_COMMIT}.`,
+    items: onStaging,
+  },
+  {
+    id: "toward-m1",
+    badge: "Not available yet",
+    title: "In progress toward M1",
+    lede: "The tracking issue and open pull requests, not merged. None of this is in Mzizi today.",
+    items: inProgress,
+  },
+];
+---
+
+<div class="progress" id="progress">
+  <p class="provenance">
+    <span>
+      Where Mzizi stands on {PROGRESS_DATE}, read from{" "}
+      <a href={LANG}><code>mzizi-dev/mzizi</code></a>: its <code>main</code> and{" "}
+      <code>staging</code> branches and its open pull requests.
+    </span>
+  </p>
+  <ul class="grid-3 progress-cols">
+    {
+      columns.map((c) => (
+        <li id={c.id}>
+          <Card padding="sm" className="h-full flow">
+            <Badge variant={c.id === "on-main" ? "default" : "outline"} size="sm">
+              {c.badge}
+            </Badge>
+            <h3>{c.title}</h3>
+            <p class="state">{c.lede}</p>
+            <ul>
+              {c.items.map((item) => (
+                <li>
+                  {item.text}
+                  {item.links?.map((l) => (
+                    <>
+                      {" "}
+                      <a href={l.href}>{l.label}</a>
+                    </>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </li>
+      ))
+    }
+  </ul>
+</div>
