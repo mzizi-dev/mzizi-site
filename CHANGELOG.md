@@ -26,7 +26,7 @@ cut, the Unreleased entries move under it.
 Read from `mzizi-dev/mzizi` on 2026-10-08. Release pull request #104 ("chore(release): staging to main") merged
 to `main` as `4d0cdc3`, carrying #97–#103. `staging` (`1743e3c`) holds the same tree, so nothing is waiting on
 `staging`. `main-release.yml` tagged `4d0cdc3` as `v0.7.0` after CI passed (18:03Z); the pages name the tag and
-`check-facts.py` checks it points at the cited commit. The one open pull request toward M1 is #105 (docs, no mark changes); it is listed under "In progress". Earlier, no pull request was open toward
+`check-facts.py` checks it points at the cited commit. #105 (docs, no mark changes) merged to the language's `staging` while this was open, so it is listed under "Landing on staging", and no pull request toward M1 is open. Earlier, no pull request was open toward
 M1 (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none). A fresh clone of `4d0cdc3` was built in a private
 target directory and tested.
 
