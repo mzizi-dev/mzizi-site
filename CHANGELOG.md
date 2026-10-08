@@ -21,6 +21,41 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the third 8 October release reached `main`: collections, records and text methods (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08. Release pull request #104 ("chore(release): staging to main") merged
+to `main` as `4d0cdc3`, carrying #97–#103. `staging` (`1743e3c`) holds the same tree, so nothing is waiting on
+`staging`. No `v0.7.0` tag existed when this was written, so no tag is named. No pull request is open toward
+M1 (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none). A fresh clone of `4d0cdc3` was built in a private
+target directory and tested.
+
+- **Facts that moved, as measured at `4d0cdc3`:** `cargo test --workspace` gives 744 tests in 27 suites (was 644
+  in 24 on `dc156c5`), 613 of them in the compiler crate (was 513). `compiler/src` is 33,138 lines (was 26,850; a
+  fresh count). `mz harness definition` gives 191 entries, 80 diagnostic codes (53 `MZ09xx` and 27 shared) and 49
+  pending codes (was 137 entries, 70 codes and 51 pending). These are on the landing page, `/language`, `/cli`
+  and `llms.txt`, and in `scripts/verify-rendered.py` and `scripts/check-facts.py`.
+- **Tracker, as it reads on `main`:** C1–C5 and C7–C10 are ✅; C6 (text operations) is 🟡. C6 is partly built:
+  length, `contains`, `starts_with`, `ends_with`, `trim`, `to_upper`, `to_lower`, `replace` and `repeat`. Slicing,
+  search that returns an option or a list, split and parsing are not built, and wait for the standard library (P2)
+  and the owner's answer to RFC-0013 §20 Q20. Modules (P1), the standard library (P2) and concurrency (P9) are ❌.
+- **What a program has, and what it lacks, is reworded.** The sentence the site used ("on `main` it has no modules,
+  standard library, text operations, maps or sets, methods on records or concurrency yet") is no longer true: maps,
+  sets, lists and records with methods are on `main`. The new sentence says the program has collections and
+  records with methods, and that Mzizi has no modules, standard library or concurrency yet, and only part of text
+  operations. `scripts/check-facts.py` and `scripts/verify-rendered.py` hold the new sentence to the tracker, and
+  the old wording is a stale-fact pattern.
+- **Progress block:** "On main today" lists records with methods (#101, #102), collections (#99), text methods
+  (#98, partly, still 🟡), the tracker's C7–C8 rows (#104), the harness `not` precedence fix (#100) and the
+  release. "Landing on staging" says there is nothing waiting. "In progress toward M1" lists the tracking issue
+  #69 and the rest of C6, with no open pull request.
+- **Example program:** `/language` shows `examples/records.mz` (C8), unedited, with the output `mz run` printed
+  at `4d0cdc3`; the output is the file's `.expected`, which CI compares with it. The other programs shown are
+  unchanged.
+- **Re-captured at `4d0cdc3`, output unchanged:** `mz check --agent examples/connectivity_bar.mz`, `mz hash` of it,
+  `mz contract examples/registry.mz`, and `mz build examples/registry.mz` on `/language`.
+- **Not claimed:** no benchmark result changed. Both pilots still show no advantage for Mzizi, and the
+  kill-criterion run has not happened.
+
 ### Changed — the language's staging work (#97, #98, #99) is on the progress block, and C6 and C7 are not on main (2026-10-08)
 
 Read from `mzizi-dev/mzizi` on 2026-10-08: `main` is unchanged (`dc156c5`, the 8 October release), and
