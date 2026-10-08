@@ -7,36 +7,40 @@
  *
  * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-08:
  * - "On main": the 8 October release, #96 ("chore(release): staging to main"),
- *   merged as dc156c5. It carries `staging` at 8ac7b55 to `main` tree for tree
- *   (`git diff origin/main origin/staging` is empty), so it holds #92 (2240347:
- *   the tracker marks C1–C5, C9 and C10 ✅) and #93 (2f7254a, ca9446a and
- *   64c0784: the language harness registers every code a program can raise).
- *   Read from `LANGUAGE-TRACKER.md`, `README.md` and `CHANGELOG.md` at dc156c5,
- *   and from a fresh build there: `cargo test --workspace` gives 644 tests in 24
- *   suites, 513 of them in the compiler crate; `mz harness definition` gives 137
- *   entries, 70 diagnostic codes and 51 pending codes; `compiler/src` is 26,850
- *   lines; the three example programs `mz run` prints the `.expected` files for.
- *   No `v0.6` tag existed on 2026-10-08 when this was read: `main-release.yml`
- *   tags after CI passes, and the site names the tag once it exists.
- * - "Landing on staging": #95 (`claude/c8-split`), merged into `staging` on
- *   2026-10-08 as 0d25354, after the release. It splits tracker row C8 and adds
- *   P12; it changes the tracker only. It is not on `main` until the next release.
+ *   merged as dc156c5. It carries `staging` at 8ac7b55 to `main` tree for tree,
+ *   so it holds #92 (the tracker marks C1–C5, C9 and C10 ✅) and #93 (the
+ *   language harness registers every code a program can raise). Read from
+ *   `LANGUAGE-TRACKER.md`, `README.md` and `CHANGELOG.md` at dc156c5, and from a
+ *   fresh build there: `cargo test --workspace` gives 644 tests in 24 suites, 513
+ *   of them in the compiler crate; `mz harness definition` gives 137 entries, 70
+ *   diagnostic codes and 51 pending codes; `compiler/src` is 26,850 lines; the
+ *   three example programs `mz run` prints the `.expected` files for. No `v0.6`
+ *   tag existed on 2026-10-08: `main-release.yml` tags after CI passes, and the
+ *   site names the tag once it exists.
+ * - "Landing on staging": merged into `staging` after the release and not yet on
+ *   `main`, at 6e67658. #95 (0d25354) splits tracker row C8 and adds P12. #97
+ *   (3d5a56e) is a wording fix to tracker row H1. #98 (1fa00a8) builds C6's text
+ *   methods that need no option or list, and #99 (6e67658) builds C7's lists,
+ *   maps and sets. Their tracker rows read 🟡 on staging, not ✅: a row is ✅ only
+ *   once it is on `main`. Measured at 6e67658 with a fresh `cargo test --workspace`:
+ *   693 tests in 26 suites, 562 of them in the compiler crate; `mz harness
+ *   definition` gives 181 entries, 75 diagnostic codes and 50 pending codes.
  * - "In progress": the open pull requests that refer to tracking issue #69,
- *   apart from a release. None was open on 2026-10-08 after #95 merged, and no
- *   pull request is open for C6 or C7. When one opens, list it here and in
- *   llms.txt (scripts/check-facts.py fails until you do); when one merges,
- *   move it.
+ *   apart from a release. `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned
+ *   none on 2026-10-08, so the column lists the tracking issue and the work with
+ *   no pull request yet. When one opens, list it here and in llms.txt
+ *   (scripts/check-facts.py fails until you do); when one merges, move it.
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
 export const PROGRESS_DATE = "2026-10-08";
 // The release, and the language commits this file was written from: `main`
 // after #96 (dc156c5) holds the same tree as `staging` at 8ac7b55
-// (RELEASED_STAGING); `staging` has since moved to 0d25354 (#95).
+// (RELEASED_STAGING); `staging` has since moved to 6e67658 (#95, #97, #98, #99).
 export const RELEASE = "8 October";
 export const MAIN_COMMIT = "dc156c5";
 export const RELEASED_STAGING = "8ac7b55";
-export const STAGING_COMMIT = "0d25354";
+export const STAGING_COMMIT = "6e67658";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -114,8 +118,23 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: 'Tracker row C8 split (#95, merged to staging on 8 October as 0d25354): C8 becomes "User types: records and methods" for M1, and a new Tier 2 row, P12, "Generics and interfaces", comes after M1 and takes the generics and interfaces the owner deferred past M1. It changes the tracker only; nothing is built by it. On main in the next release.',
+    text: "Text methods in a program, the part of C6 that needs no option or list (RFC-0013 §10, #98, 1fa00a8): length (in Unicode scalar values), contains, starts_with, ends_with, trim, to_upper, to_lower, replace and repeat, each with a test and a language-harness entry, and examples/text.mz run through mz run in CI. Tracker row C6 reads 🟡 on staging, not ✅. Not built: the methods that return an option or a list, and text indexing, which wait for C7.",
+    links: [pr(98)],
+  },
+  {
+    text: "Collections in a program (RFC-0013 §9, #99, 6e67658): list(T), map(K, V) and set(K), with bracket literals, indexing that returns an option read with otherwise, assignment through a var, in, for each over a list, the named folds, and examples/collections.mz run through mz run in CI. Tracker row C7 reads 🟡 on staging, not ✅. Not built: option(T) written as a type, none as a value, and tuples, which are decided against.",
+    links: [pr(99)],
+  },
+  {
+    text: 'Tracker row C8 split (#95, 0d25354): C8 becomes "User types: records and methods" for M1, and a new Tier 2 row, P12, "Generics and interfaces", comes after M1 and takes the generics and interfaces the owner deferred past M1. It changes the tracker only.',
     links: [pr(95)],
+  },
+  {
+    text: "Tracker wording fix (#97, 3d5a56e): row H1 says the 70 harness codes are on main, as the release made them.",
+    links: [pr(97)],
+  },
+  {
+    text: "Measured on staging at 6e67658, not yet released: cargo test --workspace gives 693 tests in 26 suites, 562 of them in the compiler crate; mz harness definition gives 181 entries, 75 diagnostic codes and 50 pending codes. These are not the main figures above.",
   },
 ];
 
@@ -125,7 +144,7 @@ export const inProgress: Item[] = [
     links: [M1_ISSUE],
   },
   {
-    text: "Next in Wave 1, with no pull request open on 8 October: maps, sets and collection operations (C7), text operations (C6), and methods on records (C8). RFC-0013 designs them; none is built.",
+    text: "Still to build for M1, with no pull request open on 8 October: methods on records (C8). Text (C6) and collections (C7) are on staging, waiting for the next release. RFC-0013 designs the rest; none of it is built on main.",
   },
 ];
 
