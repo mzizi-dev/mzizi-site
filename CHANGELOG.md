@@ -21,6 +21,73 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the third 8 October release reached `main`: collections, records and text methods (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08. Release pull request #104 ("chore(release): staging to main") merged
+to `main` as `4d0cdc3`, carrying #97–#103. `staging` (`1743e3c`) holds the same tree, so nothing is waiting on
+`staging`. `main-release.yml` tagged `4d0cdc3` as `v0.7.0` after CI passed (18:03Z); the pages name the tag and
+`check-facts.py` checks it points at the cited commit. #105 (docs, no mark changes) merged to the language's `staging` while this was open, so it is listed under "Landing on staging", and no pull request toward M1 is open. Earlier, no pull request was open toward
+M1 (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none). A fresh clone of `4d0cdc3` was built in a private
+target directory and tested.
+
+- **Facts that moved, as measured at `4d0cdc3`:** `cargo test --workspace` gives 744 tests in 27 suites (was 644
+  in 24 on `dc156c5`), 613 of them in the compiler crate (was 513). `compiler/src` is 33,138 lines (was 26,850; a
+  fresh count). `mz harness definition` gives 191 entries, 80 diagnostic codes (53 `MZ09xx` and 27 shared) and 49
+  pending codes (was 137 entries, 70 codes and 51 pending). These are on the landing page, `/language`, `/cli`
+  and `llms.txt`, and in `scripts/verify-rendered.py` and `scripts/check-facts.py`.
+- **Tracker, as it reads on `main`:** C1–C5 and C7–C10 are ✅; C6 (text operations) is 🟡. C6 is partly built:
+  length, `contains`, `starts_with`, `ends_with`, `trim`, `to_upper`, `to_lower`, `replace` and `repeat`. Slicing,
+  search that returns an option or a list, split and parsing are not built, and wait for the standard library (P2)
+  and the owner's answer to RFC-0013 §20 Q20. Modules (P1), the standard library (P2) and concurrency (P9) are ❌.
+- **What a program has, and what it lacks, is reworded.** The sentence the site used ("on `main` it has no modules,
+  standard library, text operations, maps or sets, methods on records or concurrency yet") is no longer true: maps,
+  sets, lists and records with methods are on `main`. The new sentence says the program has collections and
+  records with methods, and that Mzizi has no modules, standard library or concurrency yet, and only part of text
+  operations. `scripts/check-facts.py` and `scripts/verify-rendered.py` hold the new sentence to the tracker, and
+  the old wording is a stale-fact pattern.
+- **Release tag:** the site names `v0.7.0` (commit `4d0cdc3`, GitHub release `releases/tag/v0.7.0`) on the landing page,
+  `/language` and `llms.txt`, and the progress block's "On main today" leads with it. `verify-rendered.py` checks the
+  pages name it; `check-facts.py` checks the tag exists and points at the commit the figures cite.
+- **Progress block:** "On main today" lists records with methods (#101, #102), collections (#99), text methods
+  (#98, partly, still 🟡), the tracker's C7–C8 rows (#104), the harness `not` precedence fix (#100) and the
+  release. "Landing on staging" says there is nothing waiting. "In progress toward M1" lists the tracking issue
+  #69 and the rest of C6, with no open pull request.
+- **Example program:** `/language` shows `examples/records.mz` (C8), unedited, with the output `mz run` printed
+  at `4d0cdc3`; the output is the file's `.expected`, which CI compares with it. The other programs shown are
+  unchanged.
+- **Re-captured at `4d0cdc3`, output unchanged:** `mz check --agent examples/connectivity_bar.mz`, `mz hash` of it,
+  `mz contract examples/registry.mz`, and `mz build examples/registry.mz` on `/language`.
+- **Not claimed:** no benchmark result changed. Both pilots still show no advantage for Mzizi, and the
+  kill-criterion run has not happened.
+
+### Changed — the language's staging work (#97, #98, #99) is on the progress block, and C6 and C7 are not on main (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08: `main` is unchanged (`dc156c5`, the 8 October release), and
+`staging` is at `6e67658`. A fresh clone of each was built and tested. No pull request is open toward
+M1 (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none).
+
+- **Progress** (`src/lib/progress.ts`, the landing page, `/language`, `llms.txt`): "Landing on staging"
+  now lists #98 (text methods in a program that need no option or list, tracker C6), #99 (lists, maps and
+  sets in a program, tracker C7), #97 (a wording fix to tracker row H1) and #95 (the C8 split). Each one is
+  on `staging` and not on `main`, so none is ✅. "In progress toward M1" is down to the tracking issue #69
+  and methods on records (C8), which no pull request builds yet.
+- **Capability wording**: the pages no longer say flatly that Mzizi has no text operations, maps or sets.
+  They say that on `main` it has none of those yet, and that text operations (C6) and collections (C7) are on
+  `staging`, not yet released. The tracker's marks are unchanged: C6 and C7 read 📝 and 🟡 on `main`, and 🟡
+  on `staging`. `check-facts.py` still reads `main`'s tracker.
+- **Figures** (measured on `staging` at `6e67658`, labelled as not `main`'s): `cargo test --workspace` gives
+  693 tests in 26 suites, 562 of them in the compiler crate; `mz harness definition` gives 181 entries,
+  75 diagnostic codes and 50 pending codes. `main`'s figures are unchanged (644 tests in 24 suites, 513 in the
+  compiler crate; 137 entries, 70 codes, 51 pending; 26,850 lines in `compiler/src`), and they stay on the
+  pages that state `main`.
+- **Checks**: `scripts/verify-rendered.py` requires the progress column to link #97, #98 and #99, and refuses
+  the old next-step wording ("maps, sets and collection operations (C7), and text operations (C6)") and
+  "M1 still needs collections, text operations and methods on records", which were true before those pull
+  requests merged. `scripts/check-facts.py` is unchanged and still holds the capability sentence to `main`'s
+  tracker.
+- **Not shown**: the example programs stay `main`'s (`examples/errors.mz`, `numbers.mz`, `control.mz`); the
+  staging examples `text.mz` and `collections.mz` are not on the site yet.
+
 ### Added — the Mzizi mark, a favicon, and the mark on the share cards (2026-10-08)
 
 - **The Mzizi mark, drawn flat in hematite**, from the owner's tree-and-roots icon: a trunk whose roots mirror its crown, one colour, no shading. `public/brand/mzizi-mark.svg` is the line mark, `#546e7a` on light and `#90a4ae` on dark (it follows the reader's colour scheme). `public/brand/mzizi-badge.svg` is the same tree with fewer, heavier strokes on a hematite disc, so it holds at 16 px.

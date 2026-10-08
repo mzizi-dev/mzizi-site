@@ -5,6 +5,7 @@ import {
   inProgress,
   MAIN_COMMIT,
   RELEASE,
+  RELEASE_TAG,
   onMain,
   onStaging,
   PROGRESS_DATE,
@@ -25,7 +26,7 @@ const columns: { id: string; badge: string; title: string; lede: string; items: 
     id: "on-main",
     badge: "Shipped",
     title: "On main today",
-    lede: `What Mzizi can do, from LANGUAGE-TRACKER.md and CHANGELOG.md on main (${MAIN_COMMIT}) after the ${RELEASE} release (#96), whose tree is staging's ${RELEASED_STAGING}.`,
+    lede: `What Mzizi can do, from LANGUAGE-TRACKER.md and CHANGELOG.md on main (${MAIN_COMMIT}, tagged ${RELEASE_TAG}) after the ${RELEASE} release (#104), whose tree is staging's ${RELEASED_STAGING}.`,
     items: onMain,
   },
   {
