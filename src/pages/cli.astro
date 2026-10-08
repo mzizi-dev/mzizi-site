@@ -15,6 +15,8 @@
  */
 import Site from "../layouts/Site.astro";
 import RustCrates from "../components/RustCrates.astro";
+import ProgramRun from "../components/ProgramRun.astro";
+import { controlProgram, PROGRAMS_COMMIT } from "../lib/programs";
 import {
   getComponentRecords,
   rustCrates,
@@ -80,8 +82,16 @@ const mzCommands = [
   { cmd: "mz hash <file.mz>", what: "The root hash of the content-addressed IR, and the stored node count." },
   { cmd: "mz ir <file.mz>", what: "Every IR node with its hash and structural path." },
   {
-    cmd: "mz build <service.mz> --out <dir>",
-    what: "Lowers a service to a local Rust + axum package, which builds with Cargo and serves HTTP (RFC-0011 §8). A service only: no component lowers yet, and there is no Workers, Containers or WebAssembly target.",
+    cmd: "mz build <file.mz> --out <dir>",
+    what: "Lowers a service to a local Rust + axum package, which builds with Cargo and serves HTTP (RFC-0011 §8), or a program to a Cargo package with no dependencies (RFC-0013 §13). No component lowers yet, and there is no Workers, Containers or WebAssembly target.",
+  },
+  {
+    cmd: "mz run [--release] <program.mz>",
+    what: "Checks a program, lowers it to a Cargo package with no dependencies, builds it with cargo build --offline and runs it, exiting with its status. Errors in the file: exit 3, nothing runs. Integer overflow or division by zero: one MZ0991 line naming the .mz position, exit 101. main returning an error: MZ0992, exit 1. Needs cargo on the path and a cache directory ($MZ_CACHE_DIR, $XDG_CACHE_HOME or ~/.cache).",
+  },
+  {
+    cmd: "mz harness version | definition [--agent] | entry <name> [--agent]",
+    what: "Prints the language harness (RFC-0012): its protocol and the SHA-256 of its definition, every entry as JSON, or one entry (a type, operator, statement, command or diagnostic code, such as try or MZ0950). Exit 2 on an unknown name.",
   },
 ];
 ---
@@ -123,17 +133,61 @@ const mzCommands = [
   </div>
   <p class="prose">
     Designed but not built: <code>mz refs</code>, <code>mz path</code>,{" "}
-    <code>mz patch</code>, <code>mz diff</code>, <code>mz run</code>,{" "}
-    <code>mz test</code> and <code>mz fmt</code> (see{" "}
+    <code>mz patch</code>, <code>mz diff</code>, <code>mz test</code>,{" "}
+    <code>mz fmt</code> and <code>mz run --agent</code> (see{" "}
     <a href="https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md"
       >what still has to be built</a
-    >). <code>mz run</code> for a <code>program</code> file is on the{" "}
-    <code>staging</code> branch
-    (<a href="https://github.com/mzizi-dev/mzizi/pull/80">mzizi-dev/mzizi#80</a>),
-    not yet released to <code>main</code>, so an <code>mz</code> built from{" "}
-    <code>main</code> does not have it. Real
-    captured output is on <a href="/language#trying-it">the language page</a>.
+    >). More captured output is on{" "}
+    <a href="/language#trying-it">the language page</a>.
   </p>
+
+  <h3 id="mz-run"><code>mz run</code>: a program, built and run</h3>
+  <div class="prose">
+    <p>
+      On <code>main</code> since the 8 October release
+      (<a href="https://github.com/mzizi-dev/mzizi/pull/91">mzizi-dev/mzizi#91</a>).
+      A program has functions, <code>let</code> and <code>var</code>,{" "}
+      <code>int</code>, <code>float</code>, <code>bool</code> and{" "}
+      <code>text</code>, enums, <code>else when</code>, <code>match</code>,{" "}
+      <code>for each</code> over a range, <code>while</code>, and errors as
+      values with <code>result</code>, <code>return error(e)</code> and{" "}
+      <code>try</code>. It has no lists, maps, text operations, methods on
+      records or modules yet. Here is the repository's{" "}
+      <code>examples/control.mz</code> (FizzBuzz, <code>match</code> over an
+      enum, an <code>int</code> and a <code>text</code>, loops with{" "}
+      <code>break</code> and <code>continue</code>), unedited, and what{" "}
+      <code>mz run</code> printed for it at <code>{PROGRAMS_COMMIT}</code>:
+    </p>
+  </div>
+  <code class="cmd lead">cargo run --bin mz -- run ../examples/control.mz</code>
+  <ProgramRun program={controlProgram} />
+  <div class="prose">
+    <p>
+      The other example programs (<code>hello</code>, <code>fib</code>,{" "}
+      <code>numbers</code>, <code>errors</code>) are in{" "}
+      <a href="https://github.com/mzizi-dev/mzizi/tree/main/examples"
+        ><code>examples/</code></a
+      >; CI runs each one and compares its output with the committed{" "}
+      <code>.expected</code> file.
+    </p>
+  </div>
+
+  <h3 id="mz-harness"><code>mz harness</code>: the language harness</h3>
+  <div class="prose">
+    <p>
+      The language harness is the spine of the language: every feature a
+      program has is registered once, in <code>compiler/src/harness.rs</code>,
+      and <code>mz harness</code> prints that definition for an agent to read
+      (133 entries at <code>{PROGRAMS_COMMIT}</code>, 66 of them diagnostic
+      codes). Tests hold the compiler and the entries together: a code with no
+      entry, a trigger that stops raising its code, or an example that stops
+      checking or printing its stated output fails the build. Each
+      code's <code>say</code> text and each feature's teaching text are written
+      by hand and not compared with the checker. A component's and a service's
+      codes are not registered yet, and the plugin host is not built.
+    </p>
+  </div>
+  <code class="cmd lead">cargo run --bin mz -- harness entry try</code>
 
   <h2 id="install">Installing components</h2>
 

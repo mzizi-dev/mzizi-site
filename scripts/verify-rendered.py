@@ -324,10 +324,13 @@ for rfc in ("RFC-0011-handlers.md", "RFC-0012-harness.md"):
 # The language tracker (owner, 2026-09-30): LANGUAGE-TRACKER.md is the one list
 # of what Mzizi still needs, and every capability claim comes from it. The
 # /language page and the landing status panel link it as "What still has to be
-# built", and the site says plainly what Mzizi does not have yet. When a
-# tracker row turns ✅, scripts/check-facts.py fails until this sentence moves.
+# built", and the site says plainly what a program has (tracker C1–C4, C9, on
+# main since the 8 October release, #91) and what Mzizi does not have yet.
+# scripts/check-facts.py holds both sentences to the live tracker: it fails when
+# a row named as missing turns ✅, or a row named as present is not on main.
 TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md"
-MISSING = "no expressions, bindings, callable functions, loops, error handling, modules or standard library yet"
+PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow and error handling"
+MISSING = "no modules, standard library, text operations, maps or sets, methods on records or concurrency yet"
 status_panel = re.search(r'id="status".*?</section>', raw_index, re.S)
 check("index.html", "the status panel links the tracker as “What still has to be built”",
       status_panel is not None and f'href="{TRACKER}"' in status_panel.group(0)
@@ -337,6 +340,7 @@ check("language.html", "links the tracker as “What still has to be built”",
 language_plain = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body)))
 for name, text in (("index.html", plain), ("language.html", language_plain), ("llms.txt", re.sub(r"\s+", " ", llms.replace("*", "")))):
     check(name, "says plainly what Mzizi does not have yet (LANGUAGE-TRACKER.md)", MISSING in text)
+    check(name, "says what a program has, and no more (LANGUAGE-TRACKER.md C1–C4, C9)", PRESENT in text)
 # The backend slice (mzizi-dev/mzizi #29–#33): a service lowers, to a local
 # Rust + axum package, and nothing else does. The pages say exactly that.
 for name, text in (("index.html", plain), ("language.html", language_plain)):
@@ -358,7 +362,8 @@ check("index.html", "the Mzizi backend arm is mzizi-be, with the probe crate and
 # the tracking issue and its open pull requests. src/lib/progress.ts holds the
 # data; scripts/check-facts.py checks each linked pull request is still open.
 LANG = "https://github.com/mzizi-dev/mzizi"
-M1_LINKS = (f"{LANG}/issues/69", f"{LANG}/pull/76", f"{LANG}/pull/80", f"{LANG}/pull/81", f"{LANG}/pull/83", f"{LANG}/pull/85")
+M1_LINKS = (f"{LANG}/issues/69", f"{LANG}/pull/76", f"{LANG}/pull/80", f"{LANG}/pull/81", f"{LANG}/pull/83",
+            f"{LANG}/pull/85", f"{LANG}/pull/87", f"{LANG}/pull/88", f"{LANG}/pull/89", f"{LANG}/pull/91")
 for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
                   ("language.html", (DIST / "language.html").read_text(encoding="utf-8"))):
     text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw)))
@@ -371,18 +376,35 @@ for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
     # In progress is never presented as shipped: the column order is fixed.
     at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M1")]
     check(name, "the three columns read main, then staging, then in progress", -1 < at[0] < at[1] < at[2])
-# RFC-0013 is on staging (#76), not on main: link its file on staging and the
-# pull request, never a design/ file on main that does not exist yet. When it
-# reaches main, link design/RFC-0013-*.md on main (check-facts.py then
-# requires it) and drop this check.
-RFC13 = f"{LANG}/blob/staging/design/RFC-0013-core-language.md"
+# RFC-0013 (#76) and the language survey reached main in the 8 October release
+# (#91): link their files on main, and no design/ file on staging anywhere.
+RFC13 = f"{LANG}/blob/main/design/RFC-0013-core-language.md"
 for name in ("language.html", "llms.txt"):
     raw = (DIST / name).read_text(encoding="utf-8")
-    check(name, "lists RFC-0013 on staging, with its pull request #76",
-          RFC13 in raw and f"{LANG}/pull/76" in raw
-          and f"{LANG}/blob/main/design/RFC-0013" not in raw)
-check("language.html", "links the language survey on staging",
-      f"{LANG}/blob/staging/design/LANGUAGE-SURVEY.md" in (DIST / "language.html").read_text(encoding="utf-8"))
+    check(name, "lists RFC-0013 on main, with its pull request #76",
+          RFC13 in raw and f"{LANG}/pull/76" in raw)
+    check(name, "links the language survey on main",
+          f"{LANG}/blob/main/design/LANGUAGE-SURVEY.md" in raw)
+staged = [str(p.relative_to(DIST)) for p in sorted(DIST.rglob("*"))
+          if p.suffix in (".html", ".txt") and f"{LANG}/blob/staging/design/" in p.read_text(encoding="utf-8")]
+check("dist/", "no page links a design/ file on staging (RFC-0013 and the survey are on main)",
+      not staged, ", ".join(staged[:5]))
+
+# Programs (RFC-0013, on main since the 8 October release). The landing page,
+# /language and /cli each show a real example program from mzizi-dev/mzizi's
+# examples/ and what mz run printed for it (src/lib/programs.ts), and /cli
+# lists mz run and mz harness as commands.
+for name, head, line in (("index.html", "program errors", "20 and 151 were rejected: too_old is above 150"),
+                         ("language.html", "program numbers", "0.1 + 0.2 is 0.30000000000000004"),
+                         ("cli.html", "program control", "collatz(27) takes 111 steps")):
+    raw = html.unescape(text_without_scripts(name, quiet=True))
+    check(name, f"shows a real program ({head}) and the output mz run printed for it",
+          head in raw and line in raw and "$ mz run examples/" in raw)
+cli_text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("cli.html", quiet=True))))
+for command in ("mz run [--release] <program.mz>", "mz harness version | definition [--agent] | entry <name> [--agent]"):
+    check("cli.html", f"lists {command.split(' [')[0].split(' |')[0]} as a command", command in cli_text)
+check("cli.html", "does not list mz run as unbuilt",
+      re.search(r"not built:[^.]*\bmz run\b(?! --agent)", cli_text) is None)
 
 # --- no framework in the browser -------------------------------------------
 # @bundu/ui's React primitives render to HTML at build time. A `client:*`
@@ -449,9 +471,14 @@ for phrase, why in stale.items():
 # goes stale, add its old wording here so it cannot come back. The live check
 # of the current values is scripts/check-facts.py, which needs the network.
 stale_patterns = {
-    r"\b(269|308|428) tests\b": "the language has 437 tests in 19 suites (mzizi-dev/mzizi 0653903)",
-    r"\b(12|14|18) suites\b": "the language's tests run in 19 suites (0653903)",
-    r"\b(6,684|7,454|12,706)\b|about 12,700 lines": "compiler/src is 12,916 lines (0653903)",
+    r"\b(269|308|428|437|534) tests\b": "the language has 643 tests in 24 suites (mzizi-dev/mzizi be88017)",
+    r"\b(12|14|18|19) suites\b": "the language's tests run in 24 suites (be88017)",
+    r"\b(6,684|7,454|12,706|12,916)\b|about 12,[79]00 lines": "compiler/src is 26,811 lines (be88017)",
+    # Programs reached main in the 8 October release (#91).
+    r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":
+        "mz run is on main since the 8 October release (#91)",
+    r"\bMzizi has no functions\b|\bno expressions, bindings, callable functions\b":
+        "a program has functions, expressions, bindings, control flow and errors (tracker C1–C4, C9)",
     # The React arm's pins came from the registry's lockfile on 2026-10-07
     # (released to mzizi-dev/mzizi main in 0653903; benchmarks/READINESS.md item 1).
     r"waits on:? the React arm's pins|still needs the React arm's pins":

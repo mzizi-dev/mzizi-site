@@ -5,32 +5,32 @@
  * Shared by the landing page's status panel and `/language`, so the two never
  * disagree. `public/llms.txt` says the same in its own words.
  *
- * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-08 (main unchanged since
- * 2026-10-07):
- * - "On main": `LANGUAGE-TRACKER.md` and `CHANGELOG.md` at `main` (0653903).
- *   Two releases reached `main` on 2026-10-07: #72 (9a88e1d) and #79
- *   (0653903). Their entries are still under `## [Unreleased]` in `main`'s
- *   CHANGELOG.md, not in a dated section. Every capability here is a tracker
- *   row that is ✅, or the narrow form a 🟡 row names.
- * - "On staging": the commits on `staging` that are not on `main`, up to
- *   faf3003 (the survey, CLAUDE.md #77, release notes #82, RFC-0013 #76 and
- *   its amendments #81, the foundation slice #80, the pre-commit hook #86,
- *   which superseded the closed #84, the performance suite #85, floats and the
- *   numeric methods #83, and the language harness #88). README.md on staging
- *   says 534 tests in the workspace, 403 of them in the compiler crate. The
- *   tracker on staging still marks C1–C5, C10 and H1 🟡: they turn ✅ only
- *   when the work reaches `main` (H1 also needs the parts not built yet).
- * - "In progress": the open pull requests and tracking issue #69. Nothing in
- *   that list is available. When one merges, move it, and when it reaches
- *   `main` and its tracker row turns ✅, change what the site says Mzizi lacks
- *   (scripts/check-facts.py fails until you do).
+ * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-08:
+ * - "On main": the 8 October release, #91 ("chore(release): staging to main"),
+ *   merged as be88017, which took `staging` at 6a96e41 to `main`: the two
+ *   commits hold the same tree (cae0231). Read from `LANGUAGE-TRACKER.md`, `README.md` and
+ *   `CHANGELOG.md` (`## 2026-10-08` and `## 2026-10-07`) at 6a96e41, and from
+ *   a fresh build there: `cargo test` gives 512 tests in the compiler crate
+ *   and 643 in the workspace (24 suites, README.md), and every example
+ *   program prints its `.expected` file under `mz run`. The tracker at
+ *   6a96e41 still marks C1–C5, C9 and C10 🟡, each saying it turns ✅ when
+ *   it reaches `main`; until a tracker edit flips them, the site says 🟡.
+ * - "On staging": nothing beyond `main`. The release took all of it.
+ * - "In progress": the open pull requests that refer to tracking issue #69,
+ *   apart from the release itself: #92 (the tracker's rows turning ✅) on
+ *   2026-10-08. When one
+ *   opens, list it here and in llms.txt (scripts/check-facts.py fails until
+ *   you do); when one merges, move it.
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
 export const PROGRESS_DATE = "2026-10-08";
-// The language's main and staging commits this file was written from.
-export const MAIN_COMMIT = "0653903";
-export const STAGING_COMMIT = "faf3003";
+// The release, and the language commits this file was written from: `main`
+// after #91 (be88017, tagged v0.5.0 by main-release.yml) holds the same tree
+// as `staging` at 6a96e41.
+export const RELEASE = "8 October";
+export const MAIN_COMMIT = "be88017";
+export const STAGING_COMMIT = "6a96e41";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -38,8 +38,32 @@ export type Item = { text: string; links?: Link[] };
 const pr = (n: number): Link => ({ href: `${LANG}/pull/${n}`, label: `#${n}` });
 
 export const M1_ISSUE: Link = { href: `${LANG}/issues/69`, label: "#69" };
+export const RELEASE_PR: Link = pr(91);
 
 export const onMain: Item[] = [
+  {
+    text: "Programs that compute (RFC-0013, released to main on 8 October in #91, tagged v0.5.0). A program file kind with fn main and print; functions with typed parameters and returns, calls and recursion; let, var and assignment; int, float, bool and text expressions, the numeric methods and interpolation; when, else when, match (exhaustive, and usable as a value), for each over a range, while, break, continue and early return; enums, with columns; and errors as values: result(T, E), return error(e), a prefix try that propagates, and a match on a result. Integer overflow and division by zero stop the program (MZ0991, exit 101); a float never traps. The tracker's C1–C5, C9 and C10 rows meet their \"Done when\" tests and still read 🟡: each says it turns ✅ when it reaches main.",
+    links: [pr(80), pr(83), pr(89), pr(87), RELEASE_PR],
+  },
+  {
+    text: "mz run, which checks a program, lowers it to a Rust package with no dependencies, builds it with Cargo and runs it, exiting with the program's status; mz build writes the same package. CI runs every example program (hello, fib, numbers, control, errors) and compares its output with a committed .expected file.",
+    links: [pr(80)],
+  },
+  {
+    text: "The language harness, the spine of the language: every built feature of a program registers an entry in compiler/src/harness.rs, and mz harness version, definition and entry print the definition as JSON (133 entries, 66 of them diagnostic codes, at 6a96e41). Enforced by tests: every code the compiler can emit has an entry or is on the pending list, every trigger still raises its code with a declared fix kind, every example still checks, and every program example still prints its stated output. Written by hand and not compared with the checker: each code's say text and each feature's teaching text. component and service are registered at kind level only, with 55 codes pending. The plugin host and the generated skills are not built; tracker row H1 is 🟡.",
+    links: [
+      pr(88),
+      { href: `${LANG}/blob/main/design/RFC-0012-harness.md`, label: "RFC-0012" },
+    ],
+  },
+  {
+    text: "RFC-0013, the core language: one RFC for all of Tier 1 (C1–C10), with the amendments from the language survey. A draft for review, with 29 questions for the owner: design, apart from what is built above.",
+    links: [
+      { href: `${LANG}/blob/main/design/RFC-0013-core-language.md`, label: "RFC-0013" },
+      pr(76),
+      pr(81),
+    ],
+  },
   {
     text: "UI components: enums with data columns, records, list and option types, a view, and contracts that mz contract evaluates. Nine primitives are written in Mzizi.",
   },
@@ -47,79 +71,31 @@ export const onMain: Item[] = [
     text: "One kind of backend program: a service with HTTP routes and handlers. mz contract runs it in process; mz build lowers it to a local Rust + axum package, which CI compiles, tests and serves.",
   },
   {
-    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, and mz build for a service only.",
+    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 643 tests in the workspace, 512 of them in the compiler crate.",
   },
   {
-    text: "From the 7 October releases (#72, #79), as listed under [Unreleased] in CHANGELOG.md on main. #79: blocks nest at most 64 deep (MZ0411, where deep nesting used to crash mz), mz build escapes file names in the comments it writes, robustness tests, and no unsafe code in the compiler. 437 tests.",
+    text: "A performance suite against hand-written Rust (benchmarks/perf): four programs, each with a Rust reference built with and without overflow checks. CI checks only that all three print the same output; no timing is gated or committed, and no overflow check is removed yet.",
+    links: [pr(85)],
+  },
+  {
+    text: "Also in the 8 October release: a survey of the top 10 languages as design input (nothing in it is implemented or measured), release notes generated from CHANGELOG.md, a pre-commit hook that asks for a changelog entry, and a CLAUDE.md. Tooling and docs, not the language.",
     links: [
-      pr(72),
-      pr(79),
-      { href: `${LANG}/blob/main/CHANGELOG.md`, label: "CHANGELOG.md" },
+      { href: `${LANG}/blob/main/design/LANGUAGE-SURVEY.md`, label: "design/LANGUAGE-SURVEY.md" },
+      pr(82),
+      pr(86),
+      pr(77),
     ],
   },
   {
-    text: "#72: match in a view is MZ0410; RFC-0012 (the harness, a draft) surveys prior art in §8; the React arm's pins come from the registry's lockfile; the workflows are pinned to commit SHAs and audited.",
-    links: [pr(72)],
+    text: "From the 7 October releases: blocks nest at most 64 deep (MZ0411, where deep nesting used to crash mz), robustness tests, no unsafe code in the compiler, and match in a view is MZ0410.",
+    links: [pr(72), pr(79)],
   },
 ];
 
 export const onStaging: Item[] = [
   {
-    text: "RFC-0013, the core language: one RFC for all of Tier 1 (C1–C10), with the amendments from the language survey (named arguments, records, options, collections and errors). A draft for review: design, apart from the foundation slice below, with 29 questions for the owner.",
-    links: [
-      {
-        href: `${LANG}/blob/staging/design/RFC-0013-core-language.md`,
-        label: "RFC-0013",
-      },
-      pr(76),
-      pr(81),
-    ],
-  },
-  {
-    text: "The foundation slice: a program file kind with fn main, functions with parameters and returns, let and var, int, bool and text expressions, when/else, return and print, and mz run, which lowers a program to a Rust package with no dependencies, builds it and runs it. Integer overflow and division by zero stop the program with MZ0991. The tracker still marks these rows 🟡: they turn ✅ when the slice reaches main.",
-    links: [pr(80)],
-  },
-  {
-    text: "Numbers in a program: a float type (IEEE 754, never traps), the numeric methods (to_float, to_int, round, floor, ceil, sqrt, is_nan, abs, min, max, pow) and the rest of the operators, with their diagnostics. This completes C1 and C5 in a program on staging; their tracker rows stay 🟡 until it reaches main.",
-    links: [pr(83)],
-  },
-  {
-    text: "The language harness, the spine of the language. RFC-0012 is amended as a design: every feature of the language registers an entry in it, and it is what an agent reads. Its first slice is built and tested: compiler/src/harness.rs registers 105 entries (the program kind, component and service at kind level only, the types, operators, numeric methods and statement forms a program has, 52 diagnostic codes and the nine mz commands), mz harness version, definition and entry print them as JSON, and drift tests fail when the compiler and the registry disagree. Every pull request that adds a language feature must add its harness entry. Each code's say text and each feature's teaching text are written by hand and not compared with the checker. The harness is designed to be tested by the benchmark; no benchmark has run on it, and nothing is measured. The plugin host and the generated skills are not built, and tracker row H1 stays 🟡.",
-    links: [
-      pr(88),
-      {
-        href: `${LANG}/blob/staging/design/RFC-0012-harness.md`,
-        label: "RFC-0012 on staging",
-      },
-    ],
-  },
-  {
-    text: "A performance suite against hand-written Rust (benchmarks/perf): four programs in the foundation slice, each with a Rust reference built with and without overflow checks. CI checks only that all three print the same output; no timing is gated or committed, and no overflow check is removed yet.",
-    links: [pr(85)],
-  },
-  {
-    text: "Tests on staging: 534 in the workspace, 403 of them in the compiler crate (README.md on staging). The figures elsewhere on this site are main's.",
-  },
-  {
-    text: "A survey of the top 10 languages, feature by feature: 63 features, each marked adopt, improve, already has, or reject. Design input only: nothing in it is implemented or measured.",
-    links: [
-      {
-        href: `${LANG}/blob/staging/design/LANGUAGE-SURVEY.md`,
-        label: "design/LANGUAGE-SURVEY.md",
-      },
-    ],
-  },
-  {
-    text: "Release notes generated from CHANGELOG.md, and a changelog entry required in every pull request. CI only.",
-    links: [pr(82)],
-  },
-  {
-    text: "A pre-commit hook (.githooks/pre-commit, installed with scripts/install-hooks.sh) that refuses a commit without a CHANGELOG.md entry and runs cargo fmt --check on staged Rust, with a test that CI's compiler job runs. Tooling, not the language. It supersedes #84, which was closed.",
-    links: [pr(86)],
-  },
-  {
-    text: "A CLAUDE.md for agents working in the repository. Docs only.",
-    links: [pr(77)],
+    text: "Nothing yet. The 8 October release (#91) took all of staging to main: after it, the two hold the same tree (6a96e41). Work merged to staging from now on is listed here until the next release.",
+    links: [RELEASE_PR],
   },
 ];
 
@@ -129,15 +105,11 @@ export const inProgress: Item[] = [
     links: [M1_ISSUE],
   },
   {
-    text: "Wave 1, control flow (C4): else when, match over an enum, int, text or bool with exhaustiveness, when and match as values, for each over a range, while, break and continue, and enums in a program. A draft pull request.",
-    links: [pr(89)],
+    text: "The tracker catching up with the release: C1–C5, C9 and C10 marked ✅, now that their work is on main. A tracker edit, open to staging; until it merges and is released, the tracker on main still reads 🟡.",
+    links: [pr(92)],
   },
   {
-    text: "Wave 1, errors (C9): enums with columns in a program, a result(T, E) type, return error(e), prefix try, a match on a result, and main returning a result (an escaped error is MZ0992, and mz run exits 1). It is to be rebased after the control-flow pull request, sharing its match and enum.",
-    links: [pr(87)],
-  },
-  {
-    text: "Next in Wave 1, with no pull request open yet: maps and collection operations, text operations, and methods on records.",
+    text: "Next in Wave 1, with no pull request open on 8 October: maps, sets and collection operations (C7), text operations (C6), and methods on records (C8). RFC-0013 designs them; none is built.",
   },
 ];
 

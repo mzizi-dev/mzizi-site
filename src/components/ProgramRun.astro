@@ -1,0 +1,80 @@
+---
+import { PROGRAMS_COMMIT, type Program } from "../lib/programs";
+
+/**
+ * One real Mzizi program and what `mz run` printed for it. The source and the
+ * output are src/lib/programs.ts, mirrored verbatim from mzizi-dev/mzizi; this
+ * component only lays them out, side by side where there is room.
+ */
+interface Props {
+  program: Program;
+  heading?: string;
+}
+
+const { program, heading } = Astro.props;
+const href = `https://github.com/mzizi-dev/mzizi/blob/${PROGRAMS_COMMIT}/${program.path}`;
+---
+
+<figure class="program-run">
+  {heading && <figcaption>{heading}</figcaption>}
+  <div class="program-panes">
+    <div class="program-pane">
+      <p class="program-label">
+        <a href={href}><code>{program.path}</code></a>
+      </p>
+      <pre><code>{program.source}</code></pre>
+    </div>
+    <div class="program-pane">
+      <p class="program-label"><code>$ mz run {program.path}</code></p>
+      <pre><code>{program.output}</code></pre>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .program-run {
+    margin-block: var(--space-md);
+  }
+
+  .program-run figcaption {
+    margin-block-end: var(--space-sm);
+  }
+
+  .program-panes {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 64rem) {
+    .program-panes {
+      grid-template-columns: 3fr 2fr;
+      align-items: start;
+    }
+  }
+
+  .program-pane {
+    min-width: 0;
+  }
+
+  .program-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--muted-foreground);
+  }
+
+  .program-pane pre {
+    margin-block-start: var(--space-xs, 0.25rem);
+    background: var(--surface-container);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    overflow-x: auto;
+    max-height: 32rem;
+  }
+
+  .program-pane pre code {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+</style>
