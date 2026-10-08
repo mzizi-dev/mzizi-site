@@ -1,0 +1,346 @@
+<!doctype html>
+<!--
+  The share card for mzizi.dev (og:image / twitter:image), rendered by
+  scripts/generate-og.mjs at 1200 x 630, one per top-level page:
+  card.html?theme=dark|light&title=<page heading>&path=<url path>&fig=<n>.
+
+  The blueprint layout follows the Bundu Foundation's card, so the estate's
+  cards read as one family. Mzizi's colour is hematite, its brand mineral
+  (owner, 2026-09-30): the surface, the grid, the rules and the figure are
+  all hematite. The mark is public/brand/mzizi-badge.svg, the owner's mark drawn
+  flat in hematite. The seven-mineral strip is the site's own (@bundu/ui
+  MineralStrip). Colours are @bundu/ui's tokens, copied as values because
+  this page renders outside the site build. Mzizi is Swahili for "root", so
+  the figure is a root system where Bundu's is a tree.
+
+  The tagline is the owner's (2026-10-08): "Designed for machine
+  authorship", the charter's one sharp edge (§1). The label is the
+  charter's title, "a general-purpose programming language". Both say what
+  Mzizi is designed for, the goal Phase 0 measures, which the footer says.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans:wght@400;700&display=block"
+    />
+    <style>
+      :root {
+        --bg: #141b1e;
+        --fg: #eceff1;
+        --sub: #b0bec5;
+        --accent: #90a4ae;
+        --grid-fine: rgb(144 164 174 / 0.06);
+        --grid-major: rgb(144 164 174 / 0.13);
+        --mark-bg: #546e7a;
+        --mark-fg: #eceff1;
+        --cobalt: #00b0ff;
+        --tanzanite: #b388ff;
+        --malachite: #64ffda;
+        --gold: #ffd740;
+        --terracotta: #e1b07e;
+        --sodalite: #3d5afe;
+        --copper: #ff8a65;
+      }
+      :root[data-theme="light"] {
+        --bg: #eef1f2;
+        --fg: #1c262b;
+        --sub: #37474f;
+        --accent: #546e7a;
+        --grid-fine: rgb(84 110 122 / 0.08);
+        --grid-major: rgb(84 110 122 / 0.2);
+        --mark-bg: #546e7a;
+        --mark-fg: #eceff1;
+        --cobalt: #0047ab;
+        --tanzanite: #4b0082;
+        --malachite: #004d40;
+        --gold: #5d4037;
+        --terracotta: #a0522d;
+        --sodalite: #283593;
+        --copper: #bf5a36;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        background-color: var(--bg);
+        background-image:
+          linear-gradient(var(--grid-major) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+          linear-gradient(var(--grid-fine) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-fine) 1px, transparent 1px);
+        background-size:
+          120px 120px,
+          120px 120px,
+          24px 24px,
+          24px 24px;
+        color: var(--fg);
+        font-family: "Noto Sans", system-ui, sans-serif;
+        position: relative;
+      }
+      .mono {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+      }
+      .strip {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 12px;
+        display: flex;
+        flex-direction: column;
+      }
+      .strip span {
+        flex: 1;
+      }
+      .cross {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+      }
+      .cross::before,
+      .cross::after {
+        content: "";
+        position: absolute;
+        background: var(--accent);
+      }
+      .cross::before {
+        left: 0;
+        right: 0;
+        top: 13.5px;
+        height: 1px;
+      }
+      .cross::after {
+        top: 0;
+        bottom: 0;
+        left: 13.5px;
+        width: 1px;
+      }
+      .handle {
+        position: absolute;
+        left: 84px;
+        top: 84px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 24px;
+        color: var(--sub);
+      }
+      .mark {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 3px var(--bg),
+          0 0 0 4.5px var(--accent);
+      }
+      .fig {
+        position: absolute;
+        left: 84px;
+        top: 166px;
+        font-size: 15px;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .fig .rule {
+        margin-top: 12px;
+        width: 100%;
+        height: 11px;
+        border-left: 1px solid var(--accent);
+        border-right: 1px solid var(--accent);
+        position: relative;
+      }
+      .fig .rule::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 5px;
+        height: 1px;
+        background: var(--accent);
+      }
+      h1 {
+        position: absolute;
+        left: 80px;
+        top: 226px;
+        font-weight: 700;
+        font-size: 84px;
+        letter-spacing: -0.015em;
+        line-height: 1.05;
+        white-space: nowrap;
+      }
+      .sub {
+        position: absolute;
+        left: 84px;
+        top: 346px;
+        width: 760px;
+        font-size: 38px;
+        line-height: 1.35;
+        color: var(--sub);
+      }
+      .tags {
+        position: absolute;
+        left: 84px;
+        top: 520px;
+        display: flex;
+        gap: 30px;
+        font-size: 21px;
+        color: var(--fg);
+      }
+      .tags span::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-right: 12px;
+        vertical-align: middle;
+        position: relative;
+        top: -2px;
+      }
+      .url {
+        position: absolute;
+        right: 81px;
+        top: 518px;
+        font-size: 24px;
+        color: var(--accent);
+      }
+      .url b {
+        color: var(--fg);
+        font-weight: 500;
+      }
+      svg.root {
+        position: absolute;
+        left: 922px;
+        top: 112px;
+      }
+      svg.root line {
+        stroke: var(--accent);
+        stroke-width: 1.5;
+      }
+      svg.root .ground {
+        stroke-dasharray: 3 6;
+      }
+      svg.root circle {
+        fill: var(--accent);
+      }
+      svg.root circle.heart {
+        fill: var(--mark-bg);
+        stroke: var(--accent);
+        stroke-width: 2;
+      }
+    </style>
+    <script>
+      const q = new URLSearchParams(location.search);
+      document.documentElement.dataset.theme =
+        q.get("theme") === "light" ? "light" : "dark";
+      addEventListener("DOMContentLoaded", () => {
+        const title = q.get("title") || "Mzizi";
+        const path = q.get("path") || "/";
+        const fig = String(q.get("fig") || "1").padStart(2, "0");
+        document.querySelector("h1").textContent = title;
+        document.querySelector(".fig .label").textContent =
+          `Fig. ${fig} — a general-purpose programming language`;
+        const url = document.querySelector(".url");
+        url.textContent = "mzizi.dev";
+        if (path !== "/") {
+          const b = document.createElement("b");
+          b.textContent = path;
+          url.append(b);
+        }
+        // A long heading steps down until it fits the column beside the figure.
+        const h1 = document.querySelector("h1");
+        let size = 84;
+        while (h1.scrollWidth > 800 && size > 48) {
+          size -= 2;
+          h1.style.fontSize = `${size}px`;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="strip" aria-hidden="true">
+      <span style="background: var(--cobalt)"></span>
+      <span style="background: var(--tanzanite)"></span>
+      <span style="background: var(--malachite)"></span>
+      <span style="background: var(--gold)"></span>
+      <span style="background: var(--terracotta)"></span>
+      <span style="background: var(--sodalite)"></span>
+      <span style="background: var(--copper)"></span>
+    </div>
+    <div class="cross" style="left: 34px; top: 26px"></div>
+    <div class="cross" style="right: 26px; top: 26px"></div>
+    <div class="cross" style="left: 34px; bottom: 26px"></div>
+    <div class="cross" style="right: 26px; bottom: 26px"></div>
+
+    <div class="handle mono">
+      <img class="mark" src="../../public/brand/mzizi-badge.svg" alt="" />
+      mzizi-dev
+    </div>
+
+    <div class="fig mono">
+      <span class="label"></span>
+      <div class="rule"></div>
+    </div>
+
+    <h1></h1>
+
+    <p class="sub">Designed for machine authorship.</p>
+
+    <div class="tags mono">
+      <span>Apache-2.0</span>
+      <span>Compiler in Rust</span>
+      <span>Phase 0</span>
+    </div>
+    <div class="url mono"></div>
+
+    <!--
+      A root system: a stem above a dashed ground line, then roots that fork
+      twice below it. Coordinates are relative to the svg's top-left.
+    -->
+    <svg
+      class="root"
+      width="264"
+      height="352"
+      viewBox="0 0 300 400"
+      aria-hidden="true"
+    >
+      <line class="ground" x1="0" y1="140" x2="300" y2="140" />
+      <line x1="155" y1="18" x2="155" y2="205" />
+      <line x1="155" y1="205" x2="70" y2="270" />
+      <line x1="155" y1="205" x2="240" y2="270" />
+      <line x1="155" y1="205" x2="155" y2="330" />
+      <line x1="70" y1="270" x2="30" y2="350" />
+      <line x1="70" y1="270" x2="95" y2="370" />
+      <line x1="240" y1="270" x2="210" y2="370" />
+      <line x1="240" y1="270" x2="280" y2="345" />
+      <line x1="155" y1="330" x2="155" y2="390" />
+      <line x1="155" y1="330" x2="125" y2="385" />
+      <line x1="155" y1="330" x2="185" y2="385" />
+
+      <circle cx="155" cy="18" r="5" />
+      <circle cx="155" cy="80" r="5" />
+      <circle cx="155" cy="140" r="5" />
+      <circle class="heart" cx="155" cy="205" r="11" />
+      <circle cx="70" cy="270" r="5" />
+      <circle cx="240" cy="270" r="5" />
+      <circle cx="155" cy="330" r="5" />
+      <circle cx="30" cy="350" r="5" />
+      <circle cx="95" cy="370" r="5" />
+      <circle cx="210" cy="370" r="5" />
+      <circle cx="280" cy="345" r="5" />
+      <circle cx="155" cy="390" r="5" />
+      <circle cx="125" cy="385" r="5" />
+      <circle cx="185" cy="385" r="5" />
+    </svg>
+  </body>
+</html>

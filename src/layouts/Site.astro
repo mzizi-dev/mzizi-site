@@ -22,6 +22,7 @@ import Breadcrumb from "@bundu/ui/Breadcrumb.astro";
 import { deriveBreadcrumbs } from "@bundu/ui";
 import { Tooltip } from "@bundu/ui/ui/tooltip";
 import "../styles/site.css";
+import ogCards from "../data/og-cards.json";
 
 interface Props {
   title: string;
@@ -129,6 +130,14 @@ const minerals = [
 // forms, and so `astro preview` highlights the same link production does.
 const here = Astro.url.pathname.replace(/\.html$/, "") || "/";
 const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
+// The share card: each top-level page has its own (scripts/generate-og.mjs,
+// listed in src/data/og-cards.json), carrying its heading and URL. A component
+// or skill page uses its section's card; anything else, the landing page's.
+const section = here === "/" ? "index" : here.split("/")[1];
+const cards: Record<string, string> = ogCards;
+const ogCard = section in cards ? section : "index";
+const ogImage = new URL(`/og/${ogCard}.png`, canonical).href;
+const ogImageAlt = `${ogCard === "index" ? "Mzizi" : `Mzizi: ${cards[ogCard]}`}, mzizi.dev${ogCard === "index" ? "" : `/${ogCard}`}. Designed for machine authorship. A general-purpose programming language; Apache-2.0, compiler in Rust, Phase 0.`;
 
 const crumbLabels = {
   language: "The language",
@@ -155,10 +164,30 @@ const crumbs =
     <title>{documentTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
+    <!-- The Mzizi mark on a hematite disc (public/brand/, scripts/generate-brand.mjs). -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:title" content={documentTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical.href} />
+    <meta property="og:site_name" content="Mzizi" />
+    <!--
+      The share card, rendered from scripts/og/card.html by
+      scripts/generate-og.mjs. Absolute, because link unfurlers do not resolve
+      a relative og:image.
+    -->
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={documentTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
     <!-- Agents that read HTML rather than llms.txt still get pointed at it. -->
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 

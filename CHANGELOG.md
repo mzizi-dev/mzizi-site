@@ -21,6 +21,22 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — the Mzizi mark, a favicon, and the mark on the share cards (2026-10-08)
+
+- **The Mzizi mark, drawn flat in hematite**, from the owner's tree-and-roots icon: a trunk whose roots mirror its crown, one colour, no shading. `public/brand/mzizi-mark.svg` is the line mark, `#546e7a` on light and `#90a4ae` on dark (it follows the reader's colour scheme). `public/brand/mzizi-badge.svg` is the same tree with fewer, heavier strokes on a hematite disc, so it holds at 16 px.
+- **The master artwork is kept as supplied**, `public/brand/mzizi-logo-master.jpg` (2576 x 1439, the gold and copper tree), as the reference the flat marks are refined from. The roots leave the ground line and the trunk along them, so no stroke end shows at a join.
+- **The site has a favicon**: `favicon.svg` (the badge), a 32 px PNG fallback and a 180 px `apple-touch-icon.png`, linked from every page. Before this, no page named an icon.
+- **The share cards** carry the badge beside `mzizi-dev`, in place of a placeholder glyph, and are regenerated.
+- `scripts/generate-brand.mjs` renders the PNGs (including 512 px copies under `public/brand/` for avatars) from the SVGs, which are the source. `scripts/verify-rendered.py` now fails when a page does not link the favicon or the touch icon, or when either file is missing from `dist/`.
+
+### Added — a share card for link previews (2026-10-08)
+
+- **Every page now has a share card** for link previews: an `og:image` and `twitter:image` with its size, type and alt text, plus `og:site_name` and `twitter:card` `summary_large_image`. Before this, no page set an image, so LinkedIn, X, Slack and WhatsApp showed whatever image they found on the page, or none.
+  - **One card per top-level page,** `/og/<page>.png` (1200 x 630), carrying that page's heading and URL (`mzizi.dev/language`, `mzizi.dev/tokens`, …). A component or skill page uses its section's card. `/og/index-light.png` is a light version of the landing page's, for posts on a light background.
+  - **The look** is the Bundu Foundation card's blueprint layout (grid, corner marks, a numbered `FIG.` label), so the estate's cards read as one family, in Mzizi's hematite: the surface, grid, rules and mark are hematite, with the site's seven-mineral strip down the left edge. The figure is a root system, since Mzizi is Swahili for "root".
+  - **The tagline is "Designed for machine authorship."** (owner, 2026-10-08), the charter's one sharp edge (§1), under the page's heading. The label is the charter's title, "a general-purpose programming language", and the footer reads "Apache-2.0 · Compiler in Rust · Phase 0": the tagline is what Mzizi is designed for, the goal Phase 0 measures, not a result.
+- `scripts/og/card.html` is the card. `scripts/generate-og.mjs` reads each built page's `<h1>`, renders its card with Playwright and writes `src/data/og-cards.json`, which `Site.astro` reads; the PNGs are generated, then committed, like the component previews. `scripts/verify-rendered.py` now fails when a top-level page has no card, a card is missing or not 1200 x 630, a page names any card but its own section's, or the landing page drops `summary_large_image`.
+
 ### Changed — the 8 October release (#96) is on main: the tracker's C1–C5, C9 and C10 rows read ✅, the harness has 70 codes, and #95 is on staging (2026-10-08)
 
 Read from `mzizi-dev/mzizi` on 2026-10-08: the release pull request #96 merged as `dc156c5`, which
