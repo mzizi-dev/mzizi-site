@@ -439,6 +439,12 @@ no_card = [p.relative_to(DIST).as_posix() for p in DIST.rglob("*.html")
            if p.name != "404.html" and not p.relative_to(DIST).as_posix().startswith("pagefind/")
            and f'property="og:image" content="https://mzizi.dev/og/{_want_card(p)}.png"' not in p.read_text(encoding="utf-8")]
 check("dist/", "every page names its own section's card as its absolute og:image", not no_card, ", ".join(no_card[:5]))
+for icon in ("favicon.svg", "favicon-32.png", "apple-touch-icon.png"):
+    check(icon, "is in dist/", (DIST / icon).is_file())
+no_icon = [p.relative_to(DIST).as_posix() for p in DIST.glob("*.html")
+           if 'rel="icon" href="/favicon.svg"' not in p.read_text(encoding="utf-8")
+           or 'rel="apple-touch-icon" href="/apple-touch-icon.png"' not in p.read_text(encoding="utf-8")]
+check("dist/", "every top-level page links the favicon and the touch icon", not no_icon, ", ".join(no_icon[:5]))
 check("index.html", "asks for a large-image card on X", 'name="twitter:card" content="summary_large_image"' in raw_index)
 
 # --- /.well-known --------------------------------------------------------

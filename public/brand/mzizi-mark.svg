@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Mzizi">
+  <!-- The Mzizi mark, flat, in hematite (Mzizi's brand mineral): a tree whose roots
+       mirror its crown. This file is the source; scripts/generate-brand.mjs renders the PNGs. -->
+  <defs>
+    <g id="half" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="butt" stroke-linejoin="round">
+      <path d="M256 122 C256 98 236 82 230 54" />
+      <path d="M256 240 C240 200 196 150 184 60" />
+      <path d="M218 170 C190 146 150 126 98 122" />
+      <path d="M78 352 L156 352 Q192 352 192 316 L192 274 C192 238 150 212 58 210" />
+      <path d="M171 236 C150 200 118 172 80 154" />
+      <path d="M192 292 C160 290 110 296 62 312" />
+      <path d="M140 352 C130 370 118 386 108 400" />
+      <path d="M180 352 C170 380 162 408 156 434" />
+      <path d="M256 372 C236 392 218 420 208 454" />
+    </g>
+  </defs>
+  <style>g.m{color:#546e7a}@media (prefers-color-scheme:dark){g.m{color:#90a4ae}}</style>
+  <g class="m">
+    <line x1="256" y1="52" x2="256" y2="460" stroke="currentColor" stroke-width="14" />
+    <use href="#half" />
+    <use href="#half" transform="translate(512 0) scale(-1 1)" />
+  </g>
+</svg>
