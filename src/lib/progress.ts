@@ -5,17 +5,21 @@
  * Shared by the landing page's status panel and `/language`, so the two never
  * disagree. `public/llms.txt` says the same in its own words.
  *
- * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-07:
+ * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-08 (main unchanged since
+ * 2026-10-07):
  * - "On main": `LANGUAGE-TRACKER.md` and `CHANGELOG.md` at `main` (0653903).
  *   Two releases reached `main` on 2026-10-07: #72 (9a88e1d) and #79
  *   (0653903). Their entries are still under `## [Unreleased]` in `main`'s
  *   CHANGELOG.md, not in a dated section. Every capability here is a tracker
  *   row that is ✅, or the narrow form a 🟡 row names.
  * - "On staging": the commits on `staging` that are not on `main`, up to
- *   9254ef4 (the survey, CLAUDE.md #77, release notes #82, RFC-0013 #76 and
- *   its amendments #81, the foundation slice #80, and the pre-commit hook
- *   #86, which superseded the closed #84). The tracker on staging still marks C1–C5 and
- *   C10 🟡: they turn ✅ only when the slice reaches `main`.
+ *   faf3003 (the survey, CLAUDE.md #77, release notes #82, RFC-0013 #76 and
+ *   its amendments #81, the foundation slice #80, the pre-commit hook #86,
+ *   which superseded the closed #84, the performance suite #85, floats and the
+ *   numeric methods #83, and the language harness #88). README.md on staging
+ *   says 534 tests in the workspace, 403 of them in the compiler crate. The
+ *   tracker on staging still marks C1–C5, C10 and H1 🟡: they turn ✅ only
+ *   when the work reaches `main` (H1 also needs the parts not built yet).
  * - "In progress": the open pull requests and tracking issue #69. Nothing in
  *   that list is available. When one merges, move it, and when it reaches
  *   `main` and its tracker row turns ✅, change what the site says Mzizi lacks
@@ -23,10 +27,10 @@
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
-export const PROGRESS_DATE = "2026-10-07";
+export const PROGRESS_DATE = "2026-10-08";
 // The language's main and staging commits this file was written from.
 export const MAIN_COMMIT = "0653903";
-export const STAGING_COMMIT = "9254ef4";
+export const STAGING_COMMIT = "faf3003";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -76,6 +80,27 @@ export const onStaging: Item[] = [
     links: [pr(80)],
   },
   {
+    text: "Numbers in a program: a float type (IEEE 754, never traps), the numeric methods (to_float, to_int, round, floor, ceil, sqrt, is_nan, abs, min, max, pow) and the rest of the operators, with their diagnostics. This completes C1 and C5 in a program on staging; their tracker rows stay 🟡 until it reaches main.",
+    links: [pr(83)],
+  },
+  {
+    text: "The language harness, the spine of the language. RFC-0012 is amended as a design: every feature of the language registers an entry in it, and it is what an agent reads. Its first slice is built and tested: compiler/src/harness.rs registers 105 entries (the program kind, component and service at kind level only, the types, operators, numeric methods and statement forms a program has, 52 diagnostic codes and the nine mz commands), mz harness version, definition and entry print them as JSON, and drift tests fail when the compiler and the registry disagree. Every pull request that adds a language feature must add its harness entry. Each code's say text and each feature's teaching text are written by hand and not compared with the checker. The harness is designed to be tested by the benchmark; no benchmark has run on it, and nothing is measured. The plugin host and the generated skills are not built, and tracker row H1 stays 🟡.",
+    links: [
+      pr(88),
+      {
+        href: `${LANG}/blob/staging/design/RFC-0012-harness.md`,
+        label: "RFC-0012 on staging",
+      },
+    ],
+  },
+  {
+    text: "A performance suite against hand-written Rust (benchmarks/perf): four programs in the foundation slice, each with a Rust reference built with and without overflow checks. CI checks only that all three print the same output; no timing is gated or committed, and no overflow check is removed yet.",
+    links: [pr(85)],
+  },
+  {
+    text: "Tests on staging: 534 in the workspace, 403 of them in the compiler crate (README.md on staging). The figures elsewhere on this site are main's.",
+  },
+  {
     text: "A survey of the top 10 languages, feature by feature: 63 features, each marked adopt, improve, already has, or reject. Design input only: nothing in it is implemented or measured.",
     links: [
       {
@@ -104,19 +129,15 @@ export const inProgress: Item[] = [
     links: [M1_ISSUE],
   },
   {
-    text: "Wave 1, numbers: a float type, numeric methods such as round and sqrt, the rest of the operators, and their diagnostics, in a program.",
-    links: [pr(83)],
+    text: "Wave 1, control flow (C4): else when, match over an enum, int, text or bool with exhaustiveness, when and match as values, for each over a range, while, break and continue, and enums in a program. A draft pull request.",
+    links: [pr(89)],
   },
   {
-    text: "A performance suite against hand-written Rust: four programs in the foundation slice, each with a Rust reference built with and without overflow checks. It builds the benchmark only; no overflow check is removed yet. No result is committed to the repository; the pull request's description records one informal run on one machine.",
-    links: [pr(85)],
-  },
-  {
-    text: "Wave 1, errors: enums in a program, a result(T, E) type, return error(e), prefix try, a match on a result, and main returning a result (an escaped error is MZ0992, and mz run exits 1). Only the match on a result is built; a general match is control flow's.",
+    text: "Wave 1, errors (C9): enums with columns in a program, a result(T, E) type, return error(e), prefix try, a match on a result, and main returning a result (an escaped error is MZ0992, and mz run exits 1). It is to be rebased after the control-flow pull request, sharing its match and enum.",
     links: [pr(87)],
   },
   {
-    text: "Next in Wave 1, with no pull request open yet: loops and a general match, maps and collection operations, and methods on records.",
+    text: "Next in Wave 1, with no pull request open yet: maps and collection operations, text operations, and methods on records.",
   },
 ];
 
