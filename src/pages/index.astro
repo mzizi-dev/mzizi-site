@@ -366,7 +366,7 @@ const notYet = [
   },
   {
     what: "Most of a programming language, and a release",
-    note: "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, collections and records with methods, since the third 8 October release (#104); on main it has no modules, standard library or concurrency yet, and text operations are only partly built (C6). A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 needs the rest of text operations next, which waits on the standard library (see the status panel).",
+    note: "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, collections and records with methods, since the third 8 October release (#104, tagged v0.7.0); on main it has no modules, standard library or concurrency yet, and text operations are only partly built (C6). A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 needs the rest of text operations next, which waits on the standard library (see the status panel).",
   },
   {
     what: "The wider benchmark",
@@ -513,7 +513,7 @@ const repos: Repo[] = [
         <strong>The language harness is the spine of the language.</strong> Every
         feature a program has registers an entry in the compiler, and{" "}
         on <code>main</code>, <code>mz harness definition</code> prints them as JSON: 191 entries,
-        80 of them diagnostic codes, at <code>4d0cdc3</code>; 49 codes are pending. Tests enforce that every code the compiler
+        80 of them diagnostic codes, at <code>4d0cdc3</code> (v0.7.0); 49 codes are pending. Tests enforce that every code the compiler
         can emit has an entry (or, for a component's or a service's codes, is on
         a frozen pending list) and that every entry's examples and triggers still
         do what they say. Each code's <code>say</code> text and each feature's

@@ -25,7 +25,8 @@ cut, the Unreleased entries move under it.
 
 Read from `mzizi-dev/mzizi` on 2026-10-08. Release pull request #104 ("chore(release): staging to main") merged
 to `main` as `4d0cdc3`, carrying #97–#103. `staging` (`1743e3c`) holds the same tree, so nothing is waiting on
-`staging`. No `v0.7.0` tag existed when this was written, so no tag is named. No pull request is open toward
+`staging`. `main-release.yml` tagged `4d0cdc3` as `v0.7.0` after CI passed (18:03Z); the pages name the tag and
+`check-facts.py` checks it points at the cited commit. The one open pull request toward M1 is #105 (docs, no mark changes); it is listed under "In progress". Earlier, no pull request was open toward
 M1 (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none). A fresh clone of `4d0cdc3` was built in a private
 target directory and tested.
 
@@ -44,6 +45,9 @@ target directory and tested.
   records with methods, and that Mzizi has no modules, standard library or concurrency yet, and only part of text
   operations. `scripts/check-facts.py` and `scripts/verify-rendered.py` hold the new sentence to the tracker, and
   the old wording is a stale-fact pattern.
+- **Release tag:** the site names `v0.7.0` (commit `4d0cdc3`, GitHub release `releases/tag/v0.7.0`) on the landing page,
+  `/language` and `llms.txt`, and the progress block's "On main today" leads with it. `verify-rendered.py` checks the
+  pages name it; `check-facts.py` checks the tag exists and points at the commit the figures cite.
 - **Progress block:** "On main today" lists records with methods (#101, #102), collections (#99), text methods
   (#98, partly, still 🟡), the tracker's C7–C8 rows (#104), the harness `not` precedence fix (#100) and the
   release. "Landing on staging" says there is nothing waiting. "In progress toward M1" lists the tracking issue

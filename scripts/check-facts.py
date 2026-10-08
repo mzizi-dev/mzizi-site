@@ -332,6 +332,19 @@ if lagging:
     notes.append(f"skill pages still carry pre-62a0f32 language facts ({', '.join(lagging)}): "
                  "@nyuchi/mzizi-skills lags the language; tell the skills-freshness agent.")
 
+# The language's release tag. The pages name v0.7.0 (main-release.yml tags main
+# after CI passes); the tag must exist and point at the commit the figures cite.
+print("\nthe language's release tag")
+TAG = "v0.7.0"
+tag_commit = upstream(f"tag {TAG}", lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/commits/{TAG}")["sha"])
+if tag_commit:
+    cited_tag = re.search(r"mzizi-dev/mzizi/commit/([0-9a-f]{7,40})", (DIST / "index.html").read_text(encoding="utf-8"))
+    check(f"the tag {TAG} points at the commit the figures cite",
+          cited_tag is not None and tag_commit.startswith(cited_tag.group(1)),
+          f"{TAG} is {tag_commit[:7]}, the page cites {cited_tag.group(1) if cited_tag else 'none'}")
+    for name in ("index.html", "language.html", "llms.txt"):
+        check(f"{name} names the tag {TAG}", TAG in pages[name])
+
 # --- npm ---------------------------------------------------------------------
 print("\nnpm (latest dist-tags)")
 npm_latest: dict[str, str] = {}
