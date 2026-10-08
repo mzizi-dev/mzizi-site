@@ -7,7 +7,8 @@
   The blueprint layout follows the Bundu Foundation's card, so the estate's
   cards read as one family. Mzizi's colour is hematite, its brand mineral
   (owner, 2026-09-30): the surface, the grid, the rules and the figure are
-  all hematite. The seven-mineral strip is the site's own (@bundu/ui
+  all hematite. The mark is public/brand/mzizi-badge.svg, the owner's mark drawn
+  flat in hematite. The seven-mineral strip is the site's own (@bundu/ui
   MineralStrip). Colours are @bundu/ui's tokens, copied as values because
   this page renders outside the site build. Mzizi is Swahili for "root", so
   the figure is a root system where Bundu's is a tree.
@@ -132,15 +133,12 @@
         color: var(--sub);
       }
       .mark {
-        width: 46px;
-        height: 46px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
-        background: var(--mark-bg);
         box-shadow:
           0 0 0 3px var(--bg),
           0 0 0 4.5px var(--accent);
-        display: grid;
-        place-items: center;
       }
       .fig {
         position: absolute;
@@ -285,20 +283,7 @@
     <div class="cross" style="right: 26px; bottom: 26px"></div>
 
     <div class="handle mono">
-      <span class="mark" aria-hidden="true">
-        <svg width="26" height="26" viewBox="0 0 24 24">
-          <g
-            stroke="var(--mark-fg)"
-            stroke-width="1.7"
-            fill="none"
-            stroke-linecap="round"
-          >
-            <line x1="12" y1="3" x2="12" y2="10" />
-            <line x1="4" y1="10" x2="20" y2="10" />
-            <path d="M12 10 L12 21 M12 13 L6.5 19 M12 13 L17.5 19" />
-          </g>
-        </svg>
-      </span>
+      <img class="mark" src="../../public/brand/mzizi-badge.svg" alt="" />
       mzizi-dev
     </div>
 

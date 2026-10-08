@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — the Mzizi mark, a favicon, and the mark on the share cards (2026-10-08)
+
+- **The Mzizi mark, drawn flat in hematite**, from the owner's tree-and-roots icon: a trunk whose roots mirror its crown, one colour, no shading. `public/brand/mzizi-mark.svg` is the line mark, `#546e7a` on light and `#90a4ae` on dark (it follows the reader's colour scheme). `public/brand/mzizi-badge.svg` is the same tree with fewer, heavier strokes on a hematite disc, so it holds at 16 px.
+- **The site has a favicon**: `favicon.svg` (the badge), a 32 px PNG fallback and a 180 px `apple-touch-icon.png`, linked from every page. Before this, no page named an icon.
+- **The share cards** carry the badge beside `mzizi-dev`, in place of a placeholder glyph, and are regenerated.
+- `scripts/generate-brand.mjs` renders the PNGs (including 512 px copies under `public/brand/` for avatars) from the SVGs, which are the source. `scripts/verify-rendered.py` now fails when a page does not link the favicon or the touch icon, or when either file is missing from `dist/`.
+
 ### Added — a share card for link previews (2026-10-08)
 
 - **Every page now has a share card** for link previews: an `og:image` and `twitter:image` with its size, type and alt text, plus `og:site_name` and `twitter:card` `summary_large_image`. Before this, no page set an image, so LinkedIn, X, Slack and WhatsApp showed whatever image they found on the page, or none.
