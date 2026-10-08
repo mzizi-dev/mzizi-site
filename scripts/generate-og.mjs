@@ -30,33 +30,35 @@ const outDir = path.join(root, "public", "og");
 const manifest = path.join(root, "src", "data", "og-cards.json");
 const card = pathToFileURL(path.join(here, "og", "card.html")).href;
 
-/** The text of a page's first <h1>, tags and entities removed. */
-function heading(html) {
-  const m = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/);
-  if (!m) return null;
-  return m[1]
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, " ")
-    .trim();
+/**
+ * Each built page's first <h1>, as text. Read through the browser's own DOM
+ * (textContent) rather than by stripping tags and decoding entities by hand.
+ * Page scripts are off and every request is refused, so only the HTML loads.
+ */
+async function headings(browser) {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  await context.route("**/*", (route) => route.abort());
+  const page = await context.newPage();
+  const pages = [];
+  for (const file of (await readdir(dist)).sort()) {
+    if (!file.endsWith(".html") || file === "404.html") continue;
+    const slug = file.replace(/\.html$/, "");
+    await page.setContent(await readFile(path.join(dist, file), "utf-8"), {
+      waitUntil: "domcontentloaded",
+    });
+    const h1 = await page.evaluate(() =>
+      (document.querySelector("h1")?.textContent ?? "")
+        .replace(/\s+/g, " ")
+        .trim(),
+    );
+    if (!h1) throw new Error(`dist/${file} has no <h1>`);
+    // The landing page's heading is a sentence; its card is the name.
+    const title = slug === "index" ? "Mzizi" : h1.replace(/\.$/, "");
+    pages.push({ slug, title, path: slug === "index" ? "/" : `/${slug}` });
+  }
+  await context.close();
+  return pages;
 }
-
-const pages = [];
-for (const file of (await readdir(dist)).sort()) {
-  if (!file.endsWith(".html") || file === "404.html") continue;
-  const slug = file.replace(/\.html$/, "");
-  const h1 = heading(await readFile(path.join(dist, file), "utf-8"));
-  if (!h1) throw new Error(`dist/${file} has no <h1>`);
-  // The landing page's heading is a sentence; its card is the name.
-  const title = slug === "index" ? "Mzizi" : h1.replace(/\.$/, "");
-  pages.push({ slug, title, path: slug === "index" ? "/" : `/${slug}` });
-}
-// The landing page is figure 1; the rest follow in file order.
-pages.sort((a, b) => (a.slug === "index" ? -1 : b.slug === "index" ? 1 : 0));
 
 const browser = await chromium.launch(
   process.env.PLAYWRIGHT_CHROMIUM_PATH
@@ -64,6 +66,9 @@ const browser = await chromium.launch(
     : {},
 );
 try {
+  const pages = await headings(browser);
+  // The landing page is figure 1; the rest follow in file order.
+  pages.sort((a, b) => (a.slug === "index" ? -1 : b.slug === "index" ? 1 : 0));
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
   const page = await browser.newPage({
