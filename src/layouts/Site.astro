@@ -129,6 +129,9 @@ const minerals = [
 // forms, and so `astro preview` highlights the same link production does.
 const here = Astro.url.pathname.replace(/\.html$/, "") || "/";
 const canonical = new URL(here, Astro.site ?? "https://mzizi.dev");
+// What scripts/og/card.html shows, for readers who get the alt text instead.
+const ogImageAlt =
+  "Mzizi, Phase 0 research prototype: built to make Rust better, the way TypeScript makes JavaScript better. Beside it, a recursive fib function in Mzizi and the output of mz run.";
 
 const crumbLabels = {
   language: "The language",
@@ -159,6 +162,22 @@ const crumbs =
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical.href} />
+    <meta property="og:site_name" content="Mzizi" />
+    <!--
+      The share card, rendered from scripts/og/card.html by
+      scripts/generate-og.mjs. Absolute, because link unfurlers do not resolve
+      a relative og:image.
+    -->
+    <meta property="og:image" content={new URL("/og.png", canonical).href} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={documentTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL("/og.png", canonical).href} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
     <!-- Agents that read HTML rather than llms.txt still get pointed at it. -->
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 
