@@ -1,12 +1,14 @@
 /**
  * Real Mzizi programs and their real output, mirrored verbatim from
- * `mzizi-dev/mzizi` `main` at be88017 (the 8 October release, #91, whose
- * tree is `staging`'s 6a96e41). Each output is what `mz run` printed for that file on
+ * `mzizi-dev/mzizi` `main` at dc156c5 (the 8 October release, #96, whose
+ * tree is `staging`'s 8ac7b55). The examples are unchanged since be88017 (#91),
+ * the release these outputs were first copied from; `mz run` at dc156c5 prints
+ * the same bytes. Each output is what `mz run` printed for that file on
  * 2026-10-08, byte for byte the same as the `.expected` file CI compares it
  * with. Update them together, from a run, never by hand.
  */
 
-export const PROGRAMS_COMMIT = "be88017";
+export const PROGRAMS_COMMIT = "dc156c5";
 
 export type Program = { path: string; source: string; output: string };
 
