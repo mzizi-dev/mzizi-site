@@ -24,6 +24,7 @@ cut, the Unreleased entries move under it.
 ### Added — the Mzizi mark, a favicon, and the mark on the share cards (2026-10-08)
 
 - **The Mzizi mark, drawn flat in hematite**, from the owner's tree-and-roots icon: a trunk whose roots mirror its crown, one colour, no shading. `public/brand/mzizi-mark.svg` is the line mark, `#546e7a` on light and `#90a4ae` on dark (it follows the reader's colour scheme). `public/brand/mzizi-badge.svg` is the same tree with fewer, heavier strokes on a hematite disc, so it holds at 16 px.
+- **The master artwork is kept as supplied**, `public/brand/mzizi-logo-master.jpg` (2576 x 1439, the gold and copper tree), as the reference the flat marks are refined from. The roots leave the ground line and the trunk along them, so no stroke end shows at a join.
 - **The site has a favicon**: `favicon.svg` (the badge), a 32 px PNG fallback and a 180 px `apple-touch-icon.png`, linked from every page. Before this, no page named an icon.
 - **The share cards** carry the badge beside `mzizi-dev`, in place of a placeholder glyph, and are regenerated.
 - `scripts/generate-brand.mjs` renders the PNGs (including 512 px copies under `public/brand/` for avatars) from the SVGs, which are the source. `scripts/verify-rendered.py` now fails when a page does not link the favicon or the touch icon, or when either file is missing from `dist/`.
