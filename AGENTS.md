@@ -64,19 +64,26 @@ It also holds the language tracker (owner, 2026-09-30): `LANGUAGE-TRACKER.md` in
 `mzizi-dev/mzizi` is the one list of what Mzizi still needs, and **every capability claim
 on this site comes from it**. The landing status panel and `/language` link it as "What
 still has to be built", RFC-0011 and RFC-0012 are in every RFC list, and the landing page,
-`/language` and `llms.txt` say plainly that Mzizi has no expressions, bindings, callable
-functions, loops, error handling, modules or standard library yet. `check-facts.py` reads
-the tracker, the charter's version and `benchmarks/arms/`, and fails when that sentence, a
-charter version or an arm's state no longer matches upstream.
+`/language` and `llms.txt` say plainly what a program has ("In a program, Mzizi has
+expressions, bindings, functions, control flow and error handling", tracker C1–C4 and C9)
+and what Mzizi has none of yet (modules, a standard library, text operations, maps or sets,
+methods on records, concurrency). `check-facts.py` reads the tracker, the charter's version
+and `benchmarks/arms/`, and fails when a missing row turns ✅, a present row is not on
+`main`, or a charter version or an arm's state no longer matches upstream.
 
 It also holds the progress block (owner, 2026-10-07: "We also need to be updating docs and
 the site with progress and where we are"). The landing page's status section and
 `/language` show, in this order, what is on the language's `main` ("On main today"), what is
 on its `staging` ("Landing on staging"), and what is in open pull requests ("In progress
 toward M1", labelled "Not available yet"), linking the tracking issue
-(`mzizi-dev/mzizi#69`) and its pull requests. RFC-0013 is linked on `staging` (with its pull
-request, #76) until it reaches `main`. The data is `src/lib/progress.ts`; `check-facts.py` fails when a pull
-request listed as in progress has merged or closed, so move it in the same update.
+(`mzizi-dev/mzizi#69`) and its pull requests. RFC-0013 and the language survey reached
+`main` in the 8 October release (#91), and no page may link a `design/` file on `staging`. The
+data is `src/lib/progress.ts`; `check-facts.py` fails when a pull request listed as in
+progress has merged or closed, or when an open one that refers to #69 is not listed (a
+release pull request, staging to main, is not work toward M1), so move it in the same
+update. The landing page, `/language` and `/cli` each show a real example program from the
+language's `examples/` with what `mz run` printed for it (`src/lib/programs.ts`, copied
+from a run, never typed), and `/cli` lists `mz run` and `mz harness`.
 
 It also holds the contact addresses: every page's footer links `support@bundu.org` (the
 owner's general contact for Mzizi, 2026-09-30) and `security@nyuchi.com` (the one security

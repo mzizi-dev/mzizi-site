@@ -188,24 +188,35 @@ if charter:
 
 # The tracker (owner, 2026-09-30): LANGUAGE-TRACKER.md is the one list of what
 # Mzizi still needs, and every capability claim on the site comes from it. The
-# site says Mzizi has none of these yet; the moment one of their rows turns ✅
-# upstream, that sentence is wrong and this fails until it is rewritten.
+# site says what a program has (PRESENT) and what Mzizi has none of yet
+# (MISSING). The moment a MISSING row turns ✅ upstream, or a PRESENT row is not
+# on main in at least a narrow form (🟡 or ✅), that sentence is wrong and this
+# fails until it is rewritten.
 tracker = upstream("the language's LANGUAGE-TRACKER.md", lambda: fetch(LANGUAGE_TRACKER))
-MISSING = "no expressions, bindings, callable functions, loops, error handling, modules or standard library yet"
+PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow and error handling"
+MISSING = "no modules, standard library, text operations, maps or sets, methods on records or concurrency yet"
 if tracker:
     rows = dict(re.findall(r"^\|\s*([A-Z]\d+)\s*\|[^|]*\|\s*(✅|🟡|📝|❌)\s*\|", tracker, re.M))
-    # C1 expressions, C2 bindings, C3 functions, C4 control flow (loops),
-    # C9 error handling, P1 modules, P2 standard library.
-    named = {"C1": "expressions", "C2": "bindings", "C3": "callable functions", "C4": "loops",
-             "C9": "error handling", "P1": "modules", "P2": "standard library"}
-    check("the tracker has every row the site's sentence names", all(r in rows for r in named),
-          ", ".join(r for r in named if r not in rows))
+    # C1 expressions, C2 bindings, C3 functions, C4 control flow, C9 error handling.
+    present = {"C1": "expressions", "C2": "bindings", "C3": "functions", "C4": "control flow",
+               "C9": "error handling"}
+    # P1 modules, P2 standard library, C6 text operations, C7 maps and sets,
+    # C8 methods on records, P9 concurrency.
+    named = {"P1": "modules", "P2": "standard library", "C6": "text operations", "C7": "maps or sets",
+             "C8": "methods on records", "P9": "concurrency"}
+    check("the tracker has every row the site's sentences name", all(r in rows for r in (*present, *named)),
+          ", ".join(r for r in (*present, *named) if r not in rows))
     done = [named[r] for r in named if rows.get(r) == "✅"]
+    absent = [f"{present[r]} ({r} {rows.get(r, 'missing')})" for r in present if rows.get(r) not in ("✅", "🟡")]
     for name in ("index.html", "language.html", "llms.txt"):
         says = MISSING in pages[name]
         check(f"{name} says Mzizi has {MISSING}", says)
         check(f"{name}'s list of what Mzizi lacks matches the tracker", not (says and done),
               f"the tracker marks {', '.join(done)} ✅" if done else "")
+        has = PRESENT in pages[name]
+        check(f"{name} says “{PRESENT}”", has)
+        check(f"{name}'s list of what a program has matches the tracker", not (has and absent),
+              f"the tracker does not have {', '.join(absent)} on main" if absent else "")
     for name in ("index.html", "language.html"):
         raw = (DIST / name).read_text(encoding="utf-8")
         check(f"{name} links the tracker as “What still has to be built”",
@@ -260,7 +271,8 @@ check("llms.txt has its “In progress toward M1” list", llms_block is not Non
 llms_listed = sorted({int(n) for n in re.findall(PULL, llms_block.group(1))}) if llms_block else []
 check("llms.txt lists the same pull requests in progress as index.html", llms_listed == listed,
       f"llms.txt {llms_listed}, index.html {listed}")
-check("index.html lists pull requests in progress toward M1", bool(listed))
+check("index.html's “In progress toward M1” column links the tracking issue #69",
+      len(column) == 2 and 'href="https://github.com/mzizi-dev/mzizi/issues/69"' in column[1].split("</ul>", 1)[0])
 for number in sorted(set(listed) | set(llms_listed)):
     state = upstream(f"mzizi-dev/mzizi#{number}",
                      lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/pulls/{number}"))
@@ -272,10 +284,15 @@ for number in sorted(set(listed) | set(llms_listed)):
               f"merged into {state['base']['ref']} on {merged[:10]}: move it out of “In progress”"
               if merged else "closed: take it out of “In progress”")
 # Every open pull request that works toward M1 (its body refers to #69) is listed.
+# A release pull request (staging to main) is not work toward M1, though its
+# body quotes the entries that do: what it carries is the staging column.
 open_prs = upstream("the language's open pull requests",
                     lambda: fetch_json("https://api.github.com/repos/mzizi-dev/mzizi/pulls?state=open&per_page=100"))
 if open_prs is not None:
     for pr in open_prs:
+        if pr["base"]["ref"] == "main" and pr["title"].startswith("chore(release)"):
+            print(f"  [note] #{pr['number']} is a release pull request ({pr['title']}), not listed in progress")
+            continue
         if re.search(r"(?<![\w/])#69\b|issues/69\b", pr.get("body") or ""):
             check(f"#{pr['number']} (open, refs #69) is listed in progress toward M1",
                   pr["number"] in listed, pr["title"])
