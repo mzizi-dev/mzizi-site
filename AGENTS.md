@@ -33,10 +33,10 @@ and a gitleaks scan.
 
 ### The rendered-content gate
 
-Strips every `<script>` from the built HTML and asserts the content is still there: 655
-component cards and 655 component pages (each with its source and install command, Rust
+Strips every `<script>` from the built HTML and asserts the content is still there: 656
+component cards and 656 component pages (each with its source and install command, Rust
 before React where there is Rust), the Roots list, the eight node titles, the four rung
-titles, the six strands, N2's count of 387, all 21 colour families by CSS variable,
+titles, the six strands, N2's count of 388, all 21 colour families by CSS variable,
 specific hex values, the landing page's Hero (with the contract bench as its media and
 the "Phase 0 · research prototype" badge) followed directly by the status panel, ahead of
 the components, and no "faster", "better than" or "outperform" on it, that no page hydrates
@@ -64,10 +64,26 @@ It also holds the language tracker (owner, 2026-09-30): `LANGUAGE-TRACKER.md` in
 `mzizi-dev/mzizi` is the one list of what Mzizi still needs, and **every capability claim
 on this site comes from it**. The landing status panel and `/language` link it as "What
 still has to be built", RFC-0011 and RFC-0012 are in every RFC list, and the landing page,
-`/language` and `llms.txt` say plainly that Mzizi has no expressions, bindings, callable
-functions, loops, error handling, modules or standard library yet. `check-facts.py` reads
-the tracker, the charter's version and `benchmarks/arms/`, and fails when that sentence, a
-charter version or an arm's state no longer matches upstream.
+`/language` and `llms.txt` say plainly what a program has ("In a program, Mzizi has
+expressions, bindings, functions, control flow and error handling", tracker C1–C4 and C9)
+and what Mzizi has none of yet (modules, a standard library, text operations, maps or sets,
+methods on records, concurrency). `check-facts.py` reads the tracker, the charter's version
+and `benchmarks/arms/`, and fails when a missing row turns ✅, a present row is not on
+`main`, or a charter version or an arm's state no longer matches upstream.
+
+It also holds the progress block (owner, 2026-10-07: "We also need to be updating docs and
+the site with progress and where we are"). The landing page's status section and
+`/language` show, in this order, what is on the language's `main` ("On main today"), what is
+on its `staging` ("Landing on staging"), and what is in open pull requests ("In progress
+toward M1", labelled "Not available yet"), linking the tracking issue
+(`mzizi-dev/mzizi#69`) and its pull requests. RFC-0013 and the language survey reached
+`main` in the 8 October release (#91), and no page may link a `design/` file on `staging`. The
+data is `src/lib/progress.ts`; `check-facts.py` fails when a pull request listed as in
+progress has merged or closed, or when an open one that refers to #69 is not listed (a
+release pull request, staging to main, is not work toward M1), so move it in the same
+update. The landing page, `/language` and `/cli` each show a real example program from the
+language's `examples/` with what `mz run` printed for it (`src/lib/programs.ts`, copied
+from a run, never typed), and `/cli` lists `mz run` and `mz harness`.
 
 It also holds the contact addresses: every page's footer links `support@bundu.org` (the
 owner's general contact for Mzizi, 2026-09-30) and `security@nyuchi.com` (the one security
@@ -96,7 +112,8 @@ crates.io, and the `@nyuchi/` npm packages built in `agent-tools`).
 - Anyone changing the language or the components must expect a site update to follow,
   and should say so in their PR body.
 - `scripts/check-facts.py dist` reads the live facts — the language README's test and
-  suite counts, the charter's version, `LANGUAGE-TRACKER.md`'s rows, the arms in
+  suite counts, `compiler/src`'s line count (counted in the source, because the README can
+  lag), the charter's version, `LANGUAGE-TRACKER.md`'s rows, the arms in
   `benchmarks/arms/`, the npm `latest` versions, the crates.io versions, the crate each
   `/v1/rs/<name>` document names (every Roots page must lead with Rust and name that
   crate), the MCP Registry listing — and fails when the built site disagrees. While the
@@ -223,3 +240,12 @@ Any substantial build, migration, investigation or multi-step task gets a GitHub
 - Post progress, decisions and a hand-off note (what's done, what's left, branch names) as issue comments — at each merge and before a session or agent finishes.
 - Work spanning repos gets a tracking issue that links the per-repo issues.
 - Never put secrets, credential status or exploitable detail in issues on public repos.
+
+## Dev skills, progress reports and the merge gate
+
+Load the Mzizi **dev skills** before starting work: `mzizi_get_skills category=dev` on the Mzizi MCP (`mcp.mzizi.dev`), or `@nyuchi/mzizi-skills` from npm. They are `digital-hygiene` and `progress-report`.
+
+- **Digital hygiene.** Check free disk before starting, clone only under `$TMPDIR`, share build caches, and audit, then delete, your clones once the work merges (`digital-hygiene` skill).
+- **Clone isolation.** Clone only into a directory unique to you; never touch another agent's.
+- **Progress reports.** All dev work runs on a 10-minute progress-report loop (`progress-report` skill): measured bars, what changed, and a final "Needs you:" line. Report ticks never publish, release, merge or deploy without the owner's approval.
+- **Merge gate.** Merge only when the work is complete, CI is green, it's verified at runtime, and `/code-review` has run with findings resolved.

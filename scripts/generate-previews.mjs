@@ -4,8 +4,8 @@
  * preview, for the visual cards on /components.
  *
  * Deliberately NOT a build-time step: hitting a live headless browser against
- * 655 pages on every `astro build` would make the build slow and dependent on
- * a production Worker responding correctly 655 times in a row. Instead this
+ * 656 pages on every `astro build` would make the build slow and dependent on
+ * a production Worker responding correctly 656 times in a row. Instead this
  * runs on demand (locally, or from a scheduled CI job) and commits the result
  * as ordinary static assets under `public/previews/`, the same way
  * `registry-source.generated.json` and friends are generated-then-committed

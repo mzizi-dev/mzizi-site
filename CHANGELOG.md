@@ -21,6 +21,200 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the 8 October language release: programs, `mz run` and the language harness are on main (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08, after its release pull request #91 merged as
+`be88017` and was tagged `v0.5.0`; its tree is `staging`'s `6a96e41` (both hold tree `cae0231`).
+
+- **Progress** (`src/lib/progress.ts`, the landing page, `/language`, `llms.txt`): everything
+  that was "Landing on staging" moves to "On main today": RFC-0013 (#76, #81), the foundation
+  slice and `mz run` (#80), numbers (#83), control flow (#89), errors (#87), the language
+  harness (#88), the performance suite (#85), the survey, release notes, the pre-commit hook
+  and `CLAUDE.md` (#82, #86, #77). C4 (#89) and C9 (#87), listed as in progress, merged and
+  are on `main` too. "In progress toward M1"
+  keeps the tracking issue #69 and lists the next wave (C6, C7, C8), which has no pull request
+  open. "Landing on staging" (`2240347`) lists #92: the tracker marks C1–C5, C9 and C10 ✅, on
+  `main` in the next release; the site still says the tracker on `main` marks them 🟡.
+- **What Mzizi can do**: the landing page, `/language` and `llms.txt` no longer say Mzizi has
+  no expressions, bindings, functions, loops or error handling. They say a program has them,
+  over `int`, `float`, `bool`, `text` and enums, that the tracker still marks those rows 🟡,
+  and that Mzizi has no modules, standard library, text operations, maps or sets, methods on
+  records or concurrency yet. A program lowers to a Rust package with no dependencies, beside
+  the service's axum package; no component lowers. The public suites stay blocked, now on
+  collections, text operations and a standard library rather than on functions.
+- **Real programs on three pages**: the landing page shows `examples/errors.mz`, `/language`
+  shows `examples/numbers.mz` and `/cli` shows `examples/control.mz`, each unedited, beside
+  what `mz run` printed for it at `be88017` (`src/lib/programs.ts`, new; byte for byte the
+  `.expected` files CI compares).
+- **`mz run` and `mz harness`**: `/cli` lists both as commands, with `mz build` taking a
+  service or a program, and drops `mz run` from "designed but not built". `/language` gains
+  "A program, with `mz run`" and "The language harness, with `mz harness`", with the real
+  `mz harness version` output. The harness is described as the spine of the language: what
+  tests enforce (every code has an entry or is on a frozen pending list; triggers and
+  examples still do what their entries say) and what is written by hand and not compared
+  with the checker (`say` and teaching text). Whether it helps an agent is a hypothesis the
+  benchmark is designed to test; nothing has measured it.
+- **Figures**: 643 tests in 24 suites (was 437 in 19), 512 of them in the compiler crate, and
+  26,811 lines in `compiler/src` (was 12,916), from a fresh `cargo test` and a line count at
+  `6a96e41`. The figures, the bench and the captured output now cite `be88017`; the captured
+  `mz check --agent`, `mz hash`, `mz contract` and `mz build` output was re-run and is
+  unchanged.
+- **Links**: RFC-0013 and `design/LANGUAGE-SURVEY.md` link `blob/main`, and RFC-0012's link in
+  the progress column moves from `staging` to `main`. `/ecosystem`'s language card names
+  RFC-0001 to RFC-0013, `mz run`, `mz harness` and the example programs.
+- **Checks**: `scripts/verify-rendered.py` requires RFC-0013 and the survey on `main` and no
+  `design/` link on `staging`, links to #87, #88, #89 and #91, a real program with its output
+  on the landing page, `/language` and `/cli`, and `mz run` and `mz harness` in `/cli`'s
+  command table; it refuses the old counts (437, 534, 19 suites, 12,916 lines), `mz run`
+  placed on `staging`, and "no functions" or the old missing-capabilities sentence.
+  `scripts/check-facts.py` checks the new present and missing sentences against the live
+  tracker (a missing row turning ✅, or a present row not on `main`, fails), skips a release
+  pull request when it requires every open pull request that refers to #69 to be listed, and
+  requires the in-progress column to link #69 instead of at least one pull request.
+
+### Changed — progress: numbers, the performance suite and the language harness land on staging; C4 in progress (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08: `main` is unchanged (`0653903`), and `staging` is at
+`faf3003`. The landing page's and `/language`'s progress columns (`src/lib/progress.ts`) and
+`llms.txt`'s "Where it stands" say the same thing:
+
+- **Landing on staging** (`faf3003`, was `9254ef4`) gains three merged pull requests, moved out of
+  "In progress toward M1":
+  - mzizi#83, numbers in a program: `float`, the numeric methods and the rest of the operators
+    (C1 and C5 in a program; the tracker rows stay 🟡 until they reach `main`).
+  - mzizi#85, the performance suite against hand-written Rust (`benchmarks/perf`). CI checks only
+    that the outputs agree; no timing is committed.
+  - mzizi#88, the language harness: RFC-0012 amended, as a design, to make it the spine of the
+    language, and its first slice built and tested: 105 registered entries, `mz harness version`,
+    `definition` and `entry`, and drift tests. Every feature pull request must add its harness
+    entry. The `say` and teaching text are written by hand and not compared with the checker. The
+    harness is described as designed to be tested by the benchmark; nothing is measured, and
+    tracker row H1 stays 🟡.
+  - Staging's test counts, labelled as staging's: 534 in the workspace, 403 in the compiler crate.
+    The figures cited elsewhere on the site are still `main`'s (437 tests in 19 suites).
+- **In progress toward M1** now lists mzizi#89 (control flow, C4, a draft) beside mzizi#87 (errors,
+  C9, to be rebased after #89). The "next" line drops loops and a general `match`, which #89 covers,
+  and adds text operations.
+- `/language` no longer says the performance suite does not exist; the landing page's status text
+  names floats and the language harness among what is on `staging`.
+
+### Added — where Mzizi stands: shipped, next, and in progress toward M1 (2026-10-07)
+
+The owner asked on 2026-10-07 for the site to show progress and where the language is.
+
+- **The landing page's status section and `/language` gain three columns**, from one source
+  (`src/lib/progress.ts`, rendered by `src/components/Progress.astro`):
+  - **On main today**: what Mzizi can do on `mzizi-dev/mzizi` `main` (`0653903`), taken from
+    `LANGUAGE-TRACKER.md`, and what the two 7 October releases added, split by release and
+    taken from the `[Unreleased]` section of `main`'s `CHANGELOG.md`: mzizi#72 (`9a88e1d`:
+    `match` in a view as `MZ0410`, RFC-0012 §8, the React arm's pins, pinned workflows) and
+    mzizi#79 (`0653903`: the nesting cap `MZ0411`, escaped file names in `mz build`'s
+    comments, robustness tests, no `unsafe` in the compiler).
+  - **Landing on staging** (`9254ef4`), not yet released: RFC-0013, the core language, a
+    draft (mzizi#76), with its amendments from the language survey (mzizi#81); the foundation slice, with `program`, `fn`, `let`/`var`, `int`/`bool`/
+    `text` expressions, `when`/`else`, `print` and `mz run` (mzizi#80), whose tracker rows
+    stay 🟡 until it reaches `main`; `design/LANGUAGE-SURVEY.md` (design input); release
+    notes from the changelog (mzizi#82); `CLAUDE.md` (mzizi#77); and a pre-commit hook
+    (mzizi#86, which superseded the closed mzizi#84) that refuses a commit without a
+    `CHANGELOG.md` entry and runs `cargo fmt --check` on staged Rust, installed with
+    `scripts/install-hooks.sh`, with a test CI's `compiler` job runs.
+  - **In progress toward M1**, labelled "Not available yet": the tracking issue mzizi#69,
+    Wave 1's numbers (mzizi#83), the performance suite against hand-written Rust
+    (mzizi#85, the benchmark only; no result is committed to the repository, and its pull
+    request's description records one informal run on one machine) and Wave 1's errors
+    (mzizi#87: enums in a program, `result(T, E)`, `return error(e)`, prefix `try`, a
+    `match` on a result, and `main` returning a result, with `MZ0992`), all open and
+    unmerged. The "next" line no longer lists a result type, which mzizi#87 now covers.
+- **`/language` adds "Progress toward M1"** with the owner's decisions of 2026-10-07 from
+  mzizi#69, and the one informal `fib(40)` timing recorded there, stated as one noisy run on
+  one machine: slower than Rust's default build, about level with Rust under the same
+  overflow checks, and not a benchmark.
+- **RFC-0013 is in the RFC lists** on `/language` and in `llms.txt`, linked to its file on
+  `staging` and its pull request, not to a file on `main`. `/language` and `llms.txt` link the
+  language survey on `staging`. `/`, `/cli` and `/language` say `mz run` is on `staging`, not
+  yet on `main`.
+- **`llms.txt` gains "Where it stands"**, with the same three lists, the owner's decisions,
+  and an instruction never to describe the in-progress work as something Mzizi has.
+
+### Changed — the language figures move from `9a88e1d` to `0653903` (2026-10-07)
+
+- From a fresh `cargo test --workspace` at `0653903`: **437 tests in 19 suites** (was 428 in
+  18), 306 of them in the compiler crate, and **12,916 lines** in `compiler/src` (was
+  12,706). `mz contract` still gives 29 clauses over the nine primitives, and the captured
+  `mz check --agent`, `mz hash`, `mz contract` and `mz build` outputs on `/language` are
+  unchanged at the new commit.
+- **The kill-criterion run no longer "waits on" the React arm's pins** (`/`, `/language`,
+  `llms.txt`): they come from the registry's lockfile since 2026-10-07
+  (`benchmarks/READINESS.md`, item 1). The rest of the list is unchanged.
+- RFC-0012's row says "draft for review", as the RFC does, and names §8's seven prior-art systems.
+
+### Changed — the rendered-content gate and the freshness check follow the progress block
+
+- **`scripts/verify-rendered.py`** requires the three columns, in order, on `/` (inside the
+  status section) and `/language`; the "Not available yet" label; links to mzizi#69, #76,
+  #80, #81, #83 and #85; RFC-0013 linked on `staging` with #76, and never on `main`, on
+  `/language` and in `llms.txt`; and the survey link. It now refuses "428 tests", "18 suites", "12,706" and a run that still "waits on" the
+  React arm's pins.
+- **`scripts/check-facts.py`** fails when a pull request listed as in progress has merged or
+  closed, when an open pull request that refers to mzizi#69 is not listed, when `llms.txt`'s
+  in-progress list differs from the landing page's, once RFC-0013 is in `main`'s `design/`
+  when a page still says it is not on `main`, and once the tracker marks C10 ✅ when a page
+  still says `mz run` is not on `main`. `AGENTS.md` describes the progress block.
+
+### Changed — versions from the 5–7 October releases, and the language at `9a88e1d` (2026-10-07)
+
+A freshness update. The scheduled Freshness check (`scripts/check-facts.py`) failed on the
+versions below. While they were being fixed, `@nyuchi/mzizi-cli` 0.7.0 reached npm and the
+language released to `main` (`9a88e1d`).
+
+- **`llms.txt`'s dated version list moves to 2026-10-07:**
+  - `mzizi-mcp` 0.13.0, not 0.11.2, on npm and in the MCP Registry.
+  - `@nyuchi/mzizi-skills` 0.11.0, not 0.8.5: seven skills in four categories, including the
+    `dev` skills `digital-hygiene` and `progress-report`. A note says that
+    `api.mzizi.dev/v1/skills` and the `/skills` pages still serve the earlier five-skill bundle.
+  - `@nyuchi/mzizi-cli` 0.7.0, not 0.6.3, with its Astro target.
+  - Every Mzizi Roots crate at 0.3.0, not 0.1.0.
+
+  Its MCP paragraph adds the `astro` build in `mzizi_get_component`, the `astro` filter and
+  `astroFile`, and `mzizi_get_skills`' `category`. The installer lines (the `/cli` entry and
+  "Install components from absolute URLs") cover every target, Astro included, and the
+  api.mzizi.dev route list adds `/v1/astro` and `/v1/astro/<name>`.
+
+- **`/ecosystem` reads its versions at build time:** the MCP server's from npm, and the Roots
+  crates' from crates.io. The registry card said the crates were at 0.1.0; it now shows 0.3.0.
+  The MCP paragraph gives the Rust, Astro, React order and both filters. `/.well-known/mcp.json`
+  and README's MCP card section name `mzizi-mcp` 0.13.0, checked 2026-10-07.
+- **Fixed: `/cli` no longer says `mzizi add` refuses Astro.** From `@nyuchi/mzizi-cli` 0.7.0,
+  `--target astro` (inferred in an Astro project) installs a component's pure `.astro` from
+  `/v1/astro/<name>` into `src/components/mzizi/`. The heading, the detection sentence and the
+  Astro line follow the npm version read at build time. When npm cannot be reached, the page
+  says so. A prerelease such as `0.7.0-beta.1` counts as below `0.7.0`. `/components` calls
+  `mzizi add` the installer for every target.
+- **The language figures move from `62a0f32` to `9a88e1d`** (`/`, `/language`, `llms.txt`), from
+  a fresh build at `9a88e1d`. `cargo test --workspace` gives 428 tests in 18 suites (was 425),
+  and `compiler/src` is 12,706 lines (was 12,644). `mz contract` gives 29 clauses over the nine
+  primitives. The captured `mz check --agent`, `mz hash`, `mz contract` and `mz build` outputs
+  on `/language`, and the `button.mz` excerpt, are unchanged. The React arm's pins come from
+  the registry's lockfile, no longer provisional.
+- **`check-facts.py` checks more, and counts lines in the source.**
+  - It counts `compiler/src` in the language's source (anonymous git) instead of reading the
+    README, which still says 12,644.
+  - It fails when `/ecosystem` names the Roots crates at any version but crates.io's.
+  - `/.well-known/mcp.json` is now among the files that may not name an older `mzizi-mcp`.
+- **Fixed: the rendered-page check expects 656 components (N2 388), not 655 (N2 387).** The
+  registry's v4.6.0 added `markdown-parse` (installed with `markdown-renderer`), and
+  api.mzizi.dev now serves it, so `scripts/verify-rendered.py` failed on every build.
+  `AGENTS.md`, `README.md`, `scripts/generate-previews.mjs` and a code comment state the same
+  count.
+
+### Added — `CLAUDE.md` for Claude Code (2026-10-07)
+
+- **`CLAUDE.md` imports `AGENTS.md`** and adds what it does not spell out: pull requests target `staging`, every `staging` merge is tagged as a patch, `pnpm run lint` needs `astro sync` types first, how `src/lib/registry.ts` feeds the pages at build time, and which files are generated (committed or not) versus hand-written. Docs only: no page, fact or behaviour changes.
+
+### Added — `AGENTS.md` loads the Mzizi dev skills (2026-10-06)
+
+- **`AGENTS.md` gains "Dev skills, progress reports and the merge gate"**, the canonical rule block from nyuchi/.github#87, after "Track big work in GitHub issues": load the Mzizi dev skills (`digital-hygiene` and `progress-report`), clone only into a directory unique to the agent, run dev work on a 10-minute progress-report loop whose ticks never publish, release, merge or deploy without the owner's approval, and merge only through the merge gate. Docs only: no behaviour changes, and CI is unchanged.
+
 ### Fixed — the rendered-page check expects the registry's live counts (2026-10-06)
 
 - **`scripts/verify-rendered.py` expects 655 components (N2 387, N6 90), not 577 (N2 371, N6 52).**

@@ -12,7 +12,7 @@
  *
  * Reading the API here means the answer is in the HTML. No JavaScript runs, no
  * island can miss its mount point, and a browser with scripting off sees all
- * 655 components. The cost is real and is stated rather than hidden:
+ * 656 components. The cost is real and is stated rather than hidden:
  *
  *   1. The BUILD depends on `api.mzizi.dev`. If the API is down, the build
  *      fails — loudly, by design. There is deliberately no committed snapshot

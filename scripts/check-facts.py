@@ -24,7 +24,9 @@ import json
 import os
 import pathlib
 import re
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 
@@ -88,6 +90,31 @@ def reader_text(path: pathlib.Path) -> str:
     return re.sub(r"\s+", " ", raw.replace("`", "").replace("*", ""))
 
 
+def compiler_lines() -> str:
+    """compiler/src's line count at the language's main, counted in the source.
+
+    Not read from the README: the README can lag its code (it said 12,644 at
+    9a88e1d, where the code is 12,706), and the landing page's figure is from a
+    fresh build, not the README. Anonymous git, so no API rate limit. Lines are
+    counted as `git grep -c ''` counts them.
+    """
+    with tempfile.TemporaryDirectory(prefix="mzizi-lang-") as tmp:
+        try:
+            git = lambda *args: subprocess.run(["git", "-C", tmp, *args], check=True,
+                                               capture_output=True, text=True, timeout=120).stdout
+            subprocess.run(["git", "clone", "--quiet", "--depth", "1", "--filter=blob:none", "--no-checkout",
+                            "https://github.com/mzizi-dev/mzizi", tmp],
+                           check=True, capture_output=True, text=True, timeout=120)
+            git("checkout", "--quiet", "HEAD", "--", "compiler/src")
+            total = 0
+            for name in filter(None, git("ls-files", "compiler/src").split("\n")):
+                text = (pathlib.Path(tmp) / name).read_text(encoding="utf-8")
+                total += 0 if text == "" else text.count("\n") + (0 if text.endswith("\n") else 1)
+        except (subprocess.SubprocessError, OSError) as error:
+            raise ValueError(f"could not count compiler/src: {error}") from error
+    return f"{total:,}"
+
+
 def upstream(label: str, get):
     """Read one upstream fact. A source that cannot be read is a failure, not a pass."""
     try:
@@ -99,7 +126,8 @@ def upstream(label: str, get):
 
 pages = {
     name: reader_text(DIST / name)
-    for name in ("index.html", "language.html", "ecosystem.html", "cli.html", "components.html", "llms.txt")
+    for name in ("index.html", "language.html", "ecosystem.html", "cli.html", "components.html", "llms.txt",
+                 ".well-known/mcp.json")
 }
 
 # --- the language -------------------------------------------------------------
@@ -107,9 +135,7 @@ print("the language (mzizi-dev/mzizi main)")
 readme = upstream("the language README", lambda: fetch(LANGUAGE_README))
 if readme:
     tests = re.search(r"\b([\d,]+) tests in (\d+) suites\b", readme)
-    lines = re.search(r"`compiler/src` is ([\d,]+) lines", readme)
     check("the README states a test and suite count", tests is not None)
-    check("the README states compiler/src's line count", lines is not None)
     if tests:
         n, suites = tests.group(1), tests.group(2)
         check(f"index.html shows {n} tests in {suites} suites",
@@ -117,9 +143,10 @@ if readme:
         for page in ("language.html", "llms.txt"):
             check(f"{page} says {n} tests in {suites} suites",
                   f"{n} tests in {suites} suites" in pages[page])
-    if lines:
-        check(f"index.html shows {lines.group(1)} lines in the compiler",
-              f"{lines.group(1)} lines of Rust in the compiler" in pages["index.html"])
+lines = upstream("the language's compiler/src", compiler_lines)
+if lines:
+    check(f"index.html shows {lines} lines in the compiler (counted in the source)",
+          f"{lines} lines of Rust in the compiler" in pages["index.html"])
 
 # The commit the figures cite. A newer main is not by itself drift (the figures
 # may still hold), so this is a note for the freshness agent, not a failure.
@@ -161,24 +188,35 @@ if charter:
 
 # The tracker (owner, 2026-09-30): LANGUAGE-TRACKER.md is the one list of what
 # Mzizi still needs, and every capability claim on the site comes from it. The
-# site says Mzizi has none of these yet; the moment one of their rows turns ✅
-# upstream, that sentence is wrong and this fails until it is rewritten.
+# site says what a program has (PRESENT) and what Mzizi has none of yet
+# (MISSING). The moment a MISSING row turns ✅ upstream, or a PRESENT row is not
+# on main in at least a narrow form (🟡 or ✅), that sentence is wrong and this
+# fails until it is rewritten.
 tracker = upstream("the language's LANGUAGE-TRACKER.md", lambda: fetch(LANGUAGE_TRACKER))
-MISSING = "no expressions, bindings, callable functions, loops, error handling, modules or standard library yet"
+PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow and error handling"
+MISSING = "no modules, standard library, text operations, maps or sets, methods on records or concurrency yet"
 if tracker:
     rows = dict(re.findall(r"^\|\s*([A-Z]\d+)\s*\|[^|]*\|\s*(✅|🟡|📝|❌)\s*\|", tracker, re.M))
-    # C1 expressions, C2 bindings, C3 functions, C4 control flow (loops),
-    # C9 error handling, P1 modules, P2 standard library.
-    named = {"C1": "expressions", "C2": "bindings", "C3": "callable functions", "C4": "loops",
-             "C9": "error handling", "P1": "modules", "P2": "standard library"}
-    check("the tracker has every row the site's sentence names", all(r in rows for r in named),
-          ", ".join(r for r in named if r not in rows))
+    # C1 expressions, C2 bindings, C3 functions, C4 control flow, C9 error handling.
+    present = {"C1": "expressions", "C2": "bindings", "C3": "functions", "C4": "control flow",
+               "C9": "error handling"}
+    # P1 modules, P2 standard library, C6 text operations, C7 maps and sets,
+    # C8 methods on records, P9 concurrency.
+    named = {"P1": "modules", "P2": "standard library", "C6": "text operations", "C7": "maps or sets",
+             "C8": "methods on records", "P9": "concurrency"}
+    check("the tracker has every row the site's sentences name", all(r in rows for r in (*present, *named)),
+          ", ".join(r for r in (*present, *named) if r not in rows))
     done = [named[r] for r in named if rows.get(r) == "✅"]
+    absent = [f"{present[r]} ({r} {rows.get(r, 'missing')})" for r in present if rows.get(r) not in ("✅", "🟡")]
     for name in ("index.html", "language.html", "llms.txt"):
         says = MISSING in pages[name]
         check(f"{name} says Mzizi has {MISSING}", says)
         check(f"{name}'s list of what Mzizi lacks matches the tracker", not (says and done),
               f"the tracker marks {', '.join(done)} ✅" if done else "")
+        has = PRESENT in pages[name]
+        check(f"{name} says “{PRESENT}”", has)
+        check(f"{name}'s list of what a program has matches the tracker", not (has and absent),
+              f"the tracker does not have {', '.join(absent)} on main" if absent else "")
     for name in ("index.html", "language.html"):
         raw = (DIST / name).read_text(encoding="utf-8")
         check(f"{name} links the tracker as “What still has to be built”",
@@ -214,6 +252,66 @@ if arms:
           react is not None and (react.group(1).startswith("exists") == ("react" in present)),
           react.group(1) if react else "missing")
 
+# Progress toward M1 (owner, 2026-10-07). The landing page and /language list
+# the pull requests that are in progress, labelled as not available. One that
+# has merged or closed is no longer in progress: move it (to "Landing on
+# staging", or "On main today" once released) in src/lib/progress.ts and
+# llms.txt. A pull request that merges into main and turns a tracker row ✅
+# also changes what the site says Mzizi lacks (the tracker check above).
+print("\nprogress toward M1 (open pull requests)")
+PULL = r'https://github\.com/mzizi-dev/mzizi/pull/(\d+)'
+raw_index = (DIST / "index.html").read_text(encoding="utf-8")
+column = raw_index.split('id="toward-m1"', 1)
+check("index.html has the “In progress toward M1” column (id toward-m1)", len(column) == 2)
+listed = sorted({int(n) for n in re.findall(r'href="' + PULL + '"', column[1].split("</ul>", 1)[0])}) if len(column) == 2 else []
+# llms.txt carries the same list by hand, under its "In progress toward M1" item.
+llms_raw = (DIST / "llms.txt").read_text(encoding="utf-8")
+llms_block = re.search(r"\*\*In progress toward M1, not available:\*\*(.*?)\n- \*\*", llms_raw, re.S)
+check("llms.txt has its “In progress toward M1” list", llms_block is not None)
+llms_listed = sorted({int(n) for n in re.findall(PULL, llms_block.group(1))}) if llms_block else []
+check("llms.txt lists the same pull requests in progress as index.html", llms_listed == listed,
+      f"llms.txt {llms_listed}, index.html {listed}")
+check("index.html's “In progress toward M1” column links the tracking issue #69",
+      len(column) == 2 and 'href="https://github.com/mzizi-dev/mzizi/issues/69"' in column[1].split("</ul>", 1)[0])
+for number in sorted(set(listed) | set(llms_listed)):
+    state = upstream(f"mzizi-dev/mzizi#{number}",
+                     lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/pulls/{number}"))
+    if state:
+        merged = state.get("merged_at")
+        is_open = state["state"] == "open"
+        check(f"#{number} is still open, as the site says", is_open,
+              "" if is_open else
+              f"merged into {state['base']['ref']} on {merged[:10]}: move it out of “In progress”"
+              if merged else "closed: take it out of “In progress”")
+# Every open pull request that works toward M1 (its body refers to #69) is listed.
+# A release pull request (staging to main) is not work toward M1, though its
+# body quotes the entries that do: what it carries is the staging column.
+open_prs = upstream("the language's open pull requests",
+                    lambda: fetch_json("https://api.github.com/repos/mzizi-dev/mzizi/pulls?state=open&per_page=100"))
+if open_prs is not None:
+    for pr in open_prs:
+        if pr["base"]["ref"] == "main" and pr["title"].startswith("chore(release)"):
+            print(f"  [note] #{pr['number']} is a release pull request ({pr['title']}), not listed in progress")
+            continue
+        if re.search(r"(?<![\w/])#69\b|issues/69\b", pr.get("body") or ""):
+            check(f"#{pr['number']} (open, refs #69) is listed in progress toward M1",
+                  pr["number"] in listed, pr["title"])
+# Staging released: RFC-0013 reaching main's design/ means the "Landing on
+# staging" column has shipped. Move its items to "On main today", and re-read
+# the tracker (C1–C5 and C10 may be ✅, which changes what the site says Mzizi
+# lacks).
+if design and any(entry["name"].startswith("RFC-0013") for entry in design):
+    hits = [name for name in pages
+            if "mzizi/blob/staging/design/RFC-0013" in (DIST / name).read_text(encoding="utf-8")
+            or re.search(r"RFC-0013[^.]{0,200}\bnot yet (on|released to) main\b", pages[name], re.I)]
+    check("no page still places RFC-0013 on staging (it is in main's design/)", not hits, ", ".join(hits))
+# mz run reaching main (tracker C10 ✅): no page may still say it is not there.
+if tracker and rows.get("C10") == "✅":
+    hits = [name for name, text in pages.items()
+            if re.search(r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)|\bno mz run\b",
+                         text, re.I)]
+    check("no page says mz run is not on main (tracker C10 is ✅)", not hits, ", ".join(hits))
+
 # The skill pages carry @nyuchi/mzizi-skills as /v1/skills serves it. Language
 # facts in them that went stale upstream are the skills-freshness agent's to
 # fix, not this site's, so they are notes here, not failures.
@@ -238,7 +336,7 @@ for package in NPM:
     check(f"llms.txt lists {package} at {latest}", latest in listed, f"llms.txt says {sorted(set(listed)) or 'nothing'}")
     if short == "mzizi-mcp":
         # Every "mzizi-mcp <version>" anywhere on the site is a claim about the live server.
-        for name in ("index.html", "ecosystem.html", "llms.txt"):
+        for name in ("index.html", "ecosystem.html", "llms.txt", ".well-known/mcp.json"):
             stale = sorted(set(re.findall(r"mzizi-mcp ([0-9]+\.[0-9]+\.[0-9]+)", pages[name])) - {latest})
             check(f"{name} names no older mzizi-mcp than {latest}", not stale, ", ".join(stale))
 
@@ -255,6 +353,11 @@ for crate in CRATES:
           re.search(rf"\b{re.escape(crate)}\b", pages["llms.txt"]) is not None and crate_versions == {version},
           f"llms.txt says {sorted(crate_versions) or 'no version'}")
     published[crate] = version
+    if crate == "mzizi-roots":
+        # /ecosystem's registry card gives the ten crates one version, read at build time.
+        stated_eco = set(re.findall(r"ten crates on crates\.io at ([0-9]+\.[0-9]+\.[0-9]+)", pages["ecosystem.html"]))
+        check(f"ecosystem.html names the Roots crates at {version}", stated_eco == {version},
+              f"ecosystem.html says {sorted(stated_eco) or 'no version'}")
     if crate in ("mzizi-ui", "mzizi-brand", "mzizi-roots"):
         check(f"components.html shows {crate} at {version}", f"{version}" in pages["components.html"]
               and "not on crates.io yet" not in pages["components.html"])
