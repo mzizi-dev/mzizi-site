@@ -329,8 +329,8 @@ for rfc in ("RFC-0011-handlers.md", "RFC-0012-harness.md"):
 # scripts/check-facts.py holds both sentences to the live tracker: it fails when
 # a row named as missing turns ✅, or a row named as present is not on main.
 TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md"
-PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, collections and records with methods"
-MISSING = "no modules, standard library or concurrency yet, and text operations are only partly built"
+PRESENT = "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, text operations, collections and records with methods"
+MISSING = "no modules, standard library or concurrency yet"
 status_panel = re.search(r'id="status".*?</section>', raw_index, re.S)
 check("index.html", "the status panel links the tracker as “What still has to be built”",
       status_panel is not None and f'href="{TRACKER}"' in status_panel.group(0)
@@ -366,24 +366,25 @@ M1_LINKS = (f"{LANG}/issues/69", f"{LANG}/pull/76", f"{LANG}/pull/80", f"{LANG}/
             f"{LANG}/pull/85", f"{LANG}/pull/87", f"{LANG}/pull/88", f"{LANG}/pull/89", f"{LANG}/pull/91",
             f"{LANG}/pull/92", f"{LANG}/pull/93", f"{LANG}/pull/95",
             f"{LANG}/pull/97", f"{LANG}/pull/98", f"{LANG}/pull/99", f"{LANG}/pull/100", f"{LANG}/pull/101",
-            f"{LANG}/pull/102", f"{LANG}/pull/103", f"{LANG}/pull/104")
+            f"{LANG}/pull/102", f"{LANG}/pull/103", f"{LANG}/pull/105", f"{LANG}/pull/106",
+            f"{LANG}/pull/108", f"{LANG}/pull/109")
 for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
                   ("language.html", (DIST / "language.html").read_text(encoding="utf-8"))):
     text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw)))
     check(name, "shows what is on main, on staging, and in progress toward M1",
-          all(h in text for h in ("On main today", "Landing on staging", "In progress toward M1")))
+          all(h in text for h in ("On main today", "Landing on staging", "In progress toward M2")))
     check(name, "labels the in-progress work as open pull requests, not available yet",
           "Not available yet" in text and "None of this is in Mzizi today" in text)
     for link in M1_LINKS:
         check(name, f"links {link.removeprefix(LANG + '/')}", f'href="{link}"' in raw)
     # In progress is never presented as shipped: the column order is fixed.
-    at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M1")]
+    at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M2")]
     check(name, "the three columns read main, then staging, then in progress", -1 < at[0] < at[1] < at[2])
-# The language's release tag (main-release.yml, v0.7.0 at 4d0cdc3): the pages that
+# The language's release tag (main-release.yml, v0.8.0 at 1d5e578): the pages that
 # name the release name it, and check-facts.py holds the tag to its commit.
 for name in ("index.html", "language.html", "llms.txt"):
     raw = (DIST / name).read_text(encoding="utf-8")
-    check(name, "names the language's release tag v0.7.0", "v0.7.0" in raw)
+    check(name, "names the language's release tag v0.8.0", "v0.8.0" in raw)
 # RFC-0013 (#76) and the language survey reached main in the 8 October release
 # (#91): link their files on main, and no design/ file on staging anywhere.
 RFC13 = f"{LANG}/blob/main/design/RFC-0013-core-language.md"
@@ -517,8 +518,8 @@ stale_patterns = {
     r"\b133 entries\b|\b66 (of them )?diagnostic codes\b|\b55 codes\b": "mz harness definition has 137 entries and 70 diagnostic codes, with 51 codes pending (dc156c5)",
     # The tracker marks C1–C5, C7–C10 ✅ on main (#104), and C6 🟡: no page says
     # the rows are 🟡 that are ✅, or that C6 is ✅.
-    r"still marks (those rows|C1–C5)[^.]{0,80}🟡|rows \(C1–C5, C9, C10\) 🟡|C6 (is|reads) ✅":
-        "the tracker marks C1–C5, C7–C10 ✅ on main (#104) and C6 🟡",
+    r"still marks (those rows|C1–C5)[^.]{0,80}🟡|rows \(C1–C5, C9, C10\) 🟡|C6 (is|reads) 🟡|C6 \(text operations\) 🟡|text operations are (only )?partly built|no slicing, search, split or parsing":
+        "the tracker marks C1–C10 ✅ on main (v0.8.0, M1 met), and C6 ✅",
     # Collections (C7) and records (C8) reached main in the third 2026-10-08
     # release (#104). No page may still say they are on staging, or that Mzizi
     # has no maps, sets or methods on records.
@@ -526,16 +527,18 @@ stale_patterns = {
         "C7 and C8 are on main (#99, #101, #102); C6 is on main in part (#98)",
     r"no modules, standard library, text operations, maps or sets, methods on records or concurrency":
         "on main Mzizi has maps, sets and methods on records (C7, C8); text operations are partly built (C6)",
-    r"M1 still needs methods on records|M1 still needs collections, text operations and methods\s+on records":
-        "M1 still needs C6, text operations, which waits on the standard library (P2) and RFC-0013 §20 Q20",
+    r"M1 still needs methods on records|M1 still needs collections, text operations and methods\s+on records|M1 still needs (the rest of )?text operations|Neither milestone is reached|Neither is reached":
+        "M1 is met on main (v0.8.0); M2 is not reached (modules, a standard library)",
     # The 2026-10-08 figures on main before #104 (644 tests, 513 in the compiler,
     # 26,850 lines, 137 entries, 70 codes, 51 pending) and the staging figures
     # (693, 562, 181, 75, 50) are not the current ones.
     r"\b(644 tests in 24 suites|513 of them|512 of them|562 of them|693 tests|26 suites|24 suites)\b":
-        "the language's current figures are 744 tests in 27 suites, 613 of them in the compiler crate (mzizi-dev/mzizi main, 4d0cdc3)",
+        "the language's current figures are 760 tests in 27 suites, 629 of them in the compiler crate (mzizi-dev/mzizi main, 1d5e578)",
+    r"\b(744 tests|613 of them|33,138|191 entries|1743e3c)\b":
+        "the language's figures at v0.8.0 are 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578)",
     # The release tag existed from 18:03Z on 2026-10-08 (main-release.yml): no page says it does not.
-    r"[Nn]o `?v0\.7\.0`? tag\b|no tag is named|tag existed on 2026-10-08": "the tag v0.7.0 exists (4d0cdc3, main-release.yml)",
-    r"\b26,850 lines\b": "compiler/src is 33,138 lines at 4d0cdc3 (a fresh count), not the 26,850 of dc156c5",
+    r"[Nn]o `?v0\.8\.0`? tag\b|no tag is named|tag existed on 2026-10-08": "the tag v0.8.0 exists (1d5e578, main-release.yml)",
+    r"\b26,850 lines\b": "compiler/src is 33,438 lines at 1d5e578 (a fresh count), not the 26,850 of dc156c5",
     # Programs reached main in the 8 October release (#91).
     r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":
         "mz run is on main since the 8 October release (#91)",

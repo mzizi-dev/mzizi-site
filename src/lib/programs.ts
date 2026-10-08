@@ -1,14 +1,15 @@
 /**
  * Real Mzizi programs and their real output, mirrored verbatim from
- * `mzizi-dev/mzizi` `main` at 4d0cdc3 (the third 8 October release, #104). The
- * examples the site shows are unchanged since be88017 (#91), the release these
- * outputs were first copied from; `records.mz` (C8) was added in #101, and its
- * output is the `.expected` file CI compares it with. Each output is what
- * `mz run` printed for that file on 2026-10-08, byte for byte the same as the
- * `.expected` file. Update them together, from a run, never by hand.
+ * `mzizi-dev/mzizi` `main` at 1d5e578 (the release tagged v0.8.0, #109). The
+ * examples the site shows are unchanged since v0.7.0 (4d0cdc3) and since be88017
+ * (#91), the release these outputs were first copied from: v0.8.0 changed only
+ * `examples/text.mz` and its `.expected` file, which the site does not show.
+ * Each output is what `mz run` printed for that file on 2026-10-08, byte for
+ * byte the same as the `.expected` file. Update them together, from a run, never
+ * by hand.
  */
 
-export const PROGRAMS_COMMIT = "4d0cdc3";
+export const PROGRAMS_COMMIT = "1d5e578";
 
 export type Program = { path: string; source: string; output: string };
 
