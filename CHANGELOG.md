@@ -21,6 +21,34 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
+
+Read from `mzizi-dev/mzizi` at `1d5e578`, tagged `v0.8.0` by `main-release.yml` after CI passed. Release pull
+request #109 ("chore(release): staging to main") carries #105 (tracker and README prose), #106 (the rest of C6, text
+operations) and #108 (release prep). `staging` is at the same commit, so nothing is waiting on `staging`, and no
+pull request toward M2 is open (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none).
+
+- **Facts that moved, as measured at `1d5e578`:** `cargo test --workspace` gives 760 tests in 27 suites (was 744),
+  629 of them in the compiler crate (was 613). `compiler/src` is 33,438 lines (was 33,138). `mz harness definition`
+  gives 197 entries (was 191), still 80 diagnostic codes (53 `MZ09xx` and 27 shared) and 49 pending codes. These
+  are on the landing page, `/language`, `/cli`, `llms.txt`, and in `scripts/verify-rendered.py` and
+  `scripts/check-facts.py`. The `v0.8.0` tag is named in place of `v0.7.0` and checked against `1d5e578`.
+- **Tracker, as it reads on `main`:** C6 (text operations) is ✅, so C1–C10 are all ✅ and M1, a language that
+  computes, is met. Text operations now include `s[i]`, `s.slice(a, to = b)`, `s.find(t)`, `s.split(sep)`,
+  `s.chars()`, `s.parse_int()` and `s.parse_float()`, with the options and lists they return. The owner decided on
+  2026-10-08 (RFC-0013 §20 Q20) that built-in methods with tests meet C6. Modules (P1), the standard library (P2)
+  and concurrency (P9) are still ❌, so Mzizi still has no modules, standard library or concurrency, and M2 is not
+  reached.
+- **Progress columns:** "In progress toward M1" is now "In progress toward M2", since M1 is met. The "Landing on
+  staging" column says nothing is waiting. `/language`'s table marks Text operations ✅, and its "Progress toward
+  M1" heading is "Progress toward M2".
+- **Examples:** `examples/text.mz` changed in `v0.8.0`, but no page shows it. The four programs the site shows
+  (`errors`, `numbers`, `control`, `records`) are unchanged since `4d0cdc3`; their output was re-checked against
+  `examples/*.expected` at `1d5e578`. `mz build examples/registry.mz --out out/registry` prints the line `/language`
+  quotes, byte for byte.
+- **Not changed:** the two pilots (no advantage shown; the kill-criterion run has not happened), and the rule that
+  only a `service` and a `program` lower, with no component lowering.
+
 ### Changed — the third 8 October release reached `main`: collections, records and text methods (2026-10-08)
 
 Read from `mzizi-dev/mzizi` on 2026-10-08. Release pull request #104 ("chore(release): staging to main") merged
