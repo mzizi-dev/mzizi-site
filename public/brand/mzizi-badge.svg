@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Mzizi">
+  <!-- The Mzizi mark on a hematite disc: the favicon, avatar and the share cards' mark,
+       with fewer, heavier strokes than mzizi-mark.svg so it holds at 16 px. -->
+  <defs>
+    <g id="half" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="butt" stroke-linejoin="round">
+      <path d="M256 240 C240 200 196 150 184 60" />
+      <path d="M218 170 C190 146 150 126 98 122" />
+      <path d="M78 352 L156 352 Q192 352 192 316 L192 274 C192 238 150 212 58 210" />
+      <path d="M192 292 C160 290 110 296 62 312" />
+      <path d="M134 352 C160 352 164 400 156 434" />
+      <path d="M256 356 C256 394 214 412 206 454" />
+    </g>
+  </defs>
+  <circle cx="256" cy="256" r="256" fill="#546e7a" />
+  <g style="color: #eceff1" transform="translate(256 256) scale(0.74) translate(-256 -256)">
+    <line x1="256" y1="52" x2="256" y2="460" stroke="currentColor" stroke-width="24" />
+    <use href="#half" />
+    <use href="#half" transform="translate(512 0) scale(-1 1)" />
+  </g>
+</svg>

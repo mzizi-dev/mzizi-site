@@ -417,6 +417,36 @@ islands = [str(p.relative_to(DIST)) for p in all_html
            if re.search(r"<astro-island\b|renderer-url=|/_astro/client\.[^\"']*\.js", p.read_text(encoding="utf-8"))]
 check("dist/", "no page hydrates an island or loads the React client", not islands, ", ".join(islands[:5]))
 
+# --- The share card ------------------------------------------------------
+# Without an og:image, a link preview picks any image on the page or none.
+print("\nshare card")
+import json as _json
+_og_manifest = pathlib.Path(__file__).resolve().parent.parent / "src" / "data" / "og-cards.json"
+og_cards = _json.loads(_og_manifest.read_text(encoding="utf-8")) if _og_manifest.is_file() else {}
+check("og-cards.json", "lists a card for the landing page and each top-level page",
+      "index" in og_cards and all(p.stem in og_cards for p in DIST.glob("*.html") if p.name != "404.html"),
+      ", ".join(p.stem for p in DIST.glob("*.html") if p.name != "404.html" and p.stem not in og_cards))
+def _is_card(f: pathlib.Path) -> bool:
+    b = f.read_bytes() if f.is_file() else b""
+    return b[:8] == b"\x89PNG\r\n\x1a\n" and int.from_bytes(b[16:20], "big") == 1200 and int.from_bytes(b[20:24], "big") == 630
+bad_png = [s for s in [*og_cards, "index-light"] if not _is_card(DIST / "og" / f"{s}.png")]
+check("og/", "every card is in dist/ as a 1200 x 630 PNG", not bad_png, ", ".join(bad_png))
+def _want_card(p: pathlib.Path) -> str:
+    rel = p.relative_to(DIST).with_suffix("").as_posix()
+    first = rel.split("/")[0]
+    return first if first in og_cards else "index"
+no_card = [p.relative_to(DIST).as_posix() for p in DIST.rglob("*.html")
+           if p.name != "404.html" and not p.relative_to(DIST).as_posix().startswith("pagefind/")
+           and f'property="og:image" content="https://mzizi.dev/og/{_want_card(p)}.png"' not in p.read_text(encoding="utf-8")]
+check("dist/", "every page names its own section's card as its absolute og:image", not no_card, ", ".join(no_card[:5]))
+for icon in ("favicon.svg", "favicon-32.png", "apple-touch-icon.png"):
+    check(icon, "is in dist/", (DIST / icon).is_file())
+no_icon = [p.relative_to(DIST).as_posix() for p in DIST.glob("*.html")
+           if 'rel="icon" href="/favicon.svg"' not in p.read_text(encoding="utf-8")
+           or 'rel="apple-touch-icon" href="/apple-touch-icon.png"' not in p.read_text(encoding="utf-8")]
+check("dist/", "every top-level page links the favicon and the touch icon", not no_icon, ", ".join(no_icon[:5]))
+check("index.html", "asks for a large-image card on X", 'name="twitter:card" content="summary_large_image"' in raw_index)
+
 # --- /.well-known --------------------------------------------------------
 print("\n.well-known")
 security = (DIST / ".well-known" / "security.txt").read_text(encoding="utf-8")
