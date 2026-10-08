@@ -114,8 +114,8 @@ still waits on: held-out tasks in a private repository (not yet created);
 the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
-**Where it stands, 2026-10-07: shipped, next, and in progress.** Read from
-`mzizi-dev/mzizi`'s `main` (`0653903`), `staging` (`9254ef4`) and its open pull
+**Where it stands, 2026-10-08: shipped, next, and in progress.** Read from
+`mzizi-dev/mzizi`'s `main` (`0653903`), `staging` (`faf3003`) and its open pull
 requests.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md): UI components
@@ -152,22 +152,50 @@ requests.
     `scripts/install-hooks.sh`, refuses a commit without a `CHANGELOG.md`
     entry and runs `cargo fmt --check` on staged Rust; CI's `compiler` job
     runs its test. Tooling, not the language.
+  - Wave 1's numbers ([#83](https://github.com/mzizi-dev/mzizi/pull/83)): a
+    `float` type (IEEE 754, never traps), the numeric methods (`to_float`,
+    `to_int`, `round`, `floor`, `ceil`, `sqrt`, `is_nan`, `abs`, `min`,
+    `max`, `pow`) and the rest of the operators in a program, with their
+    diagnostics. The C1 and C5 rows stay 🟡 until this reaches `main`.
+  - The language harness ([#88](https://github.com/mzizi-dev/mzizi/pull/88)):
+    [RFC-0012 on `staging`](https://github.com/mzizi-dev/mzizi/blob/staging/design/RFC-0012-harness.md)
+    is amended, as a design, to make the language harness the spine of the
+    language: every feature registers an entry, and it is what an agent
+    reads. Its first slice is built and tested on `staging`:
+    `compiler/src/harness.rs` registers 105 entries (the `program` kind,
+    `component` and `service` at kind level only, the types, operators,
+    numeric methods and statement forms a program has, 52 diagnostic codes
+    and the nine `mz` commands); `mz harness version`, `mz harness definition`
+    and `mz harness entry <name>` print them as JSON; and drift tests fail
+    when the compiler and the registry disagree. Every pull request that adds
+    a language feature must add its harness entry. Each code's `say` text and
+    each feature's teaching text are written by hand and not compared with
+    the checker. The harness is designed to be tested by the benchmark; no
+    benchmark has run on it. The plugin host and the generated skills are not
+    built, and tracker row H1 stays 🟡.
+  - A performance suite against hand-written Rust
+    ([#85](https://github.com/mzizi-dev/mzizi/pull/85), `benchmarks/perf/`):
+    four foundation-slice programs, each with a Rust reference built with
+    and without overflow checks. CI checks only that the outputs agree; no
+    timing is gated or committed, and no overflow check is removed yet.
+  - Tests on `staging`: 534 in the workspace, 403 of them in the compiler
+    crate (`README.md` on `staging`). The other figures in this file are
+    `main`'s.
 - **In progress toward M1, not available:** open pull requests, not merged.
   Never describe any of this as something Mzizi has.
   - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
     M1, every Tier 1 row (C1–C10) ✅ on `main`, built in waves.
-  - [#83](https://github.com/mzizi-dev/mzizi/pull/83), Wave 1's numbers: a
-    `float` type, numeric methods and the rest of the operators in a program.
-  - [#85](https://github.com/mzizi-dev/mzizi/pull/85), a performance suite
-    against hand-written Rust (`benchmarks/perf/`): the benchmark only, with
-    no overflow check removed yet. No result is committed to the repository;
-    the pull request's description records one informal run on one machine.
-  - [#87](https://github.com/mzizi-dev/mzizi/pull/87), Wave 1's errors: enums
-    in a program, `result(T, E)`, `return error(e)`, prefix `try`, a `match`
-    on a result, and `main` returning a result (an escaped error is MZ0992,
-    and `mz run` exits 1). Only the `match` on a result is built.
-  - Next, with no pull request open yet: loops and a general `match`, maps
-    and collection operations, methods on records.
+  - [#89](https://github.com/mzizi-dev/mzizi/pull/89), Wave 1's control flow
+    (C4), a draft: `else when`, `match` over an enum, `int`, `text` or `bool`
+    with exhaustiveness, `when` and `match` as values, `for each` over a
+    range, `while`, `break`, `continue`, and enums in a program.
+  - [#87](https://github.com/mzizi-dev/mzizi/pull/87), Wave 1's errors (C9):
+    enums with columns in a program, `result(T, E)`, `return error(e)`,
+    prefix `try`, a `match` on a result, and `main` returning a result (an
+    escaped error is MZ0992, and `mz run` exits 1). It is to be rebased after
+    #89, sharing its `match` and `enum`.
+  - Next, with no pull request open yet: maps and collection operations,
+    text operations, methods on records.
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
   one RFC per tier; `mz run` is to compile a program to Rust and run it; methods on records now,
   generics after M1; integer overflow checks stay in every build, removed only

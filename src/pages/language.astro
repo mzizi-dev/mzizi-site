@@ -300,8 +300,9 @@ const arms = [
     The work toward M1 is tracked in{" "}
     <a href={M1_ISSUE.href}>mzizi-dev/mzizi{M1_ISSUE.label}</a>. It is built
     in waves: first RFC-0013, the design of all of Tier 1, and a foundation
-    slice that the later waves extend. Both are on <code>staging</code>, not
-    yet released to <code>main</code>. Everything in the third column below is
+    slice that the later waves extend, then numbers and the first slice of the
+    language harness. All of these are on <code>staging</code>, not yet
+    released to <code>main</code>. Everything in the third column below is
     in open pull requests, not merged. Mzizi does not have any of it until its
     tracker row turns ✅ on <code>main</code>.
   </p>
@@ -329,9 +330,10 @@ const arms = [
     and the program the foundation slice lowers from Mzizi about 730 ms. On
     that machine Mzizi was slower than Rust's default, and about level with
     Rust under the same overflow checks. It is context for the overflow
-    decision above, not a result: the performance suite does not exist yet,
-    and the lowering it timed is on <code>staging</code>, not yet on{" "}
-    <code>main</code>.
+    decision above, not a result. The performance suite has since landed on{" "}
+    <code>staging</code> (<a href="https://github.com/mzizi-dev/mzizi/pull/85">#85</a>)
+    with no timing committed, and the lowering it timed is on{" "}
+    <code>staging</code>, not yet on <code>main</code>.
   </p>
 
   <div class="scroller">

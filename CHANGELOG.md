@@ -21,6 +21,32 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — progress: numbers, the performance suite and the language harness land on staging; C4 in progress (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08: `main` is unchanged (`0653903`), and `staging` is at
+`faf3003`. The landing page's and `/language`'s progress columns (`src/lib/progress.ts`) and
+`llms.txt`'s "Where it stands" say the same thing:
+
+- **Landing on staging** (`faf3003`, was `9254ef4`) gains three merged pull requests, moved out of
+  "In progress toward M1":
+  - mzizi#83, numbers in a program: `float`, the numeric methods and the rest of the operators
+    (C1 and C5 in a program; the tracker rows stay 🟡 until they reach `main`).
+  - mzizi#85, the performance suite against hand-written Rust (`benchmarks/perf`). CI checks only
+    that the outputs agree; no timing is committed.
+  - mzizi#88, the language harness: RFC-0012 amended, as a design, to make it the spine of the
+    language, and its first slice built and tested: 105 registered entries, `mz harness version`,
+    `definition` and `entry`, and drift tests. Every feature pull request must add its harness
+    entry. The `say` and teaching text are written by hand and not compared with the checker. The
+    harness is described as designed to be tested by the benchmark; nothing is measured, and
+    tracker row H1 stays 🟡.
+  - Staging's test counts, labelled as staging's: 534 in the workspace, 403 in the compiler crate.
+    The figures cited elsewhere on the site are still `main`'s (437 tests in 19 suites).
+- **In progress toward M1** now lists mzizi#89 (control flow, C4, a draft) beside mzizi#87 (errors,
+  C9, to be rebased after #89). The "next" line drops loops and a general `match`, which #89 covers,
+  and adds text operations.
+- `/language` no longer says the performance suite does not exist; the landing page's status text
+  names floats and the language harness among what is on `staging`.
+
 ### Added — where Mzizi stands: shipped, next, and in progress toward M1 (2026-10-07)
 
 The owner asked on 2026-10-07 for the site to show progress and where the language is.
