@@ -17,12 +17,12 @@
  *   entries, 80 diagnostic codes (53 `MZ09xx` and 27 shared) and 49 pending codes;
  *   `compiler/src` is 33,138 lines (`git ls-files compiler/src`, counted as
  *   scripts/check-facts.py counts them); `mz run` prints the `.expected` file of
- *   each of the eight example programs. No `v0.7.0` tag existed on 2026-10-08:
- *   `main-release.yml` tags after CI passes, and the site names the tag once it
- *   exists.
+ *   each of the eight example programs. `main-release.yml` tagged 4d0cdc3 as
+ *   v0.7.0 after CI passed (the tag exists on 2026-10-08, and its GitHub release
+ *   is at releases/tag/v0.7.0).
  * - "Landing on staging": nothing. `staging` (1743e3c) and `main` (4d0cdc3) hold
  *   the same tree; `git diff 4d0cdc3 origin/staging` is empty.
- * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned none on
+ * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned #105 on
  *   2026-10-08, so the column lists the tracking issue and the work with no pull
  *   request yet. When one opens, list it here and in llms.txt
  *   (scripts/check-facts.py fails until you do); when one merges, move it.
@@ -34,6 +34,9 @@ export const PROGRESS_DATE = "2026-10-08";
 // 4d0cdc3 holds the same tree as `staging` at 1743e3c (nothing is waiting).
 export const RELEASE = "8 October";
 export const MAIN_COMMIT = "4d0cdc3";
+// The release tag main-release.yml created for MAIN_COMMIT (GitHub release v0.7.0).
+export const RELEASE_TAG = "v0.7.0";
+export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.7.0`;
 export const RELEASED_STAGING = "1743e3c";
 export const STAGING_COMMIT = "1743e3c";
 
@@ -46,6 +49,10 @@ export const M1_ISSUE: Link = { href: `${LANG}/issues/69`, label: "#69" };
 export const RELEASE_PR: Link = pr(104);
 
 export const onMain: Item[] = [
+  {
+    text: "Released as v0.7.0: main-release.yml tagged 4d0cdc3 after CI passed, and created the GitHub release. The release notes are the CHANGELOG.md entries since the last main release, plus the merged pull requests.",
+    links: [{ href: RELEASE_TAG_HREF, label: "v0.7.0" }, RELEASE_PR],
+  },
   {
     text: "Records with methods (C8, RFC-0013 §11): in a program, a record with fields, fn methods that read self, an always contract checked at each construction, with and field assignment, built by field name and printed as point(x = 3.0, y = 4.0). Shipped in the third release with C7; examples/records.mz runs through mz run in CI against records.expected.",
     links: [pr(101), pr(102)],
@@ -132,6 +139,10 @@ export const onStaging: Item[] = [
 ];
 
 export const inProgress: Item[] = [
+  {
+    text: "Docs, not the language: the tracker and README prose that v0.7.0 left stale (the example count, the suites row, the line count). No row's mark changes. Open against staging on 8 October, with the M1 tracking issue.",
+    links: [pr(105)],
+  },
   {
     text: "M1, a language that computes: every Tier 1 row of the tracker (C1–C10) ✅ on main, built in waves. The tracking issue.",
     links: [M1_ISSUE],
