@@ -231,7 +231,7 @@ const arms = [
       by 744 tests in 27 suites, 613 of them in the compiler crate
       (<code>mzizi-dev/mzizi</code> at{" "}
       <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>,{" "}
-      <code>main</code> after the third 8 October release, #104; 33,138 lines in{" "}
+      <code>main</code> after the third 8 October release, #104, tagged <code>v0.7.0</code>; 33,138 lines in{" "}
       <code>compiler/src</code>, from a fresh count). Nothing is waiting on{" "}
       <code>staging</code>, which holds <code>main</code>'s tree. Blocks nest at most 64
       deep (MZ0411), and robustness tests hold every command to ending with a
@@ -323,12 +323,12 @@ const arms = [
     the first slice of the language harness. All of these reached{" "}
     <code>main</code> in the 8 October release (<a href="https://github.com/mzizi-dev/mzizi/pull/91">#91</a>). The tracker rows that now read ✅ (<a href="https://github.com/mzizi-dev/mzizi/pull/92">#92</a>) and the harness's second slice (<a href="https://github.com/mzizi-dev/mzizi/pull/93">#93</a>) came in the same release, <a href="https://github.com/mzizi-dev/mzizi/pull/96">#96</a>.
     Records and methods (C8) and collections (C7) reached <code>main</code> in the
-    third 8 October release (<a href="https://github.com/mzizi-dev/mzizi/pull/104">#104</a>, with{" "}
+    third 8 October release, tagged <a href="https://github.com/mzizi-dev/mzizi/releases/tag/v0.7.0">v0.7.0</a> (<a href="https://github.com/mzizi-dev/mzizi/pull/104">#104</a>, with{" "}
     <a href="https://github.com/mzizi-dev/mzizi/pull/101">#101</a>, <a href="https://github.com/mzizi-dev/mzizi/pull/102">#102</a> and{" "}
     <a href="https://github.com/mzizi-dev/mzizi/pull/99">#99</a>), and text methods (C6, <a href="https://github.com/mzizi-dev/mzizi/pull/98">#98</a>) partly so.
     What M1 still needs is the rest of text operations, which waits on the standard
-    library and an owner decision. No pull request is open toward M1 as of 8
-    October. Anything in the third column below is not merged, and Mzizi does not
+    library and an owner decision. The one open pull request toward M1 on 8 October is
+    #105, a docs fix after v0.7.0 that changes no mark. Anything in the third column below is not merged, and Mzizi does not
     have it.
   </p>
 
