@@ -137,7 +137,7 @@ const section = here === "/" ? "index" : here.split("/")[1];
 const cards: Record<string, string> = ogCards;
 const ogCard = section in cards ? section : "index";
 const ogImage = new URL(`/og/${ogCard}.png`, canonical).href;
-const ogImageAlt = `${ogCard === "index" ? "Mzizi" : `Mzizi: ${cards[ogCard]}`}, mzizi.dev${ogCard === "index" ? "" : `/${ogCard}`}. Built to make Rust better, the way TypeScript makes JavaScript better. Apache-2.0, compiler in Rust, Phase 0.`;
+const ogImageAlt = `${ogCard === "index" ? "Mzizi" : `Mzizi: ${cards[ogCard]}`}, mzizi.dev${ogCard === "index" ? "" : `/${ogCard}`}. Designed for machine authorship. A general-purpose programming language; Apache-2.0, compiler in Rust, Phase 0.`;
 
 const crumbLabels = {
   language: "The language",
