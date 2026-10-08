@@ -1,14 +1,14 @@
 /**
  * Real Mzizi programs and their real output, mirrored verbatim from
- * `mzizi-dev/mzizi` `main` at dc156c5 (the 8 October release, #96, whose
- * tree is `staging`'s 8ac7b55). The examples are unchanged since be88017 (#91),
- * the release these outputs were first copied from; `mz run` at dc156c5 prints
- * the same bytes. Each output is what `mz run` printed for that file on
- * 2026-10-08, byte for byte the same as the `.expected` file CI compares it
- * with. Update them together, from a run, never by hand.
+ * `mzizi-dev/mzizi` `main` at 4d0cdc3 (the third 8 October release, #104). The
+ * examples the site shows are unchanged since be88017 (#91), the release these
+ * outputs were first copied from; `records.mz` (C8) was added in #101, and its
+ * output is the `.expected` file CI compares it with. Each output is what
+ * `mz run` printed for that file on 2026-10-08, byte for byte the same as the
+ * `.expected` file. Update them together, from a run, never by hand.
  */
 
-export const PROGRAMS_COMMIT = "dc156c5";
+export const PROGRAMS_COMMIT = "4d0cdc3";
 
 export type Program = { path: string; source: string; output: string };
 
@@ -34,4 +34,10 @@ export const controlProgram = program(
   "control",
   '## Control flow in function bodies, RFC-0013 \u00a77 (C4): `else when`, `match` over an enum,\n## an int and a text, `when` and `match` used as values, `for each` over `range(a, to = b)`,\n## `while`, `break`, `continue` and early `return`.\n## `mz run examples/control.mz` prints what control.expected holds; CI compares the two.\nprogram control\n\n  enum shape\n    circle\n    square\n    triangle\n  end\n\n  fn main\n    for each n in range(1, to = 16)\n      print(fizzbuzz(n))\n    end\n    for each s in range(0, to = 3)\n      print("{pick(s)} has {corners(pick(s))} corners and is {kind(pick(s))}")\n    end\n    print("first multiple of 7 above 50 is {first_multiple(7, 50)}")\n    print("the odd numbers below 10 sum to {odd_sum(10)}")\n    print("collatz(27) takes {collatz(27)} steps")\n    print(day(6))\n    print(day(9))\n    print(greeting("fr"))\n    print(greeting("de"))\n  end fn main\n\n  fn fizzbuzz(n: int): text\n    when n % 15 is 0\n      return "FizzBuzz"\n    else when n % 3 is 0\n      return "Fizz"\n    else when n % 5 is 0\n      return "Buzz"\n    end\n    return "{n}"\n  end fn fizzbuzz\n\n  fn pick(i: int): shape\n    return match i\n      case 0\n        circle\n      case 1\n        square\n      else\n        triangle\n    end\n  end fn pick\n\n  fn corners(s: shape): int\n    match s\n      case circle\n        return 0\n      case square\n        return 4\n      case triangle\n        return 3\n    end\n  end fn corners\n\n  fn kind(s: shape): text\n    let label = when s is circle\n      "round"\n    else\n      "angular"\n    end\n    return label\n  end fn kind\n\n  fn first_multiple(of: int, above: int): int\n    var n = above + 1\n    while true\n      when n % of is 0\n        return n\n      end\n      n = n + 1\n    end\n  end fn first_multiple\n\n  fn odd_sum(limit: int): int\n    var total = 0\n    for each i in range(0, to = 100)\n      when i >= limit\n        break\n      end\n      when i % 2 is 0\n        continue\n      end\n      total = total + i\n    end\n    return total\n  end fn odd_sum\n\n  fn collatz(start: int): int\n    var n = start\n    var steps = 0\n    while n is not 1\n      n = match n % 2\n        case 0\n          n / 2\n        else\n          3 * n + 1\n      end\n      steps = steps + 1\n    end\n    return steps\n  end fn collatz\n\n  fn day(n: int): text\n    match n\n      case 6 7\n        return "{n} is a weekend day"\n      case 1 2 3 4 5\n        return "{n} is a weekday"\n      else\n        return "{n} is not a day of the week"\n    end\n  end fn day\n\n  fn greeting(lang: text): text\n    match lang\n      case "fr"\n        return "bonjour"\n      case "sw"\n        return "habari"\n      else\n        return "hello"\n    end\n  end fn greeting\n\nend program control\n',
   "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\ncircle has 0 corners and is round\nsquare has 4 corners and is angular\ntriangle has 3 corners and is angular\nfirst multiple of 7 above 50 is 56\nthe odd numbers below 10 sum to 25\ncollatz(27) takes 111 steps\n6 is a weekend day\n9 is not a day of the week\nbonjour\nhello\n",
+);
+
+export const recordsProgram = program(
+  "records",
+  '## Records, RFC-0013 §11 (C8): a record built by field name, copied with `with`, read by\n## field, given methods that read `self`, a field of a `var` assigned, and an `always`\n## clause that every value holds.\n## `mz run examples/records.mz` prints what records.expected holds; CI compares the two.\nprogram records\n\n  record point\n    field x: float\n    field y: float\n\n    fn norm: float\n      return (self.x * self.x + self.y * self.y).sqrt()\n    end fn norm\n\n    fn scaled(k: float): point\n      return point(x = self.x * k, y = self.y * k)\n    end fn scaled\n  end\n\n  record span\n    field low: int\n    field high: int\n\n    contract\n      always low <= high\n    end\n  end\n\n  fn width(s: span): int\n    return s.high - s.low\n  end fn width\n\n  fn main\n    let p = point(x = 3.0, y = 4.0)\n    print(p)\n    print(p.norm())\n    print(p.scaled(2.0))\n    print(p with (y = 0.0))\n    print(p is point(x = 3.0, y = 4.0))\n    var q = point(x = 1.0, y = 1.0)\n    q.x = 5.0\n    print(q)\n    let s = span(low = 2, high = 9)\n    print(width(s))\n    print("{s} is {width(s)} wide")\n  end fn main\n\nend program records\n',
+  "point(x = 3.0, y = 4.0)\n5.0\npoint(x = 6.0, y = 8.0)\npoint(x = 3.0, y = 0.0)\ntrue\npoint(x = 5.0, y = 1.0)\n7\nspan(low = 2, high = 9) is 7 wide\n",
 );

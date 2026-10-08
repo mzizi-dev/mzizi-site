@@ -33,11 +33,13 @@ full. Today Mzizi can declare UI components (enums with data columns,
 records, `list`, `option`, `view`, contracts), one kind of backend program, a
 `service` with HTTP routes and handlers (RFC-0011), and programs that compute
 (RFC-0013, on `main` since the 8 October release). **In a program, Mzizi has
-expressions, bindings, functions, control flow and error handling**, over
-`int`, `float`, `bool`, `text` and enums; the tracker marks those rows
-(C1–C5, C9, C10) ✅ on `main`.
-**Mzizi has no modules, standard library, text operations, maps or sets,
-methods on records or concurrency yet.** Its milestones are M1, a language that computes (all of Tier 1),
+expressions, bindings, functions, control flow, error handling, collections and
+records with methods**, over `int`, `float`, `bool`, `text` and enums; the tracker
+marks those rows (C1–C5, C7–C10) ✅ on `main`.
+**On `main`, Mzizi has no modules, standard library or concurrency yet, and text
+operations are only partly built.** Text operations (C6) are 🟡: length, search of a
+fixed kind, case, trim, replace and repeat are built, but slicing, search that returns
+an option or a list, split and parsing are not. Its milestones are M1, a language that computes (all of Tier 1),
 and M2, a working programming language (Tier 1 plus modules, a standard
 library, lowering all code to Rust, `mz build`/`mz run` for a general
 program, errors mapped back to `.mz`, and Rust crate interop). Neither is
@@ -84,9 +86,9 @@ The task families, never pooled:
 - `ui-port` (development only): porting a React `spec.tsx`, as both pilots
   did, against Dioxus and Leptos.
 - Public suites (never gating): MultiPL-E, EvalPlus, Aider polyglot and
-  BaxBench, blocked: a program with functions runs, but these suites also
-  need lists, maps, text operations and a standard library, which Mzizi
-  does not have yet.
+  BaxBench, blocked: a program with functions, lists, maps, sets and records
+  runs, but these suites also need the rest of text operations (C6) and a
+  standard library, which Mzizi does not have on `main` yet.
 
 The arms in `benchmarks/arms/` are `dioxus`, `leptos`, `mzizi`, `mzizi-be`
 and `react`. The pilots below are tests inside Phase 0, not its goal.
@@ -94,9 +96,9 @@ and `react`. The pilots below are tests inside Phase 0, not its goal.
 **Status: two pilots run, no advantage shown; Phase 0 is not complete.** The
 compiler front end exists and is tested — a lexer, a recovering parser, an agent
 diagnostic protocol with `mz fix`, a content-addressed IR, and nine primitives
-written in Mzizi itself, covered by 644 tests in 24 suites, 513 of them in the
-compiler crate (`mzizi-dev/mzizi` `main` at `dc156c5`; 26,850 lines in
-`compiler/src`). Blocks nest at most 64 deep
+written in Mzizi itself, covered by 744 tests in 27 suites, 613 of them in the
+compiler crate (`mzizi-dev/mzizi` `main` at `4d0cdc3`, tagged `v0.7.0`; 33,138 lines in
+`compiler/src`, from a fresh count). Blocks nest at most 64 deep
 (MZ0411), and robustness tests hold every command to ending with a diagnostic. `mz contract` evaluates
 contract blocks. A `service` with HTTP routes and handlers is checked by
 `mz check`, run in process by `mz contract` and lowered by `mz build` to a
@@ -130,11 +132,27 @@ the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
 **Where it stands, 2026-10-08: shipped, next, and in progress.** Read from
-`mzizi-dev/mzizi`'s `main` (`dc156c5`, the 8 October release,
-[#96](https://github.com/mzizi-dev/mzizi/pull/96), whose tree is `staging`'s `8ac7b55`), `staging` (`0d25354`, one tracker
-commit past it: #95) and its open pull requests.
+`mzizi-dev/mzizi`'s `main` (`4d0cdc3`, tagged `v0.7.0`, the third 8 October release,
+[#104](https://github.com/mzizi-dev/mzizi/pull/104), whose tree is `staging`'s `1743e3c`),
+and its open pull requests (none on 8 October). `staging` holds one docs fix, #105, on top of `main`.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md):
+  - Records with methods (C8, [#101](https://github.com/mzizi-dev/mzizi/pull/101),
+    [#102](https://github.com/mzizi-dev/mzizi/pull/102)): in a `program`, a
+    `record` with `field`s, `fn` methods that read `self`, `with` copies, an
+    `always` contract checked at each construction and assignment, and built by
+    field name. `examples/records.mz` runs through `mz run` in CI.
+  - Collections (C7, [#99](https://github.com/mzizi-dev/mzizi/pull/99)): in a
+    `program`, `list(T)`, `map(K, V)` and `set(K)`, with bracket literals, indexing
+    that returns an option read with `otherwise`, `in`, `for each` over a list, the
+    methods and the eight named folds. Maps and sets iterate in key order.
+    `examples/collections.mz` runs through `mz run` in CI.
+  - Text methods (C6, partly built and still 🟡,
+    [#98](https://github.com/mzizi-dev/mzizi/pull/98)): `length`, `contains`,
+    `starts_with`, `ends_with`, `trim`, `to_upper`, `to_lower`, `replace` and
+    `repeat`. The methods that return an option or a list are not built; they
+    wait for the standard library (P2) and the owner's answer to RFC-0013 §20 Q20.
+    `examples/text.mz` runs in CI.
   - Programs that compute, from RFC-0013's waves
     ([#80](https://github.com/mzizi-dev/mzizi/pull/80),
     [#83](https://github.com/mzizi-dev/mzizi/pull/83),
@@ -148,21 +166,21 @@ commit past it: #95) and its open pull requests.
     columns; and `result(T, E)`, `return error(e)`, a prefix `try` and a
     `match` on a result. Integer overflow and division by zero stop the
     program (MZ0991, exit 101); a `float` never traps. The tracker's C1–C5,
-    C9 and C10 rows meet their "Done when" tests and read ✅ on `main`
-    ([#92](https://github.com/mzizi-dev/mzizi/pull/92)).
+    C7–C10 rows meet their "Done when" tests and read ✅ on `main`
+    ([#92](https://github.com/mzizi-dev/mzizi/pull/92), [#104](https://github.com/mzizi-dev/mzizi/pull/104)).
   - `mz run`, which checks a program, lowers it to a Rust package with no
     dependencies, builds it with Cargo and runs it; CI runs every example
     program and compares its output with a committed `.expected` file.
   - The language harness ([#88](https://github.com/mzizi-dev/mzizi/pull/88),
     [RFC-0012](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0012-harness.md)),
     the spine of the language ([#93](https://github.com/mzizi-dev/mzizi/pull/93)):
-    `compiler/src/harness.rs` registers 137 entries (the `program` kind and
-    everything it has, the nine `mz` commands, and 70 diagnostic codes: 45
-    `MZ09xx` and 25 shared), and `mz harness version`,
+    `compiler/src/harness.rs` registers 191 entries (the `program` kind and
+    everything it has, the nine `mz` commands, and 80 diagnostic codes: 53
+    `MZ09xx` and 27 shared), and `mz harness version`,
     `mz harness definition` and `mz harness entry <name>` print them as
     JSON. Enforced by tests: every code the compiler can emit has an entry or
     is on a frozen pending list (`component` and `service` are kind-level
-    only, with 51 codes pending), and every trigger and example still does
+    only, with 49 codes pending), and every trigger and example still does
     what its entry says. Written by hand and not compared with the checker:
     each code's `say` text and each feature's teaching text. The plugin host
     and the generated skills are not built, and tracker row H1 is 🟡. Whether
@@ -171,8 +189,8 @@ commit past it: #95) and its open pull requests.
   - [RFC-0013](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0013-core-language.md),
     the core language ([#76](https://github.com/mzizi-dev/mzizi/pull/76),
     amended in [#81](https://github.com/mzizi-dev/mzizi/pull/81)): one RFC for
-    all of Tier 1, a draft for review, with 29 questions for the owner.
-    Collections, text operations and methods on records are design only.
+    all of Tier 1, a draft for review, with 29 questions for the owner. Its
+    built parts are the bullets above.
   - A performance suite against hand-written Rust
     ([#85](https://github.com/mzizi-dev/mzizi/pull/85), `benchmarks/perf/`):
     CI checks only that the outputs agree; no timing is gated or committed.
@@ -187,18 +205,15 @@ commit past it: #95) and its open pull requests.
     contracts, a `service` that `mz build` lowers to a local Rust + axum
     package, the nesting cap (MZ0411), robustness tests, no `unsafe` in the
     compiler, and `match` in a view as MZ0410.
-- **On `staging`, not yet released to `main`** (`0d25354`):
-  - [#95](https://github.com/mzizi-dev/mzizi/pull/95): the tracker row C8 splits
-    into "User types: records and methods" (M1), and a new Tier 2 row, P12,
-    "Generics and interfaces", comes after M1. It changes the tracker only;
-    nothing is built by it. On `main` in the next release.
+- **Landing on `staging`:** [#105](https://github.com/mzizi-dev/mzizi/pull/105), docs only:
+  the tracker and README prose that v0.7.0 left stale. No row's mark changes.
 - **In progress toward M1, not available:** open pull requests, not merged.
   Never describe any of this as something Mzizi has.
   - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
     M1, every Tier 1 row (C1–C10) ✅ on `main`, built in waves.
-  - Next, with no pull request open for them on 8 October: maps, sets and
-    collection operations (C7), and text operations (C6). Methods on records
-    (C8) are designed in RFC-0013 §11, and no pull request builds them yet.
+  - Still to build, with no pull request open for it on 8 October: the rest of
+    text operations (C6), slicing, search, split and parsing, which return an
+    option or a list. They wait for the standard library (P2) and RFC-0013 §20 Q20.
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
   one RFC per tier; `mz run` is to compile a program to Rust and run it; methods on records now,
   generics after M1; integer overflow checks stay in every build, removed only

@@ -4,7 +4,7 @@ import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
 import Progress from "../components/Progress.astro";
 import ProgramRun from "../components/ProgramRun.astro";
-import { numbersProgram } from "../lib/programs";
+import { numbersProgram, recordsProgram } from "../lib/programs";
 import { decisions, DECISIONS_FIRST_HREF, DECISIONS_HREF, M1_ISSUE } from "../lib/progress";
 
 /**
@@ -20,13 +20,13 @@ import { decisions, DECISIONS_FIRST_HREF, DECISIONS_HREF, M1_ISSUE } from "../li
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 // The language commit this page's figures and captured output were read at.
-const LANG_COMMIT = "dc156c5";
-// Captured from `mz build examples/registry.mz --out out/registry` at dc156c5,
-// the 8 October release (#96), whose tree is staging's 8ac7b55.
+const LANG_COMMIT = "4d0cdc3";
+// Captured from `mz build examples/registry.mz --out out/registry` at 4d0cdc3,
+// the third 8 October release (#104); re-run at 4d0cdc3 and unchanged.
 const buildOutput =
   "mz: built `service registry` into out/registry (3 routes, 1 fixtures); run it with `cargo run --release --manifest-path out/registry/Cargo.toml`";
 
-// LANGUAGE-TRACKER.md at dc156c5, condensed by area. Each mark is the one the
+// LANGUAGE-TRACKER.md at 4d0cdc3, condensed by area. Each mark is the one the
 // tracker's Tier 1, Tier 2 and tooling rows give (C1–C10, P1–P11, T1): its
 // "Against the languages" table still describes the program slice as an open
 // pull request, and the rows are the ones it keeps current.
@@ -36,9 +36,9 @@ const tracker = [
   { area: "Modules and imports", mark: "❌", mzizi: "one declaration per file" },
   { area: "Standard library", mark: "❌", mzizi: "none" },
   { area: "Numbers", mark: "✅", mzizi: "int (overflow traps) and float (IEEE 754), with the numeric methods; no decimal (C5)" },
-  { area: "Text operations", mark: "📝", mzizi: "text is a type with interpolation; its operations are designed in RFC-0013, not built (C6)" },
-  { area: "Collections", mark: "🟡", mzizi: "list and option in components; no map or set, and no list in a program (C7)" },
-  { area: "User types", mark: "🟡", mzizi: "enums with data, records; enums with columns in a program; no methods, traits or generics (C8)" },
+  { area: "Text operations", mark: "🟡", mzizi: "in a program: length, contains, starts_with, ends_with, trim, to_upper, to_lower, replace and repeat (C6); no slicing, search, split or parsing, which wait for the standard library and RFC-0013 §20 Q20" },
+  { area: "Collections", mark: "✅", mzizi: "in a program: list, map and set with methods, folds, and indexing that returns an option; no tuples, by design (C7)" },
+  { area: "User types", mark: "✅", mzizi: "in a program: records with fields, methods, with and always contracts (C8); enums with columns; no traits or generics (P12)" },
   { area: "Compiles to something that runs", mark: "🟡", mzizi: "a service lowers to a local Rust + axum package, which CI compiles, tests and serves; a program lowers to a Rust package with no dependencies, which mz run builds and runs; no component lowers (P3, P4)" },
   { area: "Rust interop, package manager, editor support, concurrency", mark: "❌", mzizi: "none yet" },
   { area: "Diagnostics built for agents", mark: "✅", mzizi: "mz check --agent, mz fix" },
@@ -170,7 +170,7 @@ const rfcs = [
   },
 ];
 // RFC-0009 §1, the arms; each state is benchmarks/arms/ at mzizi-dev/mzizi
-// dc156c5. "exists" is a directory there; "not added yet" is proposed by
+// 4d0cdc3. "exists" is a directory there; "not added yet" is proposed by
 // RFC-0009 with no directory. scripts/check-facts.py compares this table with
 // the live directory listing.
 const arms = [
@@ -228,11 +228,12 @@ const arms = [
       Real today, in the toolchain: the lexer, a recovering parser, a resolver,
       the agent diagnostic protocol and <code>mz fix</code>, and the
       content-addressed IR, plus nine primitives written in Mzizi itself, covered
-      by 644 tests in 24 suites, 513 of them in the compiler crate
+      by 744 tests in 27 suites, 613 of them in the compiler crate
       (<code>mzizi-dev/mzizi</code> at{" "}
       <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>,{" "}
-      <code>main</code> after the 8 October release; 26,850 lines in{" "}
-      <code>compiler/src</code>). Blocks nest at most 64
+      <code>main</code> after the third 8 October release, #104, tagged <code>v0.7.0</code>; 33,138 lines in{" "}
+      <code>compiler/src</code>, from a fresh count). Nothing is waiting on{" "}
+      <code>staging</code>, which holds <code>main</code>'s tree. Blocks nest at most 64
       deep (MZ0411), and robustness tests hold every command to ending with a
       diagnostic on random and deeply nested input.{" "}
       <code>mz contract</code> evaluates contract blocks. A <code>service</code>{" "}
@@ -288,14 +289,14 @@ const arms = [
   <Card className="flow my-6">
     <p>
       <strong>Mzizi is not yet a working programming language.</strong> In a
-      program, Mzizi has expressions, bindings, functions, control flow and
-      error handling, over <code>int</code>, <code>float</code>,{" "}
-      <code>bool</code>, <code>text</code> and enums: the tracker marks
-      C1–C5, C9 and C10 ✅ on{" "}
-      <code>main</code>. It has no modules, standard library, text operations,
-      maps or sets, methods on records or concurrency yet, and no component
-      lowers to Rust.{" "}
-      <a href={TRACKER}><code>LANGUAGE-TRACKER.md</code></a> is the one tracker of
+      program, Mzizi has expressions, bindings, functions, control flow, error
+      handling, collections and records with methods, over <code>int</code>,{" "}
+      <code>float</code>, <code>bool</code>, <code>text</code> and enums: the
+      tracker marks C1–C5 and C7–C10 ✅ on{" "}
+      <code>main</code>, and C6 (text operations) 🟡. On main it has no modules,
+      standard library or concurrency yet, and text operations are only partly
+      built: slicing, search, split and parsing are not. No component lowers to
+      Rust. <a href={TRACKER}><code>LANGUAGE-TRACKER.md</code></a> is the one tracker of
       what it still needs, row by row against Python, Go, C++, TypeScript and
       Rust, each with its evidence and the test that turns it ✅. It is where this
       page takes every capability claim from.
@@ -321,9 +322,14 @@ const arms = [
     slice that the later waves extend, then numbers, control flow, errors and
     the first slice of the language harness. All of these reached{" "}
     <code>main</code> in the 8 October release (<a href="https://github.com/mzizi-dev/mzizi/pull/91">#91</a>). The tracker rows that now read ✅ (<a href="https://github.com/mzizi-dev/mzizi/pull/92">#92</a>) and the harness's second slice (<a href="https://github.com/mzizi-dev/mzizi/pull/93">#93</a>) came in the same release, <a href="https://github.com/mzizi-dev/mzizi/pull/96">#96</a>.
-    What M1 still needs, collections, text operations and methods on records,
-    has no pull request open yet; <a href="https://github.com/mzizi-dev/mzizi/pull/95">#95</a>, merged to <code>staging</code> on 8 October, only splits C8's tracker row. Anything in the third column below is not
-    merged, and Mzizi does not have it.
+    Records and methods (C8) and collections (C7) reached <code>main</code> in the
+    third 8 October release, tagged <a href="https://github.com/mzizi-dev/mzizi/releases/tag/v0.7.0">v0.7.0</a> (<a href="https://github.com/mzizi-dev/mzizi/pull/104">#104</a>, with{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/pull/101">#101</a>, <a href="https://github.com/mzizi-dev/mzizi/pull/102">#102</a> and{" "}
+    <a href="https://github.com/mzizi-dev/mzizi/pull/99">#99</a>), and text methods (C6, <a href="https://github.com/mzizi-dev/mzizi/pull/98">#98</a>) partly so.
+    What M1 still needs is the rest of text operations, which waits on the standard
+    library and an owner decision. No pull request toward M1 is open on 8 October;
+    #105, a docs fix after v0.7.0 that changes no mark, is on staging. Anything in the third column below is not merged, and Mzizi does not
+    have it.
   </p>
 
   <Progress />
@@ -682,19 +688,29 @@ const arms = [
 
   <ProgramRun program={numbersProgram} />
 
+  <p>
+    Records (RFC-0013 §11, C8) are the next example: <code>examples/records.mz</code>,
+    unedited, with the output <code>mz run</code> printed for it at{" "}
+    <code>{LANG_COMMIT}</code>. Its fields are read and assigned, its methods read{" "}
+    <code>self</code>, and its <code>always</code> clause holds for every value.
+    CI compares it with <code>examples/records.expected</code>.
+  </p>
+
+  <ProgramRun program={recordsProgram} />
+
   <h3 id="harness">The language harness, with <code>mz harness</code></h3>
 
   <p>
     The language harness is the spine of the language (RFC-0012): every
     feature is defined once, as an entry in the compiler, and that entry is
     what an agent reads. Its first slice is built.{" "}
-    <code>compiler/src/harness.rs</code> registers 137 entries at{" "}
-    <code>{LANG_COMMIT}</code>: the <code>program</code> kind and everything a
+    <code>compiler/src/harness.rs</code> registers 191 entries on{" "}
+    <code>main</code> at <code>{LANG_COMMIT}</code>: the <code>program</code> kind and everything a
     program has (types, operators, methods, statement forms,{" "}
     <code>result</code> and <code>try</code>), the nine <code>mz</code>{" "}
-    commands, and 70 diagnostic codes, each with its <code>say</code> text, fix
+    commands, and 80 diagnostic codes, each with its <code>say</code> text, fix
     kinds and a trigger. <code>component</code> and <code>service</code> are
-    registered at kind level only, and their 51 codes are on a pending list
+    registered at kind level only, and their 49 codes are on a pending list
     that a test lets only shrink.
   </p>
 

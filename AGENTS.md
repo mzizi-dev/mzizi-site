@@ -65,9 +65,10 @@ It also holds the language tracker (owner, 2026-09-30): `LANGUAGE-TRACKER.md` in
 on this site comes from it**. The landing status panel and `/language` link it as "What
 still has to be built", RFC-0011 and RFC-0012 are in every RFC list, and the landing page,
 `/language` and `llms.txt` say plainly what a program has ("In a program, Mzizi has
-expressions, bindings, functions, control flow and error handling", tracker C1–C4 and C9)
-and what Mzizi has none of yet (modules, a standard library, text operations, maps or sets,
-methods on records, concurrency). `check-facts.py` reads the tracker, the charter's version
+expressions, bindings, functions, control flow, error handling, collections and records with
+methods", tracker C1–C5 and C7–C10)
+and what Mzizi has none of yet (modules, a standard library, concurrency), and what it has only in
+part (text operations, C6). `check-facts.py` reads the tracker, the charter's version
 and `benchmarks/arms/`, and fails when a missing row turns ✅, a present row is not on
 `main`, or a charter version or an arm's state no longer matches upstream.
 
