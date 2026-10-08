@@ -12,10 +12,10 @@
   this page renders outside the site build. Mzizi is Swahili for "root", so
   the figure is a root system where Bundu's is a tree.
 
-  The words are the language repo's own: the README's headline ("built to
-  make Rust better, the way TypeScript makes JavaScript better") and the
-  charter's one sharp edge (§1: designed for machine authorship). Both are
-  the design and the goal Phase 0 measures, which the footer says.
+  The tagline is the owner's (2026-10-08): "Designed for machine
+  authorship", the charter's one sharp edge (§1). The label is the
+  charter's title, "a general-purpose programming language". Both say what
+  Mzizi is designed for, the goal Phase 0 measures, which the footer says.
 -->
 <html lang="en">
   <head>
@@ -150,10 +150,11 @@
         letter-spacing: 0.14em;
         color: var(--accent);
         text-transform: uppercase;
+        white-space: nowrap;
       }
       .fig .rule {
         margin-top: 12px;
-        width: 280px;
+        width: 100%;
         height: 11px;
         border-left: 1px solid var(--accent);
         border-right: 1px solid var(--accent);
@@ -183,8 +184,8 @@
         left: 84px;
         top: 346px;
         width: 760px;
-        font-size: 28px;
-        line-height: 1.5;
+        font-size: 38px;
+        line-height: 1.35;
         color: var(--sub);
       }
       .tags {
@@ -250,7 +251,7 @@
         const fig = String(q.get("fig") || "1").padStart(2, "0");
         document.querySelector("h1").textContent = title;
         document.querySelector(".fig .label").textContent =
-          `Fig. ${fig} — designed for machine authorship`;
+          `Fig. ${fig} — a general-purpose programming language`;
         const url = document.querySelector(".url");
         url.textContent = "mzizi.dev";
         if (path !== "/") {
@@ -308,9 +309,7 @@
 
     <h1></h1>
 
-    <p class="sub">
-      Built to make Rust better, the way TypeScript makes JavaScript better.
-    </p>
+    <p class="sub">Designed for machine authorship.</p>
 
     <div class="tags mono">
       <span>Apache-2.0</span>
