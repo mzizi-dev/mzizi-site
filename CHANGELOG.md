@@ -21,6 +21,34 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the language's staging work (#97, #98, #99) is on the progress block, and C6 and C7 are not on main (2026-10-08)
+
+Read from `mzizi-dev/mzizi` on 2026-10-08: `main` is unchanged (`dc156c5`, the 8 October release), and
+`staging` is at `6e67658`. A fresh clone of each was built and tested. No pull request is open toward
+M1 (`GET /repos/mzizi-dev/mzizi/pulls?state=open` returns none).
+
+- **Progress** (`src/lib/progress.ts`, the landing page, `/language`, `llms.txt`): "Landing on staging"
+  now lists #98 (text methods in a program that need no option or list, tracker C6), #99 (lists, maps and
+  sets in a program, tracker C7), #97 (a wording fix to tracker row H1) and #95 (the C8 split). Each one is
+  on `staging` and not on `main`, so none is ✅. "In progress toward M1" is down to the tracking issue #69
+  and methods on records (C8), which no pull request builds yet.
+- **Capability wording**: the pages no longer say flatly that Mzizi has no text operations, maps or sets.
+  They say that on `main` it has none of those yet, and that text operations (C6) and collections (C7) are on
+  `staging`, not yet released. The tracker's marks are unchanged: C6 and C7 read 📝 and 🟡 on `main`, and 🟡
+  on `staging`. `check-facts.py` still reads `main`'s tracker.
+- **Figures** (measured on `staging` at `6e67658`, labelled as not `main`'s): `cargo test --workspace` gives
+  693 tests in 26 suites, 562 of them in the compiler crate; `mz harness definition` gives 181 entries,
+  75 diagnostic codes and 50 pending codes. `main`'s figures are unchanged (644 tests in 24 suites, 513 in the
+  compiler crate; 137 entries, 70 codes, 51 pending; 26,850 lines in `compiler/src`), and they stay on the
+  pages that state `main`.
+- **Checks**: `scripts/verify-rendered.py` requires the progress column to link #97, #98 and #99, and refuses
+  the old next-step wording ("maps, sets and collection operations (C7), and text operations (C6)") and
+  "M1 still needs collections, text operations and methods on records", which were true before those pull
+  requests merged. `scripts/check-facts.py` is unchanged and still holds the capability sentence to `main`'s
+  tracker.
+- **Not shown**: the example programs stay `main`'s (`examples/errors.mz`, `numbers.mz`, `control.mz`); the
+  staging examples `text.mz` and `collections.mz` are not on the site yet.
+
 ### Added — the Mzizi mark, a favicon, and the mark on the share cards (2026-10-08)
 
 - **The Mzizi mark, drawn flat in hematite**, from the owner's tree-and-roots icon: a trunk whose roots mirror its crown, one colour, no shading. `public/brand/mzizi-mark.svg` is the line mark, `#546e7a` on light and `#90a4ae` on dark (it follows the reader's colour scheme). `public/brand/mzizi-badge.svg` is the same tree with fewer, heavier strokes on a hematite disc, so it holds at 16 px.
