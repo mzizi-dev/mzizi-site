@@ -1,38 +1,45 @@
 <!doctype html>
 <!--
-  The share card for mzizi.dev (og:image / twitter:image), rendered to
-  public/og.png by scripts/generate-og.mjs at 1200 x 630.
+  The share card for mzizi.dev (og:image / twitter:image), rendered by
+  scripts/generate-og.mjs at 1200 x 630: `card.html?theme=dark` to
+  public/og.png (what every page names) and `?theme=light` to
+  public/og-light.png (for posts on a light background).
 
-  The colours are @bundu/ui's dark-scheme tokens (styles/tokens.css), copied as
-  values because this page renders outside the site build. The program is an
-  excerpt of mzizi-dev/mzizi examples/fib.mz, and the output line is the first
-  line of examples/fib.expected, which CI diffs against `mz run`.
-  The tagline is the landing page's, stated there as the goal Phase 0 measures,
-  so the card carries the same "Phase 0 · research prototype" badge.
+  The blueprint layout follows the Bundu Foundation's card, so the estate's
+  cards read as one family. Mzizi's accent is hematite, its brand mineral
+  (owner, 2026-09-30); the colours are @bundu/ui's tokens, copied as values
+  because this page renders outside the site build. Mzizi is Swahili for
+  "root", so the figure is a root system where Bundu's is a tree.
+  The tagline is the landing page's, the goal Phase 0 measures, which is why
+  the figure label and the footer both say Phase 0.
 -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans:wght@400;500;600&family=Noto+Serif:wght@600;700&display=block"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans:wght@400;700&display=block"
     />
     <style>
       :root {
-        --pitch: #050505;
-        --base: #0e0d0c;
-        --container: #1e1d1a;
-        --raised: #2e2c29;
-        --foreground: #f0efe9;
-        --muted: #a8a6a0;
-        --cobalt: #00b0ff;
-        --tanzanite: #b388ff;
-        --malachite: #64ffda;
-        --gold: #ffd740;
-        --terracotta: #e1b07e;
-        --sodalite: #3d5afe;
-        --copper: #ff8a65;
-        --hematite: #90a4ae;
+        --bg: #1a1a17;
+        --fg: #f0efe9;
+        --sub: #c9c7c0;
+        --accent: #90a4ae;
+        --accent-strong: #b0bec5;
+        --grid-fine: rgb(240 239 233 / 0.035);
+        --grid-major: rgb(240 239 233 / 0.07);
+        --mark-bg: #263238;
+      }
+      :root[data-theme="light"] {
+        --bg: #f8f7f3;
+        --fg: #1a1a17;
+        --sub: #3d3c38;
+        --accent: #546e7a;
+        --accent-strong: #37474f;
+        --grid-fine: rgb(26 26 23 / 0.06);
+        --grid-major: rgb(26 26 23 / 0.16);
+        --mark-bg: #eceff1;
       }
       * {
         box-sizing: border-box;
@@ -45,217 +52,244 @@
         overflow: hidden;
       }
       body {
-        background:
-          radial-gradient(
-            900px 520px at 88% 8%,
-            rgb(0 176 255 / 0.1),
-            transparent 60%
-          ),
-          radial-gradient(
-            700px 460px at 6% 108%,
-            rgb(179 136 255 / 0.09),
-            transparent 60%
-          ),
-          var(--base);
-        color: var(--foreground);
+        background-color: var(--bg);
+        background-image:
+          linear-gradient(var(--grid-major) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+          linear-gradient(var(--grid-fine) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-fine) 1px, transparent 1px);
+        background-size:
+          120px 120px,
+          120px 120px,
+          24px 24px,
+          24px 24px;
+        background-position: 0 0;
+        color: var(--fg);
         font-family: "Noto Sans", system-ui, sans-serif;
         position: relative;
       }
-      .strip {
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 14px;
-        display: flex;
-        flex-direction: column;
-      }
-      .strip span {
-        flex: 1;
-      }
-      .card {
-        position: absolute;
-        inset: 0 0 0 14px;
-        padding: 52px 64px 48px 66px;
-        display: grid;
-        grid-template-columns: 1fr 448px;
-        grid-template-rows: auto 1fr auto;
-        column-gap: 56px;
-      }
-      .top {
-        grid-column: 1 / -1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .wordmark {
-        display: inline-flex;
-        align-items: center;
-        gap: 14px;
-        font-family: "Noto Serif", Georgia, serif;
-        font-weight: 700;
-        font-size: 46px;
-        letter-spacing: -0.01em;
-      }
-      .wordmark .dot {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        background: var(--cobalt);
-        box-shadow: 0 0 24px rgb(0 176 255 / 0.55);
-      }
-      .badge {
+      .mono {
         font-family: "JetBrains Mono", ui-monospace, monospace;
-        font-size: 17px;
-        color: var(--muted);
-        border: 1px solid var(--raised);
-        background: rgb(30 29 26 / 0.7);
-        padding: 9px 18px;
-        border-radius: 999px;
-        letter-spacing: 0.02em;
       }
-      .badge b {
-        color: var(--gold);
-        font-weight: 600;
+      .cross {
+        position: absolute;
+        width: 28px;
+        height: 28px;
       }
-      .copy {
-        align-self: center;
+      .cross::before,
+      .cross::after {
+        content: "";
+        position: absolute;
+        background: var(--accent);
+      }
+      .cross::before {
+        left: 0;
+        right: 0;
+        top: 13.5px;
+        height: 1px;
+      }
+      .cross::after {
+        top: 0;
+        bottom: 0;
+        left: 13.5px;
+        width: 1px;
+      }
+      .handle {
+        position: absolute;
+        left: 80px;
+        top: 84px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 24px;
+        color: var(--sub);
+      }
+      .mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--mark-bg);
+        border: 3px solid var(--accent);
+        display: grid;
+        place-items: center;
+      }
+      .fig {
+        position: absolute;
+        left: 80px;
+        top: 166px;
+        font-size: 15px;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+      }
+      .fig .rule {
+        margin-top: 12px;
+        width: 280px;
+        height: 11px;
+        border-left: 1px solid var(--accent);
+        border-right: 1px solid var(--accent);
+        position: relative;
+      }
+      .fig .rule::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 5px;
+        height: 1px;
+        background: var(--accent);
       }
       h1 {
-        font-family: "Noto Serif", Georgia, serif;
-        font-weight: 600;
-        font-size: 50px;
-        line-height: 1.14;
-        letter-spacing: -0.015em;
-      }
-      h1 em {
-        font-style: normal;
-        color: var(--cobalt);
+        position: absolute;
+        left: 76px;
+        top: 228px;
+        font-weight: 700;
+        font-size: 80px;
+        letter-spacing: -0.01em;
+        line-height: 1.05;
       }
       .sub {
-        margin-top: 24px;
-        font-size: 23px;
-        line-height: 1.45;
-        color: var(--muted);
-        max-width: 560px;
+        position: absolute;
+        left: 80px;
+        top: 346px;
+        width: 780px;
+        font-size: 28px;
+        line-height: 1.5;
+        color: var(--sub);
       }
-      .code {
-        align-self: center;
-        background: rgb(5 5 5 / 0.82);
-        border: 1px solid var(--raised);
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 30px 80px rgb(0 0 0 / 0.55);
-        font-family: "JetBrains Mono", ui-monospace, monospace;
-      }
-      .code .bar {
+      .tags {
+        position: absolute;
+        left: 80px;
+        top: 520px;
         display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 13px 18px;
-        border-bottom: 1px solid var(--container);
-        color: var(--muted);
-        font-size: 15px;
+        gap: 30px;
+        font-size: 21px;
+        color: var(--fg);
       }
-      .code .bar i {
-        width: 11px;
-        height: 11px;
+      .tags span::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: var(--raised);
+        background: var(--accent);
+        margin-right: 12px;
+        vertical-align: middle;
+        position: relative;
+        top: -2px;
       }
-      .code .bar span {
-        margin-left: 8px;
-      }
-      pre {
-        padding: 18px 22px 16px;
-        font-size: 18.5px;
-        line-height: 1.55;
-        color: var(--foreground);
-        font-family: inherit;
-      }
-      .k {
-        color: var(--cobalt);
-      }
-      .t {
-        color: var(--tanzanite);
-      }
-      .n {
-        color: var(--gold);
-      }
-      .f {
-        color: var(--malachite);
-      }
-      .run {
-        border-top: 1px solid var(--container);
-        padding: 14px 22px 16px;
-        font-size: 17px;
-        line-height: 1.6;
-      }
-      .run .prompt {
-        color: var(--muted);
-      }
-      .run .out {
-        color: var(--malachite);
-      }
-      .foot {
-        grid-column: 1 / -1;
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        font-family: "JetBrains Mono", ui-monospace, monospace;
-        font-size: 20px;
-        color: var(--muted);
-      }
-      .foot .url {
-        color: var(--foreground);
-        font-weight: 600;
+      .url {
+        position: absolute;
+        right: 81px;
+        top: 518px;
         font-size: 24px;
+        color: var(--accent);
+      }
+      svg.root {
+        position: absolute;
+        left: 922px;
+        top: 112px;
+      }
+      svg.root line,
+      svg.root path {
+        stroke: var(--accent);
+        stroke-width: 1.5;
+        fill: none;
+      }
+      svg.root .ground {
+        stroke-dasharray: 3 6;
+      }
+      svg.root circle {
+        fill: var(--accent);
       }
     </style>
+    <script>
+      document.documentElement.dataset.theme =
+        new URLSearchParams(location.search).get("theme") === "light"
+          ? "light"
+          : "dark";
+    </script>
   </head>
   <body>
-    <div class="strip" aria-hidden="true">
-      <span style="background: var(--cobalt)"></span>
-      <span style="background: var(--tanzanite)"></span>
-      <span style="background: var(--malachite)"></span>
-      <span style="background: var(--gold)"></span>
-      <span style="background: var(--terracotta)"></span>
-      <span style="background: var(--sodalite)"></span>
-      <span style="background: var(--copper)"></span>
+    <div class="cross" style="left: 26px; top: 26px"></div>
+    <div class="cross" style="right: 26px; top: 26px"></div>
+    <div class="cross" style="left: 26px; bottom: 26px"></div>
+    <div class="cross" style="right: 26px; bottom: 26px"></div>
+
+    <div class="handle mono">
+      <span class="mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24">
+          <g
+            stroke="var(--accent-strong)"
+            stroke-width="1.6"
+            fill="none"
+            stroke-linecap="round"
+          >
+            <line x1="12" y1="3" x2="12" y2="10" />
+            <line x1="4" y1="10" x2="20" y2="10" />
+            <path d="M12 10 L12 21 M12 13 L6.5 19 M12 13 L17.5 19" />
+          </g>
+        </svg>
+      </span>
+      mzizi-dev
     </div>
-    <div class="card">
-      <div class="top">
-        <div class="wordmark"><span class="dot"></span>Mzizi</div>
-        <div class="badge"><b>Phase 0</b> · research prototype</div>
-      </div>
 
-      <div class="copy">
-        <h1>
-          Built to make <em>Rust</em> better, the way TypeScript makes
-          JavaScript better.
-        </h1>
-        <p class="sub">
-          A general-purpose programming language with a harness at its core: the
-          layer an agent reads.
-        </p>
-      </div>
-
-      <div class="code">
-        <div class="bar"><i></i><i></i><i></i><span>examples/fib.mz</span></div>
-        <pre><span class="k">fn</span> <span class="f">fib</span>(n: <span class="t">int</span>): <span class="t">int</span>
-  <span class="k">when</span> n &lt; <span class="n">2</span>
-    <span class="k">return</span> n
-  <span class="k">end</span>
-  <span class="k">return</span> <span class="f">fib</span>(n - <span class="n">1</span>) + <span class="f">fib</span>(n - <span class="n">2</span>)
-<span class="k">end fn</span> <span class="f">fib</span></pre>
-        <div class="run">
-          <div><span class="prompt">$</span> mz run examples/fib.mz</div>
-          <div class="out">fib(9) is 34</div>
-        </div>
-      </div>
-
-      <div class="foot">
-        <span class="url">mzizi.dev</span>
-        <span>open source · github.com/mzizi-dev</span>
-      </div>
+    <div class="fig mono">
+      FIG. 01 — A PROGRAMMING LANGUAGE
+      <div class="rule"></div>
     </div>
+
+    <h1>The Mzizi Language</h1>
+
+    <p class="sub">
+      Built to make Rust better, the way TypeScript makes JavaScript better,
+      with a harness at its core.
+    </p>
+
+    <div class="tags mono">
+      <span>Apache-2.0</span>
+      <span>Compiler in Rust</span>
+      <span>Phase 0 prototype</span>
+    </div>
+    <div class="url mono">mzizi.dev</div>
+
+    <!--
+      A root system: a stem above a dashed ground line, then roots that fork
+      twice below it. Coordinates are relative to the svg's top-left.
+    -->
+    <svg
+      class="root"
+      width="264"
+      height="352"
+      viewBox="0 0 300 400"
+      aria-hidden="true"
+    >
+      <line class="ground" x1="0" y1="140" x2="300" y2="140" />
+      <line x1="155" y1="18" x2="155" y2="205" />
+      <line x1="155" y1="205" x2="70" y2="270" />
+      <line x1="155" y1="205" x2="240" y2="270" />
+      <line x1="155" y1="205" x2="155" y2="330" />
+      <line x1="70" y1="270" x2="30" y2="350" />
+      <line x1="70" y1="270" x2="95" y2="370" />
+      <line x1="240" y1="270" x2="210" y2="370" />
+      <line x1="240" y1="270" x2="280" y2="345" />
+      <line x1="155" y1="330" x2="155" y2="390" />
+      <line x1="155" y1="330" x2="125" y2="385" />
+      <line x1="155" y1="330" x2="185" y2="385" />
+
+      <circle cx="155" cy="18" r="5" />
+      <circle cx="155" cy="80" r="5" />
+      <circle cx="155" cy="140" r="5" />
+      <circle cx="155" cy="205" r="9" />
+      <circle cx="70" cy="270" r="5" />
+      <circle cx="240" cy="270" r="5" />
+      <circle cx="155" cy="330" r="5" />
+      <circle cx="30" cy="350" r="5" />
+      <circle cx="95" cy="370" r="5" />
+      <circle cx="210" cy="370" r="5" />
+      <circle cx="280" cy="345" r="5" />
+      <circle cx="155" cy="390" r="5" />
+      <circle cx="125" cy="385" r="5" />
+      <circle cx="185" cy="385" r="5" />
+    </svg>
   </body>
 </html>
