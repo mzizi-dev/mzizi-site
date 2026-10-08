@@ -311,6 +311,13 @@ if tracker and rows.get("C10") == "✅":
             if re.search(r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)|\bno mz run\b",
                          text, re.I)]
     check("no page says mz run is not on main (tracker C10 is ✅)", not hits, ", ".join(hits))
+# Tracker rows C1–C5, C9 and C10 read ✅ on main (#92): a page that still says the
+# tracker marks them 🟡 is stale, and so is the "Landing on staging" column if it
+# lists them as waiting for a release.
+if tracker and all(rows.get(r) == "✅" for r in ("C1", "C2", "C3", "C4", "C5", "C9", "C10")):
+    hits = [name for name, text in pages.items()
+            if re.search(r"still (marks|reads?) (those rows|C1–C5|C1–C4)[^.]{0,80}🟡|rows \(C1–C5, C9, C10\) 🟡", text)]
+    check("no page says the tracker still marks C1–C5, C9 and C10 🟡 (they are ✅ on main)", not hits, ", ".join(hits))
 
 # The skill pages carry @nyuchi/mzizi-skills as /v1/skills serves it. Language
 # facts in them that went stale upstream are the skills-freshness agent's to

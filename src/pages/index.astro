@@ -82,7 +82,7 @@ const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 // The language commit the figures below were read at: a fresh build, not the
 // README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "be88017";
+const LANG_COMMIT = "dc156c5";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -489,7 +489,7 @@ const repos: Repo[] = [
         <code>service</code> with HTTP routes and handlers, which{" "}
         <code>mz contract</code> runs in process and <code>mz build</code> lowers
         to a local Rust + axum package that CI compiles, tests and serves. Since
-        the v0.5.0 release (8 October), a <code>program</code> computes:{" "}
+        the 8 October release (#96), a <code>program</code> computes:{" "}
         <code>mz run</code> checks it, lowers it to a Rust package with no
         dependencies, builds it and runs it (an example is below). No component
         lowers yet, and there is no Workers, Containers or WebAssembly target.
@@ -498,9 +498,8 @@ const repos: Repo[] = [
         <strong>Mzizi is not yet a working programming language.</strong> In a
         program, Mzizi has expressions, bindings, functions, control flow and
         error handling, over <code>int</code>, <code>float</code>,{" "}
-        <code>bool</code>, <code>text</code> and enums. The tracker still marks
-        those rows 🟡, partly there, though each says it turns ✅ when it
-        reaches <code>main</code>. It has no modules, standard library, text operations,
+        <code>bool</code>, <code>text</code> and enums. The tracker marks
+        C1–C5, C9 and C10 ✅ on <code>main</code>. It has no modules, standard library, text operations,
         maps or sets, methods on records or concurrency yet.{" "}
         <a href={TRACKER}><strong>What still has to be built</strong></a>{" "}
         (<code>LANGUAGE-TRACKER.md</code>) is the one list, stacked against
@@ -512,8 +511,8 @@ const repos: Repo[] = [
       <p>
         <strong>The language harness is the spine of the language.</strong> Every
         feature a program has registers an entry in the compiler, and{" "}
-        <code>mz harness definition</code> prints them as JSON: 133 entries,
-        66 of them diagnostic codes. Tests enforce that every code the compiler
+        <code>mz harness definition</code> prints them as JSON: 137 entries,
+        70 of them diagnostic codes. Tests enforce that every code the compiler
         can emit has an entry (or, for a component's or a service's codes, is on
         a frozen pending list) and that every entry's examples and triggers still
         do what they say. Each code's <code>say</code> text and each feature's
@@ -585,9 +584,9 @@ const repos: Repo[] = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>643</b><span>tests passing, 24 suites</span></li>
+      <li class="fig"><b>644</b><span>tests passing, 24 suites</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>26,811</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>26,850</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
