@@ -21,6 +21,11 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — a share card for link previews (2026-10-08)
+
+- **Every page now names a share card**, `https://mzizi.dev/og.png` (1200 x 630 PNG), as its `og:image` and `twitter:image`, with its size, type and alt text, plus `og:site_name` and `twitter:card` `summary_large_image`. Before this, no page set an image, so LinkedIn, X, Slack and WhatsApp showed whatever image they found on the page, or none. The card is the Mzizi wordmark, the "Phase 0 · research prototype" badge, the landing page's tagline (the goal Phase 0 measures, not a result), an excerpt of the language's `examples/fib.mz` with the first line `mz run` prints for it, and the seven-mineral strip, in `@bundu/ui`'s dark-scheme colours.
+- `scripts/og/card.html` is the card and `scripts/generate-og.mjs` renders it with Playwright; the PNG is generated, then committed, like the component previews. `scripts/verify-rendered.py` now fails when `og.png` is missing or not 1200 x 630, when a page lacks the absolute `og:image`, or when the landing page drops `summary_large_image`.
+
 ### Changed — the 8 October release (#96) is on main: the tracker's C1–C5, C9 and C10 rows read ✅, the harness has 70 codes, and #95 is on staging (2026-10-08)
 
 Read from `mzizi-dev/mzizi` on 2026-10-08: the release pull request #96 merged as `dc156c5`, which
