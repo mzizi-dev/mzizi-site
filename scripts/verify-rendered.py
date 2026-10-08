@@ -363,7 +363,8 @@ check("index.html", "the Mzizi backend arm is mzizi-be, with the probe crate and
 # data; scripts/check-facts.py checks each linked pull request is still open.
 LANG = "https://github.com/mzizi-dev/mzizi"
 M1_LINKS = (f"{LANG}/issues/69", f"{LANG}/pull/76", f"{LANG}/pull/80", f"{LANG}/pull/81", f"{LANG}/pull/83",
-            f"{LANG}/pull/85", f"{LANG}/pull/87", f"{LANG}/pull/88", f"{LANG}/pull/89", f"{LANG}/pull/91")
+            f"{LANG}/pull/85", f"{LANG}/pull/87", f"{LANG}/pull/88", f"{LANG}/pull/89", f"{LANG}/pull/91",
+            f"{LANG}/pull/92", f"{LANG}/pull/93", f"{LANG}/pull/95", f"{LANG}/pull/96")
 for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
                   ("language.html", (DIST / "language.html").read_text(encoding="utf-8"))):
     text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw)))
@@ -471,9 +472,14 @@ for phrase, why in stale.items():
 # goes stale, add its old wording here so it cannot come back. The live check
 # of the current values is scripts/check-facts.py, which needs the network.
 stale_patterns = {
-    r"\b(269|308|428|437|534) tests\b": "the language has 643 tests in 24 suites (mzizi-dev/mzizi be88017)",
-    r"\b(12|14|18|19) suites\b": "the language's tests run in 24 suites (be88017)",
-    r"\b(6,684|7,454|12,706|12,916)\b|about 12,[79]00 lines": "compiler/src is 26,811 lines (be88017)",
+    r"\b(269|308|428|437|534|643) tests\b": "the language has 644 tests in 24 suites (mzizi-dev/mzizi dc156c5)",
+    r"\b512 of them in the compiler crate\b": "the compiler crate has 513 of the 644 tests (dc156c5)",
+    r"\b(12|14|18|19) suites\b": "the language's tests run in 24 suites (dc156c5)",
+    r"\b(6,684|7,454|12,706|12,916|26,811)\b|about 12,[79]00 lines": "compiler/src is 26,850 lines (dc156c5)",
+    # The harness at dc156c5: 137 entries, 70 diagnostic codes, 51 pending (#93).
+    r"\b133 entries\b|\b66 (of them )?diagnostic codes\b|\b55 codes\b": "mz harness definition has 137 entries and 70 diagnostic codes, with 51 codes pending (dc156c5)",
+    # The tracker marks C1–C5, C9 and C10 ✅ on main (#92): no page says they read 🟡.
+    r"still marks (those rows|C1–C5)[^.]{0,80}🟡|rows \(C1–C5, C9, C10\) 🟡": "the tracker marks C1–C5, C9 and C10 ✅ on main (#92)",
     # Programs reached main in the 8 October release (#91).
     r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":
         "mz run is on main since the 8 October release (#91)",
