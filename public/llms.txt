@@ -134,7 +134,7 @@ family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 **Where it stands, 2026-10-08: shipped, next, and in progress.** Read from
 `mzizi-dev/mzizi`'s `main` (`4d0cdc3`, tagged `v0.7.0`, the third 8 October release,
 [#104](https://github.com/mzizi-dev/mzizi/pull/104), whose tree is `staging`'s `1743e3c`),
-and its open pull requests (one on 8 October, #105, a docs fix). Nothing is waiting on `staging`.
+and its open pull requests (none on 8 October). `staging` holds one docs fix, #105, on top of `main`.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md):
   - Records with methods (C8, [#101](https://github.com/mzizi-dev/mzizi/pull/101),
@@ -205,15 +205,12 @@ and its open pull requests (one on 8 October, #105, a docs fix). Nothing is wait
     contracts, a `service` that `mz build` lowers to a local Rust + axum
     package, the nesting cap (MZ0411), robustness tests, no `unsafe` in the
     compiler, and `match` in a view as MZ0410.
-- **Landing on `staging`:** nothing. `staging` (`1743e3c`) and `main` (`4d0cdc3`)
-  hold the same tree.
+- **Landing on `staging`:** [#105](https://github.com/mzizi-dev/mzizi/pull/105), docs only:
+  the tracker and README prose that v0.7.0 left stale. No row's mark changes.
 - **In progress toward M1, not available:** open pull requests, not merged.
   Never describe any of this as something Mzizi has.
   - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
     M1, every Tier 1 row (C1–C10) ✅ on `main`, built in waves.
-  - [#105](https://github.com/mzizi-dev/mzizi/pull/105), open against `staging`: docs
-    that v0.7.0 left stale (the example count, the suites row, the line count). No
-    row's mark changes.
   - Still to build, with no pull request open for it on 8 October: the rest of
     text operations (C6), slicing, search, split and parsing, which return an
     option or a list. They wait for the standard library (P2) and RFC-0013 §20 Q20.
