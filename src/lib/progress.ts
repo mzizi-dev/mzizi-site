@@ -20,11 +20,11 @@
  *   each of the eight example programs. `main-release.yml` tagged 4d0cdc3 as
  *   v0.7.0 after CI passed (the tag exists on 2026-10-08, and its GitHub release
  *   is at releases/tag/v0.7.0).
- * - "Landing on staging": nothing. `staging` (1743e3c) and `main` (4d0cdc3) hold
- *   the same tree; `git diff 4d0cdc3 origin/staging` is empty.
- * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned #105 on
- *   2026-10-08, so the column lists the tracking issue and the work with no pull
- *   request yet. When one opens, list it here and in llms.txt
+ * - "Landing on staging": #105 (docs only, merged to staging as 90f8e10 on
+ *   2026-10-08); nothing else differs from `main` (4d0cdc3).
+ * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned none
+ *   after #105 merged on 2026-10-08, so the column lists the tracking issue and
+ *   the work with no pull request yet. When one opens, list it here and in llms.txt
  *   (scripts/check-facts.py fails until you do); when one merges, move it.
  */
 
@@ -134,15 +134,12 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: "Nothing is waiting. staging (1743e3c) and main (4d0cdc3) hold the same tree, so every merged change is on main. The next pull request to staging will be the first thing listed here.",
+    text: "Docs, not the language: the tracker and README prose that v0.7.0 left stale (the example count, the suites row, the line count). No row's mark changes. Merged to staging on 8 October; it reaches main with the next release.",
+    links: [pr(105)],
   },
 ];
 
 export const inProgress: Item[] = [
-  {
-    text: "Docs, not the language: the tracker and README prose that v0.7.0 left stale (the example count, the suites row, the line count). No row's mark changes. Open against staging on 8 October, with the M1 tracking issue.",
-    links: [pr(105)],
-  },
   {
     text: "M1, a language that computes: every Tier 1 row of the tracker (C1–C10) ✅ on main, built in waves. The tracking issue.",
     links: [M1_ISSUE],
