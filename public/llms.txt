@@ -203,13 +203,26 @@ and its open pull requests (none on 8 October). `staging` is at the same commit 
     contracts, a `service` that `mz build` lowers to a local Rust + axum
     package, the nesting cap (MZ0411), robustness tests, no `unsafe` in the
     compiler, and `match` in a view as MZ0410.
-- **Landing on `staging`:** nothing. `staging` and `main` are both at `1d5e578`.
+- **Landing on `staging`** (at `3b47ba7`, not yet on `main`):
+  - [#111](https://github.com/mzizi-dev/mzizi/pull/111): RFC-0014, the Tier 2
+    design (a draft): modules (P1), the standard library (P2), lowering all
+    code (P3), runnable builds (P4), errors mapped back to `.mz` (P5) and Rust
+    crate interop (P6), with 19 open questions for the owner. Design only;
+    nothing in it is built.
+  - [#112](https://github.com/mzizi-dev/mzizi/pull/112): fixes from the C6
+    review: `int`'s minimum is a literal under a unary `-`; MZ0962 names
+    another language's spelling as written; MZ0710 no longer fires on a return
+    of a type the signature cannot build. 765 tests in the workspace on
+    `staging`, 634 in the compiler crate.
+  - [#113](https://github.com/mzizi-dev/mzizi/pull/113): CI only, a re-pinned
+    `rust-toolchain` action.
 - **In progress toward M2, not available:** no pull request is open.
   Never describe any of this as something Mzizi has.
-  - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
-        M2 (Tier 1 plus P1–P6 ✅): M1 is met, and the tracking issue carries the work after it.
-  - Still to build, with no pull request open on 8 October: modules and imports
-    (P1) and the standard library (P2), which the public suites wait on.
+  - [#110](https://github.com/mzizi-dev/mzizi/issues/110), M2's tracking issue
+    (opened 9 October): M2 is Tier 1 plus P1–P6 ✅. M1
+    ([#69](https://github.com/mzizi-dev/mzizi/issues/69)) is met.
+  - Next, by #110's plan, once the owner answers RFC-0014's open questions: modules and imports (P1) and the standard library
+    (P2), which the public suites wait on. Nothing toward M2 is built yet.
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
   one RFC per tier; `mz run` is to compile a program to Rust and run it; methods on records now,
   generics after M1; integer overflow checks stay in every build, removed only
