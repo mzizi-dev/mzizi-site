@@ -22,8 +22,9 @@
  *   `git diff 1d5e578 origin/staging` is empty.
  * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned no
  *   pull requests on 2026-10-09. M1 is met on `main` (#69); M2 has its own
- *   tracking issue, #110, opened on 2026-10-09, which plans RFC-0014 (the Tier 2
- *   design, being drafted, no pull request yet) and then P1 modules.
+ *   tracking issue, #110, opened on 2026-10-09. Its first pull request is #111,
+ *   RFC-0014 (the Tier 2 design, a draft; nothing in it is built), open on
+ *   2026-10-09; then P1 modules.
  *   When one opens, list it here and in llms.txt (scripts/check-facts.py fails
  *   until you do); when one merges, move it.
  */
@@ -151,7 +152,11 @@ export const inProgress: Item[] = [
     links: [M2_ISSUE],
   },
   {
-    text: "Next, by #110's plan: RFC-0014, one RFC for Tier 2 (the owner's \"one RFC per tier\"), is being drafted, with no pull request open on 9 October; then modules and imports across files (P1), then the standard library (P2), which the public suites wait on. The tracker has both as ❌. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows. Nothing toward M2 is built yet.",
+    text: "RFC-0014, one RFC for Tier 2 (the owner's \"one RFC per tier\"): a draft design for modules (P1), the standard library (P2), lowering all code (P3), runnable builds (P4), errors mapped back to .mz (P5) and Rust crate interop (P6), in six waves, with 19 open questions for the owner. It is design only: nothing in it is built, and the tracker's marks do not change.",
+    links: [pr(111)],
+  },
+  {
+    text: "Then, by #110's plan: modules and imports across files (P1), then the standard library (P2), which the public suites wait on. The tracker has both as ❌. Nothing toward M2 is built yet.",
   },
 ];
 

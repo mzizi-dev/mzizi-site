@@ -23,7 +23,7 @@ cut, the Unreleased entries move under it.
 
 ### Changed — the progress block points at M2's tracking issue (2026-10-09)
 
-- **The progress block points at M2's own tracking issue.** On the landing page, `/language` and in `llms.txt`, "In progress toward M2" now links `mzizi-dev/mzizi#110` (opened 9 October), not #69, which tracked M1 and is met. It says what comes next by #110's plan: RFC-0014, the Tier 2 design, being drafted with no pull request open on 9 October, then modules (P1) and the standard library (P2). Nothing toward M2 is described as built. `check-facts.py` now requires the column to link #110, and lists every open language pull request that refers to #110 or #69.
+- **The progress block points at M2's own tracking issue.** On the landing page, `/language` and in `llms.txt`, "In progress toward M2" now links `mzizi-dev/mzizi#110` (opened 9 October), not #69, which tracked M1 and is met. It lists mzizi-dev/mzizi#111, RFC-0014 (the Tier 2 design, a draft with 19 open questions, nothing built), then modules (P1) and the standard library (P2) by #110's plan. Nothing toward M2 is described as built. `check-facts.py` now requires the column to link #110, and lists every open language pull request that refers to #110 or #69.
 
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
