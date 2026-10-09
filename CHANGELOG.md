@@ -42,6 +42,10 @@ lockfile refresh (`pnpm update @bundu/ui`), not a `package.json` edit. Third-par
 
 - **`/ecosystem` and the README name no UI framework they replaced, and no longer present Dioxus as the way forward for the console.** The `app.mzizi.dev` entry on `/ecosystem` now reads "Today it loads live data in the browser; it is being rebuilt so Astro renders it on the server with a Rust backend (mzizi-console#34). Replaces an earlier console app", and the README's "no UI framework runs in the browser" list is now "not React, not Vue". The README console row and `llms.txt` say the same about the console. The doctrine line on the same page is unchanged: one UI framework, Astro, with Rust first. No URL, fact, count or default moved. This follows the owner's decision of 2026-10-20 (mzizi-dev/mzizi-registry#503) to remove one framework's name from every repository.
 
+### Changed — the progress block points at M2's tracking issue (2026-10-09)
+
+- **The progress block points at M2's own tracking issue.** On the landing page, `/language` and in `llms.txt`, "In progress toward M2" now links `mzizi-dev/mzizi#110` (opened 9 October), not #69, which tracked M1 and is met. It says what comes next by #110's plan: RFC-0014, the Tier 2 design, being drafted with no pull request open on 9 October, then modules (P1) and the standard library (P2). Nothing toward M2 is described as built. `check-facts.py` now requires the column to link #110, and lists every open language pull request that refers to #110 or #69.
+
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
 Read from `mzizi-dev/mzizi` at `1d5e578`, tagged `v0.8.0` by `main-release.yml` after CI passed. Release pull
