@@ -1,6 +1,6 @@
 /**
  * Where the language stands: what is on `main`, what is on `staging` waiting
- * for the next release, and what is still in open pull requests toward M1.
+ * for the next release, and what is still in open pull requests toward M2.
  *
  * Shared by the landing page's status panel and `/language`, so the two never
  * disagree. `public/llms.txt` says the same in its own words.
@@ -21,14 +21,15 @@
  * - "Landing on staging": nothing. `staging` and `main` are both at 1d5e578, and
  *   `git diff 1d5e578 origin/staging` is empty.
  * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned no
- *   pull requests on 2026-10-08. M1 is met on `main`, so the column names the
- *   tracking issue and the work that follows it, with no pull request yet.
+ *   pull requests on 2026-10-09. M1 is met on `main` (#69); M2 has its own
+ *   tracking issue, #110, opened on 2026-10-09, which plans RFC-0014 (the Tier 2
+ *   design, being drafted, no pull request yet) and then P1 modules.
  *   When one opens, list it here and in llms.txt (scripts/check-facts.py fails
  *   until you do); when one merges, move it.
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
-export const PROGRESS_DATE = "2026-10-08";
+export const PROGRESS_DATE = "2026-10-09";
 // The release, and the language commits this file was written from. `main` and
 // `staging` are both at 1d5e578, so nothing is waiting.
 export const RELEASE = "8 October";
@@ -45,6 +46,7 @@ export type Item = { text: string; links?: Link[] };
 const pr = (n: number): Link => ({ href: `${LANG}/pull/${n}`, label: `#${n}` });
 
 export const M1_ISSUE: Link = { href: `${LANG}/issues/69`, label: "#69" };
+export const M2_ISSUE: Link = { href: `${LANG}/issues/110`, label: "#110" };
 export const RELEASE_PR: Link = pr(109);
 
 export const onMain: Item[] = [
@@ -145,11 +147,11 @@ export const onStaging: Item[] = [
 
 export const inProgress: Item[] = [
   {
-    text: "M2, a working programming language (Tier 1 plus P1–P6 ✅ on main). M1 was the tracking issue's goal and is met; the same issue, #69, tracks the work toward M2. M2 is not reached, so Mzizi is not yet called a working programming language.",
-    links: [M1_ISSUE],
+    text: "M2, a working programming language (Tier 1 plus P1–P6 ✅ on main), has its own tracking issue, #110, opened on 9 October. M1 (#69) is met. M2 is not reached, so Mzizi is not yet called a working programming language.",
+    links: [M2_ISSUE],
   },
   {
-    text: "Still to build for M2, with no pull request open on 8 October: modules and imports across files (P1), and the standard library (P2), which the public suites wait on. The tracker has both as ❌. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows; neither has a pull request open.",
+    text: "Next, by #110's plan: RFC-0014, one RFC for Tier 2 (the owner's \"one RFC per tier\"), is being drafted, with no pull request open on 9 October; then modules and imports across files (P1), then the standard library (P2), which the public suites wait on. The tracker has both as ❌. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows. Nothing toward M2 is built yet.",
   },
 ];
 
