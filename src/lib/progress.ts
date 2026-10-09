@@ -24,8 +24,9 @@
  *   pull requests on 2026-10-09. M1 is met on `main` (#69); M2 has its own
  *   tracking issue, #110, opened on 2026-10-09. Its first pull request, #111
  *   (RFC-0014, the Tier 2 design, a draft; nothing in it is built), merged to
- *   staging as f9d9ebf on 2026-10-09, after #113 (a CI pin). No pull request
- *   toward M2 is open; next is P1 modules.
+ *   staging on 2026-10-09, after #113 (a CI pin), and #112 (the #107 review
+ *   fixes) followed; staging is at 3b47ba7. No pull request toward M2 is open;
+ *   next is P1 modules.
  *   When one opens, list it here and in llms.txt (scripts/check-facts.py fails
  *   until you do); when one merges, move it.
  */
@@ -40,7 +41,7 @@ export const MAIN_COMMIT = "1d5e578";
 export const RELEASE_TAG = "v0.8.0";
 export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.8.0`;
 export const RELEASED_STAGING = "1d5e578";
-export const STAGING_COMMIT = "f9d9ebf";
+export const STAGING_COMMIT = "3b47ba7";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -145,6 +146,10 @@ export const onStaging: Item[] = [
   {
     text: "RFC-0014, one RFC for Tier 2 (the owner's \"one RFC per tier\"): a draft design for modules (P1), the standard library (P2), lowering all code (P3), runnable builds (P4), errors mapped back to .mz (P5) and Rust crate interop (P6), in six waves, with 19 open questions for the owner. Design only: nothing in it is built, and the tracker's marks do not change. Merged to staging on 9 October; it reaches main with the next release.",
     links: [pr(111)],
+  },
+  {
+    text: "Fixes from the C6 review (#107): int's minimum, -9223372036854775808, is a literal under a unary minus; MZ0962 names another language's spelling as written (parseInt, toUpperCase); MZ0710 no longer fires on a return of a type the signature cannot build; the tracker's comparison table follows its rows. Measured on staging: 765 tests in the workspace, 634 in the compiler crate. Merged to staging on 9 October.",
+    links: [pr(112)],
   },
   {
     text: "CI, not the language: the rust-toolchain action is pinned to a commit its repository keeps (#113), after the old pin's branch was rewritten and the workflow audit failed every pull request.",

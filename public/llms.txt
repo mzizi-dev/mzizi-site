@@ -203,12 +203,17 @@ and its open pull requests (none on 8 October). `staging` is at the same commit 
     contracts, a `service` that `mz build` lowers to a local Rust + axum
     package, the nesting cap (MZ0411), robustness tests, no `unsafe` in the
     compiler, and `match` in a view as MZ0410.
-- **Landing on `staging`** (at `f9d9ebf`, not yet on `main`):
+- **Landing on `staging`** (at `3b47ba7`, not yet on `main`):
   - [#111](https://github.com/mzizi-dev/mzizi/pull/111): RFC-0014, the Tier 2
     design (a draft): modules (P1), the standard library (P2), lowering all
     code (P3), runnable builds (P4), errors mapped back to `.mz` (P5) and Rust
     crate interop (P6), with 19 open questions for the owner. Design only;
     nothing in it is built.
+  - [#112](https://github.com/mzizi-dev/mzizi/pull/112): fixes from the C6
+    review: `int`'s minimum is a literal under a unary `-`; MZ0962 names
+    another language's spelling as written; MZ0710 no longer fires on a return
+    of a type the signature cannot build. 765 tests in the workspace on
+    `staging`, 634 in the compiler crate.
   - [#113](https://github.com/mzizi-dev/mzizi/pull/113): CI only, a re-pinned
     `rust-toolchain` action.
 - **In progress toward M2, not available:** no pull request is open.
