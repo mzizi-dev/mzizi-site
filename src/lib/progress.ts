@@ -22,9 +22,10 @@
  *   `git diff 1d5e578 origin/staging` is empty.
  * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned no
  *   pull requests on 2026-10-09. M1 is met on `main` (#69); M2 has its own
- *   tracking issue, #110, opened on 2026-10-09. Its first pull request is #111,
- *   RFC-0014 (the Tier 2 design, a draft; nothing in it is built), open on
- *   2026-10-09; then P1 modules.
+ *   tracking issue, #110, opened on 2026-10-09. Its first pull request, #111
+ *   (RFC-0014, the Tier 2 design, a draft; nothing in it is built), merged to
+ *   staging as f9d9ebf on 2026-10-09, after #113 (a CI pin). No pull request
+ *   toward M2 is open; next is P1 modules.
  *   When one opens, list it here and in llms.txt (scripts/check-facts.py fails
  *   until you do); when one merges, move it.
  */
@@ -39,7 +40,7 @@ export const MAIN_COMMIT = "1d5e578";
 export const RELEASE_TAG = "v0.8.0";
 export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.8.0`;
 export const RELEASED_STAGING = "1d5e578";
-export const STAGING_COMMIT = "1d5e578";
+export const STAGING_COMMIT = "f9d9ebf";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -142,7 +143,12 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: "Nothing is waiting. staging (1d5e578) and main (1d5e578) hold the same tree, so every merged change is on main. The next pull request to staging will be the first thing listed here.",
+    text: "RFC-0014, one RFC for Tier 2 (the owner's \"one RFC per tier\"): a draft design for modules (P1), the standard library (P2), lowering all code (P3), runnable builds (P4), errors mapped back to .mz (P5) and Rust crate interop (P6), in six waves, with 19 open questions for the owner. Design only: nothing in it is built, and the tracker's marks do not change. Merged to staging on 9 October; it reaches main with the next release.",
+    links: [pr(111)],
+  },
+  {
+    text: "CI, not the language: the rust-toolchain action is pinned to a commit its repository keeps (#113), after the old pin's branch was rewritten and the workflow audit failed every pull request.",
+    links: [pr(113)],
   },
 ];
 
@@ -152,11 +158,7 @@ export const inProgress: Item[] = [
     links: [M2_ISSUE],
   },
   {
-    text: "RFC-0014, one RFC for Tier 2 (the owner's \"one RFC per tier\"): a draft design for modules (P1), the standard library (P2), lowering all code (P3), runnable builds (P4), errors mapped back to .mz (P5) and Rust crate interop (P6), in six waves, with 19 open questions for the owner. It is design only: nothing in it is built, and the tracker's marks do not change.",
-    links: [pr(111)],
-  },
-  {
-    text: "Then, by #110's plan: modules and imports across files (P1), then the standard library (P2), which the public suites wait on. The tracker has both as ❌. Nothing toward M2 is built yet.",
+    text: "Next, by #110's plan, once the owner answers RFC-0014's open questions: modules and imports across files (P1), then the standard library (P2), which the public suites wait on. The tracker has both as ❌. Nothing toward M2 is built yet.",
   },
 ];
 
