@@ -178,7 +178,7 @@ asked at build time too, so a crate's state is never typed in. A failure to
 reach them never fails the build; the page says it could not check.
 
 `/v1/*` is the canonical, documented base; it is what every page prints and the
-only base the build reads. `api.mzizi.dev` is served by `mzizi-api-gateway`.
+only base the build reads. `api.mzizi.dev` is served by `mzizi-api` (formerly `mzizi-api-gateway`).
 
 The component previews (`public/previews/*.jpg`, used by `/components`,
 `/components/<name>` and `/playground`) are the one exception: they are
@@ -352,14 +352,14 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 
 ## Ecosystem
 
-| Repository                                                            | What it is                                                                                                                         | Address                                   |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language, and Mzizi's main goal — compiler, RFCs, benchmark                                                                    | —                                         |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system, DNA helix and Mzizi Roots                                                                    | Roots crates on crates.io                 |
-| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a Hono Worker, from the registry's files                                                                       | [api.mzizi.dev](https://api.mzizi.dev/v1) |
+| Repository                                                            | What it is                                                      | Address                                   |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language, and Mzizi's main goal — compiler, RFCs, benchmark | —                                         |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system, DNA helix and Mzizi Roots | Roots crates on crates.io                 |
+| [`mzizi-api`](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`) | The registry API as a Hono Worker, from the registry's files    | [api.mzizi.dev](https://api.mzizi.dev/v1) |
 | [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell; live data loads in the browser today, moving to server rendering with a Rust backend (mzizi-console#34) | [app.mzizi.dev](https://app.mzizi.dev)    |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs                                                                     | [docs.mzizi.dev](https://docs.mzizi.dev)  |
-| `mzizi-site`                                                          | This repository                                                                                                                    | [mzizi.dev](https://mzizi.dev)            |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)  |
+| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)            |
 
 ## Deliberately not here
 
