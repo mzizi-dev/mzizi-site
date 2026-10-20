@@ -282,7 +282,15 @@ Versions on 2026-10-07 (read the registries before repeating one):
   `mcp.mzizi.dev` serves the same bundle; `api.mzizi.dev/v1/skills` and the
   `/skills` pages here still serve the earlier five-skill bundle until the
   registry's dependency moves. `/v1/skills`' `meta.version` says which bundle
-  is served
+  is served. The public `mzizi` plugin (mzizi-dev/mzizi-registry `plugin/`:
+  `/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install
+  mzizi@mzizi`) carries the same five until then; mzizi-registry#520 moves it,
+  and the API's source, to 0.11.0 and makes the plugin installable in Codex
+  (`codex plugin marketplace add mzizi-dev/mzizi-registry`). A client that
+  installs nothing gets the skills from `mzizi_get_skills`. How to connect each
+  AI client (Claude, ChatGPT, Codex, the Claude and OpenAI APIs, Cursor,
+  VS Code, Gemini CLI, OpenCode, Windsurf):
+  https://docs.mzizi.dev/toolchain/connect
 - `@nyuchi/mzizi-cli` **0.7.0**, which ships the installer: `mzizi add <name>`
   for React (writes the TSX), Rust (records the crate the component's
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
