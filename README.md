@@ -312,7 +312,7 @@ the server, over a standard `tools/list` request.
 ## Stack, and why no framework ships to the browser
 
 Astro renders everything at build time. There are no islands, and no UI framework
-runs in the browser: not Svelte, not React, not Vue.
+runs in the browser: not React, not Vue.
 
 That is doctrine, not taste. The UI is Astro, and underneath it is Rust first and
 TypeScript second, with no third UI framework (`mzizi-dev/agent-tools#82`, and the

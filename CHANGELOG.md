@@ -38,6 +38,10 @@ Owner decision, 2026-10-21: first-party packages are pinned to a minimum accepta
 edit. `pnpm-lock.yaml` still resolves 0.2.0, so the site renders exactly as before; taking a newer release is now a
 lockfile refresh (`pnpm update @bundu/ui`), not a `package.json` edit. Third-party dependencies are unchanged.
 
+### Changed — the earlier console app is named without a UI framework
+
+- **`/ecosystem` and the README name no UI framework they replaced.** The `app.mzizi.dev` entry on `/ecosystem` now reads "Replaces an earlier console app", and the README's "no UI framework runs in the browser" list is now "not React, not Vue". The doctrine line on the same page is unchanged: one UI framework, Astro, with Rust first. No URL, fact, count or default moved. This follows the owner's decision of 2026-10-20 (mzizi-dev/mzizi-registry#503) to remove one framework's name from every repository.
+
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
 Read from `mzizi-dev/mzizi` at `1d5e578`, tagged `v0.8.0` by `main-release.yml` after CI passed. Release pull
