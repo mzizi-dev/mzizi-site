@@ -352,14 +352,14 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 
 ## Ecosystem
 
-| Repository                                                            | What it is                                                      | Address                                   |
-| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language, and Mzizi's main goal — compiler, RFCs, benchmark | —                                         |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system, DNA helix and Mzizi Roots | Roots crates on crates.io                 |
-| [`mzizi-api`](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`) | The registry API as a Hono Worker, from the registry's files    | [api.mzizi.dev](https://api.mzizi.dev/v1) |
-| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell; live data loads in the browser today, moving to server rendering with a Rust backend (mzizi-console#34) | [app.mzizi.dev](https://app.mzizi.dev)    |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)  |
-| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)            |
+| Repository                                                                           | What it is                                                                                                                         | Address                                   |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                                        | The language, and Mzizi's main goal — compiler, RFCs, benchmark                                                                    | —                                         |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)                      | The component registry, brand system, DNA helix and Mzizi Roots                                                                    | Roots crates on crates.io                 |
+| [`mzizi-api`](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`) | The registry API as a Hono Worker, from the registry's files                                                                       | [api.mzizi.dev](https://api.mzizi.dev/v1) |
+| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)                        | The console — Astro shell; live data loads in the browser today, moving to server rendering with a Rust backend (mzizi-console#34) | [app.mzizi.dev](https://app.mzizi.dev)    |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)                              | The Mintlify documentation site — the one home of Mzizi's docs                                                                     | [docs.mzizi.dev](https://docs.mzizi.dev)  |
+| `mzizi-site`                                                                         | This repository                                                                                                                    | [mzizi.dev](https://mzizi.dev)            |
 
 ## Deliberately not here
 
