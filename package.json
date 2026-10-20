@@ -29,7 +29,7 @@
     "playwright": "^1.63.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
-    "vite-plus": "^1.0.0",
+    "vite-plus": "^1.1.0",
     "wrangler": "^4.45.0"
   },
   "dependencies": {
