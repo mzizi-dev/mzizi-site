@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — `@bundu/ui` is a minimum version, `>=0.2.0`, not `^0.2.0` (2026-10-21)
+
+Owner decision, 2026-10-21: first-party packages are pinned to a minimum acceptable version, with no maximum. On a
+`0.x` version a caret stops below the next minor, so `^0.2.0` could not take `@bundu/ui` 0.3.0 without a manifest
+edit. `pnpm-lock.yaml` still resolves 0.2.0, so the site renders exactly as before; taking a newer release is now a
+lockfile refresh (`pnpm update @bundu/ui`), not a `package.json` edit. Third-party dependencies are unchanged.
+
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
 Read from `mzizi-dev/mzizi` at `1d5e578`, tagged `v0.8.0` by `main-release.yml` after CI passed. Release pull
