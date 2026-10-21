@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — Dependabot version updates target `staging` (2026-10-21)
+
+- `.github/dependabot.yml` is new: weekly version updates for GitHub Actions and this repository's package manifests, every entry with `target-branch: staging` (owner rule, 2026-10-21: "all dependabot should target staging not main.") and a seven-day cooldown before a new release is proposed.
+
 ### Security — build dependencies on patched versions (2026-10-21)
 
 `pnpm audit` reported high advisories in `devalue`, `sharp`, `source-map-js`, `undici`, `vite` and `vite-plus`, and
