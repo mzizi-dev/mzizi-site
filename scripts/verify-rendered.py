@@ -380,11 +380,11 @@ for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
     # In progress is never presented as shipped: the column order is fixed.
     at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M2")]
     check(name, "the three columns read main, then staging, then in progress", -1 < at[0] < at[1] < at[2])
-# The language's release tag (main-release.yml, v0.8.0 at 1d5e578): the pages that
+# The language's release tag (main-release.yml, v0.9.0 at 6f7b096): the pages that
 # name the release name it, and check-facts.py holds the tag to its commit.
 for name in ("index.html", "language.html", "llms.txt"):
     raw = (DIST / name).read_text(encoding="utf-8")
-    check(name, "names the language's release tag v0.8.0", "v0.8.0" in raw)
+    check(name, "names the language's release tag v0.9.0", "v0.9.0" in raw)
 # RFC-0013 (#76) and the language survey reached main in the 8 October release
 # (#91): link their files on main, and no design/ file on staging anywhere.
 RFC13 = f"{LANG}/blob/main/design/RFC-0013-core-language.md"
@@ -533,11 +533,15 @@ stale_patterns = {
     # 26,850 lines, 137 entries, 70 codes, 51 pending) and the staging figures
     # (693, 562, 181, 75, 50) are not the current ones.
     r"\b(644 tests in 24 suites|513 of them|512 of them|562 of them|693 tests|26 suites|24 suites)\b":
-        "the language's current figures are 760 tests in 27 suites, 629 of them in the compiler crate (mzizi-dev/mzizi main, 1d5e578)",
+        "the language's current figures are 765 tests in 29 suites, 634 of them in the compiler crate (mzizi-dev/mzizi main, 6f7b096)",
+    # The 2026-10-08 and v0.8.0 figures (760 tests in 27 suites, 629 of them in the
+    # compiler crate, 33,438 lines) are the ones before the 20 October release.
+    r"\b(760 tests|629 of them|33,438 lines|760 tests in 27 suites)\b":
+        "the language's current figures are 765 tests in 29 suites, 634 of them in the compiler crate, 33,518 lines (6f7b096, v0.9.0)",
     r"\b(744 tests|613 of them|33,138|191 entries|1743e3c)\b":
-        "the language's figures at v0.8.0 are 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578)",
+        "the language's figures at v0.8.0 were 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578); at v0.9.0, 765, 634, 33,518 (6f7b096)",
     # The release tag existed from 18:03Z on 2026-10-08 (main-release.yml): no page says it does not.
-    r"[Nn]o `?v0\.8\.0`? tag\b|no tag is named|tag existed on 2026-10-08": "the tag v0.8.0 exists (1d5e578, main-release.yml)",
+    r"[Nn]o `?v0\.9\.0`? tag\b|no tag is named|tag existed on 2026-10-20": "the tag v0.9.0 exists (6f7b096, main-release.yml)",
     r"\b26,850 lines\b": "compiler/src is 33,438 lines at 1d5e578 (a fresh count), not the 26,850 of dc156c5",
     # Programs reached main in the 8 October release (#91).
     r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":

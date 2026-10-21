@@ -259,7 +259,7 @@ if arms:
           react is not None and (react.group(1).startswith("exists") == ("react" in present)),
           react.group(1) if react else "missing")
 
-# Progress toward M2 (owner, 2026-10-07; M1 met in v0.8.0). The landing page and /language list
+# Progress toward M2 (owner, 2026-10-07; M1 met in v0.8.0; v0.9.0 on 2026-10-20). The landing page and /language list
 # the pull requests that are in progress, labelled as not available. One that
 # has merged or closed is no longer in progress: move it (to "Landing on
 # staging", or "On main today" once released) in src/lib/progress.ts and
@@ -278,8 +278,8 @@ check("llms.txt has its “In progress toward M2” list", llms_block is not Non
 llms_listed = sorted({int(n) for n in re.findall(PULL, llms_block.group(1))}) if llms_block else []
 check("llms.txt lists the same pull requests in progress as index.html", llms_listed == listed,
       f"llms.txt {llms_listed}, index.html {listed}")
-check("index.html's “In progress toward M2” column links the tracking issue #69",
-      len(column) == 2 and 'href="https://github.com/mzizi-dev/mzizi/issues/69"' in column[1].split("</ul>", 1)[0])
+check("index.html's “In progress toward M2” column links M2's tracking issue #110",
+      len(column) == 2 and 'href="https://github.com/mzizi-dev/mzizi/issues/110"' in column[1].split("</ul>", 1)[0])
 for number in sorted(set(listed) | set(llms_listed)):
     state = upstream(f"mzizi-dev/mzizi#{number}",
                      lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/pulls/{number}"))
@@ -290,7 +290,8 @@ for number in sorted(set(listed) | set(llms_listed)):
               "" if is_open else
               f"merged into {state['base']['ref']} on {merged[:10]}: move it out of “In progress”"
               if merged else "closed: take it out of “In progress”")
-# Every open pull request that works toward M2 (its body refers to #69) is listed.
+# Every open pull request that works toward M2 (its body refers to #110, or to #69,
+# M1's issue, which earlier M2 work cited) is listed.
 # A release pull request (staging to main) is not work toward M2, though its
 # body quotes the entries that do: what it carries is the staging column.
 open_prs = upstream("the language's open pull requests",
@@ -300,8 +301,8 @@ if open_prs is not None:
         if pr["base"]["ref"] == "main" and pr["title"].startswith("chore(release)"):
             print(f"  [note] #{pr['number']} is a release pull request ({pr['title']}), not listed in progress")
             continue
-        if re.search(r"(?<![\w/])#69\b|issues/69\b", pr.get("body") or ""):
-            check(f"#{pr['number']} (open, refs #69) is listed in progress toward M2",
+        if re.search(r"(?<![\w/])#(69|110)\b|issues/(69|110)\b", pr.get("body") or ""):
+            check(f"#{pr['number']} (open, refs #110 or #69) is listed in progress toward M2",
                   pr["number"] in listed, pr["title"])
 # Staging released: RFC-0013 reaching main's design/ means the "Landing on
 # staging" column has shipped. Move its items to "On main today", and re-read
@@ -336,10 +337,10 @@ if lagging:
     notes.append(f"skill pages still carry pre-62a0f32 language facts ({', '.join(lagging)}): "
                  "@nyuchi/mzizi-skills lags the language; tell the skills-freshness agent.")
 
-# The language's release tag. The pages name v0.8.0 (main-release.yml tags main
+# The language's release tag. The pages name v0.9.0 (main-release.yml tags main
 # after CI passes); the tag must exist and point at the commit the figures cite.
 print("\nthe language's release tag")
-TAG = "v0.8.0"
+TAG = "v0.9.0"
 tag_commit = upstream(f"tag {TAG}", lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/commits/{TAG}")["sha"])
 if tag_commit:
     cited_tag = re.search(r"mzizi-dev/mzizi/commit/([0-9a-f]{7,40})", (DIST / "index.html").read_text(encoding="utf-8"))

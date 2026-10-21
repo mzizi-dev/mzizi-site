@@ -82,7 +82,7 @@ const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 // The language commit the figures below were read at: a fresh build, not the
 // README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "1d5e578";
+const LANG_COMMIT = "6f7b096";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -173,7 +173,7 @@ const isntList = [
   },
   {
     what: "Not a rendering engine",
-    note: "Mzizi is designed to lower to Rust and Dioxus. Rendering is interop, not a rebuilt engine.",
+    note: "Mzizi is designed to lower to Rust. Roots components are moving to Mzizi's own render(); Dioxus is still a dependency of some crates until that migration finishes. Mzizi does not rebuild a renderer for other targets.",
   },
   {
     what: "Not an ML runtime",
@@ -336,7 +336,7 @@ const surfaces = [
   {
     what: "Registry API",
     host: "api.mzizi.dev",
-    repo: "mzizi-api-gateway",
+    repo: "mzizi-api",
     note: `${total} components, brand, tokens, the DNA-helix architecture. A Hono Worker serving the registry's files, bundled at a pinned commit; no database.`,
   },
   {
@@ -355,7 +355,7 @@ const surfaces = [
     what: "Console",
     host: "app.mzizi.dev",
     repo: "mzizi-console",
-    note: "Run by Nyuchi. Astro chrome, Rust/Dioxus islands, WorkOS sign-in.",
+    note: "Standalone repository, run by Nyuchi. Astro today, with WorkOS sign-in and no database of its own. Decided, not built: one Rust Worker serving Astro's output, and Cloudflare D1 for any state it keeps.",
   },
 ];
 
@@ -366,7 +366,7 @@ const notYet = [
   },
   {
     what: "Most of a programming language, and a release",
-    note: "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, text operations, collections and records with methods, on main since the fourth 8 October release (#106, tagged v0.8.0); on main it has no modules, standard library or concurrency yet. A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 is met; M2 needs modules and the standard library first (see the status panel).",
+    note: "In a program, Mzizi has expressions, bindings, functions, control flow, error handling, text operations, collections and records with methods, on main since the fourth 8 October release (#106, tagged v0.8.0). The 20 October release (v0.9.0) made the int minimum a literal under a unary minus and adjusted two diagnostics; it adds no new construct. On main it has no modules, standard library or concurrency yet. A service lowers, to a local Rust + axum package, and a program to a Rust package with no dependencies; no component lowers, and there is no Workers, Containers or WebAssembly target. LANGUAGE-TRACKER.md lists what still has to be built, against Python, Go, C++, TypeScript and Rust. M1 is met; M2 needs modules and the standard library first (see the status panel).",
   },
   {
     what: "The wider benchmark",
@@ -398,10 +398,10 @@ const repos: Repo[] = [
     desc: `${total} components built to support the language: its UI layer, with Mzizi Roots (the Rust components) written here, and the brand system. The benchmark's public UI tasks come from here too.`,
   },
   {
-    name: "mzizi-api-gateway",
+    name: "mzizi-api",
     lang: "TypeScript",
     langColor: "var(--color-cobalt)",
-    desc: "api.mzizi.dev: a Hono Cloudflare Worker serving the registry API from the registry's files, bundled at build time. No database.",
+    desc: "api.mzizi.dev: a Hono Cloudflare Worker serving the registry API from the registry's files, bundled at build time. No database. Formerly mzizi-api-gateway.",
   },
   {
     name: "mzizi-site",
@@ -419,7 +419,7 @@ const repos: Repo[] = [
     name: "mzizi-console",
     lang: "Rust",
     langColor: "var(--color-copper)",
-    desc: "app.mzizi.dev, run by Nyuchi: Astro chrome over Rust/Dioxus islands, reading the registry API live.",
+    desc: "app.mzizi.dev, run by Nyuchi: Astro over Dioxus islands today, reading the registry API live. Decided, not built: one Rust Worker serving the Astro output.",
   },
 ];
 ---
@@ -511,7 +511,7 @@ const repos: Repo[] = [
         <strong>The language harness is the spine of the language.</strong> Every
         feature a program has registers an entry in the compiler, and{" "}
         on <code>main</code>, <code>mz harness definition</code> prints them as JSON: 197 entries,
-        80 of them diagnostic codes, at <code>1d5e578</code> (v0.8.0); 49 codes are pending. Tests enforce that every code the compiler
+        79 distinct diagnostic codes, at <code>6f7b096</code> (v0.9.0); 49 codes are pending. Tests enforce that every code the compiler
         can emit has an entry (or, for a component's or a service's codes, is on
         a frozen pending list) and that every entry's examples and triggers still
         do what they say. Each code's <code>say</code> text and each feature's
@@ -583,9 +583,9 @@ const repos: Repo[] = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>760</b><span>tests passing, 27 suites</span></li>
+      <li class="fig"><b>765</b><span>tests passing, 29 suites</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>33,438</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>33,518</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
@@ -868,7 +868,7 @@ const repos: Repo[] = [
         <h3>Mzizi Roots, Rust first</h3>
         <p>
           <strong>Mzizi Roots</strong> is the Rust direction for them: Mzizi's own
-          UI and server components for the agentic web, written in Rust (Dioxus),
+          UI and server components for the agentic web, written in Rust, moving to Mzizi's own render() (Dioxus is still a dependency of some crates while the migration finishes),
           sharing a contract and a token set with their React siblings rather than
           a source file. Where a Rust implementation exists it is presented first.
           The React (TSX) builds keep working and stay installable, but new work
