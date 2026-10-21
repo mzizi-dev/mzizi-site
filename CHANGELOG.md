@@ -24,7 +24,7 @@ cut, the Unreleased entries move under it.
 ### Changed — `/skills` names the plugin and the connection guide; `llms.txt` too (2026-10-20)
 
 - **`/skills`, "Using them"** adds the public `mzizi` plugin (`/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install mzizi@mzizi`), which installs the skills and connects the MCP server in one step and carries the same bundle as the API; says `npx skills experimental_sync` links the npm bundle into `.agents/skills/`; and says a client that installs nothing still gets the skills from the MCP server. It links the new docs page, [Connect a client](https://docs.mzizi.dev/toolchain/connect) (mzizi-docs#64).
-- **`llms.txt`**, under the skills version: the plugin carries the same five skills as the API until mzizi-registry#520 moves both to 0.11.0 and makes the plugin installable in Codex; `mzizi_get_skills` serves the skills to a client that installs nothing; and the connection guide's URL.
+- **`llms.txt`**, under the skills version: the plugin carries the same five skills as the API until mzizi-registry#520 moves both to the next skills release (0.12.0) and makes the plugin installable in Codex; `mzizi_get_skills` serves the skills to a client that installs nothing; and the connection guide's URL.
 
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
