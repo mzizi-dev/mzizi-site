@@ -199,7 +199,7 @@ const arms = [
   lede="A general-purpose programming language, with Rust as its platform the way JavaScript is TypeScript's. Its goal is to be the language you choose instead of TypeScript, Python or C++. It is designed around a harness at its core, the layer an agent reads and works through, and for agents to write, specifically the small open-weight models that need the help most."
 >
   <p>
-    Mzizi is designed to lower to Rust: Roots components render with Mzizi's
+    Mzizi is designed to lower to Rust: Roots components are moving to Mzizi's
     own <code>render()</code>, with Dioxus still a dependency of some crates
     while that migration finishes, and axum or <code>workers-rs</code> for
     servers. Today two things lower: a{" "}
@@ -226,7 +226,7 @@ const arms = [
     MCP server, <code>fundi</code>) are its clients. The <code>mz</code>{" "}
     compiler is the toolchain that implements the language, not the language. Cross-platform rendering is interop
     with Dioxus rather than a rebuilt engine, as the charter has it; the
-    components render with Mzizi's own <code>render()</code> (registry #506 and
+    components are moving to Mzizi's own <code>render()</code> (registry #506 and
     #510). ML is Candle; the edge target is{" "}
     <code>workers-rs</code>. Reinventing any of those would buy the language
     nothing and would cost Phase 0 its focus.

@@ -17,7 +17,7 @@
   designed, in RFC-0012 (a draft), so never describe them as working.
   It lives in the language repository, `mzizi-dev/mzizi`; the agent-tools
   packages (`@nyuchi/mzizi-cli`, `mzizi-mcp`, `fundi`) are its clients.
-  Designed to lower to Rust (Roots render with Mzizi's own `render()`, with Dioxus still a
+  Designed to lower to Rust (Roots are moving to Mzizi's own `render()`, with Dioxus still a
   dependency of some crates during the migration; axum or `workers-rs` for servers). Today two things lower: `mz build` lowers a
   `service` to a local Rust + axum package, which CI compiles, tests and
   serves, and `mz run` (or `mz build`) lowers a `program` to a Rust package
@@ -255,13 +255,13 @@ Versions on 2026-10-07 (read the registries before repeating one):
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
   Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
   `src/components/mzizi/`), plus the `fundi` agent. `npx mzizi` works.
-- Mzizi Roots on crates.io, all **0.3.0**: `mzizi-tokens`, `mzizi-ui`,
+- Mzizi Roots on crates.io, all **0.4.0**: `mzizi-tokens`, `mzizi-ui`,
   `mzizi-brand`, `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`,
   `mzizi-discovery`, and the umbrellas `mzizi-roots` (UI) and
   `mzizi-roots-server` (server). `cargo add mzizi-roots` works.
 
 **The components are built to support the language.** *Mzizi Roots* is
-Mzizi's own UI and server components for the agentic web, in Rust (rendered by Mzizi's own `render()`; Dioxus is still a dependency of some crates during the migration):
+Mzizi's own UI and server components for the agentic web, in Rust (moving to Mzizi's own `render()`; Dioxus is still a dependency of some crates during the migration):
 the language's component model, the way React is JavaScript's, and its UI
 layer. Where a component has a Rust implementation, it is presented first. The
 React/TSX builds keep working but are deprioritised. The registry also supplies
