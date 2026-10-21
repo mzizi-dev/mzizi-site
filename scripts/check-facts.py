@@ -259,7 +259,7 @@ if arms:
           react is not None and (react.group(1).startswith("exists") == ("react" in present)),
           react.group(1) if react else "missing")
 
-# Progress toward M2 (owner, 2026-10-07; M1 met in v0.8.0). The landing page and /language list
+# Progress toward M2 (owner, 2026-10-07; M1 met in v0.8.0; v0.9.0 on 2026-10-20). The landing page and /language list
 # the pull requests that are in progress, labelled as not available. One that
 # has merged or closed is no longer in progress: move it (to "Landing on
 # staging", or "On main today" once released) in src/lib/progress.ts and
@@ -337,10 +337,10 @@ if lagging:
     notes.append(f"skill pages still carry pre-62a0f32 language facts ({', '.join(lagging)}): "
                  "@nyuchi/mzizi-skills lags the language; tell the skills-freshness agent.")
 
-# The language's release tag. The pages name v0.8.0 (main-release.yml tags main
+# The language's release tag. The pages name v0.9.0 (main-release.yml tags main
 # after CI passes); the tag must exist and point at the commit the figures cite.
 print("\nthe language's release tag")
-TAG = "v0.8.0"
+TAG = "v0.9.0"
 tag_commit = upstream(f"tag {TAG}", lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/commits/{TAG}")["sha"])
 if tag_commit:
     cited_tag = re.search(r"mzizi-dev/mzizi/commit/([0-9a-f]{7,40})", (DIST / "index.html").read_text(encoding="utf-8"))
