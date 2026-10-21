@@ -21,6 +21,11 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — every dependency and override is a minimum, and `vite-plus` is at least 1.3.0 (2026-10-21)
+
+- Owner, 2026-10-21: "mark packages with minimum acceptable, latest shouldn't be a blocker on too old of a version." Every entry in `dependencies`, `devDependencies` and `pnpm.overrides` is now `>=x.y.z` with no maximum, at the version `pnpm-lock.yaml` already resolved. `vite-plus` reads `>=1.3.0`, the version the lockfile already held. Readers see no difference.
+- The lockfile moves one transitive package: `astro`'s `magic-string` dedupes from 1.3.1 onto the 1.4.3 already in the tree. Nothing else resolves differently.
+
 ### Added — Dependabot version updates target `staging` (2026-10-21)
 
 - `.github/dependabot.yml` is new: weekly version updates for GitHub Actions and this repository's package manifests, every entry with `target-branch: staging` (owner rule, 2026-10-21: "all dependabot should target staging not main.") and a seven-day cooldown before a new release is proposed.
