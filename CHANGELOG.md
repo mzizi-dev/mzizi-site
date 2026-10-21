@@ -21,6 +21,23 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Security — build dependencies on patched versions (2026-10-21)
+
+`pnpm audit` reported high advisories in `devalue`, `sharp`, `source-map-js`, `undici`, `vite` and `vite-plus`, and
+moderate ones in `fast-uri` and `smol-toml`, all reached through `astro`, `wrangler`, `@tailwindcss/vite` and
+`@astrojs/check`. They failed the org's dependency `audit` check on any pull request that touches `pnpm-lock.yaml`.
+`vite-plus` is now `^1.1.0`, and `pnpm.overrides` puts the others on their patched versions. `http-cache-semantics`
+(GHSA-ch52-4w7c-c8xp, through `astro`) has no patched release, so it is listed in `pnpm.auditConfig.ignoreGhsas` until
+one ships; the site is static and serves no cached responses through it. The build, `astro check` and the
+rendered-content gate pass, and readers see no difference.
+
+### Changed — `@bundu/ui` is a minimum version, `>=0.2.0`, not `^0.2.0` (2026-10-21)
+
+Owner decision, 2026-10-21: first-party packages are pinned to a minimum acceptable version, with no maximum. On a
+`0.x` version a caret stops below the next minor, so `^0.2.0` could not take `@bundu/ui` 0.3.0 without a manifest
+edit. `pnpm-lock.yaml` still resolves 0.2.0, so the site renders exactly as before; taking a newer release is now a
+lockfile refresh (`pnpm update @bundu/ui`), not a `package.json` edit. Third-party dependencies are unchanged.
+
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
 Read from `mzizi-dev/mzizi` at `1d5e578`, tagged `v0.8.0` by `main-release.yml` after CI passed. Release pull
