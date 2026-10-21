@@ -44,7 +44,7 @@ export const CANONICAL_BASE = `${API_ORIGIN}/v1`;
 /**
  * The base this build READS from: the canonical one, and only that.
  *
- * `api.mzizi.dev` is served by `mzizi-api-gateway` (a Hono Worker over the
+ * `api.mzizi.dev` is served by `mzizi-api` (formerly `mzizi-api-gateway`, a Hono Worker over the
  * registry's files), which answers `/v1/*` directly. An earlier build also
  * tried `/api/v1` as a fallback while `mzizi-registry#335` was open; that
  * rewrite landed, the gateway took over the hostname on 2026-09-29, and a
