@@ -25,6 +25,7 @@ cut, the Unreleased entries move under it.
 
 - Owner, 2026-10-21: "mark packages with minimum acceptable, latest shouldn't be a blocker on too old of a version." Every entry in `dependencies`, `devDependencies` and `pnpm.overrides` is now `>=x.y.z` with no maximum, at the version `pnpm-lock.yaml` already resolved. `vite-plus` reads `>=1.3.0`, the version the lockfile already held. Readers see no difference.
 - The lockfile moves one transitive package: `astro`'s `magic-string` dedupes from 1.3.1 onto the 1.4.3 already in the tree. Nothing else resolves differently.
+- `http-cache-semantics` 4.3.0 is now published with the fix for GHSA-ch52-4w7c-c8xp, so a new override, `http-cache-semantics@<4.3.0` `>=4.3.0`, moves `astro`'s copy from 4.2.0 to 4.3.0, and the `pnpm.auditConfig.ignoreGhsas` entry for that advisory is removed. The org `audit` job strips `pnpm.auditConfig` before it runs, so the ignore never applied there. Readers see no difference.
 
 ### Added — Dependabot version updates target `staging` (2026-10-21)
 
