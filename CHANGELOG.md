@@ -21,6 +21,16 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Security — `zod` at 4.6.6 or later (2026-10-24)
+
+- A new override, `zod@<4.6.6` `>=4.6.6` (a minimum, no maximum), moves `astro`'s copy of `zod` from 4.6.2 to 4.6.7, fixing GHSA-mrhx-c7xc-m3w5 (high), which the org `audit` job reported. `zod` is a build dependency; readers see no difference.
+
+### Changed — every dependency and override is a minimum, and `vite-plus` is at least 1.3.0 (2026-10-21)
+
+- Owner, 2026-10-21: "mark packages with minimum acceptable, latest shouldn't be a blocker on too old of a version." Every entry in `dependencies`, `devDependencies` and `pnpm.overrides` is now `>=x.y.z` with no maximum, at the version `pnpm-lock.yaml` already resolved. `vite-plus` reads `>=1.3.0`, the version the lockfile already held. Readers see no difference.
+- The lockfile moves one transitive package: `astro`'s `magic-string` dedupes from 1.3.1 onto the 1.4.3 already in the tree. Nothing else resolves differently.
+- `http-cache-semantics` 4.3.0 is now published with the fix for GHSA-ch52-4w7c-c8xp, so a new override, `http-cache-semantics@<4.3.0` `>=4.3.0`, moves `astro`'s copy from 4.2.0 to 4.3.0, and the `pnpm.auditConfig.ignoreGhsas` entry for that advisory is removed. The org `audit` job strips `pnpm.auditConfig` before it runs, so the ignore never applied there. Readers see no difference.
+
 ### Added — Dependabot version updates target `staging` (2026-10-21)
 
 - `.github/dependabot.yml` is new: weekly version updates for GitHub Actions and this repository's package manifests, every entry with `target-branch: staging` (owner rule, 2026-10-21: "all dependabot should target staging not main.") and a seven-day cooldown before a new release is proposed.
