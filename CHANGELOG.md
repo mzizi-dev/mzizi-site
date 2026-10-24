@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Security — `zod` at 4.6.6 or later (2026-10-24)
+
+- A new override, `zod@<4.6.6` `>=4.6.6` (a minimum, no maximum), moves `astro`'s copy of `zod` from 4.6.2 to 4.6.7, fixing GHSA-mrhx-c7xc-m3w5 (high), which the org `audit` job reported. `zod` is a build dependency; readers see no difference.
+
 ### Changed — every dependency and override is a minimum, and `vite-plus` is at least 1.3.0 (2026-10-21)
 
 - Owner, 2026-10-21: "mark packages with minimum acceptable, latest shouldn't be a blocker on too old of a version." Every entry in `dependencies`, `devDependencies` and `pnpm.overrides` is now `>=x.y.z` with no maximum, at the version `pnpm-lock.yaml` already resolved. `vite-plus` reads `>=1.3.0`, the version the lockfile already held. Readers see no difference.
