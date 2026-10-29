@@ -189,8 +189,8 @@ the whole page, so a component with no demo simply has no picture.
 
 ### Styling
 
-`@bundu/ui` 0.2.0, the same package `bundu-labs/marketing` (three apps) and
-`shamwari-ai/shamwari/site` consume. `src/styles/site.css` is Tailwind v4 over
+`@bundu/ui`, the same package `bundu-labs/marketing` (three apps) and
+`shamwari-ai/shamwari/site` consume. The range in `package.json` is a floor with no ceiling (`>=0.7.0`): `0.x` carets stop at the next minor (`^0.2.0` could never reach 0.7.0), and the lockfile, not the range, decides what a build installs. Raise the floor when the site needs a newer feature; a bump is a Dependabot or hand PR that updates `pnpm-lock.yaml`. `src/styles/site.css` is Tailwind v4 over
 `@bundu/ui/styles/theme.css` (all 21 colour families, the surface ladder, the type
 scale), `globals.css`, `color-scheme.css` (dark mode follows the OS, with no theme
 script) and `brand-mzizi.css`. Mzizi's brand mineral is **hematite**, by the owner's
