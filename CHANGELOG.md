@@ -12,7 +12,14 @@ Security, and anything that breaks a URL or an agent-facing file
 
 **The rule (owner, 2026-09-30):** every pull request that changes a page, a
 stated fact, an agent-facing file, a redirect, a dependency or a default adds
-an entry under `## [Unreleased]
+an entry under `## [Unreleased]` in the same pull request, saying what a reader
+of the site will see differently. The `changelog / entry required` check fails
+a pull request that doesn't. Pull requests that touch only `.github/`,
+lockfiles or lint config pass without one, and pure CI, lint or typo pull
+requests can carry the `no-changelog` label instead. When a dated section is
+cut, the Unreleased entries move under it.
+
+## [Unreleased]
 
 ### Changed
 
@@ -25,17 +32,6 @@ an entry under `## [Unreleased]
   `/ecosystem`. Hero, bench, status-then-benchmark order, the arms list and every gated fact are
   unchanged. Not yet reviewed page by page beyond the landing page. Heavy text belongs in the docs;
   moving the folded text there is a follow-up.
-  `in the same pull request, saying what a reader
-  of the site will see differently. The`changelog / entry required`check fails
-  a pull request that doesn't. Pull requests that touch only`.github/`,
-  lockfiles or lint config pass without one, and pure CI, lint or typo pull
-  requests can carry the `no-changelog` label instead. When a dated section is
-  cut, the Unreleased entries move under it.
-
-## [Unreleased]
-
-### Changed
-
 - **`@bundu/ui` moves from 0.2.0 to 0.7.0**, and its range in `package.json` is now a floor with no ceiling (`>=0.7.0`). The old caret range could not reach a newer `0.x` minor, which is why the site had fallen five minors behind. The lockfile still pins what a build installs. `astro check`, `astro build` and the rendered-content gate pass on 0.7.0. Not yet reviewed visually page by page: check the preview before merging.
 
 ### Security — `zod` at 4.6.6 or later (2026-10-24)
