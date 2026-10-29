@@ -23,6 +23,15 @@ cut, the Unreleased entries move under it.
 
 ### Changed
 
+- The landing page shows the verdict first and folds the long prose away. The status panel now opens
+  with two short statements (Phase 0 is not complete; Mzizi is not yet a working programming language)
+  and keeps the full account, the example program and the progress columns behind "The full account"
+  and "A program that runs, and where the work stands". The language, toolchain and tab cards show a
+  title with the detail one tap away. "Why" and "Contracts" shrink to three one-line cards each, the
+  components section to one sentence, and the repository ledger and org list give way to a link to
+  `/ecosystem`. Hero, bench, status-then-benchmark order, the arms list and every gated fact are
+  unchanged. Not yet reviewed page by page beyond the landing page. Heavy text belongs in the docs;
+  moving the folded text there is a follow-up.
 - **`@bundu/ui` moves from 0.2.0 to 0.7.0**, and its range in `package.json` is now a floor with no ceiling (`>=0.7.0`). The old caret range could not reach a newer `0.x` minor, which is why the site had fallen five minors behind. The lockfile still pins what a build installs. `astro check`, `astro build` and the rendered-content gate pass on 0.7.0. Not yet reviewed visually page by page: check the preview before merging.
 
 ### Security — `zod` at 4.6.6 or later (2026-10-24)
