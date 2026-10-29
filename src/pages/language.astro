@@ -20,14 +20,15 @@ import { decisions, DECISIONS_FIRST_HREF, DECISIONS_HREF, M1_ISSUE } from "../li
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 // The language commit this page's figures and captured output were read at.
-const LANG_COMMIT = "6f7b096";
+const LANG_COMMIT = "2b36c8f";
 // Captured from `mz build examples/registry.mz --out out/registry` at 6f7b096
 // (v0.9.0); the same output at 1d5e578 (v0.8.0) and at 4d0cdc3, the third 8 October
-// release (#104). lower.rs and examples/registry.mz are unchanged since 1d5e578.
+// release (#104). examples/registry.mz is unchanged since 1d5e578; lower.rs changed in
+// v0.12.0 (#134: HOST, a slim release profile) and the message line is the same.
 const buildOutput =
   "mz: built `service registry` into out/registry (3 routes, 1 fixtures); run it with `cargo run --release --manifest-path out/registry/Cargo.toml`";
 
-// LANGUAGE-TRACKER.md at 6f7b096, condensed by area (no mark changed since 1d5e578). Each mark is the one the
+// LANGUAGE-TRACKER.md at 2b36c8f, condensed by area (no mark changed since 1d5e578). Each mark is the one the
 // tracker's Tier 1, Tier 2 and tooling rows give (C1–C10, P1–P11, T1): its
 // "Against the languages" table still describes the program slice as an open
 // pull request, and the rows are the ones it keeps current.
@@ -41,6 +42,7 @@ const tracker = [
   { area: "Collections", mark: "✅", mzizi: "in a program: list, map and set with methods, folds, and indexing that returns an option; no tuples, by design (C7)" },
   { area: "User types", mark: "✅", mzizi: "in a program: records with fields, methods, with and always contracts (C8); enums with columns; no traits or generics (P12)" },
   { area: "Compiles to something that runs", mark: "🟡", mzizi: "a service lowers to a local Rust + axum package, which CI compiles, tests and serves; a program lowers to a Rust package with no dependencies, which mz run builds and runs; no component lowers (P3, P4)" },
+  { area: "Build targets", mark: "🟡", mzizi: "native only: a service binds 127.0.0.1 unless HOST names another address, and a program builds with Cargo; no Workers (wasm32) target and no container image. Workers, containers and bare metal are decided, with RFC-0016 a design draft, and wait for the Phase 0 gate (P11)" },
   { area: "Rust interop, package manager, editor support, concurrency", mark: "❌", mzizi: "none yet" },
   { area: "Diagnostics built for agents", mark: "✅", mzizi: "mz check --agent, mz fix" },
   { area: "Contracts on everything", mark: "✅ 🟡", mzizi: "components ✅; services 🟡, run in process by mz contract, ensure tested over generated requests, not proven" },
@@ -73,8 +75,8 @@ const phases = [
   {
     n: "Phase 0",
     title: "Build Mzizi as a programming language, measured against the best existing language for each kind of task",
-    state: "in progress: two pilots, no advantage shown; the gating run has not happened",
-    body: "The one goal is to build Mzizi as a programming language. The measure: an agent authors equivalent code in Mzizi and in the best existing language for each kind of task, scored on tokens consumed, iterations to a clean check, and defect rate. Two gating families, on held-out tasks with the ~7B model: UI components (against Rust with Dioxus and Leptos, and TypeScript with React) and backend handlers and services (against TypeScript, Python, Go, C++ and Rust). The two pilots of 2026-09-27, which ported registry UI components into Mzizi and Dioxus, were tests inside this phase, not its goal. If Mzizi shows no measurable advantage, nothing downstream matters.",
+    state: "in progress: four pilots, no advantage shown; the gating run has not happened",
+    body: "The one goal is to build Mzizi as a programming language. The measure: an agent authors equivalent code in Mzizi and in the best existing language for each kind of task, scored on tokens consumed, iterations to a clean check, and defect rate. Two gating families, on held-out tasks with the ~7B model: UI components (against Rust with Dioxus and Leptos, and TypeScript with React) and backend handlers and services (against TypeScript, Python, Go, C++ and Rust). The four pilots so far (two on 2026-09-27, which ported registry UI components into Mzizi and Dioxus, and two on 2026-10-29, which authored from a spec in Mzizi and React) were tests inside this phase, not its goal. If Mzizi shows no measurable advantage, nothing downstream matters.",
   },
   {
     n: "Phase 1",
@@ -176,7 +178,7 @@ const rfcs = [
   },
 ];
 // RFC-0009 §1, the arms; each state is benchmarks/arms/ at mzizi-dev/mzizi
-// 6f7b096 (arms unchanged since 4d0cdc3). "exists" is a directory there; "not added yet" is proposed by
+// 2b36c8f (arms unchanged since 4d0cdc3). "exists" is a directory there; "not added yet" is proposed by
 // RFC-0009 with no directory. scripts/check-facts.py compares this table with
 // the live directory listing.
 const arms = [
@@ -237,11 +239,14 @@ const arms = [
     <p>
       Real today, in the toolchain: the lexer, a recovering parser, a resolver,
       the agent diagnostic protocol and <code>mz fix</code>, and the
-      content-addressed IR, plus nine primitives written in Mzizi itself, covered by 765 tests in 29 suites, 634 of them in the compiler crate
+      content-addressed IR, plus nine primitives written in Mzizi itself, covered by 767 tests in 35 suites
       (<code>mzizi-dev/mzizi</code> at{" "}
       <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>,{" "}
-      <code>main</code> after the 20 October release, #120, tagged <code>v0.9.0</code>; 33,518 lines in{" "}
-      <code>compiler/src</code>, from a fresh count). Nothing is waiting on{" "}
+      <code>main</code> after the 29 October release, #140, tagged <code>v0.12.0</code>; 33,540 lines in{" "}
+      <code>compiler/src</code>, from a fresh count). Run on a macOS laptop, 766 of
+      the 767 tests passed; one, a range too long to hold in memory, was killed by the
+      operating system where it expects exit 101, and the upstream README, which
+      lags, still gives the 20 October figures (765 tests, 29 suites). Nothing is waiting on{" "}
       <code>staging</code>, which holds <code>main</code>'s tree. Blocks nest at most 64
       deep (MZ0411), and robustness tests hold every command to ending with a
       diagnostic on random and deeply nested input.{" "}
@@ -259,17 +264,31 @@ const arms = [
       run.
     </p>
     <p>
-      <strong>Two pilots have run, and neither shows an advantage for Mzizi.</strong>{" "}
+      <strong>Four pilots have run, and none shows an advantage for Mzizi.</strong>{" "}
       On 2026-09-27 a frontier model scored the same on both arms, with Mzizi about
       8% cheaper in tokens. A ~7B open-weight model, the size the design targets,
       did worse in Mzizi on all three metrics: 2 of 6 clean compiles against 4 of 6.
       Its repair loop resubmitted the same file 15 times out of 16. It also hit
       React idioms Mzizi has no form for, and a variant table that asks for one
-      fact twice. Both pilots are tiny, and neither is the charter's measurement.{" "}
+      fact twice. On 2026-10-29 two more pilots gave a fresh model a spec for the
+      public <code>button</code>, <code>badge</code> and <code>card</code> tasks, in
+      Mzizi and in React, three seeds each (pilot 3 also ran one more Rust arm on{" "}
+      <code>button</code> only). A frontier model (pilot 3) and a smaller Claude model
+      (pilot 4) were clean at the first check on nearly every episode: pilot 3 had one
+      extra slot and one repair after MZ0712 in its nine Mzizi <code>card</code>{" "}
+      episodes, and pilot 4 had one defect, a <code>card</code> that declared one slot
+      where the spec lists seven. On these tasks the metrics sit at the ceiling, so
+      neither pilot separates the arms, and tokens were not measured. Neither is the
+      kill-criterion run, which needs held-out tasks, the ~7B model and a registered
+      plan. All four pilots are tiny, and none is the charter's measurement.{" "}
       <a
         href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
         >The pilot 2 write-up</a
-      > lists what has to change before a run that tests the kill criterion. The five
+      >, and the write-ups of{" "}
+      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-3-frontier/RUN.md">pilot 3</a>{" "}
+      and{" "}
+      <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-4-haiku/RUN.md">pilot 4</a>,
+      list what has to change before a run that tests the kill criterion. The five
       design goals below are hypotheses with arguments attached, and so far the
       evidence has not backed them.
     </p>
@@ -350,7 +369,7 @@ const arms = [
     Next is M2, a working programming language: modules and imports across
     files (P1) and the standard library (P2) first, which the public suites
     wait on, then lowering, errors mapped back to <code>.mz</code> and Rust
-    crate interop (P3–P6). No pull request toward M2 is open on 20 October, and
+    crate interop (P3–P6). No pull request toward M2 is open on 29 October, and
     the tracker marks P1 and P2 ❌. Anything in the third column below is not
     merged, and Mzizi does not have it.
   </p>
@@ -460,7 +479,7 @@ const arms = [
       <code>backend</code> is HTTP handlers and services, grounded in the API
       gateway and scored by HTTP probes. Both gate, on held-out tasks. Mzizi's
       own components are the ground truth for the public UI tasks.{" "}
-      <code>ui-port</code>, porting a React <code>spec.tsx</code> as both pilots
+      <code>ui-port</code>, porting a React <code>spec.tsx</code> as the first two pilots
       did, is for development and comparison with the pilots only, and the public
       suites (MultiPL-E, EvalPlus, Aider polyglot, BaxBench) give comparability
       with the field and never gate.
@@ -743,7 +762,7 @@ const arms = [
     feature is defined once, as an entry in the compiler, and that entry is
     what an agent reads. Its first slice is built.{" "}
     <code>compiler/src/harness.rs</code> registers 197 entries on{" "}
-    <code>main</code> at <code>{LANG_COMMIT}</code> (v0.9.0): the <code>program</code> kind and everything a
+    <code>main</code> at <code>{LANG_COMMIT}</code> (v0.12.0): the <code>program</code> kind and everything a
     program has (types, operators, methods, statement forms,{" "}
     <code>result</code> and <code>try</code>), the nine <code>mz</code>{" "}
     commands, and 80 diagnostic codes, each with its <code>say</code> text, fix

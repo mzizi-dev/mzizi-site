@@ -5,44 +5,56 @@
  * Shared by the landing page's status panel and `/language`, so the two never
  * disagree. `public/llms.txt` says the same in its own words.
  *
- * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-20:
- * - "On main": the release pull request #120 ("chore(release): staging to main"),
- *   merged as 6f7b096 at 11:11 UTC on 20 October, and tagged v0.9.0 (the GitHub
- *   release was published at 11:13 UTC). It carries #112 (the C6 review
- *   follow-ups, issue #107), #111 (RFC-0014, a draft), #113 and #116 (the rust-toolchain
- *   pins), #115 (no UI framework's name in the README or the charter) and #119 (the
- *   dated changelog). Read from `LANGUAGE-TRACKER.md`, `README.md`,
- *   `CHANGELOG.md`, `design/` and `compiler/` at 6f7b096. Measured there in a
- *   fresh worktree with a private CARGO_TARGET_DIR: `cargo test --workspace`
- *   passes 765 tests in 29 suites, 634 of them in the compiler crate;
- *   `mz harness definition` gives 197 entries, 79 distinct diagnostic codes (53
- *   `MZ09xx` and 26 shared) and 49 pending codes; `compiler/src` is 33,518 lines
- *   (`git ls-files compiler/src`, counted as scripts/check-facts.py counts them).
- *   No file under `examples/` changed since 1d5e578, so the program outputs below
- *   are still the ones `mz run` printed.
- * - "Landing on staging": nothing. `staging` is at a0bb6b0 and `main` at 6f7b096,
- *   and `git diff --quiet origin/main origin/staging` is clean: the release
- *   commit brings main to staging's tree.
- * - "In progress": `GET /repos/mzizi-dev/mzizi/pulls?state=open` returned one pull
- *   request on 2026-10-20, #118, an RFC-0015 draft against staging, which does not
- *   refer to #110 or #69 and is not toward M2, so it is not listed here. No open pull
- *   request implements Tier 2. When one opens toward M2, list it here and in
- *   llms.txt (scripts/check-facts.py fails until you do); when one merges, move it.
- * - The 8 October release (1d5e578, v0.8.0) is kept below as history.
+ * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-29:
+ * - "On main": the release pull request #140 ("chore(release): staging to main,
+ *   2026-10-29"), merged as 2b36c8f and tagged v0.12.0 (published 06:14 UTC on
+ *   29 October). Since the site's last pin (6f7b096, v0.9.0, 20 October) there
+ *   were three release pull requests: #125 (v0.10.0, 21 October, CI only), #128
+ *   (v0.11.0, 21 October, docs only: the 20 October target decision) and #140
+ *   (v0.12.0, 29 October: #134, the HOST and slim-profile change to `mz build`'s
+ *   services with the tokio pin, and the pilot 3 and 4 write-ups, #138 and #139).
+ *   Read from `LANGUAGE-TRACKER.md`, `README.md`, `CHANGELOG.md`, `design/`,
+ *   `compiler/` and `benchmarks/results/` at 2b36c8f. No tracker mark changed
+ *   since 6f7b096 (the status columns are identical); row P11's text did.
+ *   Measured at 2b36c8f in a fresh clone with a private CARGO_TARGET_DIR, on
+ *   macOS: `cargo test --workspace --no-fail-fast` ran 767 tests in 35 suites
+ *   (cargo's result blocks; 27 of them hold tests): 766 passed and 1 failed,
+ *   `an_index_out_of_range_an_int_sum_overflow_and_a_range_too_long_trap_with_101`,
+ *   whose `range_huge` case exited 137 (killed) where it expects 101, on a 16 GB
+ *   laptop; repeated twice, not investigated further. The upstream README, which
+ *   lags, still says 765 in 29 suites. `mz harness definition` gives 197 entries,
+ *   79 distinct diagnostic codes (53 `MZ09xx` and 26 shared) and 49 pending codes,
+ *   all unchanged. `compiler/src` is 33,540 lines (every `.rs` file, counted as
+ *   scripts/check-facts.py counts them). No file under `examples/` or
+ *   `primitives/` changed since 6f7b096, and the tests that compare `mz run` with
+ *   each `.expected` file passed, so the program outputs below are unchanged.
+ * - "Landing on staging": nothing. `staging` is at 99fa985 (#139) and `main` at
+ *   2b36c8f, and a diff of the two trees is empty.
+ * - "In progress": five pull requests were open on 2026-10-29, all against
+ *   staging: #118 (RFC-0015, a draft), #123 (RFC-0016, a draft), #129 (a `match`
+ *   in a service handler is one MZ0410), #130 (a charter wording) and #131
+ *   (portal docs). None refers to #110 or #69 and none is toward M2, so none is
+ *   listed with a link here (scripts/check-facts.py fails for an open one that
+ *   does). When one opens toward M2, list it here and in llms.txt; when one
+ *   merges, move it.
+ * - The 20 October (v0.9.0, 6f7b096) and 8 October (v0.8.0, 1d5e578) releases are
+ *   kept below as history.
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
-export const PROGRESS_DATE = "2026-10-20";
+export const PROGRESS_DATE = "2026-10-29";
 // The release, and the language commits this file was written from. `main` and
 // `staging` hold the same tree, so nothing is waiting.
-export const RELEASE = "20 October";
-export const MAIN_COMMIT = "6f7b096";
-// The release tag main-release.yml created for MAIN_COMMIT (GitHub release v0.9.0).
-export const RELEASE_TAG = "v0.9.0";
-export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.9.0`;
-// The commit staging was at when the release was cut; main carries its tree.
-export const RELEASED_STAGING = "a0bb6b0";
-export const STAGING_COMMIT = "a0bb6b0";
+export const RELEASE = "29 October";
+export const MAIN_COMMIT = "2b36c8f";
+// The release tag main-release.yml created for MAIN_COMMIT (the v0.12.0 release).
+export const RELEASE_TAG = "v0.12.0";
+export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.12.0`;
+// The release pull request, staging to main.
+export const RELEASE_PR_NUMBER = 140;
+// staging's tip (#139); main carries its tree.
+export const RELEASED_STAGING = "99fa985";
+export const STAGING_COMMIT = "99fa985";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -55,9 +67,31 @@ export const RELEASE_PR: Link = pr(109);
 
 export const onMain: Item[] = [
   {
-    text: "Released as v0.9.0 on 20 October: main-release.yml tagged 6f7b096 after CI passed, and created the GitHub release. The release notes are the CHANGELOG.md entries since the last main release, plus the merged pull requests. It carries the C6 review follow-ups (#112, for issue #107): an option return the signature cannot build reports MZ0919 only; MZ0962 names another language's spelling as written; and the int minimum, -9223372036854775808, is read as a literal under a unary minus (RFC-0013 §3.1). It carries RFC-0014, the Tier 2 design, as a draft (#111): modules, the standard library and Rust crate interop are designed there and not built. It also carries the rust-toolchain pins (#113, #116), the README and charter without a UI framework's name (#115), and the dated changelog (#119).",
+    text: "Released as v0.12.0 on 29 October: main-release.yml tagged 2b36c8f after CI passed. A service that mz build lowers now reads HOST as well as PORT (default 127.0.0.1, as before; a container sets 0.0.0.0, and a value that is not an IP address stops the service with exit 1), its Cargo.toml carries a slim release profile (lto, codegen-units = 1, panic = abort, strip, overflow-checks), and its tokio pin moves to 1.53.3 for RUSTSEC-2026-0386 (#134, fixing #132, #133 and #136). The size and memory figures in the changelog measure Rust's output through Mzizi's lowering, not a Mzizi advantage. It also publishes the write-ups of pilots 3 and 4 (#138, #139); both sat at the ceiling and separated no arms, and neither is the kill-criterion run.",
     links: [
-      { href: RELEASE_TAG_HREF, label: "v0.9.0" },
+      { href: RELEASE_TAG_HREF, label: "v0.12.0" },
+      pr(140),
+      pr(134),
+      pr(138),
+      pr(139),
+    ],
+  },
+  {
+    text: "Released as v0.11.0 and v0.10.0 on 21 October: documentation and CI only, no compiler change. v0.11.0 carries the 20 October target decision into LANGUAGE-TRACKER.md row P11 and design/ROADMAP.md: three targets (Cloudflare Workers, containers on any OCI host, bare metal), with RFC-0016 (#123, a draft) approved as design only; the build waits for the Phase 0 gate and no container or Workers target exists. It also records squash merging through the merge queue. v0.10.0 makes CI report on merge queue runs.",
+    links: [
+      { href: `${LANG}/releases/tag/v0.11.0`, label: "v0.11.0" },
+      pr(128),
+      pr(121),
+      pr(126),
+      { href: `${LANG}/releases/tag/v0.10.0`, label: "v0.10.0" },
+      pr(125),
+      pr(124),
+    ],
+  },
+  {
+    text: "Released as v0.9.0 on 20 October: main-release.yml tagged 6f7b096 after CI passed. It carries the C6 review follow-ups (#112, for issue #107): an option return the signature cannot build reports MZ0919 only; MZ0962 names another language's spelling as written; and the int minimum, -9223372036854775808, is read as a literal under a unary minus (RFC-0013 §3.1). It carries RFC-0014, the Tier 2 design, as a draft (#111): modules, the standard library and Rust crate interop are designed there and not built. It also carries the rust-toolchain pins (#113, #116), the README and charter without a UI framework's name (#115), and the dated changelog (#119).",
+    links: [
+      { href: `${LANG}/releases/tag/v0.9.0`, label: "v0.9.0" },
       pr(120),
       pr(112),
       pr(111),
@@ -98,7 +132,7 @@ export const onMain: Item[] = [
     links: [pr(80), pr(83), pr(89), pr(87), pr(91)],
   },
   {
-    text: "The language harness, the spine of the language: every built feature of a program registers an entry in compiler/src/harness.rs, and mz harness version, definition and entry print the definition as JSON (197 entries, 79 distinct diagnostic codes, 53 MZ09xx and 26 shared, at 6f7b096; 49 codes pending). `not` sits at its own precedence level (#100). Enforced by tests: every code the compiler can emit has an entry or is on the pending list, every trigger still raises its code with a declared fix kind, every example still checks, and every program example still prints its stated output. Written by hand and not compared with the checker: each code's say text and each feature's teaching text. component and service are registered at kind level only. The plugin host and the generated skills are not built; tracker row H1 is 🟡.",
+    text: "The language harness, the spine of the language: every built feature of a program registers an entry in compiler/src/harness.rs, and mz harness version, definition and entry print the definition as JSON (197 entries, 79 distinct diagnostic codes, 53 MZ09xx and 26 shared, at 2b36c8f; 49 codes pending). `not` sits at its own precedence level (#100). Enforced by tests: every code the compiler can emit has an entry or is on the pending list, every trigger still raises its code with a declared fix kind, every example still checks, and every program example still prints its stated output. Written by hand and not compared with the checker: each code's say text and each feature's teaching text. component and service are registered at kind level only. The plugin host and the generated skills are not built; tracker row H1 is 🟡.",
     links: [
       pr(88),
       pr(93),
@@ -132,7 +166,7 @@ export const onMain: Item[] = [
     text: "One kind of backend program: a service with HTTP routes and handlers. mz contract runs it in process; mz build lowers it to a local Rust + axum package, which CI compiles, tests and serves.",
   },
   {
-    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 765 tests in 29 suites in the workspace, 634 of them in the compiler crate, at 6f7b096.",
+    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 767 tests in 35 suites in the workspace at 2b36c8f, run on a macOS laptop: 766 passed, and one (a range too long to hold in memory) was killed by the operating system where it expects exit 101.",
   },
   {
     text: "A performance suite against hand-written Rust (benchmarks/perf): four programs, each with a Rust reference built with and without overflow checks. CI checks only that all three print the same output; no timing is gated or committed, and no overflow check is removed yet.",
@@ -158,7 +192,7 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: "Nothing is waiting. staging (a0bb6b0) and main (6f7b096) hold the same tree, so every merged change is on main. The next pull request to staging will be the first thing listed here.",
+    text: "Nothing is waiting. staging (99fa985) and main (2b36c8f) hold the same tree, so every merged change is on main. The next pull request to staging will be the first thing listed here.",
   },
 ];
 
@@ -168,7 +202,7 @@ export const inProgress: Item[] = [
     links: [M2_ISSUE],
   },
   {
-    text: "Still to build for M2, with no pull request open on 20 October: modules and imports across files (P1), and the standard library (P2), which the public suites wait on. The tracker has both as ❌. RFC-0014 is their draft design, on main; nothing in it is implemented. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows; neither has a pull request open.",
+    text: "Still to build for M2, with no pull request open on 29 October: modules and imports across files (P1), and the standard library (P2), which the public suites wait on. The tracker has both as ❌. RFC-0014 is their draft design, on main; nothing in it is implemented. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows; neither has a pull request open. Five other pull requests are open on 29 October, none toward M2: the RFC-0015 (performance teardown) and RFC-0016 (three targets) drafts, a checker fix, a charter wording and a portal doc.",
   },
 ];
 
