@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed
+
+- **`@bundu/ui` moves from 0.2.0 to 0.7.0**, and its range in `package.json` is now a floor with no ceiling (`>=0.7.0`). The old caret range could not reach a newer `0.x` minor, which is why the site had fallen five minors behind. The lockfile still pins what a build installs. `astro check`, `astro build` and the rendered-content gate pass on 0.7.0. Not yet reviewed visually page by page: check the preview before merging.
+
 ### Security — `zod` at 4.6.6 or later (2026-10-24)
 
 - A new override, `zod@<4.6.6` `>=4.6.6` (a minimum, no maximum), moves `astro`'s copy of `zod` from 4.6.2 to 4.6.7, fixing GHSA-mrhx-c7xc-m3w5 (high), which the org `audit` job reported. `zod` is a build dependency; readers see no difference.
