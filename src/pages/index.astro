@@ -52,7 +52,7 @@ import {
  * Every claim here is checkable against a file in this org:
  * `mzizi-dev/mzizi/CHARTER.md` for what Mzizi is and what it has not yet
  * proven, RFC-0009 there for the arms, families and kill criterion,
- * `benchmarks/results/` for the two pilots that have run,
+ * `benchmarks/results/` for the four pilots that have run,
  * `benchmarks/READINESS.md` for what the kill-criterion run still waits on,
  * and the repositories themselves for the rest. The status panel is the most
  * important block on the site. It stays second on the page and it stays strict.
@@ -82,7 +82,7 @@ const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 // The language commit the figures below were read at: a fresh build, not the
 // README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "6f7b096";
+const LANG_COMMIT = "2b36c8f";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -257,12 +257,12 @@ const families: {
     title: "Porting a React component",
     role: "Development only, never gating",
     gating: false,
-    input: "A registry component handed over as its spec.tsx, as both pilots were. Kept so a new run can be compared with the pilots.",
+    input: "A registry component handed over as its spec.tsx, as the first two pilots did. Kept so a new run can be compared with the pilots.",
     arms: [
       { lang: "Rust · Dioxus", state: "exists" },
       { lang: "Rust · Leptos", state: "exists, never run" },
     ],
-    mzizi: "Both pilots ran here, against Dioxus only.",
+    mzizi: "The first two pilots ran here, against Dioxus only. Pilots 3 and 4 gave a spec instead (ui-spec), not this task.",
   },
   {
     id: "public",
@@ -295,7 +295,7 @@ const toolchain = [
     name: "benchmarks/",
     href: "https://github.com/mzizi-dev/mzizi/tree/main/benchmarks",
     kind: "Phase 0 benchmark",
-    note: "The Phase 0 benchmark harness (not the harness at the language's core), the runner, the mzizi, dioxus, leptos, react and mzizi-be arms, the backend probe crate (mzprobe) with task B1, an open-weight setup and the kill-criterion driver. It scored both pilots. The held-out task set is not written yet, and will be private by design.",
+    note: "The Phase 0 benchmark harness (not the harness at the language's core), the runner, the mzizi, dioxus, leptos, react and mzizi-be arms, the backend probe crate (mzprobe) with task B1, an open-weight setup and the kill-criterion driver. It scored all four pilots. The held-out task set is not written yet, and will be private by design.",
   },
   {
     name: "mcp.mzizi.dev",
@@ -320,7 +320,7 @@ const toolchain = [
 
 <Site
   title="Mzizi"
-  description="Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better. It has no borrows, lifetimes or ownership in the language you write, and a harness at its core, the layer an agent reads; the aim is that you write Mzizi instead of TypeScript, Python or C++. Phase 0: two pilots have run, and neither showed an advantage yet."
+  description="Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better. It has no borrows, lifetimes or ownership in the language you write, and a harness at its core, the layer an agent reads; the aim is that you write Mzizi instead of TypeScript, Python or C++. Phase 0: four pilots have run, and none showed an advantage yet."
   bare
 >
   <Hero
@@ -364,12 +364,13 @@ const toolchain = [
       aria-labelledby="status-title"
       className="status flow text-body p-6 md:p-8"
     >
-      <h2 id="status-title">Status: two pilots, no advantage yet</h2>
+      <h2 id="status-title">Status: four pilots, no advantage yet</h2>
       <p class="status-lead">
         <strong>Phase 0 is not complete, and the kill-criterion run has not happened.</strong>{" "}
         Nothing has been measured against the best language for each kind of task. Two pilots on
-        2026-09-27 show no measurable advantage for Mzizi. Two more on 2026-10-29 sat at the
-        ceiling on every arm, and separated nothing. The run waits on held-out tasks, a
+        2026-09-27 show no measurable advantage for Mzizi. Two more on 2026-10-29, with a frontier
+        model and a smaller one, were clean at the first check on nearly every episode on the
+        public button, badge and card tasks: the metrics sit at the ceiling, and they separated no arms. The run waits on held-out tasks, a
         registered plan and the backend arms (<a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md"><code>benchmarks/READINESS.md</code></a>).
       </p>
       <p class="status-lead">
@@ -419,7 +420,7 @@ const toolchain = [
         <strong>The language harness is the spine of the language.</strong> Every
         feature a program has registers an entry in the compiler, and{" "}
         on <code>main</code>, <code>mz harness definition</code> prints them as JSON: 197 entries,
-        79 distinct diagnostic codes, at <code>6f7b096</code> (v0.9.0); 49 codes are pending. Tests enforce that every code the compiler
+        79 distinct diagnostic codes, at <code>2b36c8f</code> (v0.12.0), unchanged since v0.9.0; 49 codes are pending. Tests enforce that every code the compiler
         can emit has an entry (or, for a component's or a service's codes, is on
         a frozen pending list) and that every entry's examples and triggers still
         do what they say. Each code's <code>say</code> text and each feature's
@@ -430,8 +431,8 @@ const toolchain = [
       </p>
       <p>
         <strong
-          >Two pilot runs on 2026-09-27 show no measurable advantage for Mzizi.</strong
-        > They were the first tests inside Phase 0, not its goal: each ported
+          >Four pilot runs show no measurable advantage for Mzizi.</strong
+        > The first two, on 2026-09-27, were the first tests inside Phase 0, not its goal: each ported
         registry UI components (a button and a badge were scored) into Mzizi and
         into Rust with Dioxus. With a frontier model, the two arms were
         indistinguishable on clean compiles and defects, and Mzizi used about 8%
@@ -444,6 +445,22 @@ const toolchain = [
           >The write-up</a
         > names the three failure mechanisms and what has to change before a run
         that tests the kill criterion.
+      </p>
+      <p>
+        <strong>Pilots 3 and 4, on 2026-10-29, separated no arms.</strong> Each gave a fresh
+        model, per episode, a spec for the public <code>button</code>, <code>badge</code> and{" "}
+        <code>card</code> tasks, authored in Mzizi and in React, three seeds each (pilot 3 also
+        ran one more Rust arm on <code>button</code> only, 21 episodes in all; pilot 4 ran 18).
+        Pilot 3 used a frontier model: every episode compiled clean, one Mzizi <code>card</code>{" "}
+        added a slot the spec does not list (1 defect), and one needed a second iteration
+        after <code>MZ0712</code>. Pilot 4 used a smaller Claude model: all 18 were clean at the
+        first check, and one Mzizi <code>card</code> declared one slot where the spec lists seven
+        (1 defect). The metrics sit at the ceiling, so the arms are not separated and nothing
+        can be read from one defect in nine episodes. Tokens were not measured. Neither pilot is
+        the kill-criterion run: the tasks are public, the ~7B open-weight model was not used, the{" "}
+        <code>backend</code> family has not run, and the author model shares a vendor with the
+        language's. Write-ups: <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-3-frontier/RUN.md">pilot 3</a> and{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-4-haiku/RUN.md">pilot 4</a>.
       </p>
       <p>
         <strong>Phase 0 is not complete, and the kill-criterion run has not
@@ -492,20 +509,21 @@ const toolchain = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>765</b><span>tests passing, 29 suites</span></li>
+      <li class="fig"><b>767</b><span>tests, 35 suites (766 pass on a Mac)</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
-      <li class="fig"><b>33,518</b><span>lines of Rust in the compiler</span></li>
-      <li class="fig"><b>2</b><span>pilots run, 0 showing an advantage</span></li>
+      <li class="fig"><b>33,540</b><span>lines of Rust in the compiler</span></li>
+      <li class="fig"><b>4</b><span>pilots run, 0 showing an advantage</span></li>
     </ul>
     <p class="provenance">
       <span>
         Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
         <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>{" "}
         (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;{" "}
-        <code>mz contract</code> over <code>primitives/*.mz</code>). Pilots from{" "}
+        <code>mz contract</code> over <code>primitives/*.mz</code>). On a macOS laptop one of the 767 tests, a range too
+        long to hold in memory, was killed by the operating system where it expects exit 101; the other 766 passed. Pilots from{" "}
         <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
           ><code>benchmarks/results/</code></a
-        >, both dated 2026-09-27.
+        >: two dated 2026-09-27 and two dated 2026-10-29.
       </span>
     </p>
 
@@ -578,9 +596,11 @@ const toolchain = [
         <strong>Every run is published</strong>, whichever way it falls, in{" "}
         <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
           ><code>benchmarks/results/</code></a
-        >. The latest is{" "}
-        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md"
-          >pilot 2's write-up</a
+        >. The latest are{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-3-frontier/RUN.md">pilot 3</a> and{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-4-haiku/RUN.md">pilot 4</a>, which declare no pass or
+        fail and separated no arms; the last to compare the arms on a ~7B model is{" "}
+        <a href="https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-09-27-pilot-2/RUN.md">pilot 2's write-up</a
         >, whose result, stated first, is that “this pilot does not show a measurable
         advantage for Mzizi.”
       </p>

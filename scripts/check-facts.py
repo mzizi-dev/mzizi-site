@@ -134,15 +134,24 @@ pages = {
 print("the language (mzizi-dev/mzizi main)")
 readme = upstream("the language README", lambda: fetch(LANGUAGE_README))
 if readme:
+    # The README lags its code (it said 765 in 29 suites when main had 767 in 35), so the
+    # site's figures are measured (cargo test --workspace) and held here. The README is a
+    # floor: a README count above ours means the figures need re-measuring (a failure); a
+    # lower one is the README lagging (a note).
+    MEASURED_TESTS, MEASURED_SUITES = 767, 35
     tests = re.search(r"\b([\d,]+) tests in (\d+) suites\b", readme)
-    check("the README states a test and suite count", tests is not None)
     if tests:
-        n, suites = tests.group(1), tests.group(2)
-        check(f"index.html shows {n} tests in {suites} suites",
-              f"{n} tests passing, {suites} suites" in pages["index.html"])
-        for page in ("language.html", "llms.txt"):
-            check(f"{page} says {n} tests in {suites} suites",
-                  f"{n} tests in {suites} suites" in pages[page])
+        readme_n = int(tests.group(1).replace(",", ""))
+        check(f"the README's test count ({readme_n}) is not above the measured {MEASURED_TESTS}",
+              readme_n <= MEASURED_TESTS)
+        if readme_n != MEASURED_TESTS or int(tests.group(2)) != MEASURED_SUITES:
+            notes.append(f"the language README says {readme_n} tests in {tests.group(2)} suites; the site cites the "
+                         f"measured {MEASURED_TESTS} in {MEASURED_SUITES}. The README lags its code.")
+    n, suites = MEASURED_TESTS, MEASURED_SUITES
+    check(f"index.html shows {n} tests, {suites} suites",
+          re.search(rf"{n}\s*tests, {suites} suites", pages["index.html"]) is not None)
+    for page in ("language.html", "llms.txt"):
+        check(f"{page} says {n} tests in {suites} suites", f"{n} tests in {suites} suites" in pages[page])
 lines = upstream("the language's compiler/src", compiler_lines)
 if lines:
     check(f"index.html shows {lines} lines in the compiler (counted in the source)",
@@ -340,7 +349,7 @@ if lagging:
 # The language's release tag. The pages name v0.9.0 (main-release.yml tags main
 # after CI passes); the tag must exist and point at the commit the figures cite.
 print("\nthe language's release tag")
-TAG = "v0.9.0"
+TAG = "v0.12.0"
 tag_commit = upstream(f"tag {TAG}", lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/commits/{TAG}")["sha"])
 if tag_commit:
     cited_tag = re.search(r"mzizi-dev/mzizi/commit/([0-9a-f]{7,40})", (DIST / "index.html").read_text(encoding="utf-8"))
@@ -349,6 +358,20 @@ if tag_commit:
           f"{TAG} is {tag_commit[:7]}, the page cites {cited_tag.group(1) if cited_tag else 'none'}")
     for name in ("index.html", "language.html", "llms.txt"):
         check(f"{name} names the tag {TAG}", TAG in pages[name])
+
+# The pilot count. The headline and llms.txt say how many pilots have run; that is the
+# number of directories in benchmarks/results/ upstream.
+print("\nthe pilots")
+listing = upstream("the language's benchmarks/results listing",
+                   lambda: fetch_json("https://api.github.com/repos/mzizi-dev/mzizi/contents/benchmarks/results"))
+if listing:
+    pilots = sum(1 for e in listing if e.get("type") == "dir")
+    words = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
+    word = words.get(pilots, str(pilots))
+    check(f"index.html says {word} pilots", re.search(rf"\b{word} pilots\b", pages["index.html"], re.I) is not None,
+          f"benchmarks/results has {pilots} pilot directories")
+    check(f"llms.txt says {word} pilots", re.search(rf"\b{word} pilots\b", pages["llms.txt"], re.I) is not None,
+          f"benchmarks/results has {pilots} pilot directories")
 
 # --- npm ---------------------------------------------------------------------
 print("\nnpm (latest dist-tags)")
