@@ -258,8 +258,10 @@ The status panel is the most important block on the site and should stay that
 way. Two Phase 0 pilots ran on 2026-09-27
 ([`benchmarks/results/`](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results)
 in `mzizi-dev/mzizi`), and neither showed an advantage for Mzizi: on the ~7B
-open-weight arm, Mzizi did worse. Neither is the charter's measurement, so the kill
-criterion has still not been tested, and Phase 0 is not complete.
+open-weight arm, Mzizi did worse. Two more ran on 2026-10-29 (a frontier model and a
+smaller Claude model, on the public `button`, `badge` and `card` tasks); both sat at
+the ceiling and separated no arms. None of the four is the charter's measurement, so
+the kill criterion has still not been tested, and Phase 0 is not complete.
 [`benchmarks/READINESS.md`](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md)
 there says what the gating run still waits on. "Designed for" is accurate;
 "faster than" is not. The kill criterion is Mzizi against the best existing

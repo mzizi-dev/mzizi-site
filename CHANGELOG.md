@@ -23,6 +23,15 @@ cut, the Unreleased entries move under it.
 
 ### Changed
 
+- The stated facts move from mzizi v0.9.0 (6f7b096) to v0.12.0 (2b36c8f, 2026-10-29). The pages now
+  show 767 tests in 35 suites (766 pass on a Mac; one range-too-long case is killed by the OS),
+  33,540 lines in the compiler, and four pilots with no advantage separated: pilots 3 and 4 are added
+  with links to their write-ups. The progress panel lists v0.10.0 to v0.12.0, the open pull requests
+  (none toward M2), the P11 build-targets decision and the current package versions. Pilot 3 is
+  described from the results table (21 episodes), not the upstream summary line ("26 of 27"), which
+  does not match it. `check-facts.py` now expects v0.12.0, treats the README test count as a floor
+  (the README lags) and checks the pilot count against `benchmarks/results/`. Refs #80.
+
 - The landing page shows the verdict first and folds the long prose away. The status panel now opens
   with two short statements (Phase 0 is not complete; Mzizi is not yet a working programming language)
   and keeps the full account, the example program and the progress columns behind "The full account"

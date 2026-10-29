@@ -196,8 +196,8 @@ on the production deploy, so the same commit reads green on a PR and red on `mai
 
 - **Every claim on this site traces to a file in this org** — mostly
   [`CHARTER.md`](https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md) — or to a request
-  that was actually made. "Designed for" is accurate; "faster than" is not. Two pilots
-  have run and neither showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
+  that was actually made. "Designed for" is accurate; "faster than" is not. Four pilots
+  have run and none showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
   the kill-criterion run has not happened (`benchmarks/READINESS.md`), so Phase 0 is
   not complete. Report every new result on the status panel, whichever way it falls.
 - Numbers sourced from the registry (component count, per-node counts, the palette) are

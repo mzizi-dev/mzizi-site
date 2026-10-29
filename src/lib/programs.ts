@@ -1,15 +1,17 @@
 /**
  * Real Mzizi programs and their real output, mirrored verbatim from
- * `mzizi-dev/mzizi` `main` at 6f7b096 (the release tagged v0.9.0, #120). The
+ * `mzizi-dev/mzizi` `main` at 2b36c8f (the release tagged v0.12.0, #140). The
  * examples the site shows are unchanged since 1d5e578 (the release tagged
- * v0.8.0, #109), and no file under `examples/` changed on 20 October. On
- * 2026-10-20 each example was run at 6f7b096 with `mz run` built from that commit:
- * all eight printed exactly their `.expected` file, and exit 0. Each output here is
+ * v0.8.0, #109), and no file under `examples/` changed between 6f7b096 and
+ * 2b36c8f. On 2026-10-20 each example was run at 6f7b096 with `mz run` built from
+ * that commit: all eight printed exactly their `.expected` file, and exit 0. On
+ * 2026-10-29 `cargo test --workspace` at 2b36c8f ran the tests that compare each
+ * example's `mz run` output with its `.expected` file, and they passed. Each output here is
  * what `mz run` printed for that file, byte for byte the same as the `.expected`
  * file. Update them together, from a run, never by hand.
  */
 
-export const PROGRAMS_COMMIT = "6f7b096";
+export const PROGRAMS_COMMIT = "2b36c8f";
 
 export type Program = { path: string; source: string; output: string };
 
