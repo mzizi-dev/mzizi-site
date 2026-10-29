@@ -12,12 +12,25 @@ Security, and anything that breaks a URL or an agent-facing file
 
 **The rule (owner, 2026-09-30):** every pull request that changes a page, a
 stated fact, an agent-facing file, a redirect, a dependency or a default adds
-an entry under `## [Unreleased]` in the same pull request, saying what a reader
-of the site will see differently. The `changelog / entry required` check fails
-a pull request that doesn't. Pull requests that touch only `.github/`,
-lockfiles or lint config pass without one, and pure CI, lint or typo pull
-requests can carry the `no-changelog` label instead. When a dated section is
-cut, the Unreleased entries move under it.
+an entry under `## [Unreleased]
+
+### Changed
+
+- The landing page shows the verdict first and folds the long prose away. The status panel now opens
+  with two short statements (Phase 0 is not complete; Mzizi is not yet a working programming language)
+  and keeps the full account, the example program and the progress columns behind "The full account"
+  and "A program that runs, and where the work stands". The language, toolchain and tab cards show a
+  title with the detail one tap away. "Why" and "Contracts" shrink to three one-line cards each, the
+  components section to one sentence, and the repository ledger and org list give way to a link to
+  `/ecosystem`. Hero, bench, status-then-benchmark order, the arms list and every gated fact are
+  unchanged. Not yet reviewed page by page beyond the landing page. Heavy text belongs in the docs;
+  moving the folded text there is a follow-up.
+  `in the same pull request, saying what a reader
+  of the site will see differently. The`changelog / entry required`check fails
+  a pull request that doesn't. Pull requests that touch only`.github/`,
+  lockfiles or lint config pass without one, and pure CI, lint or typo pull
+  requests can carry the `no-changelog` label instead. When a dated section is
+  cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 

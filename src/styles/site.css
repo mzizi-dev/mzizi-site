@@ -1026,6 +1026,73 @@
     text-decoration-thickness: 1px;
   }
 
+  /* Landing page: the short claim is always visible, the long account is a
+ * disclosure. Prose lives in the docs; the front door shows the verdict. */
+  .status-lead {
+    max-width: 62ch;
+    font-size: var(--text-h5);
+  }
+
+  .status-full,
+  .status-more {
+    margin-block-start: var(--space-lg);
+    border-top: 1px solid var(--border);
+    padding-block-start: var(--space-md);
+  }
+
+  .status-full > summary,
+  .status-more > summary {
+    min-height: var(--touch-target-sm);
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .status-full > summary:focus-visible,
+  .status-more > summary:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .status-full[open] > summary,
+  .status-more[open] > summary {
+    margin-block-end: var(--space-md);
+  }
+
+  .fold > summary {
+    min-height: var(--touch-target-sm);
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .fold > summary:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .fold[open] > summary {
+    margin-block-end: var(--space-xs);
+  }
+
+  .lede {
+    max-width: 62ch;
+    margin-block: var(--space-md) 0;
+    font-size: var(--text-h5);
+    color: var(--muted-foreground);
+  }
+
+  .pillars h3 {
+    margin-block-end: var(--space-xs);
+  }
+
+  .pillars p {
+    margin: 0;
+  }
+
+  .fig b {
+    font-size: var(--text-h3);
+    line-height: 1;
+  }
+
   /* ================================================== /components ========= */
 
   .finder[hidden] {
