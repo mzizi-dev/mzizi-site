@@ -178,7 +178,7 @@ asked at build time too, so a crate's state is never typed in. A failure to
 reach them never fails the build; the page says it could not check.
 
 `/v1/*` is the canonical, documented base; it is what every page prints and the
-only base the build reads. `api.mzizi.dev` is served by `mzizi-api-gateway`.
+only base the build reads. `api.mzizi.dev` is served by `mzizi-api` (formerly `mzizi-api-gateway`).
 
 The component previews (`public/previews/*.jpg`, used by `/components`,
 `/components/<name>` and `/playground`) are the one exception: they are
@@ -189,8 +189,8 @@ the whole page, so a component with no demo simply has no picture.
 
 ### Styling
 
-`@bundu/ui` 0.2.0, the same package `bundu-labs/marketing` (three apps) and
-`shamwari-ai/shamwari/site` consume. `src/styles/site.css` is Tailwind v4 over
+`@bundu/ui`, the same package `bundu-labs/marketing` (three apps) and
+`shamwari-ai/shamwari/site` consume. The range in `package.json` is a floor with no ceiling (`>=0.7.0`): `0.x` carets stop at the next minor (`^0.2.0` could never reach 0.7.0), and the lockfile, not the range, decides what a build installs. Raise the floor when the site needs a newer feature; a bump is a Dependabot or hand PR that updates `pnpm-lock.yaml`. `src/styles/site.css` is Tailwind v4 over
 `@bundu/ui/styles/theme.css` (all 21 colour families, the surface ladder, the type
 scale), `globals.css`, `color-scheme.css` (dark mode follows the OS, with no theme
 script) and `brand-mzizi.css`. Mzizi's brand mineral is **hematite**, by the owner's
@@ -258,8 +258,10 @@ The status panel is the most important block on the site and should stay that
 way. Two Phase 0 pilots ran on 2026-09-27
 ([`benchmarks/results/`](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results)
 in `mzizi-dev/mzizi`), and neither showed an advantage for Mzizi: on the ~7B
-open-weight arm, Mzizi did worse. Neither is the charter's measurement, so the kill
-criterion has still not been tested, and Phase 0 is not complete.
+open-weight arm, Mzizi did worse. Two more ran on 2026-10-29 (a frontier model and a
+smaller Claude model, on the public `button`, `badge` and `card` tasks); both sat at
+the ceiling and separated no arms. None of the four is the charter's measurement, so
+the kill criterion has still not been tested, and Phase 0 is not complete.
 [`benchmarks/READINESS.md`](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md)
 there says what the gating run still waits on. "Designed for" is accurate;
 "faster than" is not. The kill criterion is Mzizi against the best existing
@@ -312,7 +314,7 @@ the server, over a standard `tools/list` request.
 ## Stack, and why no framework ships to the browser
 
 Astro renders everything at build time. There are no islands, and no UI framework
-runs in the browser: not Svelte, not React, not Vue.
+runs in the browser: not React, not Vue.
 
 That is doctrine, not taste. The UI is Astro, and underneath it is Rust first and
 TypeScript second, with no third UI framework (`mzizi-dev/agent-tools#82`, and the
@@ -352,14 +354,14 @@ rendered-content gate that `mzizi-console` shipped without), and — before you 
 
 ## Ecosystem
 
-| Repository                                                            | What it is                                                      | Address                                   |
-| --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
-| [`mzizi`](https://github.com/mzizi-dev/mzizi)                         | The language, and Mzizi's main goal — compiler, RFCs, benchmark | —                                         |
-| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)       | The component registry, brand system, DNA helix and Mzizi Roots | Roots crates on crates.io                 |
-| [`mzizi-api-gateway`](https://github.com/mzizi-dev/mzizi-api-gateway) | The registry API as a Hono Worker, from the registry's files    | [api.mzizi.dev](https://api.mzizi.dev/v1) |
-| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)         | The console — Astro shell, Rust/Dioxus islands                  | [app.mzizi.dev](https://app.mzizi.dev)    |
-| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)               | The Mintlify documentation site — the one home of Mzizi's docs  | [docs.mzizi.dev](https://docs.mzizi.dev)  |
-| `mzizi-site`                                                          | This repository                                                 | [mzizi.dev](https://mzizi.dev)            |
+| Repository                                                                           | What it is                                                                                                                         | Address                                   |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [`mzizi`](https://github.com/mzizi-dev/mzizi)                                        | The language, and Mzizi's main goal — compiler, RFCs, benchmark                                                                    | —                                         |
+| [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)                      | The component registry, brand system, DNA helix and Mzizi Roots                                                                    | Roots crates on crates.io                 |
+| [`mzizi-api`](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`) | The registry API as a Hono Worker, from the registry's files                                                                       | [api.mzizi.dev](https://api.mzizi.dev/v1) |
+| [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)                        | The console — Astro shell; live data loads in the browser today, moving to server rendering with a Rust backend (mzizi-console#34) | [app.mzizi.dev](https://app.mzizi.dev)    |
+| [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)                              | The Mintlify documentation site — the one home of Mzizi's docs                                                                     | [docs.mzizi.dev](https://docs.mzizi.dev)  |
+| `mzizi-site`                                                                         | This repository                                                                                                                    | [mzizi.dev](https://mzizi.dev)            |
 
 ## Deliberately not here
 
