@@ -21,6 +21,11 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — the rendered gate expects the registry at v4.18.0 (2026-11-01)
+
+- api.mzizi.dev serves registry v4.18.0 since mzizi-api v0.11.0 and v0.12.0: 675 components (was 656), N2 394 (was 388), N6 93 (was 90). `scripts/verify-rendered.py`, `AGENTS.md` and `README.md` now expect those counts. The site reads them from the API at build time, so readers see 675 components once the site rebuilds.
+- The glued-inline-tag check no longer reads attribute values. Astro escapes `"` in an attribute but not `<`, so app-money's registry description, which mentions `<code>`, reached a `<meta>` tag as `&quot;<code>&quot;` and was reported as a glued tag. Prose is still checked: a `word<code>` in a page still fails the check.
+
 ### Fixed — release notes when the previous release has no `CHANGELOG.md` (2026-11-01)
 
 - `release_notes.py` treats a previous release with no `CHANGELOG.md` as the first release, as its docstring says. It matched git's "does not exist" message, but in a checkout where the file exists on disk git says "exists on disk, but not in", so the first `main-release.yml` run that met such a tag stopped before tagging. It now asks git directly (`git cat-file -e`).
