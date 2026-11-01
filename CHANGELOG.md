@@ -21,6 +21,21 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — the rendered gate expects the registry at v4.18.0 (2026-11-01)
+
+- api.mzizi.dev serves registry v4.18.0 since mzizi-api v0.11.0 and v0.12.0: 675 components (was 656), N2 394 (was 388), N6 93 (was 90). `scripts/verify-rendered.py`, `AGENTS.md` and `README.md` now expect those counts. The site reads them from the API at build time, so readers see 675 components once the site rebuilds.
+- The glued-inline-tag check no longer reads attribute values. Astro escapes `"` in an attribute but not `<`, so app-money's registry description, which mentions `<code>`, reached a `<meta>` tag as `&quot;<code>&quot;` and was reported as a glued tag. Prose is still checked: a `word<code>` in a page still fails the check.
+
+### Fixed — release notes when the previous release has no `CHANGELOG.md` (2026-11-01)
+
+- `release_notes.py` treats a previous release with no `CHANGELOG.md` as the first release, as its docstring says. It matched git's "does not exist" message, but in a checkout where the file exists on disk git says "exists on disk, but not in", so the first `main-release.yml` run that met such a tag stopped before tagging. It now asks git directly (`git cat-file -e`).
+
+### Changed — GitHub releases carry the CHANGELOG entries they ship (2026-11-01)
+
+- Owner, 2026-11-01: a release is not done until its tag and its GitHub release, with notes from `CHANGELOG.md`, exist on the merge commit on `main`. `main-release.yml` now opens each release's notes with every `CHANGELOG.md` entry added since the previous `main` release (`.github/scripts/release_notes.py`, adapted from `mzizi-dev/mzizi`), followed by GitHub's list of merged pull requests. Before, the notes were the pull-request list alone.
+- A commit that already carries its minor tag but has no release gets one, and a manual run of the workflow on such a commit rewrites its notes from `CHANGELOG.md`, so an earlier release can be corrected.
+- Readers of the site see no difference; only the release pages do.
+
 ### Changed
 
 - The stated facts move from mzizi v0.9.0 (6f7b096) to v0.12.0 (2b36c8f, 2026-10-29). The pages now
