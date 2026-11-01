@@ -21,6 +21,79 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed
+
+- The stated facts move from mzizi v0.9.0 (6f7b096) to v0.12.0 (2b36c8f, 2026-10-29). The pages now
+  show 767 tests in 35 suites (766 pass on a Mac; one range-too-long case is killed by the OS),
+  33,540 lines in the compiler, and four pilots with no advantage separated: pilots 3 and 4 are added
+  with links to their write-ups. The progress panel lists v0.10.0 to v0.12.0, the open pull requests
+  (none toward M2), the P11 build-targets decision and the current package versions. Pilot 3 is
+  described from the results table (21 episodes), not the upstream summary line ("26 of 27"), which
+  does not match it. `check-facts.py` now expects v0.12.0, treats the README test count as a floor
+  (the README lags) and checks the pilot count against `benchmarks/results/`. Refs #80.
+
+- The landing page shows the verdict first and folds the long prose away. The status panel now opens
+  with two short statements (Phase 0 is not complete; Mzizi is not yet a working programming language)
+  and keeps the full account, the example program and the progress columns behind "The full account"
+  and "A program that runs, and where the work stands". The language, toolchain and tab cards show a
+  title with the detail one tap away. "Why" and "Contracts" shrink to three one-line cards each, the
+  components section to one sentence, and the repository ledger and org list give way to a link to
+  `/ecosystem`. Hero, bench, status-then-benchmark order, the arms list and every gated fact are
+  unchanged. Not yet reviewed page by page beyond the landing page. Heavy text belongs in the docs;
+  moving the folded text there is a follow-up.
+- **`@bundu/ui` moves from 0.2.0 to 0.7.0**, and its range in `package.json` is now a floor with no ceiling (`>=0.7.0`). The old caret range could not reach a newer `0.x` minor, which is why the site had fallen five minors behind. The lockfile still pins what a build installs. `astro check`, `astro build` and the rendered-content gate pass on 0.7.0. Not yet reviewed visually page by page: check the preview before merging.
+
+### Security — `zod` at 4.6.6 or later (2026-10-24)
+
+- A new override, `zod@<4.6.6` `>=4.6.6` (a minimum, no maximum), moves `astro`'s copy of `zod` from 4.6.2 to 4.6.7, fixing GHSA-mrhx-c7xc-m3w5 (high), which the org `audit` job reported. `zod` is a build dependency; readers see no difference.
+
+### Changed — every dependency and override is a minimum, and `vite-plus` is at least 1.3.0 (2026-10-21)
+
+- Owner, 2026-10-21: "mark packages with minimum acceptable, latest shouldn't be a blocker on too old of a version." Every entry in `dependencies`, `devDependencies` and `pnpm.overrides` is now `>=x.y.z` with no maximum, at the version `pnpm-lock.yaml` already resolved. `vite-plus` reads `>=1.3.0`, the version the lockfile already held. Readers see no difference.
+- The lockfile moves one transitive package: `astro`'s `magic-string` dedupes from 1.3.1 onto the 1.4.3 already in the tree. Nothing else resolves differently.
+- `http-cache-semantics` 4.3.0 is now published with the fix for GHSA-ch52-4w7c-c8xp, so a new override, `http-cache-semantics@<4.3.0` `>=4.3.0`, moves `astro`'s copy from 4.2.0 to 4.3.0, and the `pnpm.auditConfig.ignoreGhsas` entry for that advisory is removed. The org `audit` job strips `pnpm.auditConfig` before it runs, so the ignore never applied there. Readers see no difference.
+
+### Added — Dependabot version updates target `staging` (2026-10-21)
+
+- `.github/dependabot.yml` is new: weekly version updates for GitHub Actions and this repository's package manifests, every entry with `target-branch: staging` (owner rule, 2026-10-21: "all dependabot should target staging not main.") and a seven-day cooldown before a new release is proposed.
+
+### Security — build dependencies on patched versions (2026-10-21)
+
+`pnpm audit` reported high advisories in `devalue`, `sharp`, `source-map-js`, `undici`, `vite` and `vite-plus`, and
+moderate ones in `fast-uri` and `smol-toml`, all reached through `astro`, `wrangler`, `@tailwindcss/vite` and
+`@astrojs/check`. They failed the org's dependency `audit` check on any pull request that touches `pnpm-lock.yaml`.
+`vite-plus` is now `^1.1.0`, and `pnpm.overrides` puts the others on their patched versions. `http-cache-semantics`
+(GHSA-ch52-4w7c-c8xp, through `astro`) has no patched release, so it is listed in `pnpm.auditConfig.ignoreGhsas` until
+one ships; the site is static and serves no cached responses through it. The build, `astro check` and the
+rendered-content gate pass, and readers see no difference.
+
+### Changed — `@bundu/ui` is a minimum version, `>=0.2.0`, not `^0.2.0` (2026-10-21)
+
+Owner decision, 2026-10-21: first-party packages are pinned to a minimum acceptable version, with no maximum. On a
+`0.x` version a caret stops below the next minor, so `^0.2.0` could not take `@bundu/ui` 0.3.0 without a manifest
+edit. `pnpm-lock.yaml` still resolves 0.2.0, so the site renders exactly as before; taking a newer release is now a
+lockfile refresh (`pnpm update @bundu/ui`), not a `package.json` edit. Third-party dependencies are unchanged.
+
+### Changed — the earlier console app is named without a UI framework
+
+- **`/ecosystem` and the README name no UI framework they replaced, and no longer present Dioxus as the way forward for the console.** The `app.mzizi.dev` entry on `/ecosystem` now reads "Today it loads live data in the browser; it is being rebuilt so Astro renders it on the server with a Rust backend (mzizi-console#34). Replaces an earlier console app", and the README's "no UI framework runs in the browser" list is now "not React, not Vue". The README console row and `llms.txt` say the same about the console. The doctrine line on the same page is unchanged: one UI framework, Astro, with Rust first. No URL, fact, count or default moved. This follows the owner's decision of 2026-10-20 (mzizi-dev/mzizi-registry#503) to remove one framework's name from every repository.
+
+### Changed — the progress block points at M2's tracking issue (2026-10-09)
+
+- **The progress block points at M2's own tracking issue.** On the landing page, `/language` and in `llms.txt`, "In progress toward M2" now links `mzizi-dev/mzizi#110` (opened 9 October), not #69, which tracked M1 and is met. "Landing on staging" lists mzizi-dev/mzizi#111, RFC-0014 (the Tier 2 design, a draft with 19 open questions, nothing built), merged to the language's `staging` on 9 October, #112 (the C6 review fixes: the `int` minimum literal, `MZ0962` naming spellings as written, 765 tests on `staging`) and #113 (a CI pin); "In progress" names modules (P1) and the standard library (P2) next, by #110's plan. Nothing toward M2 is described as built. `check-facts.py` now requires the column to link #110, and lists every open language pull request that refers to #110 or #69.
+
+### Changed — the 20 October release, the platform names, and the three build targets (2026-10-20)
+
+- **The language's 20 October release is on the status pages.** Read from `mzizi-dev/mzizi` `main` at `6f7b096`, tagged `v0.9.0` (release pull request #120, GitHub release published 11:13 UTC on 20 October). The "On main today" column leads with it: the C6 review follow-ups (#112, for issue #107), RFC-0014 as a draft design (#111, nothing in it implemented), and the CI, README and changelog fixes (#113, #115, #116, #119). The landing page, `/language`, `llms.txt`, and the program and CLI pages name `6f7b096` and `v0.9.0`. Measured there: 765 tests in 29 suites, 634 of them in the compiler crate, 33,518 lines in `compiler/src`, 197 harness entries with 79 distinct diagnostic codes and 49 pending. The 8 October pages said 80 codes. At `6f7b096` the definition gives 79, and the release added and removed no code entry, so the 80 is corrected here. Every example's `mz run` output matches its `.expected` file at `6f7b096`.
+- **Nothing is waiting on `staging`.** `staging` (`a0bb6b0`) and `main` (`6f7b096`) hold the same tree. One pull request is open against `staging`, #118 (an RFC-0015 draft), and it is not toward M2, so it is not listed as in progress.
+- **The API repository is `mzizi-dev/mzizi-api`, formerly `mzizi-api-gateway`.** The ecosystem page, the landing page's repository cards, `llms.txt`, and the `api.mzizi.dev` description name the new repository and keep the old name once, in brackets. The host, `api.mzizi.dev`, is unchanged. The owner has renamed the repository, so the source links resolve; GitHub redirects the old name.
+- **The console is described as it is and as it is decided.** `app.mzizi.dev` is a standalone repository. Today it is Astro with WorkOS sign-in, live data loaded in the browser, and no database of its own (`mzizi-console` has no Supabase client, environment variable or migration). Decided, not built (`mzizi-console#34`): one Rust Worker serves Astro's output, sign-in moves to the server, and any state it keeps goes in Cloudflare D1. The ecosystem page, the landing page and `llms.txt` say so.
+- **Build targets: the owner's decision of 2026-10-20 is stated next to the charter, not in place of it.** `/language` has a note after the phase table: three targets (Cloudflare Workers, containers and bare metal), each backend behind a trait with an adapter per side, designed in RFC-0016 (mzizi#123), which the owner approved as design only on 2026-10-21: the charter amendment and every build wave wait for the Phase 0 gate. Containers mean a standard OCI image, built with Docker by default and run by any OCI runtime. The charter's Phase 1 text, which names containers reached from a Worker, is still quoted as written. The pages still say there is no Workers, Containers or WebAssembly target, because none is built.
+- **Roots render path.** Pages that name the Roots components now say they are moving to Mzizi's own `render()` (seven components have it; registry #506 and #510 merged), and that Dioxus is still a dependency of some crates until the migration finishes.
+- **`/language` lists RFC-0014** (Tier 2, a draft), beside RFC-0013.
+- **Fixed on rebase (2026-10-21).** RFC-0014 is mzizi#111 (mzizi#110 is M2's tracking issue, which the in-progress column links, from #68); the C6 review fixes are mzizi#112, for issue #107. `llms.txt` names the Mzizi Roots crates at 0.4.0, the version on crates.io. The `/ecosystem` console entry keeps #69's wording and names no UI framework it replaced.
+- **Scripts:** `scripts/check-facts.py` expects the tag `v0.9.0`; `scripts/verify-rendered.py` expects `v0.9.0` and the 765, 634 and 33,518 figures and flags the 8 October figures as stale.
+
 ### Changed — the fourth 8 October release reached `main`: every Tier 1 row is ✅, M1 is met (2026-10-08)
 
 Read from `mzizi-dev/mzizi` at `1d5e578`, tagged `v0.8.0` by `main-release.yml` after CI passed. Release pull

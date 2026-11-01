@@ -17,13 +17,17 @@
   designed, in RFC-0012 (a draft), so never describe them as working.
   It lives in the language repository, `mzizi-dev/mzizi`; the agent-tools
   packages (`@nyuchi/mzizi-cli`, `mzizi-mcp`, `fundi`) are its clients.
-  Designed to lower to Rust (Dioxus for UI; axum or
-  `workers-rs` for servers). Today two things lower: `mz build` lowers a
+  Designed to lower to Rust (Roots are moving to Mzizi's own `render()`, with Dioxus still a
+  dependency of some crates during the migration; axum or `workers-rs` for servers). Today two things lower: `mz build` lowers a
   `service` to a local Rust + axum package, which CI compiles, tests and
   serves, and `mz run` (or `mz build`) lowers a `program` to a Rust package
   with no dependencies, which `mz run` builds and runs. No component lowers yet, and there is no Workers, Containers or
   WebAssembly target, so never write that Mzizi "compiles to Rust" without
-  that narrowing.
+  that narrowing. Decided on 2026-10-20 and not yet in the charter: three build targets,
+  Cloudflare Workers, containers (a standard OCI image, Docker by default, any OCI runtime)
+  and bare metal. RFC-0016 (mzizi#123) designs them and is approved as design only
+  (2026-10-21); the charter amendment and every build wave wait for the Phase 0 gate.
+  No container image or Workers target exists yet.
 
 **What Mzizi can do, and what it cannot yet.** Take every capability claim
 from [LANGUAGE-TRACKER.md](https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md),
@@ -80,8 +84,8 @@ The task families, never pooled:
   does not score an episode with probes yet. Against TypeScript with Hono,
   Python with FastAPI, Go with `net/http`, C++20 with cpp-httplib and Rust
   with axum: none of those arms is added yet.
-- `ui-port` (development only): porting a React `spec.tsx`, as both pilots
-  did, against Dioxus and Leptos.
+- `ui-port` (development only): porting a React `spec.tsx`, as the first two
+  pilots did, against Dioxus and Leptos.
 - Public suites (never gating): MultiPL-E, EvalPlus, Aider polyglot and
   BaxBench, blocked: a program with functions, lists, maps, sets and records
   runs, but these suites also need a standard library (P2), which Mzizi does not have on `main` yet.
@@ -89,12 +93,14 @@ The task families, never pooled:
 The arms in `benchmarks/arms/` are `dioxus`, `leptos`, `mzizi`, `mzizi-be`
 and `react`. The pilots below are tests inside Phase 0, not its goal.
 
-**Status: two pilots run, no advantage shown; Phase 0 is not complete.** The
+**Status: four pilots run, no advantage shown; Phase 0 is not complete.** The
 compiler front end exists and is tested — a lexer, a recovering parser, an agent
 diagnostic protocol with `mz fix`, a content-addressed IR, and nine primitives
-written in Mzizi itself, covered by 760 tests in 27 suites, 629 of them in the
-compiler crate (`mzizi-dev/mzizi` `main` at `1d5e578`, tagged `v0.8.0`; 33,438 lines in
-`compiler/src`, from a fresh count). Blocks nest at most 64 deep
+written in Mzizi itself, covered by 767 tests in 35 suites
+(`mzizi-dev/mzizi` `main` at `2b36c8f`, tagged `v0.12.0`; 33,540 lines in
+`compiler/src`, from a fresh count; run on a macOS laptop, 766 of the 767 tests
+passed and one, a range too long to hold in memory, was killed by the operating
+system where it expects exit 101). Blocks nest at most 64 deep
 (MZ0411), and robustness tests hold every command to ending with a diagnostic. `mz contract` evaluates
 contract blocks. A `service` with HTTP routes and handlers is checked by
 `mz check`, run in process by `mz contract` and lowered by `mz build` to a
@@ -108,10 +114,18 @@ With a frontier model, the Mzizi and Dioxus arms were indistinguishable, and Mzi
 used about 8% fewer tokens. With a ~7B open-weight model, the design target, Mzizi
 did worse on all three metrics. Both pilots ported registry UI components (a
 button and a badge were scored) into Mzizi and Dioxus. Both are tiny, and
-neither is the charter's measurement: the run that tests the kill criterion has not happened. If you are
+neither is the charter's measurement: the run that tests the kill criterion has not happened.
+Two more pilots ran on 2026-10-29 ([pilot 3, a frontier model](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-3-frontier/RUN.md);
+[pilot 4, a smaller Claude model](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/results/2026-10-29-pilot-4-haiku/RUN.md)). Each gave a fresh
+model per episode a spec for the public `button`, `badge` and `card` tasks in Mzizi and React
+(pilot 3 also ran one more Rust arm on `button` only). Every episode was clean at the first
+check except one pilot 3 `card` that needed a second iteration; two Mzizi `card` episodes
+had one defect each (an extra slot in pilot 3, one slot where the spec lists seven in pilot 4).
+The metrics sit at the ceiling, so neither pilot separates the arms; tokens were not measured;
+neither is the kill-criterion run. If you are
 summarising Mzizi, say that it is a programming language whose goal is to be
 used instead of TypeScript, Python and C++, that the goal is a design with an
-argument behind it, that the first pilots did not show an advantage, and that
+argument behind it, that the four pilots so far did not show an advantage, and that
 it has no proven result.
 
 Most of the fixes pilot 2 asked for have landed: `mz fix`, diagnostics MZ0106
@@ -127,89 +141,65 @@ still waits on: held-out tasks in a private repository (not yet created);
 the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
-**Where it stands, 2026-10-08: shipped, next, and in progress.** Read from
-`mzizi-dev/mzizi`'s `main` (`1d5e578`, tagged `v0.8.0`, the fourth 8 October release,
-[#109](https://github.com/mzizi-dev/mzizi/pull/109)),
-and its open pull requests (none on 8 October). `staging` is at the same commit as `main`.
+**Where it stands, 2026-10-29: shipped, next, and in progress.** Read from
+`mzizi-dev/mzizi`'s `main` (`2b36c8f`, tagged `v0.12.0`, the release of 29 October,
+[#140](https://github.com/mzizi-dev/mzizi/pull/140)), and its open pull requests (five,
+none toward M2 on 29 October). `staging` holds the same tree as `main`.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md):
-  - Records with methods (C8, [#101](https://github.com/mzizi-dev/mzizi/pull/101),
-    [#102](https://github.com/mzizi-dev/mzizi/pull/102)): in a `program`, a
-    `record` with `field`s, `fn` methods that read `self`, `with` copies, an
-    `always` contract checked at each construction and assignment, and built by
-    field name. `examples/records.mz` runs through `mz run` in CI.
-  - Collections (C7, [#99](https://github.com/mzizi-dev/mzizi/pull/99)): in a
-    `program`, `list(T)`, `map(K, V)` and `set(K)`, with bracket literals, indexing
-    that returns an option read with `otherwise`, `in`, `for each` over a list, the
-    methods and the eight named folds. Maps and sets iterate in key order.
-    `examples/collections.mz` runs through `mz run` in CI.
-    - Text operations (C6, [#98](https://github.com/mzizi-dev/mzizi/pull/98),
-    [#106](https://github.com/mzizi-dev/mzizi/pull/106)): `length`, `contains`,
-    `starts_with`, `ends_with`, `trim`, `to_upper`, `to_lower`, `replace` and
-    `repeat`; `s[i]`, `s.slice(a, to = b)`, `s.find(t)`, `s.split(sep)`, `s.chars()`,
-    `s.parse_int()` and `s.parse_float()`, which return an option or a list.
-    Built-in methods with tests meet C6 (owner, RFC-0013 §20 Q20). `split("")` is
-    `MZ0915`; an empty separator at run time traps (`MZ0991`, exit 101).
-    `examples/text.mz` runs in CI.
-  - Programs that compute, from RFC-0013's waves
-    ([#80](https://github.com/mzizi-dev/mzizi/pull/80),
-    [#83](https://github.com/mzizi-dev/mzizi/pull/83),
-    [#89](https://github.com/mzizi-dev/mzizi/pull/89),
-    [#87](https://github.com/mzizi-dev/mzizi/pull/87)): a `program` file with
-    `fn main` and `print`; functions with typed parameters and returns, calls
-    and recursion; `let`, `var` and assignment; `int`, `float`, `bool` and
-    `text` expressions, the numeric methods and interpolation; `when`,
-    `else when`, exhaustive `match` (also as a value), `for each` over a
-    range, `while`, `break`, `continue` and early `return`; enums, with
-    columns; and `result(T, E)`, `return error(e)`, a prefix `try` and a
-    `match` on a result. Integer overflow and division by zero stop the
-    program (MZ0991, exit 101); a `float` never traps. The tracker's C1–C5,
-    C7–C10 rows meet their "Done when" tests and read ✅ on `main`
-    ([#92](https://github.com/mzizi-dev/mzizi/pull/92), [#104](https://github.com/mzizi-dev/mzizi/pull/104)).
-  - `mz run`, which checks a program, lowers it to a Rust package with no
-    dependencies, builds it with Cargo and runs it; CI runs every example
-    program and compares its output with a committed `.expected` file.
-  - The language harness ([#88](https://github.com/mzizi-dev/mzizi/pull/88),
-    [RFC-0012](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0012-harness.md)),
-    the spine of the language ([#93](https://github.com/mzizi-dev/mzizi/pull/93)):
-    `compiler/src/harness.rs` registers 197 entries (the `program` kind and
-    everything it has, the nine `mz` commands, and 80 diagnostic codes: 53
-    `MZ09xx` and 27 shared), and `mz harness version`,
-    `mz harness definition` and `mz harness entry <name>` print them as
-    JSON. Enforced by tests: every code the compiler can emit has an entry or
-    is on a frozen pending list (`component` and `service` are kind-level
-    only, with 49 codes pending), and every trigger and example still does
-    what its entry says. Written by hand and not compared with the checker:
-    each code's `say` text and each feature's teaching text. The plugin host
-    and the generated skills are not built, and tracker row H1 is 🟡. Whether
-    an agent taught by the harness does better is a hypothesis the benchmark
-    is designed to test; nothing has measured it.
-  - [RFC-0013](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0013-core-language.md),
-    the core language ([#76](https://github.com/mzizi-dev/mzizi/pull/76),
-    amended in [#81](https://github.com/mzizi-dev/mzizi/pull/81)): one RFC for
-    all of Tier 1, a draft for review, with 29 questions for the owner. Its
-    built parts are the bullets above.
-  - A performance suite against hand-written Rust
-    ([#85](https://github.com/mzizi-dev/mzizi/pull/85), `benchmarks/perf/`):
-    CI checks only that the outputs agree; no timing is gated or committed.
-  - Also released on 8 October:
-    [design/LANGUAGE-SURVEY.md](https://github.com/mzizi-dev/mzizi/blob/main/design/LANGUAGE-SURVEY.md)
-    (design input; nothing in it is implemented or measured), release notes
-    from `CHANGELOG.md` ([#82](https://github.com/mzizi-dev/mzizi/pull/82)), a
-    pre-commit hook ([#86](https://github.com/mzizi-dev/mzizi/pull/86)) and a
-    `CLAUDE.md` ([#77](https://github.com/mzizi-dev/mzizi/pull/77)).
+  - Released as v0.12.0 on 29 October ([#140](https://github.com/mzizi-dev/mzizi/pull/140)): a
+    service that `mz build` lowers reads `HOST` as well as `PORT` (default `127.0.0.1`; a
+    container sets `0.0.0.0`), its `Cargo.toml` carries a slim release profile, and its `tokio` pin
+    moves to 1.53.3 for RUSTSEC-2026-0386 ([#134](https://github.com/mzizi-dev/mzizi/pull/134)). It
+    also publishes the pilot 3 and 4 write-ups ([#138](https://github.com/mzizi-dev/mzizi/pull/138),
+    [#139](https://github.com/mzizi-dev/mzizi/pull/139)). The size figures in the changelog measure
+    Rust's output through Mzizi's lowering, not a Mzizi advantage.
+  - Released as v0.11.0 and v0.10.0 on 21 October (documentation and CI only): row P11 of the
+    tracker records the 2026-10-20 target decision (see above), and merging is squash through the
+    merge queue ([#128](https://github.com/mzizi-dev/mzizi/pull/128),
+    [#125](https://github.com/mzizi-dev/mzizi/pull/125)).
+  - Released as v0.9.0 on 20 October: the C6 review follow-ups
+    ([#112](https://github.com/mzizi-dev/mzizi/pull/112), for issue #107): an option return the
+    signature cannot build reports `MZ0919` only; `MZ0962` names another language's
+    spelling as written; and the `int` minimum, `-9223372036854775808`, is a literal
+    under a unary minus (RFC-0013 §3.1). It adds no new construct.
+  - RFC-0014, the Tier 2 design, as a draft ([#111](https://github.com/mzizi-dev/mzizi/pull/111)):
+    modules and imports, the standard library and Rust crate interop are designed
+    there. Nothing in it is implemented, and `mz check` does not accept `import`,
+    `module`, `public` or `extern` today.
+  - Also on 20 October: the rust-toolchain pins ([#113](https://github.com/mzizi-dev/mzizi/pull/113),
+    [#116](https://github.com/mzizi-dev/mzizi/pull/116)), the README and charter without
+    a UI framework's name ([#115](https://github.com/mzizi-dev/mzizi/pull/115)), and the
+    dated changelog ([#119](https://github.com/mzizi-dev/mzizi/pull/119)).
+  - Measured on `main` at `2b36c8f` (macOS): `cargo test --workspace --no-fail-fast` ran 767
+    tests in 35 suites; 766 passed and one (a range too long to hold in memory) was killed by
+    the operating system, exit 137 where 101 is expected; `mz harness definition` gives 197
+    entries, 79 distinct diagnostic codes and 49 pending codes, unchanged since v0.9.0; every
+    example's `mz run` output matches its `.expected` file.
+  - Released 8 October (v0.8.0, `1d5e578`): records with methods (C8,
+    [#101](https://github.com/mzizi-dev/mzizi/pull/101),
+    [#102](https://github.com/mzizi-dev/mzizi/pull/102)); text operations (C6,
+    [#106](https://github.com/mzizi-dev/mzizi/pull/106)); collections (C7,
+    [#99](https://github.com/mzizi-dev/mzizi/pull/99)); the release notes from
+    `CHANGELOG.md` ([#82](https://github.com/mzizi-dev/mzizi/pull/82)); a performance
+    suite against hand-written Rust ([#85](https://github.com/mzizi-dev/mzizi/pull/85),
+    `benchmarks/perf/`), where CI checks only that the outputs agree and no timing is
+    gated or committed.
   - From 7 October ([#72](https://github.com/mzizi-dev/mzizi/pull/72),
     [#79](https://github.com/mzizi-dev/mzizi/pull/79)): UI components and their
-    contracts, a `service` that `mz build` lowers to a local Rust + axum
-    package, the nesting cap (MZ0411), robustness tests, no `unsafe` in the
-    compiler, and `match` in a view as MZ0410.
-- **Landing on `staging`:** nothing. `staging` and `main` are both at `1d5e578`.
-- **In progress toward M2, not available:** no pull request is open.
+    contracts, a `service` that `mz build` lowers to a local Rust + axum package, the
+    nesting cap (MZ0411), robustness tests, no `unsafe` in the compiler, and `match` in
+    a view as MZ0410.
+- **Landing on `staging`:** nothing. `staging` (`99fa985`) and `main` (`2b36c8f`) hold the same tree.
+- **In progress toward M2, not available:** no pull request toward M2 is open (the five open on
+  29 October are RFC-0015 and RFC-0016 drafts, a checker fix, a charter wording and a portal doc).
   Never describe any of this as something Mzizi has.
-  - [#69](https://github.com/mzizi-dev/mzizi/issues/69), the tracking issue:
-        M2 (Tier 1 plus P1–P6 ✅): M1 is met, and the tracking issue carries the work after it.
-  - Still to build, with no pull request open on 8 October: modules and imports
-    (P1) and the standard library (P2), which the public suites wait on.
+  - [#110](https://github.com/mzizi-dev/mzizi/issues/110), M2's tracking issue
+    (opened 9 October): M2 is Tier 1 plus P1–P6 ✅. M1
+    ([#69](https://github.com/mzizi-dev/mzizi/issues/69)) is met.
+  - Still to build, with no pull request open on 29 October: modules and imports
+    (P1) and the standard library (P2), which the public suites wait on. RFC-0014 is
+    their draft design, on `main`; nothing in it is implemented.
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
   one RFC per tier; `mz run` is to compile a program to Rust and run it; methods on records now,
   generics after M1; integer overflow checks stay in every build, removed only
@@ -271,11 +261,11 @@ the components with that build, and its rows and `mzizi_search`'s hits carry
 `rustCrate` and `astroFile`. `mzizi_get_skills` takes `category` (`dev`,
 `design`, `language` or `build`) and returns every skill in it in full.
 
-Versions on 2026-10-07 (read the registries before repeating one):
+Versions on 2026-10-29 (read the registries before repeating one):
 
 - `mzizi-mcp` **0.13.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
   Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.13.0)
-- `@nyuchi/mzizi-skills` **0.11.0** on npm: seven skills in four categories,
+- `@nyuchi/mzizi-skills` **0.13.0** on npm: seven skills in four categories,
   `mzizi-language` (language), `mzizi-design` (design), `mzizi-roots`,
   `mzizi-backend` and `discoverability` (build), and `digital-hygiene` and
   `progress-report` (dev: how every agent works, loaded before any dev work).
@@ -288,13 +278,13 @@ Versions on 2026-10-07 (read the registries before repeating one):
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
   Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
   `src/components/mzizi/`), plus the `fundi` agent. `npx mzizi` works.
-- Mzizi Roots on crates.io, all **0.3.0**: `mzizi-tokens`, `mzizi-ui`,
+- Mzizi Roots on crates.io, all **0.6.0**: `mzizi-tokens`, `mzizi-ui`,
   `mzizi-brand`, `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`,
   `mzizi-discovery`, and the umbrellas `mzizi-roots` (UI) and
   `mzizi-roots-server` (server). `cargo add mzizi-roots` works.
 
 **The components are built to support the language.** *Mzizi Roots* is
-Mzizi's own UI and server components for the agentic web, in Rust (Dioxus):
+Mzizi's own UI and server components for the agentic web, in Rust (moving to Mzizi's own `render()`; Dioxus is still a dependency of some crates during the migration):
 the language's component model, the way React is JavaScript's, and its UI
 layer. Where a component has a Rust implementation, it is presented first. The
 React/TSX builds keep working but are deprioritised. The registry also supplies
@@ -312,8 +302,8 @@ Every ecosystem hostname resolves (checked 2026-09-29). Each is a Cloudflare
 Worker, except the docs, which Mintlify hosts:
 
 - `mzizi.dev` — this site (`mzizi-dev/mzizi-site`)
-- `api.mzizi.dev` — the registry API, served by `mzizi-dev/mzizi-api-gateway` from the registry's files at a pinned registry commit. A bot moves the pin to registry `main`, so do not repeat a pin: every response's `x-mzizi-source` header names the commit being served
-- `app.mzizi.dev` — the console (`mzizi-dev/mzizi-console`), behind AuthKit sign-in
+- `api.mzizi.dev` — the registry API, served by `mzizi-dev/mzizi-api` (formerly `mzizi-api-gateway`) from the registry's files at a pinned registry commit. A bot moves the pin to registry `main`, so do not repeat a pin: every response's `x-mzizi-source` header names the commit being served
+- `app.mzizi.dev` — the console (`mzizi-dev/mzizi-console`), a standalone repository, behind AuthKit sign-in. It keeps no database of its own today; decided, not built: one Rust Worker serving Astro's output, and Cloudflare D1 for any state it keeps
 - `mcp.mzizi.dev` — the MCP server (`mzizi-mcp`), serving bundled files and federating the docs MCP
 - `docs.mzizi.dev` — the documentation (`mzizi-dev/mzizi-docs`)
 
@@ -353,15 +343,15 @@ Hostnames change; resolve one before repeating it.
 - RFC-0005 is reserved and unwritten
 - [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, as Dioxus UI components and host-agnostic server components. Proposed
 - [Design System](https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc): the published Mzizi design system on claude.ai — voice and content fundamentals, visual foundations, the marks, and component previews. It is built file for file from the `design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418), which is the source of truth: change the folder, never the artifact page
-- [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results): both pilot write-ups and their raw episodes
+- [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results): all four pilot write-ups and their raw episodes
 - [benchmarks/READINESS.md](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md): the audit of pilot 2's fixes, and what the kill-criterion run still waits on
 
 ## Public repositories
 
 - [mzizi-dev/mzizi](https://github.com/mzizi-dev/mzizi): the language, and Mzizi's main goal: the charter, the RFCs and LANGUAGE-TRACKER.md, the `mz` compiler front end that implements it, nine primitives and an example service written in it, the benchmark harness and the pilot results. Rust. Public.
 - [mzizi-dev/mzizi-registry](https://github.com/mzizi-dev/mzizi-registry): the components built to support the language: the design system and component registry, including the Mzizi Roots Rust components (`mzizi-rs/`) and the component contracts (`contracts/`: a versioned, machine-readable contract for each of the Mzizi Dashboard Standard's 31 `@bundu/ui` app components; [docs](https://docs.mzizi.dev/patterns/dashboard-standard)). Its files are the source of the registry API; it holds no database.
-- [mzizi-dev/mzizi-api-gateway](https://github.com/mzizi-dev/mzizi-api-gateway): the registry API as a Hono Cloudflare Worker, serving [api.mzizi.dev](https://api.mzizi.dev/v1) from the registry's files bundled at a pinned commit.
-- [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome, Rust/Dioxus islands over the registry API. Live at [app.mzizi.dev](https://app.mzizi.dev), behind AuthKit sign-in.
+- [mzizi-dev/mzizi-api](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`): the registry API as a Hono Cloudflare Worker, serving [api.mzizi.dev](https://api.mzizi.dev/v1) from the registry's files bundled at a pinned commit.
+- [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome; live data loads in the browser today, and it keeps no database of its own. Decided, not built (mzizi-console#34): one Rust Worker serves Astro's output on the server, and any state it keeps goes in Cloudflare D1. Live at [app.mzizi.dev](https://app.mzizi.dev), behind AuthKit sign-in.
 - [mzizi-dev/mzizi-site](https://github.com/mzizi-dev/mzizi-site): this site, serving [mzizi.dev](https://mzizi.dev).
 - [mzizi-dev/mzizi-docs](https://github.com/mzizi-dev/mzizi-docs): the Mintlify documentation site, live at [docs.mzizi.dev](https://docs.mzizi.dev). The one home of Mzizi's documentation.
 - [mzizi-dev/mzizi-roadmap](https://github.com/mzizi-dev/mzizi-roadmap): the roadmap. A placeholder; `CHARTER.md` is the real plan of record.
@@ -384,7 +374,7 @@ Hostnames change; resolve one before repeating it.
 
 - **Do not hardcode counts, versions or token values.** Component counts, the registry version and the palette come from the registry's files and change without an edit here. Fetch them from the registry API.
 - **Do not describe direction as shipped.** Take capabilities from LANGUAGE-TRACKER.md. A `service` with HTTP routes and handlers exists and lowers to a local Rust + axum package, and a `program` lowers to a Rust package with no dependencies; no component lowers, and there are no Workers, Containers or WebAssembly targets. Contracts for functions and records, the other-language backend arms and every benchmark result are direction.
-- **Do not claim a measured result.** Two pilots have run and neither showed an advantage; the kill-criterion run has not happened. "Designed for" and "aims to" are accurate; "faster than" or "better than" is not. Being used instead of TypeScript, Python and C++ is Mzizi's goal, not something it has shown.
+- **Do not claim a measured result.** Four pilots have run and none showed an advantage; the kill-criterion run has not happened. "Designed for" and "aims to" are accurate; "faster than" or "better than" is not. Being used instead of TypeScript, Python and C++ is Mzizi's goal, not something it has shown.
 - **Do not call the toolchain or the components the language.** The `mz` compiler, the IR, the diagnostics, the CLI, the MCP server and the skills are toolchain; Mzizi Roots and the registry are components. Both are built to support the language. The one exception runs the other way: the harness the toolchain attaches to is the core of the language by design; its first slice is built (`mz harness`) and its plugin host is not.
 - **Do not describe the architecture in axes or layers.** The frontend architecture is the Mzizi DNA double helix — nodes on an engineering and a meaning backbone, held by cross-cutting rungs. The earlier axis model is retired, and its endpoints answer HTTP 410 Gone. Axis vocabulary about Mzizi came from a stale source.
 - **Install components from absolute URLs.** `npx shadcn@latest add https://api.mzizi.dev/v1/ui/<name>`, never a bare name: a bare name resolves against shadcn's own registry and installs a different component. The Rust source is at `https://api.mzizi.dev/v1/rs/<name>`. Its `crate` field names the crate that component ships in, which differs by node: `mzizi-ui` for the primitives, `mzizi-brand` for the brand components, `mzizi-shell` for the app chrome, and so on. Read the field; never assume one crate. Every Roots crate is on crates.io, and `cargo add mzizi-roots` brings the UI crates in one dependency. `mzizi add <name>` (`@nyuchi/mzizi-cli` 0.6.0 and later) writes the React build's files, or records the component's crate for the Rust one; from 0.7.0, in an Astro project (or with `--target astro`), it writes the pure `.astro` from `https://api.mzizi.dev/v1/astro/<name>`.

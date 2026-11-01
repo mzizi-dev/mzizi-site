@@ -75,11 +75,11 @@ It also holds the progress block (owner, 2026-10-07: "We also need to be updatin
 the site with progress and where we are"). The landing page's status section and
 `/language` show, in this order, what is on the language's `main` ("On main today"), what is
 on its `staging` ("Landing on staging"), and what is in open pull requests ("In progress
-toward M2", labelled "Not available yet"), linking the tracking issue
-(`mzizi-dev/mzizi#69`) and its pull requests. RFC-0013 and the language survey reached
+toward M2", labelled "Not available yet"), linking M2's tracking issue
+(`mzizi-dev/mzizi#110`; M1's was #69) and its pull requests. RFC-0013 and the language survey reached
 `main` in the 8 October release (#91), and no page may link a `design/` file on `staging`. The
 data is `src/lib/progress.ts`; `check-facts.py` fails when a pull request listed as in
-progress has merged or closed, or when an open one that refers to #69 is not listed (a
+progress has merged or closed, or when an open one that refers to #110 or #69 is not listed (a
 release pull request, staging to main, is not work toward M2), so move it in the same
 update. The landing page, `/language` and `/cli` each show a real example program from the
 language's `examples/` with what `mz run` printed for it (`src/lib/programs.ts`, copied
@@ -196,8 +196,8 @@ on the production deploy, so the same commit reads green on a PR and red on `mai
 
 - **Every claim on this site traces to a file in this org** — mostly
   [`CHARTER.md`](https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md) — or to a request
-  that was actually made. "Designed for" is accurate; "faster than" is not. Two pilots
-  have run and neither showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
+  that was actually made. "Designed for" is accurate; "faster than" is not. Four pilots
+  have run and none showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
   the kill-criterion run has not happened (`benchmarks/READINESS.md`), so Phase 0 is
   not complete. Report every new result on the status panel, whichever way it falls.
 - Numbers sourced from the registry (component count, per-node counts, the palette) are
