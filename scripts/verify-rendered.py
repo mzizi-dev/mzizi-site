@@ -250,11 +250,13 @@ plain = html.unescape(re.sub(r"<[^>]+>", " ", body))
 plain = re.sub(r"\s+", " ", plain)
 
 check("index.html", "the status panel is rendered",
-      "Status: two pilots, no advantage yet" in plain)
-check("index.html", "the status panel says neither pilot showed an advantage",
+      "Status: four pilots, no advantage yet" in plain)
+check("index.html", "the status panel says no pilot showed an advantage",
       "show no measurable advantage for Mzizi" in plain)
+check("index.html", "the status panel says pilots 3 and 4 separated no arms and are not the kill-criterion run",
+      "Pilots 3 and 4, on 2026-10-29, separated no arms" in plain and "Neither pilot is the kill-criterion run" in plain)
 # The panel comes before anything about components: the language leads.
-status_at = plain.find("Status: two pilots")
+status_at = plain.find("Status: four pilots")
 components_at = plain.find("The components: Mzizi Roots")
 check("index.html", "the status panel precedes the components section",
       0 <= status_at < components_at, f"status at {status_at}, components at {components_at}")
@@ -380,11 +382,11 @@ for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
     # In progress is never presented as shipped: the column order is fixed.
     at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M2")]
     check(name, "the three columns read main, then staging, then in progress", -1 < at[0] < at[1] < at[2])
-# The language's release tag (main-release.yml, v0.8.0 at 1d5e578): the pages that
+# The language's release tag (main-release.yml, v0.12.0 at 2b36c8f): the pages that
 # name the release name it, and check-facts.py holds the tag to its commit.
 for name in ("index.html", "language.html", "llms.txt"):
     raw = (DIST / name).read_text(encoding="utf-8")
-    check(name, "names the language's release tag v0.8.0", "v0.8.0" in raw)
+    check(name, "names the language's release tag v0.12.0", "v0.12.0" in raw)
 # RFC-0013 (#76) and the language survey reached main in the 8 October release
 # (#91): link their files on main, and no design/ file on staging anywhere.
 RFC13 = f"{LANG}/blob/main/design/RFC-0013-core-language.md"
@@ -533,11 +535,21 @@ stale_patterns = {
     # 26,850 lines, 137 entries, 70 codes, 51 pending) and the staging figures
     # (693, 562, 181, 75, 50) are not the current ones.
     r"\b(644 tests in 24 suites|513 of them|512 of them|562 of them|693 tests|26 suites|24 suites)\b":
-        "the language's current figures are 760 tests in 27 suites, 629 of them in the compiler crate (mzizi-dev/mzizi main, 1d5e578)",
+        "the language's current figures are 767 tests in 35 suites and 33,540 lines (mzizi-dev/mzizi main, 2b36c8f)",
+    # The 2026-10-08 and v0.8.0 figures (760 tests in 27 suites, 629 of them in the
+    # compiler crate, 33,438 lines) are the ones before the 20 October release.
+    r"\b(760 tests|629 of them|33,438 lines|760 tests in 27 suites)\b":
+        "the language's current figures are 767 tests in 35 suites and 33,540 lines (2b36c8f, v0.12.0)",
+    # The v0.9.0 figures (6f7b096): 765 tests in 29 suites, 634 in the compiler crate, 33,518 lines.
+    r"\b(765 tests in 29 suites|634 of them|33,518)\b|<b>765</b>":
+        "the language's figures at v0.9.0 were 765 tests in 29 suites, 33,518 lines (6f7b096); at v0.12.0, 767 tests in 35 suites, 33,540 lines (2b36c8f)",
     r"\b(744 tests|613 of them|33,138|191 entries|1743e3c)\b":
-        "the language's figures at v0.8.0 are 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578)",
+        "the language's figures at v0.8.0 were 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578); at v0.12.0, 767 tests in 35 suites, 33,540 lines (2b36c8f)",
     # The release tag existed from 18:03Z on 2026-10-08 (main-release.yml): no page says it does not.
-    r"[Nn]o `?v0\.8\.0`? tag\b|no tag is named|tag existed on 2026-10-08": "the tag v0.8.0 exists (1d5e578, main-release.yml)",
+    r"[Nn]o `?v0\.(9|12)\.0`? tag\b|no tag is named|tag existed on 2026-10-20": "the tags v0.9.0 and v0.12.0 exist (6f7b096, 2b36c8f, main-release.yml)",
+    # Two pilots, as the count of pilots that have run (four have, since 2026-10-29).
+    r"\b[Tt]wo pilots (have run|run)\b|(?<!\d)\b[Tt]wo pilots run, 0 showing|\bthe two pilots that have run\b|neither pilot showed an advantage":
+        "four pilots have run (two on 2026-09-27, two on 2026-10-29); none showed an advantage",
     r"\b26,850 lines\b": "compiler/src is 33,438 lines at 1d5e578 (a fresh count), not the 26,850 of dc156c5",
     # Programs reached main in the 8 October release (#91).
     r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":
