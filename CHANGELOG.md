@@ -21,6 +21,12 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — GitHub releases carry the CHANGELOG entries they ship (2026-11-01)
+
+- Owner, 2026-11-01: a release is not done until its tag and its GitHub release, with notes from `CHANGELOG.md`, exist on the merge commit on `main`. `main-release.yml` now opens each release's notes with every `CHANGELOG.md` entry added since the previous `main` release (`.github/scripts/release_notes.py`, adapted from `mzizi-dev/mzizi`), followed by GitHub's list of merged pull requests. Before, the notes were the pull-request list alone.
+- A commit that already carries its minor tag but has no release gets one, and a manual run of the workflow on such a commit rewrites its notes from `CHANGELOG.md`, so an earlier release can be corrected.
+- Readers of the site see no difference; only the release pages do.
+
 ### Changed
 
 - The stated facts move from mzizi v0.9.0 (6f7b096) to v0.12.0 (2b36c8f, 2026-10-29). The pages now
