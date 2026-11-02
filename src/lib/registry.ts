@@ -619,39 +619,47 @@ export interface SizeLayer {
  * the API, and never a number typed here.
  */
 export async function getSizeLayers(): Promise<SizeLayer[]> {
-  const detail = await readJson<Partial<ComponentDetail>>(
-    "/ui/mzizi-tokens-globals",
-  );
-  const css = detail.files?.find((f) =>
-    f.path.endsWith("mzizi-tokens-globals.css"),
-  )?.content;
+  // Already fetched for every component page, so this is no extra request.
+  const records = await getComponentRecords();
+  const css = records
+    .get("mzizi-tokens-globals")
+    ?.detail.files.find((f) =>
+      f.path.endsWith("mzizi-tokens-globals.css"),
+    )?.content;
   if (!css)
     throw new Error("/v1/ui/mzizi-tokens-globals served no globals.css");
   return parseSizeLayers(css);
 }
 
-const toPx = (rem: string) => Math.round(parseFloat(rem) * 16 * 100) / 100;
+const toPx = (value: string, unit: string) =>
+  Math.round(parseFloat(value) * (unit === "rem" ? 16 : 1) * 100) / 100;
+
+const MEDIA_ROOT = /@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}/g;
+const LEGACY_ROOT = /:root\[data-mzizi-sizes="legacy"\]\s*\{[^}]*\}/g;
 
 export function parseSizeLayers(css: string): SizeLayer[] {
   const wanted = new Set(SIZE_ROLES.map(([token]) => token));
-  const declarations = (block: string, first: boolean) => {
+  const declarations = (block: string) => {
     const found: Record<string, number> = {};
-    for (const m of block.matchAll(/^\s*--([a-z0-9-]+):\s*([\d.]+)rem\b/gm)) {
-      if (wanted.has(m[1]) && !(first && m[1] in found))
-        found[m[1]] ??= toPx(m[2]);
+    for (const m of block.matchAll(
+      /^\s*--([a-z0-9-]+):\s*([\d.]+)(rem|px)\b/gm,
+    )) {
+      if (wanted.has(m[1])) found[m[1]] ??= toPx(m[2], m[3]);
     }
     return found;
   };
-  const phone = declarations(css, true);
+  // The phone layer is the base declarations: the density media blocks and the
+  // legacy alias are not part of it, wherever they sit in the file.
+  const phone = declarations(
+    css.replace(MEDIA_ROOT, "").replace(LEGACY_ROOT, ""),
+  );
   // A role the API does not serve yet (--target-floor before the density layer) is absent, not guessed.
   if (!("size-touch" in phone))
-    throw new Error("globals.css declares no --size-touch in rem");
+    throw new Error("globals.css declares no --size-touch");
   const layers: SizeLayer[] = [
     { id: "phone", label: "Phone", query: null, px: phone },
   ];
-  const blocks = [
-    ...css.matchAll(/@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}/g),
-  ];
+  const blocks = [...css.matchAll(MEDIA_ROOT)];
   const tablet = blocks.find(
     (m) => !/pointer/.test(m[1]) && /min-width:\s*48rem/.test(m[1]),
   );
@@ -663,7 +671,7 @@ export function parseSizeLayers(css: string): SizeLayer[] {
       id: "tablet",
       label: "Tablet",
       query: tablet[1],
-      px: { ...phone, ...declarations(tablet[2], false) },
+      px: { ...phone, ...declarations(tablet[2]) },
     });
   }
   if (desktop) {
@@ -672,7 +680,7 @@ export function parseSizeLayers(css: string): SizeLayer[] {
       id: "desktop",
       label: "Desktop",
       query: desktop[1],
-      px: { ...below, ...declarations(desktop[2], false) },
+      px: { ...below, ...declarations(desktop[2]) },
     });
   }
   return layers;

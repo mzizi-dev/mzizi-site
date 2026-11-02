@@ -729,20 +729,26 @@ if not cells:
     print("  [skip] the API serves no density layer yet, so /tokens shows no sizes table")
 else:
     plain_tokens = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", text_without_scripts("tokens.html", quiet=True))))
-    phone = {t: v["phone"] for t, v in cells.items()}
     check("tokens.html", "the sizes table has phone, tablet and desktop columns for every role",
           all(set(v) == {"phone", "tablet", "desktop"} for v in cells.values()),
           ", ".join(t for t, v in cells.items() if set(v) != {"phone", "tablet", "desktop"}))
-    check("tokens.html", "the prose touch default and floor are the table's phone column",
-          f"{phone['size-touch']:g}px by default, never below" in plain_tokens
-          and f"never below {phone['target-floor']:g}px" in plain_tokens)
-    check("tokens.html", "no size grows from phone to desktop",
-          all(v["desktop"] <= v["phone"] for v in cells.values()),
-          ", ".join(t for t, v in cells.items() if v["desktop"] > v["phone"]))
-    check("tokens.html", "every desktop target stays at or above the 24px floor (WCAG 2.2 SC 2.5.8)",
-          all(cells[t]["desktop"] >= 24 for t in cells if t.startswith("size-")))
-    check("tokens.html", "desktop body text stays at or above 14px", cells["fs-body"]["desktop"] >= 14)
-    check("tokens.html", "phone body text is at least Apple's 17pt default", cells["fs-body"]["phone"] >= 17)
+    needed = ("target-floor", "size-touch", "fs-body")
+    missing = [t for t in needed if any(l not in cells.get(t, {}) for l in ("phone", "desktop"))]
+    check("tokens.html", "the sizes table has the floor, touch target and body rows for phone and desktop",
+          not missing, ", ".join(missing))
+    if not missing:
+        phone = {t: v["phone"] for t, v in cells.items()}
+        check("tokens.html", "the prose touch default and floor are the table's phone column",
+              f"{phone['size-touch']:g}px by default, never below" in plain_tokens
+              and f"never below {phone['target-floor']:g}px" in plain_tokens)
+        both = {t: v for t, v in cells.items() if "phone" in v and "desktop" in v}
+        check("tokens.html", "no size grows from phone to desktop",
+              all(v["desktop"] <= v["phone"] for v in both.values()),
+              ", ".join(t for t, v in both.items() if v["desktop"] > v["phone"]))
+        check("tokens.html", "every desktop target stays at or above the 24px floor (WCAG 2.2 SC 2.5.8)",
+              all(v["desktop"] >= 24 for t, v in both.items() if t.startswith("size-")))
+        check("tokens.html", "desktop body text stays at or above 14px", cells["fs-body"]["desktop"] >= 14)
+        check("tokens.html", "phone body text is at least Apple's 17pt default", cells["fs-body"]["phone"] >= 17)
 
 if notes:
     print("\nnotes")

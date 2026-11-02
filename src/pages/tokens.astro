@@ -374,10 +374,9 @@ const specs = brand.componentSpecs;
       <h2 id="sizes">Sizes by screen</h2>
       <div class="prose">
         <p>
-          Sizes step down as screens grow. A phone gets Apple's touch sizes; a
-          tablet keeps the touch targets and trims the type; a desktop (a fine
-          pointer with hover, wide enough) gets the compact sizes. Size is the
-          only thing that changes: it says nothing about the network. Read from{" "}
+          Sizes step down as screens grow, by the media query under each column.
+          Size is the only thing that changes: it says nothing about the network.
+          Read from{" "}
           <a href="https://api.mzizi.dev/v1/ui/mzizi-tokens-globals">/v1/ui/mzizi-tokens-globals</a>{" "}
           at {builtAt}.
         </p>
@@ -416,7 +415,7 @@ const specs = brand.componentSpecs;
     <p>
       Focus: {brand.accessibility.focusIndicator}. Touch targets:
       {" "}{brand.accessibility.defaultTouchTarget}px by default, never below
-      {" "}{brand.accessibility.minTouchTarget}px{desktop && `; on desktop ${desktop.px["size-touch"]}px by default, never below ${desktop.px["target-floor"]}px`}.
+      {" "}{brand.accessibility.minTouchTarget}px{desktop?.px["size-touch"] !== undefined && desktop.px["target-floor"] !== undefined && `; on desktop ${desktop.px["size-touch"]}px by default, never below ${desktop.px["target-floor"]}px`}.
       {" "}{brand.accessibility.keyboardNavigation}.
       {" "}{brand.accessibility.screenReaders}.
     </p>

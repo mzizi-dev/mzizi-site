@@ -53,7 +53,7 @@ CRATES = (
     "mzizi-roots",
     "mzizi-roots-server",
 )
-API = os.environ.get("MZIZI_API_ORIGIN", "https://api.mzizi.dev") + "/v1"
+API = os.environ.get("MZIZI_API_ORIGIN", "https://api.mzizi.dev").rstrip("/") + "/v1"
 MCP_REGISTRY = "https://registry.modelcontextprotocol.io/v0/servers?search=mzizi-mcp"
 MCP_NAME = "io.github.mzizi-dev/mzizi-mcp"
 
@@ -500,29 +500,37 @@ SIZE_TOKENS = ["target-floor", "size-touch", "size-control", "size-control-sm", 
                "size-control-icon", "size-field", "fs-h1", "fs-h2", "fs-body", "fs-small", "fs-caption"]
 
 
+MEDIA_ROOT = re.compile(r"@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}")
+LEGACY_ROOT = re.compile(r':root\[data-mzizi-sizes="legacy"\]\s*\{[^}]*\}')
+
+
 def size_layers(css: str) -> dict[str, dict[str, float]]:
+    """The same reading as src/lib/registry.ts parseSizeLayers: base declarations, first matching block."""
     def decls(block: str) -> dict[str, float]:
         found: dict[str, float] = {}
-        for name, rem in re.findall(r"^\s*--([a-z0-9-]+):\s*([\d.]+)rem\b", block, re.M):
+        for name, value, unit in re.findall(r"^\s*--([a-z0-9-]+):\s*([\d.]+)(rem|px)\b", block, re.M):
             if name in SIZE_TOKENS and name not in found:
-                found[name] = round(float(rem) * 16, 2)
+                found[name] = round(float(value) * (16 if unit == "rem" else 1), 2)
         return found
 
-    layers = {"phone": decls(css)}
-    media = re.findall(r"@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}", css)
-    for query, body in media:
-        if "pointer" not in query and "min-width: 48rem" in query:
-            layers["tablet"] = {**layers["phone"], **decls(body)}
-    for query, body in media:
-        if "pointer: fine" in query and "hover: hover" in query:
-            layers["desktop"] = {**layers.get("tablet", layers["phone"]), **decls(body)}
+    layers = {"phone": decls(LEGACY_ROOT.sub("", MEDIA_ROOT.sub("", css)))}
+    media = MEDIA_ROOT.findall(css)
+    tablet = next((b for q, b in media if "pointer" not in q and re.search(r"min-width:\s*48rem", q)), None)
+    desktop = next((b for q, b in media if re.search(r"pointer:\s*fine", q) and re.search(r"hover:\s*hover", q)), None)
+    if tablet is not None:
+        layers["tablet"] = {**layers["phone"], **decls(tablet)}
+    if desktop is not None:
+        layers["desktop"] = {**layers.get("tablet", layers["phone"]), **decls(desktop)}
     return layers
 
 
 css_doc = upstream("/v1/ui/mzizi-tokens-globals", lambda: fetch_json(f"{API}/ui/mzizi-tokens-globals"))
 brand_doc = upstream("/v1/brand", lambda: fetch_json(f"{API}/brand"))
 if css_doc and brand_doc:
-    served = size_layers(css_doc["files"][0]["content"])
+    css_text = next(f["content"] for f in css_doc["files"] if f["path"].endswith("mzizi-tokens-globals.css"))
+    served = size_layers(css_text)
+    check("a fine-pointer block in the CSS is read as the desktop layer (the parser has not gone blind)",
+          ("pointer: fine" not in css_text and "pointer:fine" not in css_text) or "desktop" in served)
     tokens_page = (DIST / "tokens.html").read_text(encoding="utf-8")
     cells = {(t, l): float(px) for t, l, px in
              re.findall(r'data-size="([^"]+)" data-layer="([^"]+)" data-px="([\d.]+)"', tokens_page)}
