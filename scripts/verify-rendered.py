@@ -28,7 +28,7 @@ DIST = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "dist")
 # The registry's own numbers. Kept here deliberately rather than read from the
 # API: if the corpus really grows, that is a change someone should make on
 # purpose, in a commit, with the number in the diff.
-EXPECTED_COMPONENTS = 656
+EXPECTED_COMPONENTS = 675
 EXPECTED_NODES = 8
 EXPECTED_RUNGS = 4
 EXPECTED_STRANDS = 6
@@ -165,7 +165,7 @@ body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("playground.ht
 check("playground.html", "says plainly it is not interactive", "Not interactive." in body)
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("observability.html")))
 check("observability.html", "links the console", "app.mzizi.dev" in body)
-check("observability.html", "shows the file-backed N2 count", "N2" in body and "388" in body)
+check("observability.html", "shows the file-backed N2 count", "N2" in body and "394" in body)
 
 # --- /architecture -------------------------------------------------------
 print("\narchitecture.html")
@@ -191,9 +191,9 @@ for strand in ("Core guarantee", "Shipped", "Swappable", "Spine",
                "Genetic code", "Transcription"):
     check("architecture.html", f"strand “{strand}” rendered", strand in plain)
 
-# Real component counts, not placeholders: N2 holds 388, N6 holds 90.
-check("architecture.html", "N2 shows its live count of 388", "388 components" in plain)
-check("architecture.html", "N6 shows its live count of 90", "90 components" in plain)
+# Real component counts, not placeholders: N2 holds 394, N6 holds 93.
+check("architecture.html", "N2 shows its live count of 394", "394 components" in plain)
+check("architecture.html", "N6 shows its live count of 93", "93 components" in plain)
 check("architecture.html", f"the {EXPECTED_COMPONENTS} total is printed", str(EXPECTED_COMPONENTS) in plain)
 
 # The diagram is in the HTML, not drawn by a script.
@@ -250,11 +250,13 @@ plain = html.unescape(re.sub(r"<[^>]+>", " ", body))
 plain = re.sub(r"\s+", " ", plain)
 
 check("index.html", "the status panel is rendered",
-      "Status: two pilots, no advantage yet" in plain)
-check("index.html", "the status panel says neither pilot showed an advantage",
+      "Status: four pilots, no advantage yet" in plain)
+check("index.html", "the status panel says no pilot showed an advantage",
       "show no measurable advantage for Mzizi" in plain)
+check("index.html", "the status panel says pilots 3 and 4 separated no arms and are not the kill-criterion run",
+      "Pilots 3 and 4, on 2026-10-29, separated no arms" in plain and "Neither pilot is the kill-criterion run" in plain)
 # The panel comes before anything about components: the language leads.
-status_at = plain.find("Status: two pilots")
+status_at = plain.find("Status: four pilots")
 components_at = plain.find("The components: Mzizi Roots")
 check("index.html", "the status panel precedes the components section",
       0 <= status_at < components_at, f"status at {status_at}, components at {components_at}")
@@ -380,11 +382,11 @@ for name, raw in (("index.html", status_panel.group(0) if status_panel else ""),
     # In progress is never presented as shipped: the column order is fixed.
     at = [text.find(h) for h in ("On main today", "Landing on staging", "In progress toward M2")]
     check(name, "the three columns read main, then staging, then in progress", -1 < at[0] < at[1] < at[2])
-# The language's release tag (main-release.yml, v0.8.0 at 1d5e578): the pages that
+# The language's release tag (main-release.yml, v0.12.0 at 2b36c8f): the pages that
 # name the release name it, and check-facts.py holds the tag to its commit.
 for name in ("index.html", "language.html", "llms.txt"):
     raw = (DIST / name).read_text(encoding="utf-8")
-    check(name, "names the language's release tag v0.8.0", "v0.8.0" in raw)
+    check(name, "names the language's release tag v0.12.0", "v0.12.0" in raw)
 # RFC-0013 (#76) and the language survey reached main in the 8 October release
 # (#91): link their files on main, and no design/ file on staging anywhere.
 RFC13 = f"{LANG}/blob/main/design/RFC-0013-core-language.md"
@@ -533,11 +535,21 @@ stale_patterns = {
     # 26,850 lines, 137 entries, 70 codes, 51 pending) and the staging figures
     # (693, 562, 181, 75, 50) are not the current ones.
     r"\b(644 tests in 24 suites|513 of them|512 of them|562 of them|693 tests|26 suites|24 suites)\b":
-        "the language's current figures are 760 tests in 27 suites, 629 of them in the compiler crate (mzizi-dev/mzizi main, 1d5e578)",
+        "the language's current figures are 767 tests in 35 suites and 33,540 lines (mzizi-dev/mzizi main, 2b36c8f)",
+    # The 2026-10-08 and v0.8.0 figures (760 tests in 27 suites, 629 of them in the
+    # compiler crate, 33,438 lines) are the ones before the 20 October release.
+    r"\b(760 tests|629 of them|33,438 lines|760 tests in 27 suites)\b":
+        "the language's current figures are 767 tests in 35 suites and 33,540 lines (2b36c8f, v0.12.0)",
+    # The v0.9.0 figures (6f7b096): 765 tests in 29 suites, 634 in the compiler crate, 33,518 lines.
+    r"\b(765 tests in 29 suites|634 of them|33,518)\b|<b>765</b>":
+        "the language's figures at v0.9.0 were 765 tests in 29 suites, 33,518 lines (6f7b096); at v0.12.0, 767 tests in 35 suites, 33,540 lines (2b36c8f)",
     r"\b(744 tests|613 of them|33,138|191 entries|1743e3c)\b":
-        "the language's figures at v0.8.0 are 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578)",
+        "the language's figures at v0.8.0 were 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578); at v0.12.0, 767 tests in 35 suites, 33,540 lines (2b36c8f)",
     # The release tag existed from 18:03Z on 2026-10-08 (main-release.yml): no page says it does not.
-    r"[Nn]o `?v0\.8\.0`? tag\b|no tag is named|tag existed on 2026-10-08": "the tag v0.8.0 exists (1d5e578, main-release.yml)",
+    r"[Nn]o `?v0\.(9|12)\.0`? tag\b|no tag is named|tag existed on 2026-10-20": "the tags v0.9.0 and v0.12.0 exist (6f7b096, 2b36c8f, main-release.yml)",
+    # Two pilots, as the count of pilots that have run (four have, since 2026-10-29).
+    r"\b[Tt]wo pilots (have run|run)\b|(?<!\d)\b[Tt]wo pilots run, 0 showing|\bthe two pilots that have run\b|neither pilot showed an advantage":
+        "four pilots have run (two on 2026-09-27, two on 2026-10-29); none showed an advantage",
     r"\b26,850 lines\b": "compiler/src is 33,438 lines at 1d5e578 (a fresh count), not the 26,850 of dc156c5",
     # Programs reached main in the 8 October release (#91).
     r"\bmz run\b[^.]{0,120}(\bnot (yet )?(on|released to) main\b|\bon (the )?staging\b)":
@@ -686,8 +698,12 @@ skipped = re.compile(
     r"<(script|style|pre|svg|textarea)\b.*?</\1>|<article class=\"prose skill-body\".*?</article>",
     flags=re.S | re.I)
 glued: list[str] = []
+# Attribute values are not prose. Astro escapes `"` in them but not `<`, so a
+# registry description that mentions `<code>` (app-money's, 2026-11-01) reaches
+# a meta tag's content as `&quot;<code>&quot;`, which is not a tag at all.
+attr_value = re.compile(r'(\s[\w:.-]+=)"[^"]*"')
 for path in html_pages:
-    raw = skipped.sub(" ", path.read_text(encoding="utf-8"))
+    raw = attr_value.sub(r'\1""', skipped.sub(" ", path.read_text(encoding="utf-8")))
     for pattern in (glued_before, glued_after):
         for m in pattern.finditer(raw):
             around = re.sub(r"\s+", " ", raw[max(0, m.start() - 40):m.end() + 30])
@@ -696,6 +712,44 @@ check("dist/", "no word or punctuation is glued to an inline tag — end the sou
       not glued, f"{len(glued)} found: " + " | ".join(glued[:8]) if glued else "")
 
 # --- result ---------------------------------------------------------------
+# Sizes (owner, 2026-11-01: Apple HIG on phones, a step-down on desktop). /tokens
+# renders the registry's size roles per screen class from the globals.css the API
+# serves. A definition that appears in several places must agree with itself, so
+# the page's own numbers are held to each other and to the floors that never move:
+# the prose ("N px by default, never below M px") is the phone column of the table,
+# desktop targets and body text only ever shrink, targets stay at or above 24px
+# (WCAG 2.2 SC 2.5.8) and desktop body stays at or above 14px. check-facts.py
+# compares the same table to the API's CSS, which needs the network.
+print("\nsizes")
+tokens_raw = (DIST / "tokens.html").read_text(encoding="utf-8")
+cells: dict[str, dict[str, float]] = {}
+for token, layer, px in re.findall(r'data-size="([^"]+)" data-layer="([^"]+)" data-px="([\d.]+)"', tokens_raw):
+    cells.setdefault(token, {})[layer] = float(px)
+if not cells:
+    print("  [skip] the API serves no density layer yet, so /tokens shows no sizes table")
+else:
+    plain_tokens = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", text_without_scripts("tokens.html", quiet=True))))
+    check("tokens.html", "the sizes table has phone, tablet and desktop columns for every role",
+          all(set(v) == {"phone", "tablet", "desktop"} for v in cells.values()),
+          ", ".join(t for t, v in cells.items() if set(v) != {"phone", "tablet", "desktop"}))
+    needed = ("target-floor", "size-touch", "fs-body")
+    missing = [t for t in needed if any(l not in cells.get(t, {}) for l in ("phone", "desktop"))]
+    check("tokens.html", "the sizes table has the floor, touch target and body rows for phone and desktop",
+          not missing, ", ".join(missing))
+    if not missing:
+        phone = {t: v["phone"] for t, v in cells.items() if "phone" in v}
+        check("tokens.html", "the prose touch default and floor are the table's phone column",
+              f"{phone['size-touch']:g}px by default, never below" in plain_tokens
+              and f"never below {phone['target-floor']:g}px" in plain_tokens)
+        grew = [f"{t} {a}->{b}" for t, v in cells.items()
+                for a, b in (("phone", "tablet"), ("tablet", "desktop")) if a in v and b in v and v[b] > v[a]]
+        check("tokens.html", "no size grows from one screen class to the next", not grew, ", ".join(grew))
+        both = {t: v for t, v in cells.items() if "phone" in v and "desktop" in v}
+        check("tokens.html", "every desktop target stays at or above the 24px floor (WCAG 2.2 SC 2.5.8)",
+              all(v["desktop"] >= 24 for t, v in both.items() if t.startswith("size-")))
+        check("tokens.html", "desktop body text stays at or above 14px", cells["fs-body"]["desktop"] >= 14)
+        check("tokens.html", "phone body text is at least Apple's 17pt default", cells["fs-body"]["phone"] >= 17)
+
 if notes:
     print("\nnotes")
     for note in notes:

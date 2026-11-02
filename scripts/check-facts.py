@@ -53,7 +53,7 @@ CRATES = (
     "mzizi-roots",
     "mzizi-roots-server",
 )
-API = "https://api.mzizi.dev/v1"
+API = os.environ.get("MZIZI_API_ORIGIN", "https://api.mzizi.dev").rstrip("/") + "/v1"
 MCP_REGISTRY = "https://registry.modelcontextprotocol.io/v0/servers?search=mzizi-mcp"
 MCP_NAME = "io.github.mzizi-dev/mzizi-mcp"
 
@@ -134,15 +134,24 @@ pages = {
 print("the language (mzizi-dev/mzizi main)")
 readme = upstream("the language README", lambda: fetch(LANGUAGE_README))
 if readme:
+    # The README lags its code (it said 765 in 29 suites when main had 767 in 35), so the
+    # site's figures are measured (cargo test --workspace) and held here. The README is a
+    # floor: a README count above ours means the figures need re-measuring (a failure); a
+    # lower one is the README lagging (a note).
+    MEASURED_TESTS, MEASURED_SUITES = 767, 35
     tests = re.search(r"\b([\d,]+) tests in (\d+) suites\b", readme)
-    check("the README states a test and suite count", tests is not None)
     if tests:
-        n, suites = tests.group(1), tests.group(2)
-        check(f"index.html shows {n} tests in {suites} suites",
-              f"{n} tests passing, {suites} suites" in pages["index.html"])
-        for page in ("language.html", "llms.txt"):
-            check(f"{page} says {n} tests in {suites} suites",
-                  f"{n} tests in {suites} suites" in pages[page])
+        readme_n = int(tests.group(1).replace(",", ""))
+        check(f"the README's test count ({readme_n}) is not above the measured {MEASURED_TESTS}",
+              readme_n <= MEASURED_TESTS)
+        if readme_n != MEASURED_TESTS or int(tests.group(2)) != MEASURED_SUITES:
+            notes.append(f"the language README says {readme_n} tests in {tests.group(2)} suites; the site cites the "
+                         f"measured {MEASURED_TESTS} in {MEASURED_SUITES}. The README lags its code.")
+    n, suites = MEASURED_TESTS, MEASURED_SUITES
+    check(f"index.html shows {n} tests, {suites} suites",
+          re.search(rf"{n}\s*tests, {suites} suites", pages["index.html"]) is not None)
+    for page in ("language.html", "llms.txt"):
+        check(f"{page} says {n} tests in {suites} suites", f"{n} tests in {suites} suites" in pages[page])
 lines = upstream("the language's compiler/src", compiler_lines)
 if lines:
     check(f"index.html shows {lines} lines in the compiler (counted in the source)",
@@ -259,7 +268,7 @@ if arms:
           react is not None and (react.group(1).startswith("exists") == ("react" in present)),
           react.group(1) if react else "missing")
 
-# Progress toward M2 (owner, 2026-10-07; M1 met in v0.8.0). The landing page and /language list
+# Progress toward M2 (owner, 2026-10-07; M1 met in v0.8.0; v0.9.0 on 2026-10-20). The landing page and /language list
 # the pull requests that are in progress, labelled as not available. One that
 # has merged or closed is no longer in progress: move it (to "Landing on
 # staging", or "On main today" once released) in src/lib/progress.ts and
@@ -278,8 +287,8 @@ check("llms.txt has its “In progress toward M2” list", llms_block is not Non
 llms_listed = sorted({int(n) for n in re.findall(PULL, llms_block.group(1))}) if llms_block else []
 check("llms.txt lists the same pull requests in progress as index.html", llms_listed == listed,
       f"llms.txt {llms_listed}, index.html {listed}")
-check("index.html's “In progress toward M2” column links the tracking issue #69",
-      len(column) == 2 and 'href="https://github.com/mzizi-dev/mzizi/issues/69"' in column[1].split("</ul>", 1)[0])
+check("index.html's “In progress toward M2” column links M2's tracking issue #110",
+      len(column) == 2 and 'href="https://github.com/mzizi-dev/mzizi/issues/110"' in column[1].split("</ul>", 1)[0])
 for number in sorted(set(listed) | set(llms_listed)):
     state = upstream(f"mzizi-dev/mzizi#{number}",
                      lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/pulls/{number}"))
@@ -290,7 +299,8 @@ for number in sorted(set(listed) | set(llms_listed)):
               "" if is_open else
               f"merged into {state['base']['ref']} on {merged[:10]}: move it out of “In progress”"
               if merged else "closed: take it out of “In progress”")
-# Every open pull request that works toward M2 (its body refers to #69) is listed.
+# Every open pull request that works toward M2 (its body refers to #110, or to #69,
+# M1's issue, which earlier M2 work cited) is listed.
 # A release pull request (staging to main) is not work toward M2, though its
 # body quotes the entries that do: what it carries is the staging column.
 open_prs = upstream("the language's open pull requests",
@@ -300,8 +310,8 @@ if open_prs is not None:
         if pr["base"]["ref"] == "main" and pr["title"].startswith("chore(release)"):
             print(f"  [note] #{pr['number']} is a release pull request ({pr['title']}), not listed in progress")
             continue
-        if re.search(r"(?<![\w/])#69\b|issues/69\b", pr.get("body") or ""):
-            check(f"#{pr['number']} (open, refs #69) is listed in progress toward M2",
+        if re.search(r"(?<![\w/])#(69|110)\b|issues/(69|110)\b", pr.get("body") or ""):
+            check(f"#{pr['number']} (open, refs #110 or #69) is listed in progress toward M2",
                   pr["number"] in listed, pr["title"])
 # Staging released: RFC-0013 reaching main's design/ means the "Landing on
 # staging" column has shipped. Move its items to "On main today", and re-read
@@ -336,10 +346,10 @@ if lagging:
     notes.append(f"skill pages still carry pre-62a0f32 language facts ({', '.join(lagging)}): "
                  "@nyuchi/mzizi-skills lags the language; tell the skills-freshness agent.")
 
-# The language's release tag. The pages name v0.8.0 (main-release.yml tags main
+# The language's release tag. The pages name v0.9.0 (main-release.yml tags main
 # after CI passes); the tag must exist and point at the commit the figures cite.
 print("\nthe language's release tag")
-TAG = "v0.8.0"
+TAG = "v0.12.0"
 tag_commit = upstream(f"tag {TAG}", lambda: fetch_json(f"https://api.github.com/repos/mzizi-dev/mzizi/commits/{TAG}")["sha"])
 if tag_commit:
     cited_tag = re.search(r"mzizi-dev/mzizi/commit/([0-9a-f]{7,40})", (DIST / "index.html").read_text(encoding="utf-8"))
@@ -348,6 +358,20 @@ if tag_commit:
           f"{TAG} is {tag_commit[:7]}, the page cites {cited_tag.group(1) if cited_tag else 'none'}")
     for name in ("index.html", "language.html", "llms.txt"):
         check(f"{name} names the tag {TAG}", TAG in pages[name])
+
+# The pilot count. The headline and llms.txt say how many pilots have run; that is the
+# number of directories in benchmarks/results/ upstream.
+print("\nthe pilots")
+listing = upstream("the language's benchmarks/results listing",
+                   lambda: fetch_json("https://api.github.com/repos/mzizi-dev/mzizi/contents/benchmarks/results"))
+if listing:
+    pilots = sum(1 for e in listing if e.get("type") == "dir")
+    words = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
+    word = words.get(pilots, str(pilots))
+    check(f"index.html says {word} pilots", re.search(rf"\b{word} pilots\b", pages["index.html"], re.I) is not None,
+          f"benchmarks/results has {pilots} pilot directories")
+    check(f"llms.txt says {word} pilots", re.search(rf"\b{word} pilots\b", pages["llms.txt"], re.I) is not None,
+          f"benchmarks/results has {pilots} pilot directories")
 
 # --- npm ---------------------------------------------------------------------
 print("\nnpm (latest dist-tags)")
@@ -464,6 +488,71 @@ if notes:
     print("\nnotes")
     for note in notes:
         print(f"  - {note}")
+
+# --- sizes: the site and the registry's CSS must agree -----------------------------
+# Owner, 2026-11-01: sizes follow Apple's HIG on a phone and step down on a wide
+# screen with a fine pointer. /tokens renders the registry's size roles from the
+# globals.css the API serves (src/lib/registry.ts getSizeLayers). This parses
+# that CSS a second time, in another language, and holds the built page to it, so
+# a change to either side that the other does not follow fails here.
+print("\nsizes (api.mzizi.dev globals.css vs /tokens)")
+SIZE_TOKENS = ["target-floor", "size-touch", "size-control", "size-control-sm", "size-control-lg",
+               "size-control-icon", "size-field", "fs-h1", "fs-h2", "fs-body", "fs-small", "fs-caption"]
+
+
+MEDIA_ROOT = re.compile(r"@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}")
+LEGACY_ROOT = re.compile(r':root\[data-mzizi-sizes="legacy"\]\s*\{[^}]*\}')
+
+
+def size_layers(css: str) -> dict[str, dict[str, float]]:
+    """The same reading as src/lib/registry.ts parseSizeLayers: base declarations, first matching block."""
+    def decls(block: str) -> dict[str, float]:
+        found: dict[str, float] = {}
+        for name, value, unit in re.findall(r"^\s*--([a-z0-9-]+):\s*([\d.]+)(rem|px)\b", block, re.M):
+            if name in SIZE_TOKENS and name not in found:
+                found[name] = round(float(value) * (16 if unit == "rem" else 1), 2)
+        return found
+
+    layers = {"phone": decls(LEGACY_ROOT.sub("", MEDIA_ROOT.sub("", css)))}
+    media = MEDIA_ROOT.findall(css)
+    tablet = next((b for q, b in media if "pointer" not in q and re.search(r"min-width:\s*48rem", q)), None)
+    desktop = next((b for q, b in media if re.search(r"pointer:\s*fine", q) and re.search(r"hover:\s*hover", q)), None)
+    if tablet is not None:
+        layers["tablet"] = {**layers["phone"], **decls(tablet)}
+    if desktop is not None:
+        layers["desktop"] = {**layers.get("tablet", layers["phone"]), **decls(desktop)}
+    return layers
+
+
+css_doc = upstream("/v1/ui/mzizi-tokens-globals", lambda: fetch_json(f"{API}/ui/mzizi-tokens-globals"))
+brand_doc = upstream("/v1/brand", lambda: fetch_json(f"{API}/brand"))
+if css_doc and brand_doc:
+    css_text = next((f["content"] for f in css_doc["files"] if f["path"].endswith("mzizi-tokens-globals.css")), "")
+    check("/v1/ui/mzizi-tokens-globals serves mzizi-tokens-globals.css", bool(css_text))
+    served = size_layers(css_text)
+    check("a fine-pointer block in the CSS is read as the desktop layer (the parser has not gone blind)",
+          ("pointer: fine" not in css_text and "pointer:fine" not in css_text) or "desktop" in served)
+    tokens_page = (DIST / "tokens.html").read_text(encoding="utf-8")
+    cells = {(t, l): float(px) for t, l, px in
+             re.findall(r'data-size="([^"]+)" data-layer="([^"]+)" data-px="([\d.]+)"', tokens_page)}
+    if len(served) > 1:
+        wrong = [f"{t}@{l}: page {cells.get((t, l))} vs API {px}"
+                 for l, values in served.items() for t, px in values.items() if cells.get((t, l)) != px]
+        extra = [f"{t}@{l}" for (t, l) in cells if (l not in served) or (t not in served[l])]
+        check("/tokens shows every size the API's CSS serves, per screen class, and no other", not wrong and not extra,
+              "; ".join(wrong[:4] + extra[:4]))
+    else:
+        check("the API serves no density layer, so /tokens shows no sizes table", not cells,
+              "the page shows sizes the API does not serve")
+    acc = brand_doc["accessibility"]
+    prose = reader_text(DIST / "tokens.html")
+    check("/tokens states /v1/brand's touch default and floor",
+          f"{acc['defaultTouchTarget']}px by default, never below {acc['minTouchTarget']}px" in prose)
+    if len(served) > 1:
+        phone = served["phone"]
+        check("/v1/brand's touch numbers agree with the CSS it ships with (phone column)",
+              acc["defaultTouchTarget"] == phone["size-touch"] and acc["minTouchTarget"] == phone["target-floor"],
+              f"brand {acc['defaultTouchTarget']}/{acc['minTouchTarget']} vs css {phone['size-touch']}/{phone['target-floor']}")
 
 print()
 if failures:

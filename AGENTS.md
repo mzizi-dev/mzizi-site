@@ -33,10 +33,10 @@ and a gitleaks scan.
 
 ### The rendered-content gate
 
-Strips every `<script>` from the built HTML and asserts the content is still there: 656
-component cards and 656 component pages (each with its source and install command, Rust
+Strips every `<script>` from the built HTML and asserts the content is still there: 675
+component cards and 675 component pages (each with its source and install command, Rust
 before React where there is Rust), the Roots list, the eight node titles, the four rung
-titles, the six strands, N2's count of 388, all 21 colour families by CSS variable,
+titles, the six strands, N2's count of 394, all 21 colour families by CSS variable,
 specific hex values, the landing page's Hero (with the contract bench as its media and
 the "Phase 0 · research prototype" badge) followed directly by the status panel, ahead of
 the components, and no "faster", "better than" or "outperform" on it, that no page hydrates
@@ -75,11 +75,11 @@ It also holds the progress block (owner, 2026-10-07: "We also need to be updatin
 the site with progress and where we are"). The landing page's status section and
 `/language` show, in this order, what is on the language's `main` ("On main today"), what is
 on its `staging` ("Landing on staging"), and what is in open pull requests ("In progress
-toward M2", labelled "Not available yet"), linking the tracking issue
-(`mzizi-dev/mzizi#69`) and its pull requests. RFC-0013 and the language survey reached
+toward M2", labelled "Not available yet"), linking M2's tracking issue
+(`mzizi-dev/mzizi#110`; M1's was #69) and its pull requests. RFC-0013 and the language survey reached
 `main` in the 8 October release (#91), and no page may link a `design/` file on `staging`. The
 data is `src/lib/progress.ts`; `check-facts.py` fails when a pull request listed as in
-progress has merged or closed, or when an open one that refers to #69 is not listed (a
+progress has merged or closed, or when an open one that refers to #110 or #69 is not listed (a
 release pull request, staging to main, is not work toward M2), so move it in the same
 update. The landing page, `/language` and `/cli` each show a real example program from the
 language's `examples/` with what `mz run` printed for it (`src/lib/programs.ts`, copied
@@ -90,6 +90,8 @@ owner's general contact for Mzizi, 2026-09-30) and `security@nyuchi.com` (the on
 contact for every repository, owner, 2026-10-03); `/ecosystem`, `llms.txt` and
 `.well-known/mcp.json` name `support@bundu.org`; and no page this repo writes may carry any
 other address. Never put a person's own address anywhere.
+
+It also holds the sizes (owner, 2026-11-01: Apple's touch sizes on a phone, lower as screens grow). `/tokens` renders "Sizes by screen" from the `globals.css` the API serves, never from numbers typed here; when the table is present the gate holds it to itself (prose equals the phone column, nothing grows toward desktop, desktop targets at least 24px, desktop body at least 14px, phone body at least 17px), and `check-facts.py` holds it to the API's CSS. Do not write a size into a page: render it from the CSS.
 
 It also fails on a word glued to an inline tag in the built HTML (`nyuchi,<code>mukoko`,
 `</code>takes`). Astro drops the line break between a source line that ends in text and
@@ -196,8 +198,8 @@ on the production deploy, so the same commit reads green on a PR and red on `mai
 
 - **Every claim on this site traces to a file in this org** — mostly
   [`CHARTER.md`](https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md) — or to a request
-  that was actually made. "Designed for" is accurate; "faster than" is not. Two pilots
-  have run and neither showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
+  that was actually made. "Designed for" is accurate; "faster than" is not. Four pilots
+  have run and none showed an advantage (`mzizi-dev/mzizi` `benchmarks/results/`);
   the kill-criterion run has not happened (`benchmarks/READINESS.md`), so Phase 0 is
   not complete. Report every new result on the status panel, whichever way it falls.
 - Numbers sourced from the registry (component count, per-node counts, the palette) are
