@@ -21,6 +21,11 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — `/skills` names the plugin and the connection guide; `llms.txt` too (2026-10-20)
+
+- **`/skills`, "Using them"** adds the public `mzizi` plugin (`/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install mzizi@mzizi`), which installs the skills and connects the MCP server in one step and carries the same bundle as the API; says `npx skills experimental_sync` links the npm bundle into `.agents/skills/`; and says a client that installs nothing still gets the skills from the MCP server. It links the new docs page, [Connect a client](https://docs.mzizi.dev/toolchain/connect) (mzizi-docs#64).
+- **`llms.txt`**, under the skills version: the plugin (1.5.0 since registry v4.20.0) carries skills 0.15.0, and mzizi-registry#520, still open, would make it installable in Codex; `mzizi_get_skills` serves the skills to a client that installs nothing; and the connection guide's URL.
+
 ### Added — /tokens shows the sizes by screen: Apple's touch sizes on a phone, a step-down on desktop (2026-11-02, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90))
 
 - Owner, 2026-11-01: "mzizi sizes i think need to lower to apple recommended sizes" and "we need to lower the sizes as the screens increase". `/tokens` gains a "Sizes by screen" table (phone, tablet, desktop) for the touch floor, touch target, controls, input, headings, body, small and caption text. It is read at build time from the `globals.css` the registry serves at `/v1/ui/mzizi-tokens-globals`, so no size is typed on this site; the table appears when the API serves the density layer from registry PR #598 and is absent until then. The touch-target sentences name the desktop numbers beside the phone ones.
