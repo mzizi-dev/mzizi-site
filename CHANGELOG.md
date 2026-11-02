@@ -21,6 +21,15 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+The daily `Freshness` run (`scripts/check-facts.py`) failed on these facts only; the language facts already match upstream.
+
+- `llms.txt`'s dated version list (now "Versions on 2026-11-02"):
+  - `mzizi-mcp` **0.14.0** on npm and in the MCP Registry (was 0.13.0). An anonymous `initialize` and `tools/list` against `mcp.mzizi.dev/mcp` on 2026-11-02 answered from 0.14.0, so the "free with no sign-in except the Fundi tools" sentence names 0.14.0 and that date, here and in `/.well-known/mcp.json`.
+  - `@nyuchi/mzizi-skills` **0.15.0** (was 0.13.0): nine skills, with `mukoko-design` and `mzizi-architecture` added. `/v1/skills` still serves 0.13.0 until the API's registry pin moves, and the page says so.
+  - The Mzizi Roots crates at **0.7.0** (was 0.6.0).
+
 ### Changed — `/skills` names the plugin and the connection guide; `llms.txt` too (2026-10-20)
 
 - **`/skills`, "Using them"** adds the public `mzizi` plugin (`/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install mzizi@mzizi`), which installs the skills and connects the MCP server in one step and carries the same bundle as the API; says `npx skills experimental_sync` links the npm bundle into `.agents/skills/`; and says a client that installs nothing still gets the skills from the MCP server. It links the new docs page, [Connect a client](https://docs.mzizi.dev/toolchain/connect) (mzizi-docs#64).
