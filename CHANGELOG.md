@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — /tokens shows the sizes by screen: Apple's touch sizes on a phone, a step-down on desktop (2026-11-02, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90))
+
+- Owner, 2026-11-01: "mzizi sizes i think need to lower to apple recommended sizes" and "we need to lower the sizes as the screens increase". `/tokens` gains a "Sizes by screen" table (phone, tablet, desktop) for the touch floor, touch target, controls, input, headings, body, small and caption text. It is read at build time from the `globals.css` the registry serves at `/v1/ui/mzizi-tokens-globals`, so no size is typed on this site; the table appears when the API serves the density layer from registry PR #598 and is absent until then. The touch-target sentences name the desktop numbers beside the phone ones.
+- Checks: `scripts/verify-rendered.py` holds the table to itself (the prose touch numbers are its phone column, nothing grows from phone to desktop, desktop targets stay at or above 24px, desktop body at or above 14px, phone body at least 17px). `scripts/check-facts.py` parses the API's CSS a second time and fails when the page and the API differ, or when `/v1/brand`'s touch numbers disagree with the CSS they ship with; it now reads `MZIZI_API_ORIGIN` too.
+- `parseSizeLayers` has unit tests (cascade, `px`, legacy alias, density-before-base), and the checks fail loudly, not silently, when the CSS names a fine-pointer block they cannot read.
+- Not changed: the landing-page contract bench still says "48px" and `h-12`, because that is `primitives/button.mz` in `mzizi-dev/mzizi`, which the registry change does not touch.
+
 ### Fixed — the rendered gate expects the registry at v4.18.0 (2026-11-01)
 
 - api.mzizi.dev serves registry v4.18.0 since mzizi-api v0.11.0 and v0.12.0: 675 components (was 656), N2 394 (was 388), N6 93 (was 90). `scripts/verify-rendered.py`, `AGENTS.md` and `README.md` now expect those counts. The site reads them from the API at build time, so readers see 675 components once the site rebuilds.
