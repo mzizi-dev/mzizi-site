@@ -1756,6 +1756,31 @@
     color: var(--muted-foreground);
   }
 
+  /* /tokens "Sizes by screen": the registry's size roles per screen class. */
+  .sizes-scroll {
+    overflow-x: auto;
+    margin-block: var(--space-lg);
+  }
+  .sizes {
+    inline-size: 100%;
+    min-inline-size: 36rem;
+    margin-block: 0;
+    border-collapse: collapse;
+    font-size: var(--text-body-small);
+  }
+  .sizes th,
+  .sizes td {
+    padding: var(--space-sm) var(--space-md);
+    border-block-end: 1px solid var(--border);
+    text-align: start;
+    font-variant-numeric: tabular-nums;
+  }
+  .sizes thead th small {
+    display: block;
+    font-weight: 400;
+    color: var(--muted-foreground);
+  }
+
   /* The component-spec gallery: the registry's own dimensions, rendered. */
   .specs {
     display: grid;

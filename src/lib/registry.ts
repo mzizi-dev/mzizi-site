@@ -585,6 +585,114 @@ export async function getBrand(): Promise<Brand> {
   return readJson<Brand>("/brand");
 }
 
+/** The size roles `/tokens` shows, in display order: `[token, label]`. */
+export const SIZE_ROLES: readonly (readonly [string, string])[] = [
+  ["target-floor", "Touch floor"],
+  ["size-touch", "Touch target"],
+  ["size-control", "Control"],
+  ["size-control-sm", "Control, small"],
+  ["size-control-lg", "Control, large"],
+  ["size-control-icon", "Icon button"],
+  ["size-field", "Input"],
+  ["fs-h1", "Heading 1"],
+  ["fs-h2", "Heading 2"],
+  ["fs-body", "Body text"],
+  ["fs-small", "Small text"],
+  ["fs-caption", "Caption"],
+];
+
+/** One screen class and the media query the registry gates it behind (`null` = the phone defaults). */
+export interface SizeLayer {
+  id: "phone" | "tablet" | "desktop";
+  label: string;
+  query: string | null;
+  /** Effective px per token on this layer, the lower layers cascaded in. */
+  px: Record<string, number>;
+}
+
+/**
+ * The registry's sizes by screen class, parsed from the CSS it serves as
+ * `mzizi-tokens-globals` (`/v1/ui/mzizi-tokens-globals`), the same file a
+ * consumer installs. The density layer is a pair of media blocks on `:root`;
+ * the `data-mzizi-sizes="legacy"` alias is skipped. `layers` has only the phone
+ * layer until the registry serves density, so the page shows nothing newer than
+ * the API, and never a number typed here.
+ */
+export async function getSizeLayers(): Promise<SizeLayer[]> {
+  // Already fetched for every component page, so this is no extra request.
+  const records = await getComponentRecords();
+  const css = records
+    .get("mzizi-tokens-globals")
+    ?.detail.files.find((f) =>
+      f.path.endsWith("mzizi-tokens-globals.css"),
+    )?.content;
+  if (!css)
+    throw new Error("/v1/ui/mzizi-tokens-globals served no globals.css");
+  return parseSizeLayers(css);
+}
+
+const toPx = (value: string, unit: string) =>
+  Math.round(parseFloat(value) * (unit === "rem" ? 16 : 1) * 100) / 100;
+
+const MEDIA_ROOT = /@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}/g;
+const LEGACY_ROOT = /:root\[data-mzizi-sizes="legacy"\]\s*\{[^}]*\}/g;
+
+export function parseSizeLayers(css: string): SizeLayer[] {
+  const wanted = new Set(SIZE_ROLES.map(([token]) => token));
+  const declarations = (block: string) => {
+    const found: Record<string, number> = {};
+    for (const m of block.matchAll(
+      /^\s*--([a-z0-9-]+):\s*([\d.]+)(rem|px)\b/gm,
+    )) {
+      if (wanted.has(m[1])) found[m[1]] ??= toPx(m[2], m[3]);
+    }
+    return found;
+  };
+  // The phone layer is the base declarations: the density media blocks and the
+  // legacy alias are not part of it, wherever they sit in the file.
+  const phone = declarations(
+    css.replace(MEDIA_ROOT, "").replace(LEGACY_ROOT, ""),
+  );
+  // A role the API does not serve yet (--target-floor before the density layer) is absent, not guessed.
+  if (!("size-touch" in phone))
+    throw new Error("globals.css declares no --size-touch");
+  const layers: SizeLayer[] = [
+    { id: "phone", label: "Phone", query: null, px: phone },
+  ];
+  const blocks = [...css.matchAll(MEDIA_ROOT)];
+  const tablet = blocks.find(
+    (m) => !/pointer/.test(m[1]) && /min-width:\s*48rem/.test(m[1]),
+  );
+  const desktop = blocks.find(
+    (m) => /pointer:\s*fine/.test(m[1]) && /hover:\s*hover/.test(m[1]),
+  );
+  if (tablet) {
+    layers.push({
+      id: "tablet",
+      label: "Tablet",
+      query: tablet[1],
+      px: { ...phone, ...declarations(tablet[2]) },
+    });
+  }
+  if (desktop) {
+    const below = layers[layers.length - 1].px;
+    layers.push({
+      id: "desktop",
+      label: "Desktop",
+      query: desktop[1],
+      px: { ...below, ...declarations(desktop[2]) },
+    });
+  }
+  // Fail the build, not the page: a fine-pointer block the regexes cannot read would
+  // otherwise quietly drop the whole sizes table.
+  if (/pointer:\s*fine/.test(css) && !desktop) {
+    throw new Error(
+      "globals.css has a fine-pointer block parseSizeLayers cannot read",
+    );
+  }
+  return layers;
+}
+
 /**
  * The moment this build read the API, to the minute, in UTC.
  *
