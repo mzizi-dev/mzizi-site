@@ -21,6 +21,15 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+The daily `Freshness` run (`scripts/check-facts.py`) failed on these facts only; the language facts already match upstream.
+
+- `llms.txt`'s dated version list (now "Versions on 2026-11-02"):
+  - `mzizi-mcp` **0.14.0** on npm and in the MCP Registry (was 0.13.0). An anonymous `initialize` and `tools/list` against `mcp.mzizi.dev/mcp` on 2026-11-02 answered from 0.14.0, so the "free with no sign-in except the Fundi tools" sentence names 0.14.0 and that date, here and in `/.well-known/mcp.json`.
+  - `@nyuchi/mzizi-skills` **0.15.0** (was 0.13.0): nine skills, with `mukoko-design` and `mzizi-architecture` added. `/v1/skills` still serves 0.13.0 until the API's registry pin moves, and the page says so.
+  - The Mzizi Roots crates at **0.7.0** (was 0.6.0).
+
 ### Fixed — the rendered gate expects the registry at v4.18.0 (2026-11-01)
 
 - api.mzizi.dev serves registry v4.18.0 since mzizi-api v0.11.0 and v0.12.0: 675 components (was 656), N2 394 (was 388), N6 93 (was 90). `scripts/verify-rendered.py`, `AGENTS.md` and `README.md` now expect those counts. The site reads them from the API at build time, so readers see 675 components once the site rebuilds.
