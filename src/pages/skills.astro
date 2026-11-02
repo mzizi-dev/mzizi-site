@@ -98,7 +98,23 @@ const sorted = [...skills].sort((a, b) => a.name.localeCompare(b.name));
       body, and <code>/skills/summary</code> is the cheap version-drift check.
     </p>
     <p>
-      <strong>From npm</strong>: <code>@nyuchi/mzizi-skills</code>.
+      <strong>From npm</strong>: <code>@nyuchi/mzizi-skills</code>, then{" "}
+      <code>npx skills experimental_sync</code>, which links them into{" "}
+      <code>.agents/skills/</code> for the agents that read that folder.
+    </p>
+    <p>
+      <strong>As a plugin</strong>: the public <code>mzizi</code> plugin, in{" "}
+      <a href="https://github.com/mzizi-dev/mzizi-registry/tree/main/plugin"><code>mzizi-dev/mzizi-registry</code></a>,
+      installs the skills and connects the MCP server in one step. In Claude Code:{" "}
+      <code>/plugin marketplace add mzizi-dev/mzizi-registry</code>, then{" "}
+      <code>/plugin install mzizi@mzizi</code>. It carries the same bundle as the API.
+    </p>
+    <p>
+      The MCP server needs nothing installed, so a client that cannot install a package
+      can still load the skills. How to connect Claude, ChatGPT, Codex, the Claude and
+      OpenAI APIs, Cursor, VS Code, Gemini CLI and others, and how the skills reach each,
+      is in the docs:{" "}
+      <a href="https://docs.mzizi.dev/toolchain/connect">Connect a client</a>.
     </p>
   </div>
 </Site>
