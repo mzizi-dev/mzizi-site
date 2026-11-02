@@ -39,6 +39,12 @@ describe("parseSizeLayers", () => {
     expect(phone.px).toMatchObject({ "size-touch": 44, "target-floor": 44 });
   });
 
+  it("throws on a fine-pointer block it cannot read, rather than dropping the table", () => {
+    const odd =
+      "@media (min-width: 64rem) and (pointer: fine) and (hover: hover) { :root { --size-touch: 2rem; } body { margin: 0; } }";
+    expect(() => parseSizeLayers([BASE, odd].join("\n"))).toThrow();
+  });
+
   it("throws when there is no touch size to show", () => {
     expect(() => parseSizeLayers(":root { --fs-body: 1rem; }")).toThrow();
   });

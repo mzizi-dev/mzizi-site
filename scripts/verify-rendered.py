@@ -737,14 +737,14 @@ else:
     check("tokens.html", "the sizes table has the floor, touch target and body rows for phone and desktop",
           not missing, ", ".join(missing))
     if not missing:
-        phone = {t: v["phone"] for t, v in cells.items()}
+        phone = {t: v["phone"] for t, v in cells.items() if "phone" in v}
         check("tokens.html", "the prose touch default and floor are the table's phone column",
               f"{phone['size-touch']:g}px by default, never below" in plain_tokens
               and f"never below {phone['target-floor']:g}px" in plain_tokens)
+        grew = [f"{t} {a}->{b}" for t, v in cells.items()
+                for a, b in (("phone", "tablet"), ("tablet", "desktop")) if a in v and b in v and v[b] > v[a]]
+        check("tokens.html", "no size grows from one screen class to the next", not grew, ", ".join(grew))
         both = {t: v for t, v in cells.items() if "phone" in v and "desktop" in v}
-        check("tokens.html", "no size grows from phone to desktop",
-              all(v["desktop"] <= v["phone"] for v in both.values()),
-              ", ".join(t for t, v in both.items() if v["desktop"] > v["phone"]))
         check("tokens.html", "every desktop target stays at or above the 24px floor (WCAG 2.2 SC 2.5.8)",
               all(v["desktop"] >= 24 for t, v in both.items() if t.startswith("size-")))
         check("tokens.html", "desktop body text stays at or above 14px", cells["fs-body"]["desktop"] >= 14)

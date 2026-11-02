@@ -683,6 +683,13 @@ export function parseSizeLayers(css: string): SizeLayer[] {
       px: { ...below, ...declarations(desktop[2]) },
     });
   }
+  // Fail the build, not the page: a fine-pointer block the regexes cannot read would
+  // otherwise quietly drop the whole sizes table.
+  if (/pointer:\s*fine/.test(css) && !desktop) {
+    throw new Error(
+      "globals.css has a fine-pointer block parseSizeLayers cannot read",
+    );
+  }
   return layers;
 }
 

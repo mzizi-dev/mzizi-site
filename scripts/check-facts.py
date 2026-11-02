@@ -527,7 +527,8 @@ def size_layers(css: str) -> dict[str, dict[str, float]]:
 css_doc = upstream("/v1/ui/mzizi-tokens-globals", lambda: fetch_json(f"{API}/ui/mzizi-tokens-globals"))
 brand_doc = upstream("/v1/brand", lambda: fetch_json(f"{API}/brand"))
 if css_doc and brand_doc:
-    css_text = next(f["content"] for f in css_doc["files"] if f["path"].endswith("mzizi-tokens-globals.css"))
+    css_text = next((f["content"] for f in css_doc["files"] if f["path"].endswith("mzizi-tokens-globals.css")), "")
+    check("/v1/ui/mzizi-tokens-globals serves mzizi-tokens-globals.css", bool(css_text))
     served = size_layers(css_text)
     check("a fine-pointer block in the CSS is read as the desktop layer (the parser has not gone blind)",
           ("pointer: fine" not in css_text and "pointer:fine" not in css_text) or "desktop" in served)
@@ -537,7 +538,9 @@ if css_doc and brand_doc:
     if len(served) > 1:
         wrong = [f"{t}@{l}: page {cells.get((t, l))} vs API {px}"
                  for l, values in served.items() for t, px in values.items() if cells.get((t, l)) != px]
-        check("/tokens shows every size the API's CSS serves, per screen class", not wrong, "; ".join(wrong[:4]))
+        extra = [f"{t}@{l}" for (t, l) in cells if (l not in served) or (t not in served[l])]
+        check("/tokens shows every size the API's CSS serves, per screen class, and no other", not wrong and not extra,
+              "; ".join(wrong[:4] + extra[:4]))
     else:
         check("the API serves no density layer, so /tokens shows no sizes table", not cells,
               "the page shows sizes the API does not serve")
