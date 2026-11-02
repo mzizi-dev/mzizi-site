@@ -585,6 +585,99 @@ export async function getBrand(): Promise<Brand> {
   return readJson<Brand>("/brand");
 }
 
+/** The size roles `/tokens` shows, in display order: `[token, label]`. */
+export const SIZE_ROLES: readonly (readonly [string, string])[] = [
+  ["target-floor", "Touch floor"],
+  ["size-touch", "Touch target"],
+  ["size-control", "Control"],
+  ["size-control-sm", "Control, small"],
+  ["size-control-lg", "Control, large"],
+  ["size-control-icon", "Icon button"],
+  ["size-field", "Input"],
+  ["fs-h1", "Heading 1"],
+  ["fs-h2", "Heading 2"],
+  ["fs-body", "Body text"],
+  ["fs-small", "Small text"],
+  ["fs-caption", "Caption"],
+];
+
+/** One screen class and the media query the registry gates it behind (`null` = the phone defaults). */
+export interface SizeLayer {
+  id: "phone" | "tablet" | "desktop";
+  label: string;
+  query: string | null;
+  /** Effective px per token on this layer, the lower layers cascaded in. */
+  px: Record<string, number>;
+}
+
+/**
+ * The registry's sizes by screen class, parsed from the CSS it serves as
+ * `mzizi-tokens-globals` (`/v1/ui/mzizi-tokens-globals`), the same file a
+ * consumer installs. The density layer is a pair of media blocks on `:root`;
+ * the `data-mzizi-sizes="legacy"` alias is skipped. `layers` has only the phone
+ * layer until the registry serves density, so the page shows nothing newer than
+ * the API, and never a number typed here.
+ */
+export async function getSizeLayers(): Promise<SizeLayer[]> {
+  const detail = await readJson<Partial<ComponentDetail>>(
+    "/ui/mzizi-tokens-globals",
+  );
+  const css = detail.files?.find((f) =>
+    f.path.endsWith("mzizi-tokens-globals.css"),
+  )?.content;
+  if (!css)
+    throw new Error("/v1/ui/mzizi-tokens-globals served no globals.css");
+  return parseSizeLayers(css);
+}
+
+const toPx = (rem: string) => Math.round(parseFloat(rem) * 16 * 100) / 100;
+
+export function parseSizeLayers(css: string): SizeLayer[] {
+  const wanted = new Set(SIZE_ROLES.map(([token]) => token));
+  const declarations = (block: string, first: boolean) => {
+    const found: Record<string, number> = {};
+    for (const m of block.matchAll(/^\s*--([a-z0-9-]+):\s*([\d.]+)rem\b/gm)) {
+      if (wanted.has(m[1]) && !(first && m[1] in found))
+        found[m[1]] ??= toPx(m[2]);
+    }
+    return found;
+  };
+  const phone = declarations(css, true);
+  // A role the API does not serve yet (--target-floor before the density layer) is absent, not guessed.
+  if (!("size-touch" in phone))
+    throw new Error("globals.css declares no --size-touch in rem");
+  const layers: SizeLayer[] = [
+    { id: "phone", label: "Phone", query: null, px: phone },
+  ];
+  const blocks = [
+    ...css.matchAll(/@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}/g),
+  ];
+  const tablet = blocks.find(
+    (m) => !/pointer/.test(m[1]) && /min-width:\s*48rem/.test(m[1]),
+  );
+  const desktop = blocks.find(
+    (m) => /pointer:\s*fine/.test(m[1]) && /hover:\s*hover/.test(m[1]),
+  );
+  if (tablet) {
+    layers.push({
+      id: "tablet",
+      label: "Tablet",
+      query: tablet[1],
+      px: { ...phone, ...declarations(tablet[2], false) },
+    });
+  }
+  if (desktop) {
+    const below = layers[layers.length - 1].px;
+    layers.push({
+      id: "desktop",
+      label: "Desktop",
+      query: desktop[1],
+      px: { ...below, ...declarations(desktop[2], false) },
+    });
+  }
+  return layers;
+}
+
 /**
  * The moment this build read the API, to the minute, in UTC.
  *

@@ -24,6 +24,8 @@ import { Separator } from "@bundu/ui/ui/separator";
 import Site from "../layouts/Site.astro";
 import {
   getBrand,
+  getSizeLayers,
+  SIZE_ROLES,
   readableInk,
   builtAt,
   CANONICAL_BASE,
@@ -31,6 +33,9 @@ import {
 } from "../lib/registry";
 
 const brand = await getBrand();
+const layers = await getSizeLayers();
+const desktop = layers.find((l) => l.id === "desktop");
+const dense = layers.length > 1;
 
 const collections = [
   {
@@ -301,9 +306,9 @@ const specs = brand.componentSpecs;
   <div class="prose">
     <p>
       The dimensions every component in the registry is built to. They are not
-      decorative: a button is a pill at {brand.accessibility.defaultTouchTarget}px
+      decorative: on a touch screen a button is a pill at {brand.accessibility.defaultTouchTarget}px
       and never below {brand.accessibility.minTouchTarget}px, because that is the
-      touch target this system commits to. Everything on this page — the search
+      touch target this system commits to.{dense && " On a wide screen with a mouse the same pill steps down; the table under this paragraph has every number."} Everything on this page — the search
       field on <a href="/components">/components</a>, the badges, the cards, the
       nav pills — is built to these same numbers, read from the same API.
     </p>
@@ -364,6 +369,44 @@ const specs = brand.componentSpecs;
     ))}
   </ul>
 
+  {dense && (
+    <>
+      <h2 id="sizes">Sizes by screen</h2>
+      <div class="prose">
+        <p>
+          Sizes step down as screens grow. A phone gets Apple's touch sizes; a
+          tablet keeps the touch targets and trims the type; a desktop (a fine
+          pointer with hover, wide enough) gets the compact sizes. Size is the
+          only thing that changes: it says nothing about the network. Read from{" "}
+          <a href="https://api.mzizi.dev/v1/ui/mzizi-tokens-globals">/v1/ui/mzizi-tokens-globals</a>{" "}
+          at {builtAt}.
+        </p>
+      </div>
+      <div class="sizes-scroll" role="region" aria-label="Sizes by screen, scrolls sideways on a narrow screen" tabindex="0">
+      <table class="sizes" id="sizes-table">
+        <thead>
+          <tr>
+            <th scope="col">Role</th>
+            {layers.map((l) => (
+              <th scope="col">{l.label}{" "}{l.query && <small>{l.query}</small>}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {SIZE_ROLES.map(([token, label]) => (
+            <tr>
+              <th scope="row">{label} <code>--{token}</code></th>
+              {layers.map((l) => (
+                <td data-size={token} data-layer={l.id} data-px={l.px[token]}>{l.px[token] === undefined ? "—" : `${l.px[token]}px`}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      </div>
+    </>
+  )}
+
   <h2 id="accessibility">What these values are held to</h2>
   <Card className="flow prose my-6">
     <p>
@@ -373,7 +416,7 @@ const specs = brand.componentSpecs;
     <p>
       Focus: {brand.accessibility.focusIndicator}. Touch targets:
       {" "}{brand.accessibility.defaultTouchTarget}px by default, never below
-      {" "}{brand.accessibility.minTouchTarget}px.
+      {" "}{brand.accessibility.minTouchTarget}px{desktop && `; on desktop ${desktop.px["size-touch"]}px by default, never below ${desktop.px["target-floor"]}px`}.
       {" "}{brand.accessibility.keyboardNavigation}.
       {" "}{brand.accessibility.screenReaders}.
     </p>
