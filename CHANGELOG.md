@@ -34,6 +34,11 @@ cut, the Unreleased entries move under it.
 ### Added — a CI guard for the floor (2026-11-03)
 
 - The `web` job runs `scripts/audit-ui.mjs dist --guard` on the runner's own Chrome: it fails on text under 14px, a control under a 49px hit region, a contrast pair under 7:1 (body) or 4.5:1, a missing or doubled h1, a skipped heading level, sideways scroll at 320px or a console error, at 390, 820 and 1440px.
+### Changed — the language's state follows `mzizi-dev/mzizi` `main` v0.13.0 and `staging` v0.13.3 (2026-11-03, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+- The landing page's status panel, `/language` and `llms.txt` say `main` is `cf3a44e`, tagged `v0.13.0` (the 1 November release, #146): benchmarks and tooling only (the runner scores backend episodes with probes, backend tasks B2 to B5, a macOS script fix). `git diff 2b36c8f cf3a44e` touches nothing under `compiler/`, `examples/` or `primitives/` and not the tracker, so the tracker marks, the harness counts, the 33,540-line count and the program outputs are unchanged.
+- The test figures (767 tests in 35 suites) stay "measured at `2b36c8f`" and are said to be not re-measured: the release adds tests to the benchmark runner, and this update had no way to run the language's test suite.
+- "Landing on staging" lists what `staging` (`792ca07`, tagged v0.13.3) holds beyond `main`: a test case that no longer gets a process killed on macOS (#149), the B4 and B5 reference servers (#147) and the dated changelog. It was read from a git clone, not the API: the "open pull requests" line is still the 29 October reading and says so.
 
 ### Changed — the site follows the Bundu floor, on `@bundu/ui` 0.9.0 (2026-11-03, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 

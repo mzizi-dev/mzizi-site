@@ -97,7 +97,7 @@ and `react`. The pilots below are tests inside Phase 0, not its goal.
 compiler front end exists and is tested — a lexer, a recovering parser, an agent
 diagnostic protocol with `mz fix`, a content-addressed IR, and nine primitives
 written in Mzizi itself, covered by 767 tests in 35 suites
-(`mzizi-dev/mzizi` `main` at `2b36c8f`, tagged `v0.12.0`; 33,540 lines in
+(`mzizi-dev/mzizi` measured at `2b36c8f`, tagged `v0.12.0`, with `main` at `cf3a44e`, tagged `v0.13.0`, since; 33,540 lines in
 `compiler/src`, from a fresh count; run on a macOS laptop, 766 of the 767 tests
 passed and one, a range too long to hold in memory, was killed by the operating
 system where it expects exit 101). Blocks nest at most 64 deep
@@ -141,12 +141,22 @@ still waits on: held-out tasks in a private repository (not yet created);
 the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
-**Where it stands, 2026-10-29: shipped, next, and in progress.** Read from
-`mzizi-dev/mzizi`'s `main` (`2b36c8f`, tagged `v0.12.0`, the release of 29 October,
-[#140](https://github.com/mzizi-dev/mzizi/pull/140)), and its open pull requests (five,
-none toward M2 on 29 October). `staging` holds the same tree as `main`.
+**Where it stands, 2026-11-03: shipped, next, and in progress.** Read from
+`mzizi-dev/mzizi`'s `main` (`cf3a44e`, tagged `v0.13.0`, the release of 1 November,
+[#146](https://github.com/mzizi-dev/mzizi/pull/146)); the figures below were measured at
+`2b36c8f` (`v0.12.0`), and nothing under `compiler/`, `examples/` or `primitives/` or in
+the tracker changed since, so they were not re-measured (the release adds benchmark-runner
+tests, so the workspace count at `cf3a44e` may differ). The open pull requests (five, none
+toward M2) were last read on 29 October.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md):
+  - Released as v0.13.0 on 1 November ([#146](https://github.com/mzizi-dev/mzizi/pull/146)):
+    benchmarks and tooling only. The runner scores backend episodes with the task's probes
+    ([#141](https://github.com/mzizi-dev/mzizi/pull/141)), public backend development tasks B2 to
+    B5 ([#142](https://github.com/mzizi-dev/mzizi/pull/142); B2 and B3 have a Mzizi reference, B4
+    and B5 do not, because a service has no state and cannot read a request body), and
+    `check-task.sh` works on macOS bash 3.2 ([#144](https://github.com/mzizi-dev/mzizi/pull/144)).
+    No tracker mark changed. None of it measures Mzizi against another language.
   - Released as v0.12.0 on 29 October ([#140](https://github.com/mzizi-dev/mzizi/pull/140)): a
     service that `mz build` lowers reads `HOST` as well as `PORT` (default `127.0.0.1`; a
     container sets `0.0.0.0`), its `Cargo.toml` carries a slim release profile, and its `tokio` pin
@@ -190,7 +200,11 @@ none toward M2 on 29 October). `staging` holds the same tree as `main`.
     contracts, a `service` that `mz build` lowers to a local Rust + axum package, the
     nesting cap (MZ0411), robustness tests, no `unsafe` in the compiler, and `match` in
     a view as MZ0410.
-- **Landing on `staging`:** nothing. `staging` (`99fa985`) and `main` (`2b36c8f`) hold the same tree.
+- **Landing on `staging`** (`792ca07`, tagged `v0.13.3`; `main` is `cf3a44e`): a test fix, where the
+  range-too-long case asks for a length every host refuses and no longer gets a process killed on
+  macOS ([#149](https://github.com/mzizi-dev/mzizi/pull/149)), the B4 and B5 Python references
+  stripping CR and LF from header values ([#147](https://github.com/mzizi-dev/mzizi/pull/147)), and the
+  dated changelog. It changes no compiler code.
 - **In progress toward M2, not available:** no pull request toward M2 is open (the five open on
   29 October are RFC-0015 and RFC-0016 drafts, a checker fix, a charter wording and a portal doc).
   Never describe any of this as something Mzizi has.
