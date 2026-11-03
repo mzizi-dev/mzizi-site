@@ -675,6 +675,12 @@
     outline: none;
   }
 
+  /* The browser's own clear button on a search field would be a second "×"
+ * beside the dialog's close button. */
+  .search-box input::-webkit-search-cancel-button {
+    display: none;
+  }
+
   .search-close {
     display: inline-flex;
     align-items: center;
