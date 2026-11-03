@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Search results no longer start with "Close search× Mzizi Close menu× Browse components.": the header, the search dialog, the menu drawer and the footer are left out of the search index (`data-pagefind-ignore`), so a result's excerpt is the page's own text. `/tokens` swatch ink reads a hex value only when it is 3 or 6 digits. The search field shows one "×" (the dialog's), not a second from the browser.
+
 ### Changed — dependencies (2026-11-03, (repository), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Supersedes Dependabot #95 to #98, which could not be rebased after the `@bundu/ui` change. `astro` 7.4.5, `@astrojs/react` 7.1.2, `@astrojs/check` 0.9.12, `react` and `react-dom` 19.3.1, `tailwindcss` and `@tailwindcss/vite` 4.3.4, `pagefind` 1.6.0, `playwright` 1.64.1, `vite-plus` 1.4.0, `wrangler` 4.156.2 (the minor and patch group); `marked` 16.4.2 to 18.1.3 (a major, build-time Markdown for skill pages; the rendered gate passes unchanged); `typescript` 5.9.3 to 6.0.3, held `<7` because TypeScript 7 (7.0.2) is a different compiler that needs its own review; `pnpm/action-setup` 6.1.0 (pinned to its commit).
