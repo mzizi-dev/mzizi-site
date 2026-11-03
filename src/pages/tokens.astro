@@ -79,7 +79,7 @@ if (familyCount !== 21) {
 // surface, so its label takes the page's own ink, not a guess about a colour
 // that is not opaque.
 const inkFor = (value: string) => {
-  if (/^#[0-9a-f]{3,6}$/i.test(value)) return readableInk(value);
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) return readableInk(value);
   const rgba = value.match(/^rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\s*\)$/);
   if (rgba && Number(rgba[4]) >= 0.5) {
     const hex = [1, 2, 3].map((i) => Number(rgba[i]).toString(16).padStart(2, "0")).join("");
