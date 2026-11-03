@@ -370,7 +370,7 @@
     grid-column: 2;
     display: none;
     justify-self: center;
-    gap: var(--space-xs);
+    gap: calc(var(--target-floor) - var(--touch-target));
   }
 
   @media (min-width: 760px) {
@@ -384,7 +384,7 @@
   .site-nav-fast a {
     display: inline-flex;
     align-items: center;
-    min-height: var(--touch-target-sm);
+    min-height: var(--touch-target);
     padding-inline: var(--space-base);
     border-radius: var(--spec-button-radius);
     color: var(--muted-foreground);
@@ -667,12 +667,18 @@
 
   .search-box input {
     flex: 1;
-    min-height: var(--touch-target-sm);
+    min-height: var(--target-floor);
     border: none;
     background: transparent;
     color: var(--foreground);
     font-size: var(--text-body);
     outline: none;
+  }
+
+  /* The browser's own clear button on a search field would be a second "×"
+ * beside the dialog's close button. */
+  .search-box input::-webkit-search-cancel-button {
+    display: none;
   }
 
   .search-close {
@@ -989,7 +995,8 @@
 
   /* In a table cell a state stays on one line; as a paragraph it is a sentence
  * with a URL in it, and must wrap on a phone. */
-  p.state {
+  p.state,
+  .state.state-wrap {
     white-space: normal;
     overflow-wrap: anywhere;
   }
@@ -1137,14 +1144,14 @@
   .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-xs);
+    gap: calc(var(--target-floor) - var(--touch-target));
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
   .filters button {
-    height: var(--spec-button-sm);
+    height: var(--touch-target);
     padding-inline: var(--space-base);
     font: inherit;
     font-size: var(--text-body-small);
@@ -1561,9 +1568,6 @@
     font-weight: var(--weight-h6);
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.8;
-    transform: scale(0.85);
-    transform-origin: left;
   }
 
   .family-body {
@@ -1756,6 +1760,32 @@
     color: var(--muted-foreground);
   }
 
+  /* /tokens "Sizes by screen": the registry's size roles per screen class. */
+  .sizes-scroll {
+    overflow-x: auto;
+    margin-block: var(--space-lg);
+  }
+  .sizes {
+    inline-size: 100%;
+    min-inline-size: 36rem;
+    margin-block: 0;
+    border-collapse: collapse;
+    font-size: var(--text-body-small);
+  }
+  .sizes th,
+  .sizes td {
+    padding: var(--space-sm) var(--space-md);
+    border-block-end: 1px solid var(--border);
+    text-align: start;
+    font-variant-numeric: tabular-nums;
+  }
+  .sizes thead th small {
+    display: block;
+    font-size: var(--text-caption);
+    font-weight: 400;
+    color: var(--muted-foreground);
+  }
+
   /* The component-spec gallery: the registry's own dimensions, rendered. */
   .specs {
     display: grid;
@@ -1858,7 +1888,7 @@
     height: var(--spec-avatar-default);
     border-radius: var(--spec-avatar-radius);
     background: var(--color-copper-container);
-    color: var(--primary);
+    color: var(--foreground);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1984,8 +2014,7 @@
   .bench-size > b {
     font-weight: 400;
     color: var(--muted-foreground);
-    opacity: 0.55;
-    text-align: right;
+    text-align: end;
     padding-inline-end: var(--space-sm);
     user-select: none;
   }
@@ -2007,6 +2036,7 @@
   }
 
   .bench-size {
+    min-block-size: var(--target-floor);
     display: grid;
     grid-template-columns: 2.4em 1fr auto;
     align-items: center;
@@ -2025,15 +2055,15 @@
   .bench-step {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: calc(var(--target-floor) - var(--touch-target));
     background: var(--surface-container);
     border-radius: 999px;
     padding: 2px;
   }
 
   .bench-step button {
-    width: var(--touch-target-sm);
-    height: var(--touch-target-sm);
+    width: var(--touch-target);
+    height: var(--touch-target);
     border: 0;
     border-radius: 50%;
     background: transparent;
@@ -2460,18 +2490,123 @@
       0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent),
       0 12px 32px -12px color-mix(in oklab, var(--foreground) 22%, transparent);
   }
+
+  /* ============================== the Bundu floor: a 49px hit region ======
+ * Every control keeps a 49px hit region on every pointer (`--target-floor`,
+ * from `@bundu/ui`'s density.css). A single-row target may be DRAWN smaller on
+ * a fine pointer: this is the same transparent overlay density.css gives
+ * `button`, extended to the site's links. Targets stacked in a list instead
+ * grow to the floor (min-block-size), because overlays in a column would
+ * overlap and the later link would steal the click. Links inside running
+ * text are exempt, as in WCAG 2.5.8. */
+  :where(
+    .wordmark,
+    .site-nav-fast a,
+    .icon-group a,
+    .footer-social a,
+    .footer-contact a,
+    .footer-bottom a,
+    nav[aria-label="Breadcrumb" i] a,
+    a[data-slot="button"],
+    a[class*="h-control"],
+    main a:only-child
+  ) {
+    position: relative;
+  }
+  :where(
+    .wordmark,
+    .site-nav-fast a,
+    .icon-group a,
+    .footer-social a,
+    .footer-contact a,
+    .footer-bottom a,
+    nav[aria-label="Breadcrumb" i] a,
+    a[data-slot="button"],
+    a[class*="h-control"],
+    main a:only-child
+  )::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--target-floor));
+    block-size: max(100%, var(--target-floor));
+    transform: translate(-50%, -50%);
+  }
+
+  .footer-section a,
+  .drawer-nav a,
+  .component h3 a,
+  .jump a,
+  .card-title,
+  .roots-list a,
+  main dd > a:first-child,
+  .section-links a,
+  .provenance a,
+  main li > a:only-child,
+  main p > a:only-child {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-floor);
+    min-inline-size: var(--target-floor);
+  }
+
+  main input:not([type="checkbox"], [type="radio"]),
+  main select,
+  .fold > summary {
+    min-block-size: var(--target-floor);
+  }
+
+  /* Drawn at the density size; the gap makes up the rest of the 49px so the
+ * hit regions of neighbours meet instead of overlapping. */
+  .icon-group {
+    gap: calc(var(--target-floor) - var(--touch-target));
+  }
+  .icon-group a,
+  .icon-group button,
+  .nav-toggle {
+    inline-size: var(--touch-target);
+    block-size: var(--touch-target);
+  }
+
+  /* Below the nav breakpoint the header is the wordmark and the actions, so
+ * it is a row: the 3-column grid reserved a centre track that is empty here
+ * and pushed the actions past a 320px screen. The registry and GitHub icons
+ * live in the drawer and the footer on a phone. */
+  @media (max-width: 759px) {
+    .site-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-inline: var(--space-base);
+    }
+    .icon-group a {
+      display: none;
+    }
+  }
 }
 
 /* Unlayered on purpose, and the only rule that is: `SocialIcon` sets its own
  * size and colour with utilities, which beat every layer. Inside the header's
  * primary pill it has to match the pill's other icon buttons. */
 .icon-group [data-social-platform] {
-  inline-size: var(--touch-target-sm);
-  block-size: var(--touch-target-sm);
+  inline-size: var(--touch-target);
+  block-size: var(--touch-target);
   color: var(--primary-foreground);
 }
 
 .icon-group [data-social-platform]:hover {
   background: color-mix(in oklab, var(--primary-foreground) 20%, transparent);
   color: var(--primary-foreground);
+}
+
+/* Unlayered on purpose: `Section`'s description and the page lede are body text
+ * (17px and up), so they are held to 7:1, and `@bundu/ui` sets them in
+ * `text-muted-foreground` (a utility, which beats every layer here), which is
+ * 5.3 to 6.0:1 on the page surface. A step from the muted ink toward the
+ * foreground, still a token expression, takes them over the floor.
+ * TODO(mzizi): move upstream (the package's section header) and delete this. */
+p.text-body.text-muted-foreground,
+p.lede {
+  color: color-mix(in oklab, var(--muted-foreground) 55%, var(--foreground));
 }
