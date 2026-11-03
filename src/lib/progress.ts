@@ -5,7 +5,27 @@
  * Shared by the landing page's status panel and `/language`, so the two never
  * disagree. `public/llms.txt` says the same in its own words.
  *
- * Sources, all in `mzizi-dev/mzizi`, read on 2026-10-29:
+ * Updated 2026-11-03 (#80), read from a git clone of `mzizi-dev/mzizi` (no API
+ * access in that session):
+ * - "On main": the release pull request #146 ("chore(release): staging to main,
+ *   2026-11-01"), merged as cf3a44e and tagged v0.13.0. `git diff 2b36c8f
+ *   cf3a44e` touches nothing under `compiler/`, `examples/` or `primitives/` and
+ *   not `LANGUAGE-TRACKER.md`: the tracker marks, the harness counts, the
+ *   `compiler/src` line count (33,540) and the program outputs are unchanged, so
+ *   the figures measured at 2b36c8f below still describe the compiler. They were
+ *   NOT re-measured at cf3a44e, which adds tests to the benchmark runner (so the
+ *   workspace count may differ from 767; the upstream README still says 765 in
+ *   29 suites). The release carries #141 (the runner scores backend episodes with
+ *   probes), #142 (backend tasks B2 to B5), #144 (check-task.sh on macOS bash 3.2)
+ *   and #145 (the dated changelog), plus CI and supply-chain workflows.
+ * - "Landing on staging": staging is at 792ca07 (tagged v0.13.3, 2 November) and
+ *   differs from main in 8 files: #147 (B4 and B5 Python references strip CR/LF
+ *   from header values), #149 (a test case in `compiler/tests/program_collections.rs`
+ *   asks for a range length every host refuses, replacing the one that was killed
+ *   on a 16 GB laptop), #148 and #150 (changelog and sync chores), and a line of
+ *   RFC-0013 (macOS joins Linux in the overcommit caveat, #135). A staging-to-main release branch exists (release/staging-to-main-2026-11-02).
+ *
+ * Earlier sources, all in `mzizi-dev/mzizi`, read on 2026-10-29:
  * - "On main": the release pull request #140 ("chore(release): staging to main,
  *   2026-10-29"), merged as 2b36c8f and tagged v0.12.0 (published 06:14 UTC on
  *   29 October). Since the site's last pin (6f7b096, v0.9.0, 20 October) there
@@ -42,19 +62,21 @@
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
-export const PROGRESS_DATE = "2026-10-29";
-// The release, and the language commits this file was written from. `main` and
-// `staging` hold the same tree, so nothing is waiting.
-export const RELEASE = "29 October";
-export const MAIN_COMMIT = "2b36c8f";
-// The release tag main-release.yml created for MAIN_COMMIT (the v0.12.0 release).
-export const RELEASE_TAG = "v0.12.0";
-export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.12.0`;
+export const PROGRESS_DATE = "2026-11-03";
+// The release, and the language commits this file was written from. `staging`
+// is ahead of `main` by the changes listed in `onStaging`.
+export const RELEASE = "1 November";
+export const MAIN_COMMIT = "cf3a44e";
+// The release tag main-release.yml created for MAIN_COMMIT (the v0.13.0 release).
+export const RELEASE_TAG = "v0.13.0";
+export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.13.0`;
+// The v0.12.0 release (2b36c8f), where the figures below were last measured.
+export const MEASURED_TAG_HREF = `${LANG}/releases/tag/v0.12.0`;
 // The release pull request, staging to main.
-export const RELEASE_PR_NUMBER = 140;
-// staging's tip (#139); main carries its tree.
-export const RELEASED_STAGING = "99fa985";
-export const STAGING_COMMIT = "99fa985";
+export const RELEASE_PR_NUMBER = 146;
+// staging's tip when main was released (#145, tagged v0.12.4); main carries its tree.
+export const RELEASED_STAGING = "a9ce37c";
+export const STAGING_COMMIT = "792ca07";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -66,6 +88,16 @@ export const M2_ISSUE: Link = { href: `${LANG}/issues/110`, label: "#110" };
 export const RELEASE_PR: Link = pr(109);
 
 export const onMain: Item[] = [
+  {
+    text: "Released as v0.13.0 on 1 November: main-release.yml tagged cf3a44e. Benchmarks and tooling only: the runner scores backend episodes with the task's probes (#141), public backend development tasks B2 to B5 each with a language-neutral spec and probes (#142; B2 and B3 have a Mzizi reference, B4 and B5 do not, because a service has no state and cannot read a request body), and check-task.sh works on macOS bash 3.2 (#144). Nothing under compiler/, examples/ or primitives/ changed since v0.12.0, and no tracker mark changed. None of it measures Mzizi against another language: the kill-criterion run has not happened.",
+    links: [
+      { href: RELEASE_TAG_HREF, label: "v0.13.0" },
+      pr(146),
+      pr(141),
+      pr(142),
+      pr(144),
+    ],
+  },
   {
     text: "Released as v0.12.0 on 29 October: main-release.yml tagged 2b36c8f after CI passed. A service that mz build lowers now reads HOST as well as PORT (default 127.0.0.1, as before; a container sets 0.0.0.0, and a value that is not an IP address stops the service with exit 1), its Cargo.toml carries a slim release profile (lto, codegen-units = 1, panic = abort, strip, overflow-checks), and its tokio pin moves to 1.53.3 for RUSTSEC-2026-0386 (#134, fixing #132, #133 and #136). The size and memory figures in the changelog measure Rust's output through Mzizi's lowering, not a Mzizi advantage. It also publishes the write-ups of pilots 3 and 4 (#138, #139); both sat at the ceiling and separated no arms, and neither is the kill-criterion run.",
     links: [
@@ -192,7 +224,12 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: "Nothing is waiting. staging (99fa985) and main (2b36c8f) hold the same tree, so every merged change is on main. The next pull request to staging will be the first thing listed here.",
+    text: "A test fix in the compiler's own suite (#149): the program_collections case for a range too long now asks for 2^59 elements, a length every host refuses, where the old 10^11 was refused only by hosts that check it against memory and was killed (exit 137) on macOS (#135, the failure the figures below record). A line in RFC-0013 says the same of macOS. It changes a test and a design note, not the compiler.",
+    links: [pr(149)],
+  },
+  {
+    text: "The B4 and B5 Python reference servers strip CR and LF from header values (benchmark references, not the language), and the changelog dated for the 2 November release (tagged v0.13.3 on staging).",
+    links: [pr(147), pr(150)],
   },
 ];
 

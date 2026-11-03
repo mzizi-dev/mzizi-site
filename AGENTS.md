@@ -91,6 +91,8 @@ contact for every repository, owner, 2026-10-03); `/ecosystem`, `llms.txt` and
 `.well-known/mcp.json` name `support@bundu.org`; and no page this repo writes may carry any
 other address. Never put a person's own address anywhere.
 
+It also holds the sizes (owner, 2026-11-01: Apple's touch sizes on a phone, lower as screens grow). `/tokens` renders "Sizes by screen" from the `globals.css` the API serves, never from numbers typed here; when the table is present the gate holds it to itself (prose equals the phone column, nothing grows toward desktop, desktop targets at least 24px, desktop body at least 14px, phone body at least 17px), and `check-facts.py` holds it to the API's CSS. Do not write a size into a page: render it from the CSS.
+
 It also fails on a word glued to an inline tag in the built HTML (`nyuchi,<code>mukoko`,
 `</code>takes`). Astro drops the line break between a source line that ends in text and
 a next line that starts with `<a>`, `<code>`, `<strong>`, `<em>` and the like (or a line
