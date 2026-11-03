@@ -613,8 +613,12 @@ def reader_text(path: pathlib.Path) -> str:
 
 
 readable = {str(p.relative_to(DIST)): reader_text(p) for p in built}
+# The skill pages are left out here as they are below (language_state_patterns):
+# their bodies are @nyuchi/mzizi-skills as /v1/skills serves it, dated by the
+# bundle's own text, and check-facts.py notes when one lags.
+site_text = {n: t for n, t in readable.items() if not n.startswith("skills/")}
 for pattern, why in stale_patterns.items():
-    hits = [name for name, text in readable.items() if re.search(pattern, text, re.I)]
+    hits = [name for name, text in site_text.items() if re.search(pattern, text, re.I)]
     check("dist/", f"nothing matches /{pattern}/ — {why}", not hits, ", ".join(hits[:5]))
 
 # The language's state at mzizi-dev/mzizi 62a0f32 (charter v0.4, RFC-0012, the

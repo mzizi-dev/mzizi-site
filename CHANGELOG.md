@@ -21,6 +21,22 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the site follows the Bundu floor, on `@bundu/ui` 0.9.0 (2026-11-03, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Dependency: `@bundu/ui` is `>=0.9.0 <1` (was `^0.7.0`, which for a 0.x package never reaches 0.8 or 0.9). The open lower bound follows this repository's other dependencies; the upper bound keeps a 1.0 major, which needs the owner, out. `styles/density.css` arrives through the package's `globals.css`, which `site.css` already imports.
+- Body text is 17px, captions 14px, and nothing readable is under 14px on any page (the `/tokens` "Sizes by screen" table's media-query labels were 11.2px). Measured at 390, 820 and 1440 on the built site, the count of text nodes under 14px went from 137 on the landing page and 3,113 on `/components` to 0.
+- Every control keeps a 49px hit region: the header wordmark, navigation pills and icon links, the footer and drawer links, breadcrumbs, the component cards' title links, the Roots list, button-styled links and the search and filter fields. A control may be drawn smaller on a fine pointer; a transparent overlay keeps the hit region (the same one `@bundu/ui` gives a `button`). Links inside running text are exempt, as in WCAG 2.5.8. Controls under the floor on the landing page went from 75 to 0.
+- On a phone the header is a row (wordmark, menu, search); the registry and GitHub icons are in the menu and the footer. No page scrolls sideways at 320px (all nine did).
+
+### Added — `scripts/audit-ui.mjs`, a UI and UX audit of the built site (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Drives `dist/` with Playwright at 390, 820 and 1440 and reports font size, hit regions, contrast, focus, landmarks, headings, alt text, link names, reduced motion, 320px reflow and 3G weight and LCP. `--guard` exits 1 on text under 14px, a control under a 49px hit region, sideways scroll or a console error.
+
+### Fixed — the rendered gate and `llms.txt` (2026-11-03, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+- `verify-rendered.py` no longer applies its stale-figure patterns to `/skills/<name>` bodies, which are the registry's `@nyuchi/mzizi-skills` text (the gate already leaves them out of the language-state patterns). The live skill text quotes the 2026-11-01 figures and made the gate fail on every branch.
+- `llms.txt`: `@nyuchi/mzizi-skills` **0.16.0** (npm and `/v1/skills`, which now serves it), the `mzizi` plugin 1.6.0 carrying it; dated 2026-11-03.
+
 ### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
 
 The daily `Freshness` run (`scripts/check-facts.py`) failed on these facts only; the language facts already match upstream.
