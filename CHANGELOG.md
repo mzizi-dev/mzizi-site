@@ -57,6 +57,12 @@ cut, the Unreleased entries move under it.
 - `verify-rendered.py` no longer applies its stale-figure patterns to `/skills/<name>` bodies, which are the registry's `@nyuchi/mzizi-skills` text (the gate already leaves them out of the language-state patterns). The live skill text quotes the 2026-11-01 figures and made the gate fail on every branch.
 - `llms.txt`: `@nyuchi/mzizi-skills` **0.16.0** (npm and `/v1/skills`, which now serves it), the `mzizi` plugin 1.6.0 carrying it; dated 2026-11-03.
 
+### Changed — `AGENTS.md` gains a Merge convention section for the `staging` queue (2026-11-03)
+
+No issue: repository guidance only. Nothing on mzizi.dev changes.
+
+- **Added: Merge convention.** The site's `AGENTS.md` had none. It now matches the other Mzizi repositories: squash through the merge queue, the target `merge-queue-staging` configuration (`SQUASH`, no 5-minute wait, up to 5 entries, `ALLGREEN`) as the owner's to apply in the rulesets, linear branches until the live values read `SQUASH` and `0`, enqueue as soon as the merge gate is met, forward-port `main`-only commits to `staging` before a release, and only a major release needs the owner.
+
 ### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
 
 The daily `Freshness` run (`scripts/check-facts.py`) failed on these facts only; the language facts already match upstream.
