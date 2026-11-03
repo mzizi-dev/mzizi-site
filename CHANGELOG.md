@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — a dependency audit and review in CI, and editor recommendations (2026-11-03, (repository), [#50](https://github.com/mzizi-dev/mzizi-site/issues/50))
+
+- `ci.yml` has a `dependency audit` job: `pnpm audit --prod --audit-level high` and, on pull requests, the dependency-review action (pinned to a commit SHA). `.vscode/extensions.json` recommends the Astro and Vite+ extensions. No page changes.
+
 ### Fixed — contrast, a focus ring and the 404 page, from the UI and UX audit (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Body text is held to 7:1: the section descriptions and the page lede were 5.3 to 6.0:1 in the muted ink and are a step darker (light) or lighter (dark). The benchmark's line numbers were faded to 2.5:1 and are now the muted ink at full strength.
