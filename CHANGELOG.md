@@ -21,6 +21,11 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — dependencies (2026-11-03, (repository), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Supersedes Dependabot #95 to #98, which could not be rebased after the `@bundu/ui` change. `astro` 7.4.5, `@astrojs/react` 7.1.2, `@astrojs/check` 0.9.12, `react` and `react-dom` 19.3.1, `tailwindcss` and `@tailwindcss/vite` 4.3.4, `pagefind` 1.6.0, `playwright` 1.64.1, `vite-plus` 1.4.0, `wrangler` 4.156.2 (the minor and patch group); `marked` 16.4.2 to 18.1.3 (a major, build-time Markdown for skill pages; the rendered gate passes unchanged); `typescript` 5.9.3 to 6.0.3, held `<7` because TypeScript 7 (7.0.2) is a different compiler that needs its own review; `pnpm/action-setup` 6.1.0 (pinned to its commit).
+- The pages are unchanged: `astro check`, `vp check`, the rendered gate and the floor guard pass.
+
 ### Added — a dependency audit and review in CI, and editor recommendations (2026-11-03, (repository), [#50](https://github.com/mzizi-dev/mzizi-site/issues/50))
 
 - `ci.yml` has a `dependency audit` job: `pnpm audit --prod --audit-level high` and, on pull requests, the dependency-review action (pinned to a commit SHA). `.vscode/extensions.json` recommends the Astro and Vite+ extensions. No page changes.
