@@ -86,6 +86,15 @@ jobs:
       - name: Pages render their content with JavaScript disabled
         run: python3 scripts/verify-rendered.py dist
 
+      # The Bundu floor, measured in a real browser (the runner's Chrome, so
+      # nothing is downloaded): nothing readable under 14px, a 49px hit region
+      # on every control, contrast, one h1 and no skipped levels, no sideways
+      # scroll at 320px, at 390, 820 and 1440px. It reads only the built dist/.
+      - name: The Bundu floor holds in a browser
+        env:
+          PW_CHANNEL: chrome
+        run: node scripts/audit-ui.mjs dist --guard
+
   secrets:
     name: secret scan
     runs-on: ubuntu-latest
