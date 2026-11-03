@@ -18,7 +18,7 @@
  * The floor it holds the site to is the Bundu floor: nothing readable under
  * 14px, body text 17px, a 49px hit region, contrast 7:1 body / 4.5:1 other.
  * Inline links inside running text are exempt from the hit region, as in
- * WCAG 2.5.8. Playwright is a devDependency; set PW_CHANNEL=chrome to use an
+ * WCAG 2.5.8. Playwright is a devDependency; set PW_EXECUTABLE=<path> or PW_CHANNEL=chrome to use an
  * installed Chrome (CI) instead of Playwright's own chromium.
  */
 import { createServer } from "node:http";
@@ -420,6 +420,11 @@ function measure({ floorText, floorBody, floorHit, root }) {
 
 async function launch() {
   const base = { args: ["--no-sandbox"] };
+  if (process.env.PW_EXECUTABLE)
+    return chromium.launch({
+      ...base,
+      executablePath: process.env.PW_EXECUTABLE,
+    });
   if (process.env.PW_CHANNEL)
     return chromium.launch({ ...base, channel: process.env.PW_CHANNEL });
   return chromium.launch(base);
