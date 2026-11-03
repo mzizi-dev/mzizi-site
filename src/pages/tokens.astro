@@ -73,7 +73,21 @@ if (familyCount !== 21) {
 }
 
 /** Inline custom properties for one painted swatch. No colour is invented. */
-const paint = (hex: string) => `--swatch: ${hex}; --swatch-ink: ${readableInk(hex)}`;
+// A hex swatch gets the black or white that reads on it. A translucent rgba()
+// of 50% or more is read as the colour it is (a 60% black scrim takes white
+// ink); anything fainter or mixed (the tinted surfaces) sits on the page
+// surface, so its label takes the page's own ink, not a guess about a colour
+// that is not opaque.
+const inkFor = (value: string) => {
+  if (/^#[0-9a-f]{3,6}$/i.test(value)) return readableInk(value);
+  const rgba = value.match(/^rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\s*\)$/);
+  if (rgba && Number(rgba[4]) >= 0.5) {
+    const hex = [1, 2, 3].map((i) => Number(rgba[i]).toString(16).padStart(2, "0")).join("");
+    return readableInk(`#${hex}`);
+  }
+  return "var(--foreground)";
+};
+const paint = (hex: string) => `--swatch: ${hex}; --swatch-ink: ${inkFor(hex)}`;
 
 const hasProse = (family: ColourFamily) =>
   Boolean(family.origin || family.symbolism || family.usage);
