@@ -613,8 +613,12 @@ def reader_text(path: pathlib.Path) -> str:
 
 
 readable = {str(p.relative_to(DIST)): reader_text(p) for p in built}
+# The skill pages are left out here as they are below (language_state_patterns):
+# their bodies are @nyuchi/mzizi-skills as /v1/skills serves it, dated by the
+# bundle's own text, and check-facts.py notes when one lags.
+site_text = {n: t for n, t in readable.items() if not n.startswith("skills/")}
 for pattern, why in stale_patterns.items():
-    hits = [name for name, text in readable.items() if re.search(pattern, text, re.I)]
+    hits = [name for name, text in site_text.items() if re.search(pattern, text, re.I)]
     check("dist/", f"nothing matches /{pattern}/ — {why}", not hits, ", ".join(hits[:5]))
 
 # The language's state at mzizi-dev/mzizi 62a0f32 (charter v0.4, RFC-0012, the
@@ -712,6 +716,44 @@ check("dist/", "no word or punctuation is glued to an inline tag — end the sou
       not glued, f"{len(glued)} found: " + " | ".join(glued[:8]) if glued else "")
 
 # --- result ---------------------------------------------------------------
+# Sizes (owner, 2026-11-01: Apple HIG on phones, a step-down on desktop). /tokens
+# renders the registry's size roles per screen class from the globals.css the API
+# serves. A definition that appears in several places must agree with itself, so
+# the page's own numbers are held to each other and to the floors that never move:
+# the prose ("N px by default, never below M px") is the phone column of the table,
+# desktop targets and body text only ever shrink, targets stay at or above 24px
+# (WCAG 2.2 SC 2.5.8) and desktop body stays at or above 14px. check-facts.py
+# compares the same table to the API's CSS, which needs the network.
+print("\nsizes")
+tokens_raw = (DIST / "tokens.html").read_text(encoding="utf-8")
+cells: dict[str, dict[str, float]] = {}
+for token, layer, px in re.findall(r'data-size="([^"]+)" data-layer="([^"]+)" data-px="([\d.]+)"', tokens_raw):
+    cells.setdefault(token, {})[layer] = float(px)
+if not cells:
+    print("  [skip] the API serves no density layer yet, so /tokens shows no sizes table")
+else:
+    plain_tokens = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", text_without_scripts("tokens.html", quiet=True))))
+    check("tokens.html", "the sizes table has phone, tablet and desktop columns for every role",
+          all(set(v) == {"phone", "tablet", "desktop"} for v in cells.values()),
+          ", ".join(t for t, v in cells.items() if set(v) != {"phone", "tablet", "desktop"}))
+    needed = ("target-floor", "size-touch", "fs-body")
+    missing = [t for t in needed if any(l not in cells.get(t, {}) for l in ("phone", "desktop"))]
+    check("tokens.html", "the sizes table has the floor, touch target and body rows for phone and desktop",
+          not missing, ", ".join(missing))
+    if not missing:
+        phone = {t: v["phone"] for t, v in cells.items() if "phone" in v}
+        check("tokens.html", "the prose touch default and floor are the table's phone column",
+              f"{phone['size-touch']:g}px by default, never below" in plain_tokens
+              and f"never below {phone['target-floor']:g}px" in plain_tokens)
+        grew = [f"{t} {a}->{b}" for t, v in cells.items()
+                for a, b in (("phone", "tablet"), ("tablet", "desktop")) if a in v and b in v and v[b] > v[a]]
+        check("tokens.html", "no size grows from one screen class to the next", not grew, ", ".join(grew))
+        both = {t: v for t, v in cells.items() if "phone" in v and "desktop" in v}
+        check("tokens.html", "every desktop target stays at or above the 24px floor (WCAG 2.2 SC 2.5.8)",
+              all(v["desktop"] >= 24 for t, v in both.items() if t.startswith("size-")))
+        check("tokens.html", "desktop body text stays at or above 14px", cells["fs-body"]["desktop"] >= 14)
+        check("tokens.html", "phone body text is at least Apple's 17pt default", cells["fs-body"]["phone"] >= 17)
+
 if notes:
     print("\nnotes")
     for note in notes:

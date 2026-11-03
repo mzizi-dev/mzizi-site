@@ -246,8 +246,11 @@ const arms = [
       <code>compiler/src</code>, from a fresh count). Run on a macOS laptop, 766 of
       the 767 tests passed; one, a range too long to hold in memory, was killed by the
       operating system where it expects exit 101, and the upstream README, which
-      lags, still gives the 20 October figures (765 tests, 29 suites). Nothing is waiting on{" "}
-      <code>staging</code>, which holds <code>main</code>'s tree. Blocks nest at most 64
+      lags, still gives the 20 October figures (765 tests, 29 suites). Since then{" "}
+      <code>main</code> has moved to <code>cf3a44e</code> (<code>v0.13.0</code>, 1 November), which changes benchmarks and tooling and nothing
+      under <code>compiler/</code>, <code>examples/</code> or <code>primitives/</code>, so these figures were not re-measured; the
+      release adds tests to the benchmark runner, so the count at <code>cf3a44e</code> may differ. <code>staging</code> is ahead of <code>main</code> by a
+      test fix and benchmark references (the staging column below). Blocks nest at most 64
       deep (MZ0411), and robustness tests hold every command to ending with a
       diagnostic on random and deeply nested input.{" "}
       <code>mz contract</code> evaluates contract blocks. A <code>service</code>{" "}

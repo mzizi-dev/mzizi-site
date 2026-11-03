@@ -53,7 +53,7 @@ CRATES = (
     "mzizi-roots",
     "mzizi-roots-server",
 )
-API = "https://api.mzizi.dev/v1"
+API = os.environ.get("MZIZI_API_ORIGIN", "https://api.mzizi.dev").rstrip("/") + "/v1"
 MCP_REGISTRY = "https://registry.modelcontextprotocol.io/v0/servers?search=mzizi-mcp"
 MCP_NAME = "io.github.mzizi-dev/mzizi-mcp"
 
@@ -488,6 +488,71 @@ if notes:
     print("\nnotes")
     for note in notes:
         print(f"  - {note}")
+
+# --- sizes: the site and the registry's CSS must agree -----------------------------
+# Owner, 2026-11-01: sizes follow Apple's HIG on a phone and step down on a wide
+# screen with a fine pointer. /tokens renders the registry's size roles from the
+# globals.css the API serves (src/lib/registry.ts getSizeLayers). This parses
+# that CSS a second time, in another language, and holds the built page to it, so
+# a change to either side that the other does not follow fails here.
+print("\nsizes (api.mzizi.dev globals.css vs /tokens)")
+SIZE_TOKENS = ["target-floor", "size-touch", "size-control", "size-control-sm", "size-control-lg",
+               "size-control-icon", "size-field", "fs-h1", "fs-h2", "fs-body", "fs-small", "fs-caption"]
+
+
+MEDIA_ROOT = re.compile(r"@media\s+([^{]+?)\s*\{\s*:root\s*\{([^}]*)\}\s*\}")
+LEGACY_ROOT = re.compile(r':root\[data-mzizi-sizes="legacy"\]\s*\{[^}]*\}')
+
+
+def size_layers(css: str) -> dict[str, dict[str, float]]:
+    """The same reading as src/lib/registry.ts parseSizeLayers: base declarations, first matching block."""
+    def decls(block: str) -> dict[str, float]:
+        found: dict[str, float] = {}
+        for name, value, unit in re.findall(r"^\s*--([a-z0-9-]+):\s*([\d.]+)(rem|px)\b", block, re.M):
+            if name in SIZE_TOKENS and name not in found:
+                found[name] = round(float(value) * (16 if unit == "rem" else 1), 2)
+        return found
+
+    layers = {"phone": decls(LEGACY_ROOT.sub("", MEDIA_ROOT.sub("", css)))}
+    media = MEDIA_ROOT.findall(css)
+    tablet = next((b for q, b in media if "pointer" not in q and re.search(r"min-width:\s*48rem", q)), None)
+    desktop = next((b for q, b in media if re.search(r"pointer:\s*fine", q) and re.search(r"hover:\s*hover", q)), None)
+    if tablet is not None:
+        layers["tablet"] = {**layers["phone"], **decls(tablet)}
+    if desktop is not None:
+        layers["desktop"] = {**layers.get("tablet", layers["phone"]), **decls(desktop)}
+    return layers
+
+
+css_doc = upstream("/v1/ui/mzizi-tokens-globals", lambda: fetch_json(f"{API}/ui/mzizi-tokens-globals"))
+brand_doc = upstream("/v1/brand", lambda: fetch_json(f"{API}/brand"))
+if css_doc and brand_doc:
+    css_text = next((f["content"] for f in css_doc["files"] if f["path"].endswith("mzizi-tokens-globals.css")), "")
+    check("/v1/ui/mzizi-tokens-globals serves mzizi-tokens-globals.css", bool(css_text))
+    served = size_layers(css_text)
+    check("a fine-pointer block in the CSS is read as the desktop layer (the parser has not gone blind)",
+          ("pointer: fine" not in css_text and "pointer:fine" not in css_text) or "desktop" in served)
+    tokens_page = (DIST / "tokens.html").read_text(encoding="utf-8")
+    cells = {(t, l): float(px) for t, l, px in
+             re.findall(r'data-size="([^"]+)" data-layer="([^"]+)" data-px="([\d.]+)"', tokens_page)}
+    if len(served) > 1:
+        wrong = [f"{t}@{l}: page {cells.get((t, l))} vs API {px}"
+                 for l, values in served.items() for t, px in values.items() if cells.get((t, l)) != px]
+        extra = [f"{t}@{l}" for (t, l) in cells if (l not in served) or (t not in served[l])]
+        check("/tokens shows every size the API's CSS serves, per screen class, and no other", not wrong and not extra,
+              "; ".join(wrong[:4] + extra[:4]))
+    else:
+        check("the API serves no density layer, so /tokens shows no sizes table", not cells,
+              "the page shows sizes the API does not serve")
+    acc = brand_doc["accessibility"]
+    prose = reader_text(DIST / "tokens.html")
+    check("/tokens states /v1/brand's touch default and floor",
+          f"{acc['defaultTouchTarget']}px by default, never below {acc['minTouchTarget']}px" in prose)
+    if len(served) > 1:
+        phone = served["phone"]
+        check("/v1/brand's touch numbers agree with the CSS it ships with (phone column)",
+              acc["defaultTouchTarget"] == phone["size-touch"] and acc["minTouchTarget"] == phone["target-floor"],
+              f"brand {acc['defaultTouchTarget']}/{acc['minTouchTarget']} vs css {phone['size-touch']}/{phone['target-floor']}")
 
 print()
 if failures:
