@@ -21,6 +21,76 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Search results no longer start with "Close search× Mzizi Close menu× Browse components.": the header, the search dialog, the menu drawer and the footer are left out of the search index (`data-pagefind-ignore`), so a result's excerpt is the page's own text. `/tokens` swatch ink reads a hex value only when it is 3 or 6 digits. The search field shows one "×" (the dialog's), not a second from the browser.
+
+### Changed — dependencies (2026-11-03, (repository), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Supersedes Dependabot #95 to #98, which could not be rebased after the `@bundu/ui` change. `astro` 7.4.5, `@astrojs/react` 7.1.2, `@astrojs/check` 0.9.12, `react` and `react-dom` 19.3.1, `tailwindcss` and `@tailwindcss/vite` 4.3.4, `pagefind` 1.6.0, `playwright` 1.64.1, `vite-plus` 1.4.0, `wrangler` 4.156.2 (the minor and patch group); `marked` 16.4.2 to 18.1.3 (a major, build-time Markdown for skill pages; the rendered gate passes unchanged); `typescript` 5.9.3 to 6.0.3, held `<7` because TypeScript 7 (7.0.2) is a different compiler that needs its own review; `pnpm/action-setup` 6.1.0 (pinned to its commit).
+- The pages are unchanged: `astro check`, `vp check`, the rendered gate and the floor guard pass.
+
+### Added — a dependency audit and review in CI, and editor recommendations (2026-11-03, (repository), [#50](https://github.com/mzizi-dev/mzizi-site/issues/50))
+
+- `ci.yml` has a `dependency audit` job: `pnpm audit --prod --audit-level high` and, on pull requests, the dependency-review action (pinned to a commit SHA). `.vscode/extensions.json` recommends the Astro and Vite+ extensions. No page changes.
+
+### Fixed — contrast, a focus ring and the 404 page, from the UI and UX audit (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Body text is held to 7:1: the section descriptions and the page lede were 5.3 to 6.0:1 in the muted ink and are a step darker (light) or lighter (dark). The benchmark's line numbers were faded to 2.5:1 and are now the muted ink at full strength.
+- `/tokens`: the swatch labels were faded and shrunk to about 12px on screen (`transform: scale(0.85)`), which hid under the 14px floor; they are full size and ink-coloured. Translucent and mixed swatches (the scrim, the tinted surfaces) take a label that reads on them (3.0:1 became 4.5:1 or more).
+- The filter box on `/components` lost its focus ring in the floor change (a search-box rule had been widened to every field); it has its ring again.
+- Hit regions no longer overlap: the navigation pills, the filter chips, the header icons and the benchmark steppers sit 49px apart, centre to centre, and the benchmark's rows are 49px tall.
+- `/404` no longer says the site is "three pages". It says what may have gone wrong in plain words and lists six places to go, each a 49px link.
+- `/skills` has an "All the skills" heading, so the page no longer jumps from the title to the cards' level-three headings.
+- `text-align: right` in the benchmark is `end`, so it follows reading direction.
+
+### Added — a CI guard for the floor (2026-11-03)
+
+- The `web` job runs `scripts/audit-ui.mjs dist --guard` on the runner's own Chrome: it fails on text under 14px, a control under a 49px hit region, a contrast pair under 7:1 (body) or 4.5:1, a missing or doubled h1, a skipped heading level, sideways scroll at 320px or a console error, at 390, 820 and 1440px.
+
+### Changed — the language's state follows `mzizi-dev/mzizi` `main` v0.13.0 and `staging` v0.13.3 (2026-11-03, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+- The landing page's status panel, `/language` and `llms.txt` say `main` is `cf3a44e`, tagged `v0.13.0` (the 1 November release, #146): benchmarks and tooling only (the runner scores backend episodes with probes, backend tasks B2 to B5, a macOS script fix). `git diff 2b36c8f cf3a44e` touches nothing under `compiler/`, `examples/` or `primitives/` and not the tracker, so the tracker marks, the harness counts, the 33,540-line count and the program outputs are unchanged.
+- The test figures (767 tests in 35 suites) stay "measured at `2b36c8f`" and are said to be not re-measured: the release adds tests to the benchmark runner, and this update had no way to run the language's test suite.
+- "Landing on staging" lists what `staging` (`792ca07`, tagged v0.13.3) holds beyond `main`: a test case that no longer gets a process killed on macOS (#149), the B4 and B5 reference servers (#147) and the dated changelog. It was read from a git clone, not the API: the "open pull requests" line is still the 29 October reading and says so.
+
+### Changed — the site follows the Bundu floor, on `@bundu/ui` 0.9.0 (2026-11-03, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Dependency: `@bundu/ui` is `>=0.9.0 <1` (was `^0.7.0`, which for a 0.x package never reaches 0.8 or 0.9). The open lower bound follows this repository's other dependencies; the upper bound keeps a 1.0 major, which needs the owner, out. `styles/density.css` arrives through the package's `globals.css`, which `site.css` already imports.
+- Body text is 17px, captions 14px, and nothing readable is under 14px on any page (the `/tokens` "Sizes by screen" table's media-query labels were 11.2px). Measured at 390, 820 and 1440 on the built site, the count of text nodes under 14px went from 137 on the landing page and 3,113 on `/components` to 0.
+- Every control keeps a 49px hit region: the header wordmark, navigation pills and icon links, the footer and drawer links, breadcrumbs, the component cards' title links, the Roots list, button-styled links and the search and filter fields. A control may be drawn smaller on a fine pointer; a transparent overlay keeps the hit region (the same one `@bundu/ui` gives a `button`). Links inside running text are exempt, as in WCAG 2.5.8. Controls under the floor on the landing page went from 75 to 0.
+- On a phone the header is a row (wordmark, menu, search); the registry and GitHub icons are in the menu and the footer. No page scrolls sideways at 320px (all nine did).
+
+### Added — `scripts/audit-ui.mjs`, a UI and UX audit of the built site (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Drives `dist/` with Playwright at 390, 820 and 1440 and reports font size, hit regions, contrast, focus, landmarks, headings, alt text, link names, reduced motion, 320px reflow and 3G weight and LCP. `--guard` exits 1 on text under 14px, a control under a 49px hit region, sideways scroll or a console error.
+
+### Fixed — the rendered gate and `llms.txt` (2026-11-03, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+- `verify-rendered.py` no longer applies its stale-figure patterns to `/skills/<name>` bodies, which are the registry's `@nyuchi/mzizi-skills` text (the gate already leaves them out of the language-state patterns). The live skill text quotes the 2026-11-01 figures and made the gate fail on every branch.
+- `llms.txt`: `@nyuchi/mzizi-skills` **0.16.0** (npm and `/v1/skills`, which now serves it), the `mzizi` plugin 1.6.0 carrying it; dated 2026-11-03.
+
+### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
+
+The daily `Freshness` run (`scripts/check-facts.py`) failed on these facts only; the language facts already match upstream.
+
+- `llms.txt`'s dated version list (now "Versions on 2026-11-02"):
+  - `mzizi-mcp` **0.14.0** on npm and in the MCP Registry (was 0.13.0). An anonymous `initialize` and `tools/list` against `mcp.mzizi.dev/mcp` on 2026-11-02 answered from 0.14.0, so the "free with no sign-in except the Fundi tools" sentence names 0.14.0 and that date, here and in `/.well-known/mcp.json`.
+  - `@nyuchi/mzizi-skills` **0.15.0** (was 0.13.0): nine skills, with `mukoko-design` and `mzizi-architecture` added. `/v1/skills` still serves 0.13.0 until the API's registry pin moves, and the page says so.
+  - The Mzizi Roots crates at **0.7.0** (was 0.6.0).
+
+### Changed — `/skills` names the plugin and the connection guide; `llms.txt` too (2026-10-20)
+
+- **`/skills`, "Using them"** adds the public `mzizi` plugin (`/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install mzizi@mzizi`), which installs the skills and connects the MCP server in one step and carries the same bundle as the API; says `npx skills experimental_sync` links the npm bundle into `.agents/skills/`; and says a client that installs nothing still gets the skills from the MCP server. It links the new docs page, [Connect a client](https://docs.mzizi.dev/toolchain/connect) (mzizi-docs#64).
+- **`llms.txt`**, under the skills version: the plugin (1.5.0 since registry v4.20.0) carries skills 0.15.0, and mzizi-registry#520, still open, would make it installable in Codex; `mzizi_get_skills` serves the skills to a client that installs nothing; and the connection guide's URL.
+
+### Added — /tokens shows the sizes by screen: Apple's touch sizes on a phone, a step-down on desktop (2026-11-02, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90))
+
+- Owner, 2026-11-01: "mzizi sizes i think need to lower to apple recommended sizes" and "we need to lower the sizes as the screens increase". `/tokens` gains a "Sizes by screen" table (phone, tablet, desktop) for the touch floor, touch target, controls, input, headings, body, small and caption text. It is read at build time from the `globals.css` the registry serves at `/v1/ui/mzizi-tokens-globals`, so no size is typed on this site; the table appears when the API serves the density layer from registry PR #598 and is absent until then. The touch-target sentences name the desktop numbers beside the phone ones.
+- Checks: `scripts/verify-rendered.py` holds the table to itself (the prose touch numbers are its phone column, nothing grows from phone to desktop, desktop targets stay at or above 24px, desktop body at or above 14px, phone body at least 17px). `scripts/check-facts.py` parses the API's CSS a second time and fails when the page and the API differ, or when `/v1/brand`'s touch numbers disagree with the CSS they ship with; it now reads `MZIZI_API_ORIGIN` too.
+- `parseSizeLayers` has unit tests (cascade, `px`, legacy alias, density-before-base), and the checks fail loudly, not silently, when the CSS names a fine-pointer block they cannot read.
+- Not changed: the landing-page contract bench still says "48px" and `h-12`, because that is `primitives/button.mz` in `mzizi-dev/mzizi`, which the registry change does not touch.
+
 ### Fixed — the rendered gate expects the registry at v4.18.0 (2026-11-01)
 
 - api.mzizi.dev serves registry v4.18.0 since mzizi-api v0.11.0 and v0.12.0: 675 components (was 656), N2 394 (was 388), N6 93 (was 90). `scripts/verify-rendered.py`, `AGENTS.md` and `README.md` now expect those counts. The site reads them from the API at build time, so readers see 675 components once the site rebuilds.

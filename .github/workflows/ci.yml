@@ -26,14 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       # No `version:` here on purpose — the action reads `packageManager` from
       # package.json, so the version CI installs and the version that wrote
       # pnpm-lock.yaml cannot drift apart without someone noticing.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: "22"
           cache: "pnpm"
@@ -86,12 +86,21 @@ jobs:
       - name: Pages render their content with JavaScript disabled
         run: python3 scripts/verify-rendered.py dist
 
+      # The Bundu floor, measured in a real browser (the runner's Chrome, so
+      # nothing is downloaded): nothing readable under 14px, a 49px hit region
+      # on every control, contrast, one h1 and no skipped levels, no sideways
+      # scroll at 320px, at 390, 820 and 1440px. It reads only the built dist/.
+      - name: The Bundu floor holds in a browser
+        env:
+          PW_CHANNEL: chrome
+        run: node scripts/audit-ui.mjs dist --guard
+
   secrets:
     name: secret scan
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
 
@@ -108,3 +117,24 @@ jobs:
           gitleaks version
 
       - run: gitleaks detect --source . --redact --no-banner --verbose
+
+  # Dependency checks (#50). The audit reads only the lockfile and the npm
+  # advisory database; dependency review compares a pull request's lockfile
+  # changes with the same data and fails on a known-vulnerable addition.
+  dependencies:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "22"
+      - name: Production dependencies have no known high or critical advisory
+        run: pnpm audit --prod --audit-level high
+      - name: Dependency review (pull requests)
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          fail-on-severity: high
