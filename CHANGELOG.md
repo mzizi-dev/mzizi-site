@@ -21,6 +21,20 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — contrast, a focus ring and the 404 page, from the UI and UX audit (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Body text is held to 7:1: the section descriptions and the page lede were 5.3 to 6.0:1 in the muted ink and are a step darker (light) or lighter (dark). The benchmark's line numbers were faded to 2.5:1 and are now the muted ink at full strength.
+- `/tokens`: the swatch labels were faded and shrunk to about 12px on screen (`transform: scale(0.85)`), which hid under the 14px floor; they are full size and ink-coloured. Translucent and mixed swatches (the scrim, the tinted surfaces) take a label that reads on them (3.0:1 became 4.5:1 or more).
+- The filter box on `/components` lost its focus ring in the floor change (a search-box rule had been widened to every field); it has its ring again.
+- Hit regions no longer overlap: the navigation pills, the filter chips, the header icons and the benchmark steppers sit 49px apart, centre to centre, and the benchmark's rows are 49px tall.
+- `/404` no longer says the site is "three pages". It says what may have gone wrong in plain words and lists six places to go, each a 49px link.
+- `/skills` has an "All the skills" heading, so the page no longer jumps from the title to the cards' level-three headings.
+- `text-align: right` in the benchmark is `end`, so it follows reading direction.
+
+### Added — a CI guard for the floor (2026-11-03)
+
+- The `web` job runs `scripts/audit-ui.mjs dist --guard` on the runner's own Chrome: it fails on text under 14px, a control under a 49px hit region, a contrast pair under 7:1 (body) or 4.5:1, a missing or doubled h1, a skipped heading level, sideways scroll at 320px or a console error, at 390, 820 and 1440px.
+
 ### Changed — the site follows the Bundu floor, on `@bundu/ui` 0.9.0 (2026-11-03, [#90](https://github.com/mzizi-dev/mzizi-site/issues/90), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Dependency: `@bundu/ui` is `>=0.9.0 <1` (was `^0.7.0`, which for a 0.x package never reaches 0.8 or 0.9). The open lower bound follows this repository's other dependencies; the upper bound keeps a 1.0 major, which needs the owner, out. `styles/density.css` arrives through the package's `globals.css`, which `site.css` already imports.

@@ -125,7 +125,9 @@ function serve(dist) {
 }
 
 // ---- measurements, run inside the page ----
-function measure({ floorText, floorBody, floorHit }) {
+function measure({ floorText, floorBody, floorHit, root }) {
+  const scope = (root && document.querySelector(root)) || document;
+  const base = scope === document ? document.body : scope;
   const cv = document.createElement("canvas");
   cv.width = cv.height = 1;
   const cx = cv.getContext("2d", { willReadFrequently: true });
@@ -219,7 +221,7 @@ function measure({ floorText, floorBody, floorHit }) {
   };
 
   // text nodes
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const walker = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
   const seen = new Set();
   for (let n; (n = walker.nextNode());) {
     const t = n.nodeValue.trim();
@@ -323,7 +325,7 @@ function measure({ floorText, floorBody, floorHit }) {
     };
     if (skip) continue;
     out.targets.push(rec);
-    if (!inline)
+    if (!inline && (w > r.width + 1 || h > r.height + 1))
       boxes.push({
         rec,
         x: r.left + r.width / 2,
@@ -583,7 +585,10 @@ async function auditPage(browser, origin, [name, path], vp, shots) {
     if (await page.locator("#nav-toggle").isVisible()) {
       await page.click("#nav-toggle");
       await page.waitForTimeout(400);
-      const d = await page.evaluate(measure, MEASURE_OPTS);
+      const d = await page.evaluate(measure, {
+        ...MEASURE_OPTS,
+        root: "#mobile-drawer",
+      });
       d.page = "drawer";
       d.vp = vp.name;
       extra.push(d);
@@ -603,7 +608,10 @@ async function auditPage(browser, origin, [name, path], vp, shots) {
     if (await page.locator("#search-dialog").isVisible()) {
       await page.fill("#search-input", "button").catch(() => {});
       await page.waitForTimeout(1200);
-      const d = await page.evaluate(measure, MEASURE_OPTS);
+      const d = await page.evaluate(measure, {
+        ...MEASURE_OPTS,
+        root: "#search-dialog",
+      });
       d.page = "search";
       d.vp = vp.name;
       extra.push(d);
@@ -688,6 +696,17 @@ const main = async () => {
     if (r.belowHit.length)
       fails.push(
         `${tag}: ${r.belowHit.length} control(s) under a 49px hit region, e.g. ${r.belowHit[0].el} ${r.belowHit[0].w}x${r.belowHit[0].h} "${r.belowHit[0].text}"`,
+      );
+    if (r.contrast.length)
+      fails.push(
+        `${tag}: ${r.contrast.length} text/background pair(s) under the contrast floor, e.g. ${r.contrast[0].el} ${r.contrast[0].ratio}:1 (needs ${r.contrast[0].need}) "${r.contrast[0].text}"`,
+      );
+    if (
+      !["drawer", "search"].includes(r.page) &&
+      (r.h1 !== 1 || r.headingSkips.length)
+    )
+      fails.push(
+        `${tag}: headings (h1 count ${r.h1}, skips ${r.headingSkips.join(",") || "none"})`,
       );
     if (r.hscroll || r.hscroll320)
       fails.push(`${tag}: horizontal scroll${r.hscroll320 ? " at 320px" : ""}`);
