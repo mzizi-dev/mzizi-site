@@ -261,21 +261,21 @@ the components with that build, and its rows and `mzizi_search`'s hits carry
 `rustCrate` and `astroFile`. `mzizi_get_skills` takes `category` (`dev`,
 `design`, `language` or `build`) and returns every skill in it in full.
 
-Versions on 2026-11-02 (read the registries before repeating one):
+Versions on 2026-11-03 (read the registries before repeating one):
 
 - `mzizi-mcp` **0.14.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
   Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.14.0)
-- `@nyuchi/mzizi-skills` **0.15.0** on npm: nine skills in four categories,
+- `@nyuchi/mzizi-skills` **0.16.0** on npm: nine skills in four categories,
   `mzizi-language` (language), `mzizi-design` and `mukoko-design` (design),
   `mzizi-roots`, `mzizi-backend`, `mzizi-architecture` and `discoverability`
   (build), and `digital-hygiene` and `progress-report` (dev: how every agent
   works, loaded before any dev work). The registry requires it from 4.20.0;
   `api.mzizi.dev/v1/skills` and the `/skills` pages here serve the bundle at
-  the API's registry pin (0.13.0 on 2026-11-02) until that pin moves.
+  the API's registry pin (0.16.0 on 2026-11-03) until that pin moves.
   `/v1/skills`' `meta.version` says which bundle is
   served. The public `mzizi` plugin (mzizi-dev/mzizi-registry `plugin/`:
   `/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install
-  mzizi@mzizi`, plugin 1.5.0 since registry v4.20.0) carries skills 0.15.0;
+  mzizi@mzizi`, plugin 1.6.0 on 2026-11-03) carries skills 0.16.0;
   mzizi-registry#520, still open, would make it installable in Codex. A client that
   installs nothing gets the skills from `mzizi_get_skills`. How to connect each
   AI client (Claude, ChatGPT, Codex, the Claude and OpenAI APIs, Cursor,
