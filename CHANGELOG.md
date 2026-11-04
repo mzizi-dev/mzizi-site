@@ -21,6 +21,12 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — every release carries notes built from the changelog (2026-11-04, (repository), [mzizi-registry#619](https://github.com/mzizi-dev/mzizi-registry/issues/619))
+
+- The `main-release.yml` minor release builds its notes (the `CHANGELOG.md` entries since the previous release plus a compare link) before it pushes the tag, so a release with no entries fails and tags nothing, and creates the release as a draft that is published once. GitHub's list of merged pull requests is no longer appended, and a manual re-run no longer rewrites a published release's notes (releases are immutable). No page changes.
+- Staging patch tags (`v*`) no longer carry GitHub's auto text: `staging-version.yml` tags with the org workflow's `create-release: false` (it has no input for notes) and a new `release` job writes the pre-release with the `CHANGELOG.md` entries the merge added and a compare link. A merge the changelog gate exempts says so.
+- The new `release notes` workflow tests the scripts and, on a `release/` pull request into `main`, fails when the release would have no changelog entries and prints the notes in the run summary. `AGENTS.md` gains "Release notes (hard rule)".
+
 ### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Search results no longer start with "Close search× Mzizi Close menu× Browse components.": the header, the search dialog, the menu drawer and the footer are left out of the search index (`data-pagefind-ignore`), so a result's excerpt is the page's own text. `/tokens` swatch ink reads a hex value only when it is 3 or 6 digits. The search field shows one "×" (the dialog's), not a second from the browser.
