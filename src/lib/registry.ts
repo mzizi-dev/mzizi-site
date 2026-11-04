@@ -207,6 +207,16 @@ export interface Brand {
     focusIndicator: string;
     minTouchTarget: number;
     defaultTouchTarget: number;
+    /**
+     * The spacing floor (registry 4.24.0, `BUNDU_FLOOR.spacing`). Optional: an API
+     * pinned to an earlier registry commit does not serve them, and the page that
+     * shows them says so rather than supplying a number of its own.
+     */
+    minInset?: number;
+    minControlGap?: number;
+    minLabelGap?: number;
+    minItemGap?: number;
+    minBodyLeading?: number;
     keyboardNavigation: string;
     screenReaders: string;
   };
