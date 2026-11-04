@@ -21,6 +21,24 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the UI audit guard measures label chips and pills on their inline axis (2026-11-04, (repository), [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+`scripts/audit-ui.mjs --guard` no longer exempts a one-line label chip or pill
+(a badge, an eyebrow that draws a box, a status pill, a one-line pill or an
+inline-flex label) on both axes. The block axis stays exempt (a chip's block
+size is its line height or fixed height), but the inline inset from the text to
+the chip's edge is now held to the same 14px floor (`floorInset`) as a container,
+the rule written down in mzizi-registry#627. A pill with 8px of side padding now
+fails the "containers with text under a 14px inset" count. Search-hit `mark`
+highlights are not chips and stay exempt. Nothing a reader sees changes: with
+`@bundu/ui` 0.12.0 the site's own pills are at 14px, and the guard reports 0 containers
+under the inset on the built site.
+
+### Fixed — badges and tooltips meet the 14px inline floor, on `@bundu/ui` 0.12.0 (2026-11-04, [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+- **Fixed:** `@bundu/ui` is now `>=0.12.0 <1` (lockfile at 0.12.0). The package's React `Badge` and `Tooltip` had 8px to 12px of side padding; they now have 14px, so every badge on the site (1997 across the built pages, none left at 8px) holds the Bundu floor's inline inset. A reader sees slightly wider badges.
+- Ten registry-synced controls in the package are still under 14px of side padding (toolbar and data-table row-action summaries, quick search, top-bar actions, command palette items, the app shell search and side-nav group labels). The site renders none of them. The fix belongs in the registry and ships as a later `@bundu/ui` minor.
+
 ### Added — the site serves its icon mark (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
 
 - **Added:** `/favicon.ico` (16, 32 and 48 px frames), the web manifest `/site.webmanifest` with 192 and 512 px icons and a maskable icon, and a light and dark `theme-color`. Crawlers and many clients ask for `/favicon.ico` by path and used to get a 404.

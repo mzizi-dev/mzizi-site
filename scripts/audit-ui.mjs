@@ -22,7 +22,9 @@
  * touch, never overlap), a 14px inset from text to the edge of its container
  * (cards, panels and callouts on all four sides; buttons, links drawn as
  * buttons and inputs on the inline axis, because the visible control is 28px
- * and a 14px block inset cannot fit), a 1.5 body line height, and a WCAG 1.4.12
+ * and a 14px block inset cannot fit; a one-line label chip or pill, such as a badge,
+ * is held by the same 14px on its inline axis only, its block axis being its line
+ * height or fixed height, registry #627), a 1.5 body line height, and a WCAG 1.4.12
  * text-spacing stress pass (line-height 1.5, paragraph spacing 2x, letter
  * 0.12em, word 0.16em, injected as CSS) with no clipped or overflowing text.
  * An element, or anything inside it, carrying `data-mzizi-spacing-exempt="<reason>"`
@@ -475,6 +477,8 @@ function measure({
   // chips are labels, not containers; table cells are data, not cards, panels or callouts
   const NOT_CONTAINER =
     "[data-slot=badge],.badge,.eyebrow,kbd,td,th,:not(pre) > code:not(.cmd)";
+  // a label chip that draws its own box (badge, eyebrow pill) is held on its inline axis
+  const CHIP = "[data-slot=badge],.badge,.eyebrow";
   const ext = new Map();
   const tw = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
   for (let n; (n = tw.nextNode());) {
@@ -490,7 +494,10 @@ function measure({
       e && e !== document.body && e !== document.documentElement;
       e = e.parentElement
     ) {
-      if (e.matches(NOT_CONTAINER)) break;
+      if (e.matches(NOT_CONTAINER)) {
+        if (e.matches(CHIP) && drawsBox(e)) c = e;
+        break;
+      }
       if (drawsBox(e)) {
         c = e;
         break;
@@ -502,10 +509,13 @@ function measure({
     const control =
       CONTROL.test(c.tagName) ||
       /^(button|tab)$/.test(c.getAttribute("role") ?? "");
-    // chips (badges, inline labels) are not containers; text-bearing inline boxes that are not controls
-    if (!control && /^inline/.test(cs.display)) continue;
-    // a chip (a label) is not a container: a box no taller than the 28px visible control
-    // minimum, or a one-line pill (a badge, a stepper, a drawn specimen of a button)
+    // a chip (a label) is not a container, but it is not free of the inset either
+    // (registry #627: a one-line label chip or pill is held by its 14px inline inset;
+    // its block axis is its line height or fixed height). A chip is a text-bearing inline
+    // box that is not a control, a box no taller than the 28px visible control minimum, or
+    // a one-line pill (a badge, a stepper, a drawn specimen of a button). It is measured
+    // on the inline axis only, against the same floorInset as a container.
+    let chip = false;
     if (!control) {
       const cb = c.getBoundingClientRect();
       const radius = parseFloat(cs.borderTopLeftRadius) || 0;
@@ -515,7 +525,13 @@ function measure({
         Math.max(...tr.map((r) => r.bottom)) -
           Math.min(...tr.map((r) => r.top)) <=
           1.5 * Math.min(...tr.map((r) => r.height));
-      if (cb.height <= 28 || (oneLine && radius >= cb.height / 2 - 1)) continue;
+      if (/^inline/.test(cs.display)) {
+        // a highlight inside running text (a search hit) is not a label chip
+        if (!oneLine || c.matches("mark")) continue;
+        chip = true;
+      } else if (cb.height <= 28 || (oneLine && radius >= cb.height / 2 - 1))
+        chip = true;
+      else if (c.matches(CHIP)) chip = true;
     }
     const ps = getComputedStyle(p);
     const lh = parseFloat(ps.lineHeight);
@@ -545,6 +561,7 @@ function measure({
         t: 1e9,
         b: -1e9,
         control,
+        chip,
         sx: false,
         sy: false,
       };
@@ -567,8 +584,9 @@ function measure({
     const sides = {
       left: x.l - b.left,
       right: scrollsX || x.sx ? Infinity : b.right - x.r,
-      top: x.control ? Infinity : x.t - b.top,
-      bottom: x.control || scrollsY || x.sy ? Infinity : b.bottom - x.b,
+      top: x.control || x.chip ? Infinity : x.t - b.top,
+      bottom:
+        x.control || x.chip || scrollsY || x.sy ? Infinity : b.bottom - x.b,
     };
     const [side, inset] = Object.entries(sides).sort((p, q) => p[1] - q[1])[0];
     if (inset < floorInset - 1)
