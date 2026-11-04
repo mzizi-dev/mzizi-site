@@ -1,0 +1,30 @@
+{
+  "name": "Mzizi",
+  "short_name": "Mzizi",
+  "description": "A programming language for the agentic web, its toolchain and the Mzizi component registry.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#F3F3F1",
+  "theme_color": "#546E7A",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
