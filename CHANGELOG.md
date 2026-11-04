@@ -27,6 +27,16 @@ cut, the Unreleased entries move under it.
 - Staging patch tags (`v*`) no longer carry GitHub's auto text: `staging-version.yml` tags with the org workflow's `create-release: false` (it has no input for notes) and a new `release` job writes the pre-release with the `CHANGELOG.md` entries the merge added and a compare link. A merge the changelog gate exempts says so.
 - The new `release notes` workflow tests the scripts and, on a `release/` pull request into `main`, fails when the release would have no changelog entries and prints the notes in the run summary. `AGENTS.md` gains "Release notes (hard rule)".
 
+### Added — the spacing floor, held and shown (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- `/tokens` has a "Spacing floor" section that reads `accessibility.minInset`, `minControlGap`, `minLabelGap`, `minItemGap` and `minBodyLeading` from `api.mzizi.dev/v1/brand` at build time and prints them with the build date. The live API does not serve them until its registry pin reaches 4.24.0; until then the section says so and shows no number.
+- `scripts/audit-ui.mjs --guard` (the CI step "The Bundu floor holds in a browser") now also fails on adjacent controls under a 7px gap (visible edge to visible edge), text under a 14px inset in cards, panels and callouts (all sides) and in buttons and inputs (inline axis), body text under a 1.5 line height, overlapping hit regions, and a WCAG 1.4.12 text-spacing stress pass (line height 1.5, paragraph spacing 2x, letter 0.12em, word 0.16em) that loses or spills text, at 390, 820 and 1440 px. An element can opt out with `data-mzizi-spacing-exempt="<reason>"` (the reason is required); the only use is the drawn component specimens on `/tokens`. One-line pill labels (badges) are not held to the inset, because the shipped components draw them smaller (raised upstream in mzizi-registry).
+
+### Changed — spacing floor applied to the site's own CSS (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- Before: 78 control pairs under 7px, 2,745 container-insets under 14px, and 1,490 pieces of text lost under the stress, measured across the audit's nine pages, its open menu drawer and its search dialog at three widths (the stress pass runs on each page and the open drawer). After: 0 of each. Install commands, colour swatches, ladder tiles, figure tiles, code panes and the bench footer have 14px insets; the component filters, the node jump list and the section links are 7px or more apart.
+- `/components` and `/skills` cards show the whole description. It was cut at four lines, which also hid a long unbroken word that widened the page at 320px; long tokens now wrap inside their cards, and the empty-family sentence on `/tokens` wraps instead of spilling.
+
 ### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Search results no longer start with "Close search× Mzizi Close menu× Browse components.": the header, the search dialog, the menu drawer and the footer are left out of the search index (`data-pagefind-ignore`), so a result's excerpt is the page's own text. `/tokens` swatch ink reads a hex value only when it is 3 or 6 digits. The search field shows one "×" (the dialog's), not a second from the browser.
