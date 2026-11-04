@@ -239,8 +239,13 @@ for prose in ("Katanga (DRC) and Zambian Copperbelt",
     check("tokens.html", f"origin/symbolism prose rendered: “{prose[:32]}…”", prose in plain)
 
 check("tokens.html", "typography rendered", "Noto Serif" in plain and "JetBrains Mono" in plain)
-check("tokens.html", "spacing steps rendered", count(r"<li class=\"step\"", body) == 17,
-      f"found {count(chr(60) + 'li class=.step.', body)}")
+# 17 spacing steps from /v1/brand's spacing scale, plus the five spacing-floor rows
+# (minInset, minControlGap, minLabelGap, minItemGap, minBodyLeading) once the API serves them.
+SPACING_STEPS = 17
+FLOOR_ROWS = 5
+steps = count(r"<li class=\"step\"", body)
+check("tokens.html", "spacing steps rendered", steps in (SPACING_STEPS, SPACING_STEPS + FLOOR_ROWS),
+      f"found {steps}, expected {SPACING_STEPS} (API without the floor) or {SPACING_STEPS + FLOOR_ROWS}")
 check("tokens.html", "radii rendered", "9999px" in body)
 
 # --- / (the landing page, which leads with the language) -----------------
