@@ -13,4 +13,3 @@ node_modules/
 
 # Python bytecode from running scripts/*.py
 __pycache__/
-audit-out/
