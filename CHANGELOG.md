@@ -21,6 +21,12 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — the site serves its icon mark (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- **Added:** `/favicon.ico` (16, 32 and 48 px frames), the web manifest `/site.webmanifest` with 192 and 512 px icons and a maskable icon, and a light and dark `theme-color`. Crawlers and many clients ask for `/favicon.ico` by path and used to get a 404.
+- **Changed:** the header, drawer and footer wordmark now show the Mzizi mark (white roots on the hematite disc) ahead of the name, where a cobalt dot stood. The mark is decorative; the link text "Mzizi" names it.
+- **Changed (repository):** `scripts/generate-brand.mjs` also renders the manifest icons and the ICO from `public/brand/` SVGs; the rendered-content gate checks the new files and that every page links them.
+
 ### Fixed — the rendered gate counts the spacing floor rows (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
 
 - **Fixed:** the rendered-content gate counted every list item with the `step` class on `/tokens` as a spacing step and expected 17. Once `api.mzizi.dev` serves the spacing floor, the page also shows five floor rows in the same list style, so the count became 22 and the gate failed on the release PR. It now accepts 17 (API without the floor) or 22 (17 steps plus the five floor rows). The page itself is unchanged.
