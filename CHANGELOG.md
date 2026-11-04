@@ -21,12 +21,9 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
-### Changed
-
-- **Changed:** `@bundu/ui` is now `>=0.10.0 <1` (lockfile at 0.10.0), so the site's styles are built on the spacing floor tokens (`--inset-floor`, `--gap-floor`, `--leading-floor`) and the base-layer rules that ship with it. A reader sees no visible change beyond the floor changes already listed below.
-
 ### Changed — every release carries notes built from the changelog (2026-11-04, (repository), [mzizi-registry#619](https://github.com/mzizi-dev/mzizi-registry/issues/619))
 
+- **Changed:** `@bundu/ui` is now `>=0.10.0 <1` (lockfile at 0.10.0), so the site's styles are built on the spacing floor tokens (`--inset-floor`, `--gap-floor`, `--leading-floor`) and the base-layer rules that ship with it. A reader sees no visible change beyond the floor changes already listed below.
 - The `main-release.yml` minor release builds its notes (the `CHANGELOG.md` entries since the previous release plus a compare link) before it pushes the tag, so a release with no entries fails and tags nothing, and creates the release as a draft that is published once. GitHub's list of merged pull requests is no longer appended, and a manual re-run no longer rewrites a published release's notes (releases are immutable). No page changes.
 - Staging patch tags (`v*`) no longer carry GitHub's auto text: `staging-version.yml` tags with the org workflow's `create-release: false` (it has no input for notes) and a new `release` job writes the pre-release with the `CHANGELOG.md` entries the merge added and a compare link. A merge the changelog gate exempts says so.
 - The new `release notes` workflow tests the scripts and, on a `release/` pull request into `main`, fails when the release would have no changelog entries and prints the notes in the run summary. `AGENTS.md` gains "Release notes (hard rule)".
