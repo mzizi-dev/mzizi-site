@@ -165,9 +165,13 @@ const crumbs =
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
     <!-- The Mzizi mark on a hematite disc (public/brand/, scripts/generate-brand.mjs). -->
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#F3F3F1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E0D0C" media="(prefers-color-scheme: dark)" />
     <meta property="og:title" content={documentTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -229,7 +233,7 @@ const crumbs =
 
     <header class="site-nav" data-pagefind-ignore>
       <a class="wordmark wordmark-lg" href="/">
-        <span class="dot" aria-hidden="true" />
+        <img class="mark" src="/favicon.svg" alt="" width="24" height="24" />
         Mzizi
       </a>
       <nav class="site-nav-fast" aria-label="Primary">
@@ -314,7 +318,7 @@ const crumbs =
     >
       <div class="drawer-head">
         <a class="wordmark" href="/">
-          <span class="dot" aria-hidden="true" />
+          <img class="mark" src="/favicon.svg" alt="" width="24" height="24" />
           Mzizi
         </a>
         <button class="drawer-close" id="drawer-close" type="button">
@@ -380,7 +384,7 @@ const crumbs =
         <div class="footer-grid">
           <div class="footer-brand">
             <a class="wordmark" href="/">
-              <span class="dot" aria-hidden="true" />
+              <img class="mark" src="/favicon.svg" alt="" width="24" height="24" />
               Mzizi
             </a>
             <p>
