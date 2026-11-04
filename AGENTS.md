@@ -233,6 +233,75 @@ mzizi-registry#418), which the artifact is built from file for file. Edit the fo
 the artifact page; the artifact is republished from registry `main` after a merge that
 touches it.
 
+## Merge convention
+
+Read off the repo settings and the rulesets on 2026-10-21, and the queue rulesets on
+2026-11-03; they are the authority if this drifts.
+
+- **Merge method.** Squash merges through the merge queue: `gh pr merge <n> --squash --auto`.
+  Never `--admin`. The squash commit keeps every commit message in its body
+  (`COMMIT_MESSAGES`), so the per-commit reasoning is preserved. Org admins can bypass the rulesets;
+  agents never do.
+- **The `staging` queue (target configuration, owner, 2026-11-03).** `merge-queue-staging`
+  squashes (`SQUASH`, was `REBASE`) and merges as soon as the checks pass
+  (`min_entries_to_merge_wait_minutes` 0, was 5). It builds and merges up to 5 entries at a
+  time, groups `ALLGREEN`, times a check out after 60 minutes, and `staging` keeps
+  `required_linear_history`. `merge-queue-main` stays `MERGE`. The owner applies this in the
+  repository rulesets; agents cannot write rulesets. Read the live values before relying on
+  it: `gh api repos/mzizi-dev/<repo>/rulesets`. Until `merge-queue-staging` reads `SQUASH`
+  and `0`, it still rebases after a 5-minute wait, and a rebase queue drops a branch that
+  holds a merge commit with `MERGE_CONFLICT`. While that holds, keep branches linear: rebase
+  onto `origin/staging` instead of merging the base in.
+- **Branches.** Once the queue squashes, updating a branch with the base (GitHub's "Update
+  branch") is fine and the squash keeps the base branch linear. The merge queue tests each PR
+  against the latest base. Merged branches are deleted.
+- **Enqueue only past the merge gate, then at once.** `--auto` adds the PR to the merge
+  queue, and is how PRs land. Meet the merge gate first (the work is complete, CI is green,
+  it's verified at runtime, and `/code-review` has run with findings resolved; see "Dev
+  skills, progress reports and the merge gate" below), then enqueue straight away rather than
+  waiting for a later pass. Every PR body carries one `Refs #n`, `Closes #n` or `No issue:`
+  line, or the "issue attached" check fails.
+- **Releases.** A merge into `main` deploys `mzizi.dev`, so only the owner releases
+  `staging` to `main`, or an agent the owner has authorised for that release. A release is a
+  `release/` branch made of `main` plus `staging`'s exact tree, squashed into `main`. Before
+  cutting one, forward-port any commit that is on `main` but not on `staging` (a bot's, for
+  example) to `staging` through the queue; the release-version-check gate fails a release
+  that would delete it. Versioned packages in other Mzizi repositories release minors and
+  patches without asking, and only a major needs the owner's go-ahead (owner, 2026-11-03: "we
+  are about a 1000 minor releases away" from deciding on a v1); this repository has no
+  versioned releases.
+- **Sync back after a release.** The squash commit on `main` is never in `staging`'s history,
+  and `staging` cannot be reset (non-fast-forward pushes are blocked). After each release,
+  open a sync PR into `staging` from a branch off `staging` with `origin/main` merged in, and
+  squash it, so the two trees match again before more work lands. Skip it when the trees
+  already match. Expect `main...staging` to keep showing old commits as ahead and behind;
+  compare trees, not counts.
+- **Bots' branches.** Never push to a bot's branch (for example `bot/registry-pin` in the API
+  and agent-tools repositories) unless taking its change over; any commit the bot didn't make
+  hands the branch to people.
+
+## Release notes (hard rule)
+
+Owner, 2026-11-04: "Every release should have release notes too with a changelog."
+
+- **Every GitHub release carries notes built from `CHANGELOG.md`**, never GitHub's auto text:
+  the entries added since the previous release (`.github/scripts/release_notes.py`) and a "Full
+  changelog" compare link. That covers the minor release `main-release.yml` makes on `main` and the
+  pre-release for each staging patch tag (`staging-version.yml` tags with the org workflow's
+  `create-release: false`, then its `release` job writes the notes).
+- **A release with no changelog content fails its job.** A minor release builds its notes
+  before it pushes the tag, so a failure tags nothing. A staging patch whose merge added no
+  entry (the changelog gate exempts CI, lockfiles, lint config and typos) says so in its notes.
+- **Notes are set when the release is created.** `.github/scripts/publish-release.sh` makes a
+  draft with the notes and publishes it once. Never `gh release edit` a published release
+  (immutable releases); a re-run leaves a published release alone.
+- **A release PR's body carries the same notes.** Before merging a `release/` PR into `main`,
+  paste the notes it will release (the `release notes / release PR` job prints them in its run
+  summary) into the PR body, so they exist before publish.
+- `.github/scripts/release_notes.py`, `publish-release.sh` and their tests are identical in
+  every Mzizi repository that carries them (mzizi-api, mzizi-docs, mzizi-site, mzizi-registry,
+  agent-tools). Change them everywhere together.
+
 ## Track big work in GitHub issues
 
 Any substantial build, migration, investigation or multi-step task gets a GitHub issue in the repo that owns it — before or as work starts — so another session, agent or person can pick it up.

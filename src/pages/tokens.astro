@@ -98,6 +98,24 @@ const fonts = Object.entries(brand.typography.fonts) as [
 ][];
 
 const maxSpace = Math.max(...brand.spacing.map((step) => step.px));
+// The spacing floor, exactly as the API serves it. Absent on an API pinned before
+// registry 4.24.0, and then the page says so instead of inventing a value.
+const acc = brand.accessibility;
+const spacingFloor = (
+  [
+    ["Inset", acc.minInset, "px", "Padding between text and the edge of its container: a control's label on the inline axis; a card, panel, dialog, alert or popover on both axes."],
+    ["Control gap", acc.minControlGap, "px", "Gap between adjacent interactive controls, visible edge to visible edge. Hit regions may touch, never overlap."],
+    ["Label gap", acc.minLabelGap, "px", "Gap between a label and its field."],
+    ["Item gap", acc.minItemGap, "px", "Gap between sibling items of a list, grid, stack or toolbar."],
+    ["Body leading", acc.minBodyLeading, "", "Body line height, as a multiple of the font size (WCAG 1.4.12)."],
+  ] as const
+)
+  .filter(([, value]) => typeof value === "number")
+  .map(([name, value, unit, usage]) => ({
+    name,
+    value: unit ? `${value}${unit}` : `${value}`,
+    usage,
+  }));
 const radii = Object.entries(brand.radii).filter(([, value]) => /^\d/.test(value));
 const specs = brand.componentSpecs;
 ---
@@ -303,6 +321,46 @@ const specs = brand.componentSpecs;
     ))}
   </ul>
 
+  <h2 id="spacing-floor">Spacing floor</h2>
+  <div class="prose">
+    <p>
+      The minimums no component, brand or density setting may go under, even
+      one that sets no padding at all. They are numbers the registry
+      publishes, and this page prints them as the API serves them.
+    </p>
+  </div>
+  {spacingFloor.length > 0 ? (
+    <>
+    <ul class="steps">
+      {spacingFloor.map((row) => (
+        <li class="step">
+          <span>
+            <span class="name">{row.name}</span>
+            <span class="val">{row.value}</span>
+          </span>
+          <span>
+            <span class="val">{row.usage}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+    <p class="prose">
+      Read from <code>{CANONICAL_BASE}/brand</code> (<code>accessibility</code>)
+      when this page was built, <time datetime={builtAt}>{builtAt}</time>. This
+      site is held to them: <code>scripts/audit-ui.mjs --guard</code> measures
+      the gaps, the insets, the line height and a text-spacing stress pass in a
+      browser at 390, 820 and 1440 px.
+    </p>
+    </>
+  ) : (
+    <p class="prose">
+      <code>{CANONICAL_BASE}/brand</code> as read when this page was built,{" "}
+      <time datetime={builtAt}>{builtAt}</time>, does not carry the spacing
+      floor yet: the API serves it once its registry pin reaches 4.24.0. No
+      number is shown here until it does.
+    </p>
+  )}
+
   <h2 id="radii">Radii</h2>
   <div class="prose"><p>{brand.radii.system}</p></div>
   <ul class="radii">
@@ -331,7 +389,7 @@ const specs = brand.componentSpecs;
     {specs.map((spec) => (
       <li class="spec-card">
         <h3>{spec.name}</h3>
-        <div class="spec-demo">
+        <div class="spec-demo" data-mzizi-spacing-exempt="drawn specimen of a registry component at its spec size, not a container">
           {spec.name === "button" && (
             <>
               <span class="demo-button">Install</span>
