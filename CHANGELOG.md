@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed
+
+- **Changed:** `@bundu/ui` is now `>=0.10.0 <1` (lockfile at 0.10.0), so the site's styles are built on the spacing floor tokens (`--inset-floor`, `--gap-floor`, `--leading-floor`) and the base-layer rules that ship with it. A reader sees no visible change beyond the floor changes already listed below.
+
 ### Changed — every release carries notes built from the changelog (2026-11-04, (repository), [mzizi-registry#619](https://github.com/mzizi-dev/mzizi-registry/issues/619))
 
 - The `main-release.yml` minor release builds its notes (the `CHANGELOG.md` entries since the previous release plus a compare link) before it pushes the tag, so a release with no entries fails and tags nothing, and creates the release as a draft that is published once. GitHub's list of merged pull requests is no longer appended, and a manual re-run no longer rewrites a published release's notes (releases are immutable). No page changes.
