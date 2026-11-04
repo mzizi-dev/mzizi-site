@@ -228,8 +228,8 @@
   /* Capitalized — "Mzizi", not "mzizi". The voice-guide's lowercase rule is
  * written down, but bundu.org's own live header/footer render "Bundu
  * Foundation" in title case regardless, and this site follows what the
- * reference site actually does, on the record. The dot ahead of it is the
- * same identity mark bundu.org's own header and footer use. */
+ * reference site actually does, on the record. The Mzizi mark ahead of it
+ * replaces the cobalt dot (owner, 2026-11-04: the site serves its icon mark). */
   .wordmark {
     display: inline-flex;
     align-items: center;
@@ -248,11 +248,12 @@
     font-size: var(--text-h3);
   }
 
-  .wordmark .dot {
-    inline-size: 0.5em;
-    block-size: 0.5em;
-    border-radius: 50%;
-    background: var(--color-cobalt);
+  /* The Mzizi mark (public/favicon.svg: white roots on the hematite disc) ahead of the
+   * name. Decorative: the link's text, "Mzizi", names it. It scales with the wordmark
+   * and keeps its width so the name never shifts it. */
+  .wordmark .mark {
+    inline-size: 1.15em;
+    block-size: 1.15em;
     flex-shrink: 0;
   }
 
