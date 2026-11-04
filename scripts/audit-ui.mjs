@@ -16,7 +16,18 @@
  * audit only) the weight, LCP and layout shift on a throttled 3G profile.
  *
  * The floor it holds the site to is the Bundu floor: nothing readable under
- * 14px, body text 17px, a 49px hit region, contrast 7:1 body / 4.5:1 other.
+ * 14px, body text 17px, a 49px hit region, contrast 7:1 body / 4.5:1 other,
+ * and the spacing floor (registry 4.24.0, BUNDU_FLOOR.spacing): a 7px gap
+ * between adjacent controls (visible edge to visible edge; hit regions may
+ * touch, never overlap), a 14px inset from text to the edge of its container
+ * (cards, panels and callouts on all four sides; buttons, links drawn as
+ * buttons and inputs on the inline axis, because the visible control is 28px
+ * and a 14px block inset cannot fit), a 1.5 body line height, and a WCAG 1.4.12
+ * text-spacing stress pass (line-height 1.5, paragraph spacing 2x, letter
+ * 0.12em, word 0.16em, injected as CSS) with no clipped or overflowing text.
+ * An element, or anything inside it, carrying `data-mzizi-spacing-exempt="<reason>"`
+ * is skipped and counted; the reason is mandatory (the convention the CLI's
+ * `mzizi check` reads as a `mzizi-spacing-exempt: <reason>` comment).
  * Inline links inside running text are exempt from the hit region, as in
  * WCAG 2.5.8. Playwright is a devDependency; set PW_EXECUTABLE=<path> or PW_CHANNEL=chrome to use an
  * installed Chrome (CI) instead of Playwright's own chromium.
@@ -125,7 +136,15 @@ function serve(dist) {
 }
 
 // ---- measurements, run inside the page ----
-function measure({ floorText, floorBody, floorHit, root }) {
+function measure({
+  floorText,
+  floorBody,
+  floorHit,
+  floorInset,
+  floorGap,
+  floorLeading,
+  root,
+}) {
   const scope = (root && document.querySelector(root)) || document;
   const base = scope === document ? document.body : scope;
   const cv = document.createElement("canvas");
@@ -176,6 +195,13 @@ function measure({ floorText, floorBody, floorHit, root }) {
       )
         return false;
       if (e.hidden) return false;
+      // the body of a closed <details> is not drawn, though its boxes still have a rect
+      if (
+        e.parentElement?.tagName === "DETAILS" &&
+        !e.parentElement.open &&
+        e.tagName !== "SUMMARY"
+      )
+        return false;
     }
     // visually-hidden helpers (1px clip) are for assistive tech, not readers
     return !(r.width <= 1 && r.height <= 1);
@@ -213,6 +239,11 @@ function measure({ floorText, floorBody, floorHit, root }) {
     contrast: [],
     targets: [],
     overlaps: [],
+    gaps: [],
+    insets: [],
+    leading: [],
+    exempt: 0,
+    exemptNoReason: [],
     headings: [],
     imgs: [],
     links: [],
@@ -288,6 +319,7 @@ function measure({ floorText, floorBody, floorHit, root }) {
     ),
   ].filter(visible);
   const boxes = [];
+  const inlineEls = new Set();
   for (const el of interactive) {
     const r = el.getBoundingClientRect();
     let w = r.width;
@@ -324,8 +356,9 @@ function measure({ floorText, floorBody, floorHit, root }) {
         .slice(0, 30),
     };
     if (skip) continue;
+    if (inline) inlineEls.add(el);
     out.targets.push(rec);
-    if (!inline && (w > r.width + 1 || h > r.height + 1))
+    if (!inline && base.contains(el) && (w > r.width + 1 || h > r.height + 1))
       boxes.push({
         rec,
         x: r.left + r.width / 2,
@@ -352,6 +385,235 @@ function measure({ floorText, floorBody, floorHit, root }) {
         Math.max(a.y - a.h / 2, b.y - b.h / 2);
       if (ox > 4 && oy > 4) out.overlaps.push(`${a.rec.el} x ${b.rec.el}`);
     }
+
+  // ---- the spacing floor (BUNDU_FLOOR.spacing) ----
+  const exempt = (el) => el.closest("[data-mzizi-spacing-exempt]");
+  const exemptEls = [
+    ...document.querySelectorAll("[data-mzizi-spacing-exempt]"),
+  ];
+  out.exempt = exemptEls.length;
+  out.exemptNoReason = exemptEls
+    .filter((e) => !e.getAttribute("data-mzizi-spacing-exempt").trim())
+    .map(sel);
+  const boxMemo = new WeakMap();
+  const drawsBox = (e) => {
+    if (boxMemo.has(e)) return boxMemo.get(e);
+    const s = getComputedStyle(e);
+    let v = rgba(s.backgroundColor)[3] > 0 || s.backgroundImage !== "none";
+    // a border on three or more sides draws a box; one rule (a divider) does not
+    const edges = ["Top", "Right", "Bottom", "Left"].filter(
+      (side) =>
+        parseFloat(s["border" + side + "Width"]) > 0 &&
+        s["border" + side + "Style"] !== "none" &&
+        rgba(s["border" + side + "Color"])[3] > 0,
+    );
+    if (edges.length >= 3) v = true;
+    if (s.boxShadow !== "none" && /\d/.test(s.boxShadow)) v = true;
+    boxMemo.set(e, v);
+    return v;
+  };
+  const textRects = (root2) => {
+    const rects = [];
+    const w = document.createTreeWalker(root2, NodeFilter.SHOW_TEXT);
+    for (let n; (n = w.nextNode());) {
+      if (!n.nodeValue.trim()) continue;
+      const p = n.parentElement;
+      if (!p || p.closest("script,style,noscript,template") || !visible(p))
+        continue;
+      const rg = document.createRange();
+      rg.selectNodeContents(n);
+      for (const r of rg.getClientRects())
+        if (r.width > 0 && r.height > 0) rects.push(r);
+    }
+    return rects;
+  };
+  // the visible edge of a control: its box when it draws one, else its text and media
+  const visibleRect = (el) => {
+    if (drawsBox(el)) return el.getBoundingClientRect();
+    const rs = textRects(el);
+    for (const m of el.querySelectorAll("img,svg,video"))
+      if (visible(m)) rs.push(m.getBoundingClientRect());
+    if (!rs.length) return el.getBoundingClientRect();
+    return {
+      left: Math.min(...rs.map((r) => r.left)),
+      right: Math.max(...rs.map((r) => r.right)),
+      top: Math.min(...rs.map((r) => r.top)),
+      bottom: Math.max(...rs.map((r) => r.bottom)),
+    };
+  };
+  // gaps between adjacent controls, visible edge to visible edge
+  const CONTROLS =
+    "a[href],button,input:not([type=hidden]),select,textarea,summary,[role=button],[role=tab],[role=link],[role=menuitem],[role=switch],[role=checkbox],[role=radio]";
+  const ctl = interactive
+    .filter(
+      (e) =>
+        base.contains(e) &&
+        e.matches(CONTROLS) &&
+        !exempt(e) &&
+        !inlineEls.has(e) &&
+        !(e.closest(".sr-only,.skip") && !e.matches(":focus")),
+    )
+    .map((e) => ({ e, r: visibleRect(e) }));
+  for (let i = 0; i < ctl.length; i++)
+    for (let j = i + 1; j < ctl.length; j++) {
+      const a = ctl[i];
+      const b = ctl[j];
+      if (a.e.contains(b.e) || b.e.contains(a.e)) continue;
+      const dx = Math.max(a.r.left - b.r.right, b.r.left - a.r.right, 0);
+      const dy = Math.max(a.r.top - b.r.bottom, b.r.top - a.r.bottom, 0);
+      const d = dx > 0 && dy > 0 ? Math.hypot(dx, dy) : Math.max(dx, dy);
+      if (d < floorGap - 0.5)
+        out.gaps.push({
+          a: sel(a.e),
+          b: sel(b.e),
+          gap: +d.toFixed(1),
+          text: `${a.e.textContent.trim().slice(0, 18)} | ${b.e.textContent.trim().slice(0, 18)}`,
+        });
+    }
+  // text inset to the edge of its container: the nearest ancestor that draws a box
+  const CONTROL = /^(BUTTON|INPUT|SELECT|TEXTAREA|SUMMARY|A)$/;
+  // chips are labels, not containers; table cells are data, not cards, panels or callouts
+  const NOT_CONTAINER =
+    "[data-slot=badge],.badge,.eyebrow,kbd,td,th,:not(pre) > code:not(.cmd)";
+  const ext = new Map();
+  const tw = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
+  for (let n; (n = tw.nextNode());) {
+    if (!n.nodeValue.trim()) continue;
+    const p = n.parentElement;
+    if (!p || p.closest("script,style,noscript,svg,template") || !visible(p))
+      continue;
+    // the nearest ancestor that is a box or a control; text in a bare control (a plain
+    // link) has no edge of its own, and text in a chip or a table cell is not held to the inset
+    let c = null;
+    for (
+      let e = p;
+      e && e !== document.body && e !== document.documentElement;
+      e = e.parentElement
+    ) {
+      if (e.matches(NOT_CONTAINER)) break;
+      if (drawsBox(e)) {
+        c = e;
+        break;
+      }
+      if (e.matches(CONTROLS)) break;
+    }
+    if (!c || exempt(c)) continue;
+    const cs = getComputedStyle(c);
+    const control =
+      CONTROL.test(c.tagName) ||
+      /^(button|tab)$/.test(c.getAttribute("role") ?? "");
+    // chips (badges, inline labels) are not containers; text-bearing inline boxes that are not controls
+    if (!control && /^inline/.test(cs.display)) continue;
+    // a chip (a label) is not a container: a box no taller than the 28px visible control
+    // minimum, or a one-line pill (a badge, a stepper, a drawn specimen of a button)
+    if (!control) {
+      const cb = c.getBoundingClientRect();
+      const radius = parseFloat(cs.borderTopLeftRadius) || 0;
+      const tr = textRects(c);
+      const oneLine =
+        tr.length > 0 &&
+        Math.max(...tr.map((r) => r.bottom)) -
+          Math.min(...tr.map((r) => r.top)) <=
+          1.5 * Math.min(...tr.map((r) => r.height));
+      if (cb.height <= 28 || (oneLine && radius >= cb.height / 2 - 1)) continue;
+    }
+    const ps = getComputedStyle(p);
+    const lh = parseFloat(ps.lineHeight);
+    const rg = document.createRange();
+    rg.selectNodeContents(n);
+    // text that sits inside its own scroll area is reached by scrolling, not clipped
+    let sx = false;
+    let sy = false;
+    for (let e = p; e && e !== c; e = e.parentElement) {
+      const es = getComputedStyle(e);
+      if (/auto|scroll/.test(es.overflowX) && e.scrollWidth > e.clientWidth + 1)
+        sx = true;
+      if (
+        /auto|scroll/.test(es.overflowY) &&
+        e.scrollHeight > e.clientHeight + 1
+      )
+        sy = true;
+    }
+    for (const r of rg.getClientRects()) {
+      if (r.width <= 0 || r.height <= 0) continue;
+      // measure to the line box, not the glyph box: the half-leading belongs to the text
+      // (negative when the line is tighter than the glyphs)
+      const half = Number.isFinite(lh) ? (lh - r.height) / 2 : 0;
+      const x = ext.get(c) ?? {
+        l: 1e9,
+        r: -1e9,
+        t: 1e9,
+        b: -1e9,
+        control,
+        sx: false,
+        sy: false,
+      };
+      x.sx ||= sx;
+      x.sy ||= sy;
+      x.l = Math.min(x.l, r.left);
+      x.r = Math.max(x.r, r.right);
+      x.t = Math.min(x.t, r.top - half);
+      x.b = Math.max(x.b, r.bottom + half);
+      ext.set(c, x);
+    }
+  }
+  for (const [c, x] of ext) {
+    const b = c.getBoundingClientRect();
+    const cs = getComputedStyle(c);
+    const scrollsX =
+      /auto|scroll/.test(cs.overflowX) && c.scrollWidth > c.clientWidth + 1;
+    const scrollsY =
+      /auto|scroll/.test(cs.overflowY) && c.scrollHeight > c.clientHeight + 1;
+    const sides = {
+      left: x.l - b.left,
+      right: scrollsX || x.sx ? Infinity : b.right - x.r,
+      top: x.control ? Infinity : x.t - b.top,
+      bottom: x.control || scrollsY || x.sy ? Infinity : b.bottom - x.b,
+    };
+    const [side, inset] = Object.entries(sides).sort((p, q) => p[1] - q[1])[0];
+    if (inset < floorInset - 1)
+      out.insets.push({
+        el: sel(c),
+        side,
+        inset: +inset.toFixed(1),
+        text: c.textContent.trim().slice(0, 30),
+      });
+  }
+  // body line height: 1.5 or more (WCAG 1.4.12); `normal` is about 1.2
+  const lhSeen = new Set();
+  const lw = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
+  for (let n; (n = lw.nextNode());) {
+    const el = n.parentElement;
+    if (!n.nodeValue.trim() || !el || lhSeen.has(el)) continue;
+    if (
+      el.closest("script,style,noscript,svg,template") ||
+      !visible(el) ||
+      exempt(el)
+    )
+      continue;
+    lhSeen.add(el);
+    const body = el.closest("p,li,dd,blockquote,td,th");
+    if (
+      !body ||
+      el.closest(
+        "nav,header,footer,button,[role=tab],summary,figcaption,code,pre,.eyebrow,.badge,small",
+      )
+    )
+      continue;
+    const s = getComputedStyle(body);
+    const px = parseFloat(s.fontSize);
+    const lh = parseFloat(s.lineHeight);
+    const ratio2 = Number.isFinite(lh) ? lh / px : 1.2;
+    if (ratio2 < floorLeading - 0.005)
+      out.leading.push({
+        el: sel(body),
+        ratio: +ratio2.toFixed(2),
+        text: body.textContent.trim().slice(0, 30),
+      });
+  }
+  out.leading = out.leading.filter(
+    (v, i, a) => a.findIndex((w) => w.el === v.el && w.ratio === v.ratio) === i,
+  );
 
   // structure
   out.landmarks = Object.fromEntries(
@@ -415,6 +677,161 @@ function measure({ floorText, floorBody, floorHit, root }) {
     return p ? parseFloat(getComputedStyle(p).fontSize) : 0;
   })();
   delete out.text;
+  return out;
+}
+
+// ---- WCAG 1.4.12 text-spacing stress, run after STRESS_CSS is injected ----
+// The criterion: with line height 1.5, paragraph spacing 2x the font size,
+// letter spacing 0.12em and word spacing 0.16em, no content or function is lost.
+// Lost here means text clipped by an overflow:hidden ancestor, text spilling out of
+// the box that draws it, a truncated line, or a page that now scrolls sideways.
+const STRESS_CSS = `*:not(svg):not(svg *) {
+  line-height: 1.5 !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+}
+p { margin-bottom: 2em !important; }`;
+
+function stress() {
+  const out = {
+    clipped: [],
+    spill: [],
+    truncated: [],
+    hscroll: false,
+  };
+  const sel = (el) => {
+    let s = el.tagName.toLowerCase();
+    if (el.id) return `${s}#${el.id}`;
+    const c = [...el.classList].slice(0, 2).join(".");
+    return c ? `${s}.${c}` : s;
+  };
+  const visible = (el) => {
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return false;
+    for (let e = el; e; e = e.parentElement) {
+      const s = getComputedStyle(e);
+      if (
+        s.display === "none" ||
+        s.visibility === "hidden" ||
+        s.opacity === "0"
+      )
+        return false;
+      if (e.hidden) return false;
+      if (
+        e.parentElement?.tagName === "DETAILS" &&
+        !e.parentElement.open &&
+        e.tagName !== "SUMMARY"
+      )
+        return false;
+    }
+    return !(r.width <= 1 && r.height <= 1);
+  };
+  const drawsBox = (e) => {
+    const s = getComputedStyle(e);
+    const clear = (c) =>
+      /^(rgba\(0, 0, 0, 0\)|transparent)$|\/ 0\)$|, 0\)$/.test(c);
+    if (!clear(s.backgroundColor) || s.backgroundImage !== "none") return true;
+    return (
+      ["Top", "Right", "Bottom", "Left"].filter(
+        (d) =>
+          parseFloat(s["border" + d + "Width"]) > 0 &&
+          s["border" + d + "Style"] !== "none" &&
+          !clear(s["border" + d + "Color"]),
+      ).length >= 3
+    );
+  };
+  out.hscroll =
+    document.documentElement.scrollWidth >
+    document.documentElement.clientWidth + 1;
+  const seen = new Set();
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = w.nextNode());) {
+    if (!n.nodeValue.trim()) continue;
+    const p = n.parentElement;
+    if (
+      !p ||
+      p.closest(
+        "script,style,noscript,svg,template,[data-mzizi-spacing-exempt]",
+      ) ||
+      !visible(p)
+    )
+      continue;
+    const rg = document.createRange();
+    rg.selectNodeContents(n);
+    const rects = [...rg.getClientRects()].filter(
+      (r) => r.width > 0 && r.height > 0,
+    );
+    if (!rects.length) continue;
+    const L = Math.min(...rects.map((r) => r.left));
+    const R = Math.max(...rects.map((r) => r.right));
+    const T = Math.min(...rects.map((r) => r.top));
+    const B = Math.max(...rects.map((r) => r.bottom));
+    const txt = n.nodeValue.trim().slice(0, 30);
+    // clipped by an overflow:hidden/clip ancestor
+    // (an ancestor that scrolls on an axis makes the text reachable on that axis)
+    let reachX = false;
+    let reachY = false;
+    for (let e = p; e && e !== document.body; e = e.parentElement) {
+      const s = getComputedStyle(e);
+      const clips = (v) => v === "hidden" || v === "clip";
+      const scrolls = (v) => v === "auto" || v === "scroll";
+      const cx = clips(s.overflowX) && !reachX;
+      const cy = clips(s.overflowY) && !reachY;
+      if (scrolls(s.overflowX)) reachX = true;
+      if (scrolls(s.overflowY)) reachY = true;
+      if (!cx && !cy) continue;
+      const b = e.getBoundingClientRect();
+      if (
+        (cx && (L < b.left - 1 || R > b.right + 1)) ||
+        (cy && (T < b.top - 1 || B > b.bottom + 1))
+      ) {
+        const key = "c" + sel(e) + txt;
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.clipped.push({ el: sel(e), text: txt });
+        }
+        break;
+      }
+    }
+    // a truncated line (text-overflow) or a one-line box that now scrolls
+    const ps = getComputedStyle(p);
+    if (ps.textOverflow === "ellipsis" && p.scrollWidth > p.clientWidth + 1) {
+      const key = "t" + sel(p) + txt;
+      if (!seen.has(key)) {
+        seen.add(key);
+        out.truncated.push({ el: sel(p), text: txt });
+      }
+    }
+    // spilling out of the box that draws it
+    let c = null;
+    for (let e = p; e && e !== document.body; e = e.parentElement)
+      if (drawsBox(e)) {
+        c = e;
+        break;
+      }
+    if (c && !/auto|scroll/.test(getComputedStyle(c).overflowX)) {
+      const b = c.getBoundingClientRect();
+      let sx = false;
+      let sy = false;
+      for (let e = p; e && e !== c; e = e.parentElement) {
+        const es = getComputedStyle(e);
+        if (/auto|scroll/.test(es.overflowX)) sx = true;
+        if (/auto|scroll/.test(es.overflowY)) sy = true;
+      }
+      if (
+        L < b.left - 1 ||
+        (!sx && R > b.right + 1) ||
+        T < b.top - 1 ||
+        (!sy && B > b.bottom + 1)
+      ) {
+        const key = "s" + sel(c) + txt;
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.spill.push({ el: sel(c), text: txt });
+        }
+      }
+    }
+  }
   return out;
 }
 
@@ -553,7 +970,16 @@ async function perfAudit(browser, origin, path) {
   return { kb: Math.round(bytes / 1024), reqs, load, ...m };
 }
 
-const MEASURE_OPTS = { floorText: 14, floorBody: 17, floorHit: 49 };
+// BUNDU_FLOOR from the registry (4.24.0): text 14, body 17, hit 49; spacing
+// insetPx 14 (--inset-floor), controlGapPx 7 (--gap-floor), leadingBody 1.5 (--leading-floor)
+const MEASURE_OPTS = {
+  floorText: 14,
+  floorBody: 17,
+  floorHit: 49,
+  floorInset: 14,
+  floorGap: 7,
+  floorLeading: 1.5,
+};
 
 async function auditPage(browser, origin, [name, path], vp, shots) {
   const ctx = await browser.newContext({
@@ -635,6 +1061,18 @@ async function auditPage(browser, origin, [name, path], vp, shots) {
         document.documentElement.clientWidth + 1,
     );
   }
+  // text-spacing stress on a fresh load of the page, and on the open drawer
+  await page.setViewportSize({ width: vp.width, height: vp.height });
+  await page.goto(origin + path, { waitUntil: "load" });
+  await page.addStyleTag({ content: STRESS_CSS });
+  await page.waitForTimeout(150);
+  r.stress = await page.evaluate(stress);
+  if (name === "home" && (await page.locator("#nav-toggle").isVisible())) {
+    await page.click("#nav-toggle");
+    await page.waitForTimeout(400);
+    const d = extra.find((x) => x.page === "drawer");
+    if (d) d.stress = await page.evaluate(stress);
+  }
   await ctx.close();
   return [r, ...extra];
 }
@@ -702,6 +1140,38 @@ const main = async () => {
       fails.push(
         `${tag}: ${r.belowHit.length} control(s) under a 49px hit region, e.g. ${r.belowHit[0].el} ${r.belowHit[0].w}x${r.belowHit[0].h} "${r.belowHit[0].text}"`,
       );
+    if (r.gaps.length)
+      fails.push(
+        `${tag}: ${r.gaps.length} pair(s) of adjacent controls under a 7px gap, e.g. ${r.gaps[0].a} / ${r.gaps[0].b} ${r.gaps[0].gap}px "${r.gaps[0].text}"`,
+      );
+    if (r.insets.length)
+      fails.push(
+        `${tag}: ${r.insets.length} container(s) with text under a 14px inset, e.g. ${r.insets[0].el} ${r.insets[0].side} ${r.insets[0].inset}px "${r.insets[0].text}"`,
+      );
+    if (r.leading.length)
+      fails.push(
+        `${tag}: ${r.leading.length} body text block(s) under a 1.5 line height, e.g. ${r.leading[0].el} ${r.leading[0].ratio} "${r.leading[0].text}"`,
+      );
+    if (r.exemptNoReason.length)
+      fails.push(
+        `${tag}: data-mzizi-spacing-exempt without a reason on ${r.exemptNoReason.join(", ")}`,
+      );
+    const st = r.stress;
+    if (st) {
+      const lost = [...st.clipped, ...st.spill, ...st.truncated];
+      if (lost.length)
+        fails.push(
+          `${tag}: text-spacing stress (1.4.12) loses text in ${lost.length} place(s), e.g. ${lost[0].el} "${lost[0].text}" (${st.clipped.length} clipped, ${st.spill.length} spilling, ${st.truncated.length} truncated)`,
+        );
+      if (st.hscroll)
+        fails.push(
+          `${tag}: text-spacing stress makes the page scroll sideways`,
+        );
+    }
+    if (r.overlaps.length)
+      fails.push(
+        `${tag}: ${r.overlaps.length} overlapping hit region(s), e.g. ${r.overlaps[0]}`,
+      );
     if (r.contrast.length)
       fails.push(
         `${tag}: ${r.contrast.length} text/background pair(s) under the contrast floor, e.g. ${r.contrast[0].el} ${r.contrast[0].ratio}:1 (needs ${r.contrast[0].need}) "${r.contrast[0].text}"`,
@@ -737,6 +1207,39 @@ const main = async () => {
   t(
     "overlapping hit regions",
     sum((r) => r.overlaps),
+  );
+  t(
+    "adjacent controls under a 7px gap",
+    sum((r) => r.gaps),
+  );
+  t(
+    "containers with text under a 14px inset",
+    sum((r) => r.insets),
+  );
+  t(
+    "body text blocks under a 1.5 line height",
+    sum((r) => r.leading),
+  );
+  t(
+    "text lost under the 1.4.12 spacing stress",
+    rows.reduce(
+      (n, r) =>
+        n +
+        (r.stress
+          ? r.stress.clipped.length +
+            r.stress.spill.length +
+            r.stress.truncated.length
+          : 0),
+      0,
+    ),
+  );
+  t(
+    "pages that scroll sideways under the stress",
+    rows.filter((r) => r.stress?.hscroll).length,
+  );
+  t(
+    "spacing exemptions (data-mzizi-spacing-exempt)",
+    rows.reduce((n, r) => n + (r.exempt ?? 0), 0),
   );
   t(
     "contrast failures (7:1 body, 4.5:1 other)",
@@ -793,7 +1296,7 @@ const main = async () => {
     if (GUARD) process.exit(1);
   } else
     console.log(
-      "\nfloor holds: no text under 14px, no control under a 49px hit region, no sideways scroll, no console errors",
+      "\nfloor holds: no text under 14px, no control under a 49px hit region, 7px between controls, 14px text inset, 1.5 line height, the 1.4.12 stress passes, no sideways scroll, no console errors",
     );
 };
 main().catch((e) => {

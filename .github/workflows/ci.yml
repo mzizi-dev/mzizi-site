@@ -90,6 +90,8 @@ jobs:
       # nothing is downloaded): nothing readable under 14px, a 49px hit region
       # on every control, contrast, one h1 and no skipped levels, no sideways
       # scroll at 320px, at 390, 820 and 1440px. It reads only the built dist/.
+      # It also holds the spacing floor: 7px between adjacent controls, a 14px
+      # text inset, a 1.5 line height and the WCAG 1.4.12 text-spacing stress.
       - name: The Bundu floor holds in a browser
         env:
           PW_CHANNEL: chrome

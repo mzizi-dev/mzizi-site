@@ -21,6 +21,27 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — the rendered gate counts the spacing floor rows (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- **Fixed:** the rendered-content gate counted every list item with the `step` class on `/tokens` as a spacing step and expected 17. Once `api.mzizi.dev` serves the spacing floor, the page also shows five floor rows in the same list style, so the count became 22 and the gate failed on the release PR. It now accepts 17 (API without the floor) or 22 (17 steps plus the five floor rows). The page itself is unchanged.
+
+### Changed — every release carries notes built from the changelog (2026-11-04, (repository), [mzizi-registry#619](https://github.com/mzizi-dev/mzizi-registry/issues/619))
+
+- **Changed:** `@bundu/ui` is now `>=0.10.0 <1` (lockfile at 0.10.0), so the site's styles are built on the spacing floor tokens (`--inset-floor`, `--gap-floor`, `--leading-floor`) and the base-layer rules that ship with it. A reader sees no visible change beyond the floor changes already listed below.
+- The `main-release.yml` minor release builds its notes (the `CHANGELOG.md` entries since the previous release plus a compare link) before it pushes the tag, so a release with no entries fails and tags nothing, and creates the release as a draft that is published once. GitHub's list of merged pull requests is no longer appended, and a manual re-run no longer rewrites a published release's notes (releases are immutable). No page changes.
+- Staging patch tags (`v*`) no longer carry GitHub's auto text: `staging-version.yml` tags with the org workflow's `create-release: false` (it has no input for notes) and a new `release` job writes the pre-release with the `CHANGELOG.md` entries the merge added and a compare link. A merge the changelog gate exempts says so.
+- The new `release notes` workflow tests the scripts and, on a `release/` pull request into `main`, fails when the release would have no changelog entries and prints the notes in the run summary. `AGENTS.md` gains "Release notes (hard rule)".
+
+### Added — the spacing floor, held and shown (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- `/tokens` has a "Spacing floor" section that reads `accessibility.minInset`, `minControlGap`, `minLabelGap`, `minItemGap` and `minBodyLeading` from `api.mzizi.dev/v1/brand` at build time and prints them with the build date. The live API does not serve them until its registry pin reaches 4.24.0; until then the section says so and shows no number.
+- `scripts/audit-ui.mjs --guard` (the CI step "The Bundu floor holds in a browser") now also fails on adjacent controls under a 7px gap (visible edge to visible edge), text under a 14px inset in cards, panels and callouts (all sides) and in buttons and inputs (inline axis), body text under a 1.5 line height, overlapping hit regions, and a WCAG 1.4.12 text-spacing stress pass (line height 1.5, paragraph spacing 2x, letter 0.12em, word 0.16em) that loses or spills text, at 390, 820 and 1440 px. An element can opt out with `data-mzizi-spacing-exempt="<reason>"` (the reason is required); the only use is the drawn component specimens on `/tokens`. One-line pill labels (badges) are not held to the inset, because the shipped components draw them smaller (raised upstream in mzizi-registry).
+
+### Changed — spacing floor applied to the site's own CSS (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- Before: 78 control pairs under 7px, 2,745 container-insets under 14px, and 1,490 pieces of text lost under the stress, measured across the audit's nine pages, its open menu drawer and its search dialog at three widths (the stress pass runs on each page and the open drawer). After: 0 of each. Install commands, colour swatches, ladder tiles, figure tiles, code panes and the bench footer have 14px insets; the component filters, the node jump list and the section links are 7px or more apart.
+- `/components` and `/skills` cards show the whole description. It was cut at four lines, which also hid a long unbroken word that widened the page at 320px; long tokens now wrap inside their cards, and the empty-family sentence on `/tokens` wraps instead of spilling.
+
 ### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Search results no longer start with "Close search× Mzizi Close menu× Browse components.": the header, the search dialog, the menu drawer and the footer are left out of the search index (`data-pagefind-ignore`), so a result's excerpt is the page's own text. `/tokens` swatch ink reads a hex value only when it is 3 or 6 digits. The search field shows one "×" (the dialog's), not a second from the browser.
@@ -69,6 +90,12 @@ cut, the Unreleased entries move under it.
 
 - `verify-rendered.py` no longer applies its stale-figure patterns to `/skills/<name>` bodies, which are the registry's `@nyuchi/mzizi-skills` text (the gate already leaves them out of the language-state patterns). The live skill text quotes the 2026-11-01 figures and made the gate fail on every branch.
 - `llms.txt`: `@nyuchi/mzizi-skills` **0.16.0** (npm and `/v1/skills`, which now serves it), the `mzizi` plugin 1.6.0 carrying it; dated 2026-11-03.
+
+### Changed — `AGENTS.md` gains a Merge convention section for the `staging` queue (2026-11-03)
+
+No issue: repository guidance only. Nothing on mzizi.dev changes.
+
+- **Added: Merge convention.** The site's `AGENTS.md` had none. It now matches the other Mzizi repositories: squash through the merge queue, the target `merge-queue-staging` configuration (`SQUASH`, no 5-minute wait, up to 5 entries, `ALLGREEN`) as the owner's to apply in the rulesets, linear branches until the live values read `SQUASH` and `0`, enqueue as soon as the merge gate is met, forward-port `main`-only commits to `staging` before a release, and only a major release needs the owner.
 
 ### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
 
