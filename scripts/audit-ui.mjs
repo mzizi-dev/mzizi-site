@@ -698,7 +698,6 @@ function stress() {
     spill: [],
     truncated: [],
     hscroll: false,
-    exempt: 0,
   };
   const sel = (el) => {
     let s = el.tagName.toLowerCase();
@@ -729,7 +728,8 @@ function stress() {
   };
   const drawsBox = (e) => {
     const s = getComputedStyle(e);
-    const clear = (c) => /^(rgba\(0, 0, 0, 0\)|transparent)$/.test(c);
+    const clear = (c) =>
+      /^(rgba\(0, 0, 0, 0\)|transparent)$|\/ 0\)$|, 0\)$/.test(c);
     if (!clear(s.backgroundColor) || s.backgroundImage !== "none") return true;
     return (
       ["Top", "Right", "Bottom", "Left"].filter(

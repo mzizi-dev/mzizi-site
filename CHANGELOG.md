@@ -34,7 +34,7 @@ cut, the Unreleased entries move under it.
 
 ### Changed — spacing floor applied to the site's own CSS (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
 
-- Before: 78 control pairs under 7px, 2,745 container-insets under 14px, and 1,490 pieces of text lost under the stress, measured across 31 page states. After: 0 of each. Install commands, colour swatches, ladder tiles, figure tiles, code panes and the bench footer have 14px insets; the component filters, the node jump list and the section links are 7px or more apart.
+- Before: 78 control pairs under 7px, 2,745 container-insets under 14px, and 1,490 pieces of text lost under the stress, measured across the audit's nine pages, its open menu drawer and its search dialog at three widths (the stress pass runs on each page and the open drawer). After: 0 of each. Install commands, colour swatches, ladder tiles, figure tiles, code panes and the bench footer have 14px insets; the component filters, the node jump list and the section links are 7px or more apart.
 - `/components` and `/skills` cards show the whole description. It was cut at four lines, which also hid a long unbroken word that widened the page at 320px; long tokens now wrap inside their cards, and the empty-family sentence on `/tokens` wraps instead of spilling.
 
 ### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
