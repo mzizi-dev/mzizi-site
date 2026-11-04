@@ -454,10 +454,20 @@ no_card = [p.relative_to(DIST).as_posix() for p in DIST.rglob("*.html")
            if p.name != "404.html" and not p.relative_to(DIST).as_posix().startswith("pagefind/")
            and f'property="og:image" content="https://mzizi.dev/og/{_want_card(p)}.png"' not in p.read_text(encoding="utf-8")]
 check("dist/", "every page names its own section's card as its absolute og:image", not no_card, ", ".join(no_card[:5]))
-for icon in ("favicon.svg", "favicon-32.png", "apple-touch-icon.png"):
+for icon in ("favicon.ico", "favicon.svg", "favicon-32.png", "apple-touch-icon.png",
+             "site.webmanifest", "icons/icon-192.png", "icons/icon-512.png",
+             "icons/icon-maskable-512.png"):
     check(icon, "is in dist/", (DIST / icon).is_file())
+_manifest = _json.loads((DIST / "site.webmanifest").read_text(encoding="utf-8"))
+check("site.webmanifest", "names the site and lists a maskable icon",
+      _manifest.get("name") == "Mzizi" and any(i.get("purpose") == "maskable" for i in _manifest.get("icons", [])))
+_ico = (DIST / "favicon.ico").read_bytes()
+check("favicon.ico", "is an ICO with 16, 32 and 48 px frames",
+      _ico[:4] == b"\x00\x00\x01\x00" and int.from_bytes(_ico[4:6], "little") == 3)
 no_icon = [p.relative_to(DIST).as_posix() for p in DIST.glob("*.html")
-           if 'rel="icon" href="/favicon.svg"' not in p.read_text(encoding="utf-8")
+           if 'rel="icon" href="/favicon.ico"' not in p.read_text(encoding="utf-8")
+           or 'rel="icon" href="/favicon.svg"' not in p.read_text(encoding="utf-8")
+           or 'rel="manifest" href="/site.webmanifest"' not in p.read_text(encoding="utf-8")
            or 'rel="apple-touch-icon" href="/apple-touch-icon.png"' not in p.read_text(encoding="utf-8")]
 check("dist/", "every top-level page links the favicon and the touch icon", not no_icon, ", ".join(no_icon[:5]))
 check("index.html", "asks for a large-image card on X", 'name="twitter:card" content="summary_large_image"' in raw_index)
