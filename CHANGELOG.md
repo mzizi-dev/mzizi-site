@@ -21,6 +21,14 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Removed — Dioxus is out of the stack (2026-11-04, [mzizi-registry#635](https://github.com/mzizi-dev/mzizi-registry/issues/635))
+
+Owner decisions: "dioxus is out!!!"; components and primitives are Mzizi first, then TypeScript, with native (Swift, Kotlin) where they exist.
+
+- **Changed: component pages.** The Rust badge now reads "Rust" and the Rust section no longer says "Written for dioxus": the page does not read or print the `/v1/rs/<name>` `target` field, so it behaves the same whether the registry keeps, reshapes or drops it. `RustImplementation.target` is optional and typed `unknown`. The rendered gate checks that `button` leads with its Rust source (`button.rs`) instead of looking for `use dioxus::prelude::*;`.
+- **Changed: `/`, `/language`, `/components`, `/playground`, `llms.txt`.** Phase 1 no longer says the UI is "rendered by a compatible engine (Dioxus today)", native mobile no longer says "a compatible mobile engine (Dioxus today)" (it now says native Swift and Kotlin components where they exist), and cross-platform rendering is "interop with an existing renderer" with what renders the Rust components marked not decided. Where the published crates still depend on Dioxus, the pages say so and that it is being removed. `llms.txt` no longer describes the Roots RFC as "Dioxus UI components" without saying the RFC as written does.
+- **Left as history:** the benchmark's `dioxus` arm and "Rust · Dioxus" rows (`benchmarks/arms/dioxus` still exists upstream, and `check-facts.py` compares the arms), and the pilot narratives that record what ran.
+
 ### Changed — the UI audit guard measures label chips and pills on their inline axis (2026-11-04, (repository), [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
 
 `scripts/audit-ui.mjs --guard` no longer exempts a one-line label chip or pill

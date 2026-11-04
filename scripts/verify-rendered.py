@@ -127,7 +127,7 @@ check("components/", "some pages lead with a Rust implementation", rust_pages > 
 body = text_without_scripts("components/button.html")
 plain = html.unescape(re.sub(r"<[^>]+>", " ", body))
 check("components/button.html", "button leads with its Rust source",
-      "Mzizi Roots: the Rust implementation" in plain and "use dioxus::prelude::*;" in plain)
+      "Mzizi Roots: the Rust implementation" in plain and "button.rs" in plain)
 check("components/button.html", "button shows its React source too",
       "class-variance-authority" in plain and "React build" in plain)
 for fact in ("Owner", "Collection", "npm dependencies", "Registry dependencies"):
