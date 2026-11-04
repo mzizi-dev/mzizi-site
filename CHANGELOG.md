@@ -21,6 +21,14 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — `llms.txt` and the MCP card name the current package versions (2026-11-04, freshness)
+
+No issue: freshness update. Read on 4 November 2026 from npm, the MCP Registry, `api.mzizi.dev/v1/skills/summary` and `mcp.mzizi.dev`; `python3 scripts/check-facts.py dist` reported five drifts and now reports none.
+
+- **Changed: `llms.txt`.** `mzizi-mcp` is 0.17.0 (was 0.14.0) on the server, npm and the MCP Registry; `@nyuchi/mzizi-skills` is 0.18.0 (was 0.16.0) with twelve skills (was nine), the `dev` category now `digital-hygiene`, `progress-report`, `ship-release`, `registry-propagation` and `pr-gates`; the API serves 0.18.0 and the plugin is 1.7.0 carrying skills 0.18.0 (was 1.6.0 and 0.16.0); `@nyuchi/mzizi-cli` is 0.8.0 (was 0.7.0), and the entry says it adds `mzizi check`. The version block is dated 2026-11-04.
+- **Changed: `/.well-known/mcp.json`.** The authorisation note cites `mzizi-mcp` 0.17.0, checked 2026-11-04, with the same behaviour: `initialize` and `tools/list` answer without a token, and only the Fundi tools need sign-in.
+- **No change needed:** the component count (675 cards and pages), the Roots crates (0.7.0) and the `/skills` pages already followed the live sources; `/skills` lists the twelve skills the API serves. `verify-rendered.py` and `check-facts.py` needed no matcher change.
+
 ### Removed — Dioxus is out of the stack (2026-11-04, [mzizi-registry#635](https://github.com/mzizi-dev/mzizi-registry/issues/635))
 
 Owner decisions: "dioxus is out!!!"; components and primitives are Mzizi first, then TypeScript, with native (Swift, Kotlin) where they exist.
