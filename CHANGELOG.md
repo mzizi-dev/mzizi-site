@@ -21,7 +21,7 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
-### Fixed
+### Fixed — the rendered gate counts the spacing floor rows (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
 
 - **Fixed:** the rendered-content gate counted every list item with the `step` class on `/tokens` as a spacing step and expected 17. Once `api.mzizi.dev` serves the spacing floor, the page also shows five floor rows in the same list style, so the count became 22 and the gate failed on the release PR. It now accepts 17 (API without the floor) or 22 (17 steps plus the five floor rows). The page itself is unchanged.
 
