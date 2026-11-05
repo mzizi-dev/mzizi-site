@@ -17,8 +17,8 @@
   designed, in RFC-0012 (a draft), so never describe them as working.
   It lives in the language repository, `mzizi-dev/mzizi`; the agent-tools
   packages (`@nyuchi/mzizi-cli`, `mzizi-mcp`, `fundi`) are its clients.
-  Designed to lower to Rust (Roots are moving to Mzizi's own `render()`, with Dioxus still a
-  dependency of some crates during the migration; axum or `workers-rs` for servers). Today two things lower: `mz build` lowers a
+  Designed to lower to Rust (Roots are moving to Mzizi's own `render()`; Dioxus is out of the stack (owner, 4 November 2026) and the published crates still depend on it
+  until it is removed; axum or `workers-rs` for servers). Today two things lower: `mz build` lowers a
   `service` to a local Rust + axum package, which CI compiles, tests and
   serves, and `mz run` (or `mz build`) lowers a `program` to a Rust package
   with no dependencies, which `mz run` builds and runs. No component lowers yet, and there is no Workers, Containers or
@@ -64,7 +64,7 @@ program, errors mapped back to `.mz`, and Rust crate interop), so do not call Mz
 
 The novel part, and the only part claimed as research, is the language: its
 syntax, its type system, its contracts, and the feedback loop its diagnostics
-give an agent. Cross-platform rendering is interop with Dioxus rather than a
+give an agent. Cross-platform rendering is interop with an existing renderer rather than a
 rebuilt engine, ML is Candle, and the edge target is `workers-rs`. Those are
 stated non-goals, not gaps.
 
@@ -263,9 +263,9 @@ direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.14.0 serves
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.17.0 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
-act as your console user and need sign-in (checked 2026-11-02). The MCP server is
+act as your console user and need sign-in (checked 2026-11-04). The MCP server is
 Rust first: where a component has a Mzizi Roots implementation,
 `mzizi_get_component` returns it under `rust` (the crate, the `cargo add` line,
 the contract and the `.rs` source), then the pure Astro build under `astro` where
@@ -275,38 +275,41 @@ the components with that build, and its rows and `mzizi_search`'s hits carry
 `rustCrate` and `astroFile`. `mzizi_get_skills` takes `category` (`dev`,
 `design`, `language` or `build`) and returns every skill in it in full.
 
-Versions on 2026-11-03 (read the registries before repeating one):
+Versions on 2026-11-04 (read the registries before repeating one):
 
-- `mzizi-mcp` **0.14.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
-  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.14.0)
-- `@nyuchi/mzizi-skills` **0.16.0** on npm: nine skills in four categories,
+- `mzizi-mcp` **0.17.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
+  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.17.0)
+- `@nyuchi/mzizi-skills` **0.18.0** on npm: twelve skills in four categories,
   `mzizi-language` (language), `mzizi-design` and `mukoko-design` (design),
   `mzizi-roots`, `mzizi-backend`, `mzizi-architecture` and `discoverability`
-  (build), and `digital-hygiene` and `progress-report` (dev: how every agent
-  works, loaded before any dev work). The registry requires it from 4.20.0;
+  (build), and `digital-hygiene`, `progress-report`, `ship-release`,
+  `registry-propagation` and `pr-gates` (dev: how every agent works, loaded
+  before any dev work). The registry requires it from 4.20.0;
   `api.mzizi.dev/v1/skills` and the `/skills` pages here serve the bundle at
-  the API's registry pin (0.16.0 on 2026-11-03) until that pin moves.
+  the API's registry pin (0.18.0 on 2026-11-04) until that pin moves.
   `/v1/skills`' `meta.version` says which bundle is
   served. The public `mzizi` plugin (mzizi-dev/mzizi-registry `plugin/`:
   `/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install
-  mzizi@mzizi`, plugin 1.6.0 on 2026-11-03) carries skills 0.16.0;
+  mzizi@mzizi`, plugin 1.7.0 on 2026-11-04) carries skills 0.18.0;
   mzizi-registry#520, still open, would make it installable in Codex. A client that
   installs nothing gets the skills from `mzizi_get_skills`. How to connect each
   AI client (Claude, ChatGPT, Codex, the Claude and OpenAI APIs, Cursor,
   VS Code, Gemini CLI, OpenCode, Windsurf):
   https://docs.mzizi.dev/toolchain/connect
-- `@nyuchi/mzizi-cli` **0.7.0**, which ships the installer: `mzizi add <name>`
+- `@nyuchi/mzizi-cli` **0.8.0**, which ships the installer: `mzizi add <name>`
   for React (writes the TSX), Rust (records the crate the component's
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
   Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
-  `src/components/mzizi/`), plus the `fundi` agent. `npx mzizi` works.
+  `src/components/mzizi/`), plus the `fundi` agent, and (from 0.8.0) `mzizi check`,
+  which fails on padding, gaps and line heights under the spacing floor.
+  `npx mzizi` works.
 - Mzizi Roots on crates.io, all **0.7.0**: `mzizi-tokens`, `mzizi-ui`,
   `mzizi-brand`, `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`,
   `mzizi-discovery`, and the umbrellas `mzizi-roots` (UI) and
   `mzizi-roots-server` (server). `cargo add mzizi-roots` works.
 
 **The components are built to support the language.** *Mzizi Roots* is
-Mzizi's own UI and server components for the agentic web, in Rust (moving to Mzizi's own `render()`; Dioxus is still a dependency of some crates during the migration):
+Mzizi's own UI and server components for the agentic web, in Rust (moving to Mzizi's own `render()`; Dioxus is out of the stack (owner, 4 November 2026) and the published crates still depend on it until it is removed):
 the language's component model, the way React is JavaScript's, and its UI
 layer. Where a component has a Rust implementation, it is presented first. The
 React/TSX builds keep working but are deprioritised. The registry also supplies
@@ -363,7 +366,7 @@ Hostnames change; resolve one before repeating it.
 - [RFC-0013 — the core language](https://github.com/mzizi-dev/mzizi/blob/main/design/RFC-0013-core-language.md): all of Tier 1 ([#76](https://github.com/mzizi-dev/mzizi/pull/76), amended in [#81](https://github.com/mzizi-dev/mzizi/pull/81)). A draft for review. Built on `main`: the program kind, expressions, numbers, bindings, functions, control flow, errors, `mz run` and their lowering; collections, text operations and methods on records are built (C6–C8)
 - [design/LANGUAGE-SURVEY.md](https://github.com/mzizi-dev/mzizi/blob/main/design/LANGUAGE-SURVEY.md): the top 10 languages, feature by feature, as design input. Nothing in it is implemented or measured
 - RFC-0005 is reserved and unwritten
-- [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, as Dioxus UI components and host-agnostic server components. Proposed
+- [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, with host-agnostic server components (the RFC as written names Dioxus for the UI components; Dioxus is now out of the stack). Proposed
 - [Design System](https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc): the published Mzizi design system on claude.ai — voice and content fundamentals, visual foundations, the marks, and component previews. It is built file for file from the `design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418), which is the source of truth: change the folder, never the artifact page
 - [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results): all four pilot write-ups and their raw episodes
 - [benchmarks/READINESS.md](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md): the audit of pilot 2's fixes, and what the kill-criterion run still waits on
