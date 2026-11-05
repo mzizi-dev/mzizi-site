@@ -82,7 +82,7 @@ const phases = [
     n: "Phase 1",
     title: "Full-stack: mzizi-ui with Cloudflare Workers and Containers",
     state: "not started",
-    body: "A Mzizi-authored full-stack application actually deployed to Cloudflare: UI through mzizi-ui, rendered by a compatible engine (Dioxus today), and the server from the same Mzizi source, lowered to workers-rs for a Worker or to a native Rust HTTP server for a Container. Its UI also ships as a self-contained artifact, an ES module or custom element with its WASM bundle, usable without the Worker.",
+    body: "A Mzizi-authored full-stack application actually deployed to Cloudflare: UI through mzizi-ui (what renders it on the Rust side is not decided), and the server from the same Mzizi source, lowered to workers-rs for a Worker or to a native Rust HTTP server for a Container. Its UI also ships as a self-contained artifact, an ES module or custom element with its WASM bundle, usable without the Worker.",
   },
   {
     n: "Phase 2",
@@ -94,7 +94,7 @@ const phases = [
     n: "Phase 3",
     title: "Native mobile: interop first",
     state: "not started",
-    body: "mzizi-ui rendered through a compatible mobile engine (Dioxus today) first. Generating native Swift, ArkTS or Kotlin from the same Rust core is named but not designed, and needs its own RFC.",
+    body: "Native Swift and Kotlin components where they exist (owner, 4 November 2026). Generating native Swift, ArkTS or Kotlin from the same Rust core is named but not designed, and needs its own RFC.",
   },
   {
     n: "Phase 4",
@@ -202,9 +202,9 @@ const arms = [
 >
   <p>
     Mzizi is designed to lower to Rust: Roots components are moving to Mzizi's
-    own <code>render()</code>, with Dioxus still a dependency of some crates
-    while that migration finishes, and axum or <code>workers-rs</code> for
-    servers. Today two things lower: a{" "}
+    own <code>render()</code>; Dioxus is out of the stack (owner, 4 November
+    2026) and the published crates still depend on it until it is removed. The designed server targets are axum and{" "}
+    <code>workers-rs</code>. Today two things lower: a{" "}
     <code>service</code>, which <code>mz build</code> turns into a local Rust +
     axum package that CI compiles, tests and serves, and a <code>program</code>,
     which <code>mz run</code> turns into a Rust package with no dependencies,
@@ -227,7 +227,7 @@ const arms = [
     <code>mzizi-dev/mzizi</code>, and the agent-tools packages (the CLI, the
     MCP server, <code>fundi</code>) are its clients. The <code>mz</code>{" "}
     compiler is the toolchain that implements the language, not the language. Cross-platform rendering is interop
-    with Dioxus rather than a rebuilt engine, as the charter has it; the
+    with an existing renderer rather than a rebuilt engine (what renders the Rust components is not decided); the
     components are moving to Mzizi's own <code>render()</code> (registry #506 and
     #510). ML is Candle; the edge target is{" "}
     <code>workers-rs</code>. Reinventing any of those would buy the language
@@ -602,8 +602,8 @@ const arms = [
   <ul class="spaced">
     <li>Not a competing tensor or ML runtime. Candle is the dependency.</li>
     <li>
-      Not a native cross-platform renderer in Phase 0 or 1. Dioxus interop
-      first; a native renderer only if interop is proven insufficient.
+      Not a native cross-platform renderer in Phase 0 or 1. Interop with
+      an existing renderer first; a native renderer only if interop is proven insufficient.
     </li>
     <li>
       Not post-quantum cryptography. Named as a future research thread and

@@ -21,6 +21,26 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — `@bundu/ui` 0.13.0, the controls that were under the 14px inline floor (2026-11-05, [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+- **Changed:** `@bundu/ui` is now `>=0.13.0 <1` (lockfile at 0.13.0). The package's synced `ToolbarMenu`, `DataTable` row actions, `QuickSearch`, `SideNav` group labels, `TopBarAction` and `CommandPalette` items now take 14px of side padding (were 8px or 10px). The site renders none of these components, so a reader sees no difference: the built pages still have 1997 badges at 14px and none at 8px, and the rendered-content gate passes. The site now follows the package, so any of these components added later arrives at the floor.
+
+### Fixed — `llms.txt` and the MCP card name the current package versions (2026-11-04, freshness)
+
+No issue: freshness update. Read on 4 November 2026 from npm, the MCP Registry, `api.mzizi.dev/v1/skills/summary` and `mcp.mzizi.dev`; `python3 scripts/check-facts.py dist` reported five drifts and now reports none.
+
+- **Changed: `llms.txt`.** `mzizi-mcp` is 0.17.0 (was 0.14.0) on the server, npm and the MCP Registry; `@nyuchi/mzizi-skills` is 0.18.0 (was 0.16.0) with twelve skills (was nine), the `dev` category now `digital-hygiene`, `progress-report`, `ship-release`, `registry-propagation` and `pr-gates`; the API serves 0.18.0 and the plugin is 1.7.0 carrying skills 0.18.0 (was 1.6.0 and 0.16.0); `@nyuchi/mzizi-cli` is 0.8.0 (was 0.7.0), and the entry says it adds `mzizi check`. The version block is dated 2026-11-04.
+- **Changed: `/.well-known/mcp.json`.** The authorisation note cites `mzizi-mcp` 0.17.0, checked 2026-11-04, with the same behaviour: `initialize` and `tools/list` answer without a token, and only the Fundi tools need sign-in.
+- **No change needed:** the component count (675 cards and pages), the Roots crates (0.7.0) and the `/skills` pages already followed the live sources; `/skills` lists the twelve skills the API serves. `verify-rendered.py` and `check-facts.py` needed no matcher change.
+
+### Removed — Dioxus is out of the stack (2026-11-04, [mzizi-registry#635](https://github.com/mzizi-dev/mzizi-registry/issues/635))
+
+Owner decisions: "dioxus is out!!!"; components and primitives are Mzizi first, then TypeScript, with native (Swift, Kotlin) where they exist.
+
+- **Changed: component pages.** The Rust badge now reads "Rust" and the Rust section no longer says "Written for dioxus": the page does not read or print the `/v1/rs/<name>` `target` field, so it behaves the same whether the registry keeps, reshapes or drops it. `RustImplementation.target` is optional and typed `unknown`. The rendered gate checks that `button` leads with its Rust source (`button.rs`) instead of looking for `use dioxus::prelude::*;`.
+- **Changed: `/`, `/language`, `/components`, `/playground`, `llms.txt`.** Phase 1 no longer says the UI is "rendered by a compatible engine (Dioxus today)", native mobile no longer says "a compatible mobile engine (Dioxus today)" (it now says native Swift and Kotlin components where they exist), and cross-platform rendering is "interop with an existing renderer" with what renders the Rust components marked not decided. Where the published crates still depend on Dioxus, the pages say so and that it is being removed. `llms.txt` no longer describes the Roots RFC as "Dioxus UI components" without saying the RFC as written does.
+- **Left as history:** the benchmark's `dioxus` arm and "Rust · Dioxus" rows (`benchmarks/arms/dioxus` still exists upstream, and `check-facts.py` compares the arms), and the pilot narratives that record what ran.
+
 ### Changed — the UI audit guard measures label chips and pills on their inline axis (2026-11-04, (repository), [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
 
 `scripts/audit-ui.mjs --guard` no longer exempts a one-line label chip or pill
