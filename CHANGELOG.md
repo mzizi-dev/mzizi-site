@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — `@bundu/ui` 0.13.0, the controls that were under the 14px inline floor (2026-11-05, [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+- **Changed:** `@bundu/ui` is now `>=0.13.0 <1` (lockfile at 0.13.0). The package's synced `ToolbarMenu`, `DataTable` row actions, `QuickSearch`, `SideNav` group labels, `TopBarAction` and `CommandPalette` items now take 14px of side padding (were 8px or 10px). The site renders none of these components, so a reader sees no difference: the built pages still have 1997 badges at 14px and none at 8px, and the rendered-content gate passes. The site now follows the package, so any of these components added later arrives at the floor.
+
 ### Fixed — `llms.txt` and the MCP card name the current package versions (2026-11-04, freshness)
 
 No issue: freshness update. Read on 4 November 2026 from npm, the MCP Registry, `api.mzizi.dev/v1/skills/summary` and `mcp.mzizi.dev`; `python3 scripts/check-facts.py dist` reported five drifts and now reports none.
