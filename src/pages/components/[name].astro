@@ -85,7 +85,7 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
   wide
 >
   <ul class="badges component-badges">
-    {rust && <li><Badge variant="info" size="sm">Rust · {rust.target}</Badge></li>}
+    {rust && <li><Badge variant="info" size="sm">Rust</Badge></li>}
     <li><Badge size="sm">{shortType(item.type)}</Badge></li>
     <li><Badge variant="outline" size="sm">N{item.node} {nodeTitle}</Badge></li>
     {item.categories.map((category) => <li><Badge variant="outline" size="sm">{category}</Badge></li>)}
@@ -175,8 +175,8 @@ const uiUrl = `${CANONICAL_BASE}/ui/${item.name}`;
       <section class="impl impl-rust" id="rust">
         <h2>Mzizi Roots: the Rust implementation</h2>
         <p class="prose">
-          Written for <code>{rust.target}</code>, against the same contract and
-          token set as the React build, not translated from it. This is the
+          Written against the same contract and token set as the React build,
+          not translated from it. This is the
           component as Mzizi presents it.
         </p>
 

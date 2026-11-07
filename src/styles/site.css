@@ -94,6 +94,13 @@
   --spec-badge-default: calc(var(--spacing) * 5.5);
   --spec-toggle-default: calc(var(--spacing) * 6);
   --spec-checkbox-default: calc(var(--spacing) * 5);
+
+  /* The spacing floor (BUNDU_FLOOR.spacing, registry 4.24.0): 14px between text and
+     the edge of its container, 7px between adjacent controls, 1.5 body leading.
+     `@bundu/ui` registers --inset-floor, --gap-floor and --leading-floor from 0.10;
+     the fallback is the same number on this file's spacing unit (2 x 7, 7). */
+  --space-inset: var(--inset-floor, calc(var(--spacing) * 3.5));
+  --space-gap: var(--gap-floor, calc(var(--spacing) * 1.75));
 }
 
 @layer base {
@@ -221,8 +228,8 @@
   /* Capitalized — "Mzizi", not "mzizi". The voice-guide's lowercase rule is
  * written down, but bundu.org's own live header/footer render "Bundu
  * Foundation" in title case regardless, and this site follows what the
- * reference site actually does, on the record. The dot ahead of it is the
- * same identity mark bundu.org's own header and footer use. */
+ * reference site actually does, on the record. The Mzizi mark ahead of it
+ * replaces the cobalt dot (owner, 2026-11-04: the site serves its icon mark). */
   .wordmark {
     display: inline-flex;
     align-items: center;
@@ -241,11 +248,12 @@
     font-size: var(--text-h3);
   }
 
-  .wordmark .dot {
-    inline-size: 0.5em;
-    block-size: 0.5em;
-    border-radius: 50%;
-    background: var(--color-cobalt);
+  /* The Mzizi mark (public/favicon.svg: white roots on the hematite disc) ahead of the
+   * name. Decorative: the link's text, "Mzizi", names it. It scales with the wordmark
+   * and keeps its width so the name never shifts it. */
+  .wordmark .mark {
+    inline-size: 1.15em;
+    block-size: 1.15em;
     flex-shrink: 0;
   }
 
@@ -303,6 +311,12 @@
   samp {
     font-family: var(--font-mono);
     font-size: var(--text-code);
+  }
+
+  /* A long unbroken token (a package name, an integer literal, a URL) wraps
+     inside its box instead of spilling out of it or widening the page. */
+  main :where(p, li, dd, summary, figcaption, h1, h2, h3, h4, h5, h6) {
+    overflow-wrap: break-word;
   }
 
   :not(pre) > code {
@@ -675,6 +689,12 @@
     outline: none;
   }
 
+  /* The browser's own clear button on a search field would be a second "×"
+ * beside the dialog's close button. */
+  .search-box input::-webkit-search-cancel-button {
+    display: none;
+  }
+
   .search-close {
     display: inline-flex;
     align-items: center;
@@ -865,7 +885,7 @@
     line-height: var(--leading-code);
     background: var(--surface-container);
     border-radius: var(--radius-sm);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-inset);
     color: var(--muted-foreground);
     overflow-wrap: anywhere;
   }
@@ -1138,7 +1158,7 @@
   .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: calc(var(--target-floor) - var(--touch-target));
+    gap: max(var(--space-gap), calc(var(--target-floor) - var(--touch-target)));
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1178,7 +1198,7 @@
   .jump {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-xs);
+    gap: var(--space-gap);
     padding: 0;
     margin-block: var(--space-base);
     list-style: none;
@@ -1311,18 +1331,15 @@
     color: var(--muted-foreground);
   }
 
-  /* Four lines is enough to decide whether this is the component you want. The
- * full description stays in the HTML for search and for screen readers. */
+  /* The whole description, never clipped: a line clamp loses text the moment a
+ * reader widens the spacing (WCAG 1.4.12), which `scripts/audit-ui.mjs --guard`
+ * checks at 390, 820 and 1440 px. */
   .component p {
+    overflow-wrap: anywhere;
     margin: 0;
     font-size: var(--text-body-small);
     line-height: var(--leading-body-small);
     color: var(--muted-foreground);
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    line-clamp: 4;
-    overflow: hidden;
   }
 
   /* One line, scrolling inside its own card rather than growing it. The full
@@ -1550,7 +1567,7 @@
   .swatch {
     background: var(--swatch);
     color: var(--swatch-ink);
-    padding: var(--space-lg) var(--space-md) var(--space-sm);
+    padding: var(--space-lg) var(--space-inset) var(--space-inset);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
   }
@@ -1562,6 +1579,11 @@
     font-weight: var(--weight-h6);
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+
+  /* A sentence in a card, not a one-line label: it wraps. */
+  .family-body .count-link {
+    white-space: normal;
   }
 
   .family-body {
@@ -1617,7 +1639,7 @@
   }
 
   .pair.sub .swatch {
-    padding: var(--space-md) var(--space-sm) var(--space-xs);
+    padding: var(--space-inset);
   }
 
   .ladder {
@@ -1639,14 +1661,14 @@
   .ladder-item .pair > div {
     background: var(--swatch);
     color: var(--swatch-ink);
-    padding: var(--space-base) var(--space-sm) var(--space-xs);
+    padding: var(--space-inset);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
     overflow-wrap: anywhere;
   }
 
   .ladder-item .meta {
-    padding: var(--space-sm) var(--space-md) var(--space-md);
+    padding: var(--space-inset);
   }
 
   .ladder-item .meta strong {
@@ -2000,7 +2022,7 @@
   .bench-src .ln {
     display: grid;
     grid-template-columns: 2.4em 1fr;
-    padding-inline-end: var(--space-lg);
+    padding-inline: var(--space-inset) var(--space-lg);
     white-space: pre;
   }
 
@@ -2035,7 +2057,7 @@
     grid-template-columns: 2.4em 1fr auto;
     align-items: center;
     white-space: pre;
-    padding-inline-end: var(--space-lg);
+    padding-inline: var(--space-inset) var(--space-lg);
   }
 
   .bench-size.fail {
@@ -2049,7 +2071,7 @@
   .bench-step {
     display: inline-flex;
     align-items: center;
-    gap: calc(var(--target-floor) - var(--touch-target));
+    gap: max(var(--space-gap), calc(var(--target-floor) - var(--touch-target)));
     background: var(--surface-container);
     border-radius: 999px;
     padding: 2px;
@@ -2107,7 +2129,7 @@
   }
 
   .bench-foot {
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-inset) var(--space-lg);
     font-size: var(--text-caption);
     color: var(--muted-foreground);
     border-block-start: 1px solid var(--border);
@@ -2145,7 +2167,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--spec-card-radius);
-    padding: var(--space-base);
+    padding: var(--space-inset);
   }
 
   .fig b {
@@ -2333,7 +2355,7 @@
     background: var(--surface-container);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-inset);
     overflow-x: auto;
   }
 
@@ -2462,6 +2484,9 @@
   }
 
   .section-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-gap) var(--space-lg);
     margin-block: var(--space-xl) 0;
     font-weight: 500;
   }

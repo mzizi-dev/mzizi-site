@@ -207,6 +207,16 @@ export interface Brand {
     focusIndicator: string;
     minTouchTarget: number;
     defaultTouchTarget: number;
+    /**
+     * The spacing floor (registry 4.24.0, `BUNDU_FLOOR.spacing`). Optional: an API
+     * pinned to an earlier registry commit does not serve them, and the page that
+     * shows them says so rather than supplying a number of its own.
+     */
+    minInset?: number;
+    minControlGap?: number;
+    minLabelGap?: number;
+    minItemGap?: number;
+    minBodyLeading?: number;
     keyboardNavigation: string;
     screenReaders: string;
   };
@@ -359,8 +369,12 @@ export interface ComponentDetail {
 export interface RustImplementation {
   name: string;
   type: string;
-  /** The rendering target the source is written for — `dioxus` today. */
-  target: string;
+  /**
+   * The registry's `target` for the source. Not read by any page: it served
+   * `dioxus` until the registry dropped Dioxus (mzizi-registry#635) and may
+   * change shape or go away, so it is optional and never rendered.
+   */
+  target?: unknown;
   description: string;
   /**
    * The crate the API says this source belongs to. It differs by node:

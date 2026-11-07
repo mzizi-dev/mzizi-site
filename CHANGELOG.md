@@ -21,6 +21,75 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — `@bundu/ui` 0.13.0, the controls that were under the 14px inline floor (2026-11-05, [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+- **Changed:** `@bundu/ui` is now `>=0.13.0 <1` (lockfile at 0.13.0). The package's synced `ToolbarMenu`, `DataTable` row actions, `QuickSearch`, `SideNav` group labels, `TopBarAction` and `CommandPalette` items now take 14px of side padding (were 8px or 10px). The site renders none of these components, so a reader sees no difference: the built pages still have 1997 badges at 14px and none at 8px, and the rendered-content gate passes. The site now follows the package, so any of these components added later arrives at the floor.
+
+### Fixed — `llms.txt` and the MCP card name the current package versions (2026-11-04, freshness)
+
+No issue: freshness update. Read on 4 November 2026 from npm, the MCP Registry, `api.mzizi.dev/v1/skills/summary` and `mcp.mzizi.dev`; `python3 scripts/check-facts.py dist` reported five drifts and now reports none.
+
+- **Changed: `llms.txt`.** `mzizi-mcp` is 0.17.0 (was 0.14.0) on the server, npm and the MCP Registry; `@nyuchi/mzizi-skills` is 0.18.0 (was 0.16.0) with twelve skills (was nine), the `dev` category now `digital-hygiene`, `progress-report`, `ship-release`, `registry-propagation` and `pr-gates`; the API serves 0.18.0 and the plugin is 1.7.0 carrying skills 0.18.0 (was 1.6.0 and 0.16.0); `@nyuchi/mzizi-cli` is 0.8.0 (was 0.7.0), and the entry says it adds `mzizi check`. The version block is dated 2026-11-04.
+- **Changed: `/.well-known/mcp.json`.** The authorisation note cites `mzizi-mcp` 0.17.0, checked 2026-11-04, with the same behaviour: `initialize` and `tools/list` answer without a token, and only the Fundi tools need sign-in.
+- **No change needed:** the component count (675 cards and pages), the Roots crates (0.7.0) and the `/skills` pages already followed the live sources; `/skills` lists the twelve skills the API serves. `verify-rendered.py` and `check-facts.py` needed no matcher change.
+
+### Removed — Dioxus is out of the stack (2026-11-04, [mzizi-registry#635](https://github.com/mzizi-dev/mzizi-registry/issues/635))
+
+Owner decisions: "dioxus is out!!!"; components and primitives are Mzizi first, then TypeScript, with native (Swift, Kotlin) where they exist.
+
+- **Changed: component pages.** The Rust badge now reads "Rust" and the Rust section no longer says "Written for dioxus": the page does not read or print the `/v1/rs/<name>` `target` field, so it behaves the same whether the registry keeps, reshapes or drops it. `RustImplementation.target` is optional and typed `unknown`. The rendered gate checks that `button` leads with its Rust source (`button.rs`) instead of looking for `use dioxus::prelude::*;`.
+- **Changed: `/`, `/language`, `/components`, `/playground`, `llms.txt`.** Phase 1 no longer says the UI is "rendered by a compatible engine (Dioxus today)", native mobile no longer says "a compatible mobile engine (Dioxus today)" (it now says native Swift and Kotlin components where they exist), and cross-platform rendering is "interop with an existing renderer" with what renders the Rust components marked not decided. Where the published crates still depend on Dioxus, the pages say so and that it is being removed. `llms.txt` no longer describes the Roots RFC as "Dioxus UI components" without saying the RFC as written does.
+- **Left as history:** the benchmark's `dioxus` arm and "Rust · Dioxus" rows (`benchmarks/arms/dioxus` still exists upstream, and `check-facts.py` compares the arms), and the pilot narratives that record what ran.
+
+### Changed — the UI audit guard measures label chips and pills on their inline axis (2026-11-04, (repository), [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+`scripts/audit-ui.mjs --guard` no longer exempts a one-line label chip or pill
+(a badge, an eyebrow that draws a box, a status pill, a one-line pill or an
+inline-flex label) on both axes. The block axis stays exempt (a chip's block
+size is its line height or fixed height), but the inline inset from the text to
+the chip's edge is now held to the same 14px floor (`floorInset`) as a container,
+the rule written down in mzizi-registry#627. A pill with 8px of side padding now
+fails the "containers with text under a 14px inset" count. Search-hit `mark`
+highlights are not chips and stay exempt. Nothing a reader sees changes: with
+`@bundu/ui` 0.12.0 the site's own pills are at 14px, and the guard reports 0 containers
+under the inset on the built site.
+
+### Fixed — badges and tooltips meet the 14px inline floor, on `@bundu/ui` 0.12.0 (2026-11-04, [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
+
+- **Fixed:** `@bundu/ui` is now `>=0.12.0 <1` (lockfile at 0.12.0). The package's React `Badge` and `Tooltip` had 8px to 12px of side padding; they now have 14px, so every badge on the site (1997 across the built pages, none left at 8px) holds the Bundu floor's inline inset. A reader sees slightly wider badges.
+- Ten registry-synced controls in the package are still under 14px of side padding (toolbar and data-table row-action summaries, quick search, top-bar actions, command palette items, the app shell search and side-nav group labels). The site renders none of them. The fix belongs in the registry and ships as a later `@bundu/ui` minor.
+
+### Added — the site serves its icon mark (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- **Added:** `/favicon.ico` (16, 32 and 48 px frames), the web manifest `/site.webmanifest` with 192 and 512 px icons and a maskable icon, and a light and dark `theme-color`. Crawlers and many clients ask for `/favicon.ico` by path and used to get a 404.
+- **Changed:** the header, drawer and footer wordmark now show the Mzizi mark (white roots on the hematite disc) ahead of the name, where a cobalt dot stood. The mark is decorative; the link text "Mzizi" names it.
+- **Changed (repository):** `scripts/generate-brand.mjs` also renders the manifest icons and the ICO from `public/brand/` SVGs; the rendered-content gate checks the new files and that every page links them.
+
+### Fixed — the rendered gate counts the spacing floor rows (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- **Fixed:** the rendered-content gate counted every list item with the `step` class on `/tokens` as a spacing step and expected 17. Once `api.mzizi.dev` serves the spacing floor, the page also shows five floor rows in the same list style, so the count became 22 and the gate failed on the release PR. It now accepts 17 (API without the floor) or 22 (17 steps plus the five floor rows). The page itself is unchanged.
+
+### Changed — every release carries notes built from the changelog (2026-11-04, (repository), [mzizi-registry#619](https://github.com/mzizi-dev/mzizi-registry/issues/619))
+
+- **Changed:** `@bundu/ui` is now `>=0.10.0 <1` (lockfile at 0.10.0), so the site's styles are built on the spacing floor tokens (`--inset-floor`, `--gap-floor`, `--leading-floor`) and the base-layer rules that ship with it. A reader sees no visible change beyond the floor changes already listed below.
+- The `main-release.yml` minor release builds its notes (the `CHANGELOG.md` entries since the previous release plus a compare link) before it pushes the tag, so a release with no entries fails and tags nothing, and creates the release as a draft that is published once. GitHub's list of merged pull requests is no longer appended, and a manual re-run no longer rewrites a published release's notes (releases are immutable). No page changes.
+- Staging patch tags (`v*`) no longer carry GitHub's auto text: `staging-version.yml` tags with the org workflow's `create-release: false` (it has no input for notes) and a new `release` job writes the pre-release with the `CHANGELOG.md` entries the merge added and a compare link. A merge the changelog gate exempts says so.
+- The new `release notes` workflow tests the scripts and, on a `release/` pull request into `main`, fails when the release would have no changelog entries and prints the notes in the run summary. `AGENTS.md` gains "Release notes (hard rule)".
+
+### Added — the spacing floor, held and shown (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- `/tokens` has a "Spacing floor" section that reads `accessibility.minInset`, `minControlGap`, `minLabelGap`, `minItemGap` and `minBodyLeading` from `api.mzizi.dev/v1/brand` at build time and prints them with the build date. The live API does not serve them until its registry pin reaches 4.24.0; until then the section says so and shows no number.
+- `scripts/audit-ui.mjs --guard` (the CI step "The Bundu floor holds in a browser") now also fails on adjacent controls under a 7px gap (visible edge to visible edge), text under a 14px inset in cards, panels and callouts (all sides) and in buttons and inputs (inline axis), body text under a 1.5 line height, overlapping hit regions, and a WCAG 1.4.12 text-spacing stress pass (line height 1.5, paragraph spacing 2x, letter 0.12em, word 0.16em) that loses or spills text, at 390, 820 and 1440 px. An element can opt out with `data-mzizi-spacing-exempt="<reason>"` (the reason is required); the only use is the drawn component specimens on `/tokens`. One-line pill labels (badges) are not held to the inset, because the shipped components draw them smaller (raised upstream in mzizi-registry).
+
+### Changed — spacing floor applied to the site's own CSS (2026-11-04, [mzizi-registry#617](https://github.com/mzizi-dev/mzizi-registry/issues/617))
+
+- Before: 78 control pairs under 7px, 2,745 container-insets under 14px, and 1,490 pieces of text lost under the stress, measured across the audit's nine pages, its open menu drawer and its search dialog at three widths (the stress pass runs on each page and the open drawer). After: 0 of each. Install commands, colour swatches, ladder tiles, figure tiles, code panes and the bench footer have 14px insets; the component filters, the node jump list and the section links are 7px or more apart.
+- `/components` and `/skills` cards show the whole description. It was cut at four lines, which also hid a long unbroken word that widened the page at 320px; long tokens now wrap inside their cards, and the empty-family sentence on `/tokens` wraps instead of spilling.
+
+### Fixed — site search shows page text, not the menu (2026-11-03, [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
+
+- Search results no longer start with "Close search× Mzizi Close menu× Browse components.": the header, the search dialog, the menu drawer and the footer are left out of the search index (`data-pagefind-ignore`), so a result's excerpt is the page's own text. `/tokens` swatch ink reads a hex value only when it is 3 or 6 digits. The search field shows one "×" (the dialog's), not a second from the browser.
+
 ### Changed — dependencies (2026-11-03, (repository), [#99](https://github.com/mzizi-dev/mzizi-site/issues/99))
 
 - Supersedes Dependabot #95 to #98, which could not be rebased after the `@bundu/ui` change. `astro` 7.4.5, `@astrojs/react` 7.1.2, `@astrojs/check` 0.9.12, `react` and `react-dom` 19.3.1, `tailwindcss` and `@tailwindcss/vite` 4.3.4, `pagefind` 1.6.0, `playwright` 1.64.1, `vite-plus` 1.4.0, `wrangler` 4.156.2 (the minor and patch group); `marked` 16.4.2 to 18.1.3 (a major, build-time Markdown for skill pages; the rendered gate passes unchanged); `typescript` 5.9.3 to 6.0.3, held `<7` because TypeScript 7 (7.0.2) is a different compiler that needs its own review; `pnpm/action-setup` 6.1.0 (pinned to its commit).
@@ -65,6 +134,12 @@ cut, the Unreleased entries move under it.
 
 - `verify-rendered.py` no longer applies its stale-figure patterns to `/skills/<name>` bodies, which are the registry's `@nyuchi/mzizi-skills` text (the gate already leaves them out of the language-state patterns). The live skill text quotes the 2026-11-01 figures and made the gate fail on every branch.
 - `llms.txt`: `@nyuchi/mzizi-skills` **0.16.0** (npm and `/v1/skills`, which now serves it), the `mzizi` plugin 1.6.0 carrying it; dated 2026-11-03.
+
+### Changed — `AGENTS.md` gains a Merge convention section for the `staging` queue (2026-11-03)
+
+No issue: repository guidance only. Nothing on mzizi.dev changes.
+
+- **Added: Merge convention.** The site's `AGENTS.md` had none. It now matches the other Mzizi repositories: squash through the merge queue, the target `merge-queue-staging` configuration (`SQUASH`, no 5-minute wait, up to 5 entries, `ALLGREEN`) as the owner's to apply in the rulesets, linear branches until the live values read `SQUASH` and `0`, enqueue as soon as the merge gate is met, forward-port `main`-only commits to `staging` before a release, and only a major release needs the owner.
 
 ### Fixed — `llms.txt` and `/.well-known/mcp.json` name the current packages (2026-11-02, [#80](https://github.com/mzizi-dev/mzizi-site/issues/80))
 

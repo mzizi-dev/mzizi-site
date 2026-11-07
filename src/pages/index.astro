@@ -173,7 +173,7 @@ const isntList = [
   },
   {
     what: "Not a rendering engine",
-    note: "Mzizi is designed to lower to Rust. Roots components are moving to Mzizi's own render(); Dioxus is still a dependency of some crates until that migration finishes. Mzizi does not rebuild a renderer for other targets.",
+    note: "Mzizi is designed to lower to Rust. Roots components are moving to Mzizi's own render(). Dioxus is out of the stack (owner, 4 November 2026), and the published crates still depend on it until it is removed. Mzizi does not rebuild a renderer for other targets.",
   },
   {
     what: "Not an ML runtime",
@@ -1008,10 +1008,6 @@ const toolchain = [
 
   .arms li:last-child {
     border-block-end: 0;
-  }
-
-  #benchmark .section-links a + a {
-    margin-inline-start: var(--space-lg, 1.5rem);
   }
 
   .progress-title {
