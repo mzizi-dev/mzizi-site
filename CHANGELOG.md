@@ -21,6 +21,18 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — the language's commits, staging and open pull requests, and the package versions (2026-11-11, freshness)
+
+No issue: freshness update. Read on 11 November 2026 from a clone of `mzizi-dev/mzizi`, the GitHub API, npm and `mcp.mzizi.dev`. `python3 scripts/check-facts.py dist` reported that the tag `v0.12.0` no longer points at the commit the figures cite: the language repository's history was rewritten, and `2b36c8f` (`v0.12.0`) and `cf3a44e` (`v0.13.0`) no longer exist. The tags survive: `v0.12.0` is now `9766929`, and `v0.13.0` is `f9bea2b`, which is `main`. (`6f7b096`, `1d5e578` and `4d0cdc3`, named in older history entries, are gone too; `v0.9.0` is now `effe7c7` and `v0.8.0` is `550826a`.)
+
+- **Changed: the landing page, `/language`, `/cli` and `llms.txt`.** The commit links point at `9766929` (`v0.12.0`). The test count (767 in 35 suites), the 197 harness entries and the program outputs say they were measured at `2b36c8f`, a commit no longer in the repository's history, and that they were **not re-measured**: `git diff 9766929 f9bea2b` is empty under `compiler/`, `examples/` and `primitives/`, and for `LANGUAGE-TRACKER.md` and `CHARTER.md`, so they should still hold. The compiler/src line count (33,540) is counted at `main`.
+- **Changed: "On main today".** `main` is `f9bea2b`, tagged `v0.13.0`; the release's tree is staging's `d1037ca`.
+- **Changed: "Landing on staging".** Staging is `1749471` (`v0.13.11`, 7 November) and differs from `main` in 46 files. It adds an element tree for a component's static view (#156), `render` contract clauses and the `label` and `skeleton` primitives (#158), `int` arithmetic in a view string and the `progress` primitive (#160), three server components written in Mzizi and seven gaps they found (#157), RFC-0018 (a draft, #159), `mz check` and `mz contract` on a directory (#155), and the owner's 4 November note that Dioxus is out of the stack (#154). No tracker row turned ✅; the new rows are ❌, 📝 or 🟡, and nothing on staging is measured or released.
+- **Changed: "In progress".** Nine pull requests are open on 11 November, none toward M2. #162 (function values, RFC-0018 wave 1) and #161 (conditional view attributes) are listed with links as work toward the components-in-Mzizi stream, not M2; the others (five incumbent backend arms, #129, #130, #131, and the RFC-0015 and RFC-0016 drafts) are named in the text, and the stale 2 November release pull request is noted.
+- **Changed: `llms.txt` versions.** `@nyuchi/mzizi-skills` is 0.19.0 on npm and in the MCP server (was 0.18.0), and `@nyuchi/mzizi-cli` is 0.9.0 (was 0.8.0). The API and the public Claude Code plugin (1.7.0) still carry skills 0.18.0 until the registry release in progress lands, and the file says so. `mzizi-mcp` is 0.17.0, unchanged.
+- **Changed, `scripts/verify-rendered.py`.** Messages and a comment name `9766929` for `v0.12.0`.
+- A reader of mzizi.dev sees the corrected commits and the "measured at a commit no longer in the history, not re-measured" labels beside every figure, a staging column that matches staging, and the current package versions.
+
 ### Fixed — the rendered gate expects the registry's 690 components, N2's 409 (2026-11-11, registry v4.28.0)
 
 No issue: the registry gained fifteen `react-*` items (mzizi-registry#640) and `api.mzizi.dev` serves them since the pin moved to v4.28.0, so the build prints 690 components and N2's 409. The rendered-content gate failed on every branch until its expected numbers moved.

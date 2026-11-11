@@ -1,9 +1,12 @@
 /**
  * Real Mzizi programs and their real output, mirrored verbatim from
- * `mzizi-dev/mzizi` `main` at 2b36c8f (the release tagged v0.12.0, #140). The
- * examples the site shows are unchanged since 1d5e578 (the release tagged
- * v0.8.0, #109), and no file under `examples/` changed between 6f7b096 and
- * 2b36c8f. On 2026-10-20 each example was run at 6f7b096 with `mz run` built from
+ * `mzizi-dev/mzizi` `main` at 2b36c8f (the release tagged v0.12.0, #140; the
+ * language repository's history was rewritten afterwards, 2b36c8f no longer
+ * exists, and the tag v0.12.0 is now 9766929). `git diff 9766929 f9bea2b`
+ * (main, v0.13.0) is empty under `examples/`, `primitives/` and `compiler/`,
+ * and these outputs were not re-run at either. The examples the site shows are
+ * unchanged since 1d5e578 (the release tagged v0.8.0, #109), and no file under
+ * `examples/` changed between 6f7b096 and 2b36c8f. On 2026-10-20 each example was run at 6f7b096 with `mz run` built from
  * that commit: all eight printed exactly their `.expected` file, and exit 0. On
  * 2026-10-29 `cargo test --workspace` at 2b36c8f ran the tests that compare each
  * example's `mz run` output with its `.expected` file, and they passed. Each output here is
@@ -11,7 +14,11 @@
  * file. Update them together, from a run, never by hand.
  */
 
+// Where the outputs were captured: a commit no longer in the repository's
+// history. The same release is the tag v0.12.0, now 9766929; compiler/,
+// examples/ and primitives/ are identical at main (f9bea2b).
 export const PROGRAMS_COMMIT = "2b36c8f";
+export const PROGRAMS_RELEASE_COMMIT = "9766929";
 
 export type Program = { path: string; source: string; output: string };
 
