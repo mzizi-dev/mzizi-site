@@ -5,7 +5,47 @@
  * Shared by the landing page's status panel and `/language`, so the two never
  * disagree. `public/llms.txt` says the same in its own words.
  *
- * Updated 2026-11-03 (#80), read from a git clone of `mzizi-dev/mzizi` (no API
+ * Updated 2026-11-11, read from a git clone of `mzizi-dev/mzizi` and the GitHub
+ * API:
+ * - The language repository's history was rewritten after 2026-11-03. The
+ *   commits this file used to cite, 2b36c8f (v0.12.0) and cf3a44e (v0.13.0), no
+ *   longer exist; so do 6f7b096 (v0.9.0), 1d5e578 (v0.8.0) and 4d0cdc3, which
+ *   older entries below still name. The tags survive and now point at: v0.12.0 =
+ *   9766929 ("chore(release): staging to main, 2026-10-29 (#140)"), v0.13.0 =
+ *   f9bea2b ("chore(release): staging to main, 2026-11-01 (#146)", and `main`),
+ *   v0.9.0 = effe7c7, v0.8.0 = 550826a. Commit names below that are not these are
+ *   the ones the entries were written against.
+ * - Measured figures: `git diff 9766929 f9bea2b` is empty under `compiler/`,
+ *   `examples/`, `primitives/` and for LANGUAGE-TRACKER.md and CHARTER.md (66
+ *   files, nearly all under benchmarks/, plus two workflows, a line of RFC-0011,
+ *   Cargo.toml, CHANGELOG.md and AGENTS.md). The test count (767 in 35 suites),
+ *   the 197 harness entries and the program outputs were measured at 2b36c8f, a
+ *   commit no longer in the history (the same release is now v0.12.0 = 9766929).
+ *   Because compiler/ is unchanged between 9766929 and main (f9bea2b), they
+ *   should still hold, but they were NOT re-measured. The compiler/src line count
+ *   (33,540) is counted by scripts/check-facts.py at `main`.
+ * - "On main": f9bea2b, tagged v0.13.0 (the 1 November release, #146).
+ * - "Landing on staging": staging is 1749471 (tagged v0.13.11, 7 November) and
+ *   differs from main in 46 files. From `git log main..staging`, the diff and
+ *   LANGUAGE-TRACKER.md on staging: #156 (an element tree for a component's
+ *   static view, U1), #158 (render contract clauses, label and skeleton, U7),
+ *   #160 (int arithmetic in a view string, progress, U11), #155 (mz check and mz
+ *   contract take a directory), #157 (three server components as programs and
+ *   gaps K1 to K7), #154 (Dioxus out of the stack, notes on the charter and
+ *   RFCs), #159 (RFC-0018, a draft), #152 (a CI bump), plus the earlier #147,
+ *   #149, #150 and #148. No tracker row turned ✅ on staging; the new rows are
+ *   ❌, 📝 or 🟡. Test counts on staging were not measured. The staging-to-main
+ *   release pull request #151 is still open but stale: it carries staging's
+ *   792ca07 tree only.
+ * - "In progress": nine pull requests are open. #161 (conditional view
+ *   attributes, U10) and #162 (function values, RFC-0018 wave 1, K5) work toward
+ *   #153, the components-in-Mzizi stream, not M2; #143 (five incumbent backend
+ *   arms), #131, #130, #129 and the drafts #123 (RFC-0016) and #118 (RFC-0015) are
+ *   not toward M2 either, and #151 is the release pull request. None of them
+ *   refers to #110 or #69. #161 and #162 are listed with links, and the rest are
+ *   named in the text, so a merge shows up in scripts/check-facts.py.
+ *
+ * Earlier, 2026-11-03 (#80), read from a git clone of `mzizi-dev/mzizi` (no API
  * access in that session):
  * - "On main": the release pull request #146 ("chore(release): staging to main,
  *   2026-11-01"), merged as cf3a44e and tagged v0.13.0. `git diff 2b36c8f
@@ -62,21 +102,25 @@
  */
 
 export const LANG = "https://github.com/mzizi-dev/mzizi";
-export const PROGRESS_DATE = "2026-11-03";
+export const PROGRESS_DATE = "2026-11-11";
 // The release, and the language commits this file was written from. `staging`
 // is ahead of `main` by the changes listed in `onStaging`.
 export const RELEASE = "1 November";
-export const MAIN_COMMIT = "cf3a44e";
+export const MAIN_COMMIT = "f9bea2b";
 // The release tag main-release.yml created for MAIN_COMMIT (the v0.13.0 release).
 export const RELEASE_TAG = "v0.13.0";
 export const RELEASE_TAG_HREF = `${LANG}/releases/tag/v0.13.0`;
-// The v0.12.0 release (2b36c8f), where the figures below were last measured.
+// The v0.12.0 release (9766929 today), where the figures below were last
+// measured, as 2b36c8f, a commit no longer in the repository's history.
+export const MEASURED_COMMIT = "2b36c8f";
+export const MEASURED_RELEASE_COMMIT = "9766929";
 export const MEASURED_TAG_HREF = `${LANG}/releases/tag/v0.12.0`;
 // The release pull request, staging to main.
 export const RELEASE_PR_NUMBER = 146;
-// staging's tip when main was released (#145, tagged v0.12.4); main carries its tree.
-export const RELEASED_STAGING = "a9ce37c";
-export const STAGING_COMMIT = "792ca07";
+// staging's tip when main was released (#145); main carries its exact tree.
+export const RELEASED_STAGING = "d1037ca";
+// staging today: tagged v0.13.11 on 7 November.
+export const STAGING_COMMIT = "1749471";
 
 export type Link = { href: string; label: string };
 export type Item = { text: string; links?: Link[] };
@@ -89,7 +133,7 @@ export const RELEASE_PR: Link = pr(109);
 
 export const onMain: Item[] = [
   {
-    text: "Released as v0.13.0 on 1 November: main-release.yml tagged cf3a44e. Benchmarks and tooling only: the runner scores backend episodes with the task's probes (#141), public backend development tasks B2 to B5 each with a language-neutral spec and probes (#142; B2 and B3 have a Mzizi reference, B4 and B5 do not, because a service has no state and cannot read a request body), and check-task.sh works on macOS bash 3.2 (#144). Nothing under compiler/, examples/ or primitives/ changed since v0.12.0, and no tracker mark changed. None of it measures Mzizi against another language: the kill-criterion run has not happened.",
+    text: "Released as v0.13.0 on 1 November: main-release.yml tagged f9bea2b. Benchmarks and tooling only: the runner scores backend episodes with the task's probes (#141), public backend development tasks B2 to B5 each with a language-neutral spec and probes (#142; B2 and B3 have a Mzizi reference, B4 and B5 do not, because a service has no state and cannot read a request body), and check-task.sh works on macOS bash 3.2 (#144). Nothing under compiler/, examples/ or primitives/ changed since v0.12.0, and no tracker mark changed. None of it measures Mzizi against another language: the kill-criterion run has not happened.",
     links: [
       { href: RELEASE_TAG_HREF, label: "v0.13.0" },
       pr(146),
@@ -99,7 +143,7 @@ export const onMain: Item[] = [
     ],
   },
   {
-    text: "Released as v0.12.0 on 29 October: main-release.yml tagged 2b36c8f after CI passed. A service that mz build lowers now reads HOST as well as PORT (default 127.0.0.1, as before; a container sets 0.0.0.0, and a value that is not an IP address stops the service with exit 1), its Cargo.toml carries a slim release profile (lto, codegen-units = 1, panic = abort, strip, overflow-checks), and its tokio pin moves to 1.53.3 for RUSTSEC-2026-0386 (#134, fixing #132, #133 and #136). The size and memory figures in the changelog measure Rust's output through Mzizi's lowering, not a Mzizi advantage. It also publishes the write-ups of pilots 3 and 4 (#138, #139); both sat at the ceiling and separated no arms, and neither is the kill-criterion run.",
+    text: "Released as v0.12.0 on 29 October: main-release.yml tagged it after CI passed (the tag v0.12.0 is 9766929 now; the language repository's history was rewritten and the 2b36c8f this site first cited no longer exists). A service that mz build lowers now reads HOST as well as PORT (default 127.0.0.1, as before; a container sets 0.0.0.0, and a value that is not an IP address stops the service with exit 1), its Cargo.toml carries a slim release profile (lto, codegen-units = 1, panic = abort, strip, overflow-checks), and its tokio pin moves to 1.53.3 for RUSTSEC-2026-0386 (#134, fixing #132, #133 and #136). The size and memory figures in the changelog measure Rust's output through Mzizi's lowering, not a Mzizi advantage. It also publishes the write-ups of pilots 3 and 4 (#138, #139); both sat at the ceiling and separated no arms, and neither is the kill-criterion run.",
     links: [
       { href: RELEASE_TAG_HREF, label: "v0.12.0" },
       pr(140),
@@ -164,7 +208,7 @@ export const onMain: Item[] = [
     links: [pr(80), pr(83), pr(89), pr(87), pr(91)],
   },
   {
-    text: "The language harness, the spine of the language: every built feature of a program registers an entry in compiler/src/harness.rs, and mz harness version, definition and entry print the definition as JSON (197 entries, 79 distinct diagnostic codes, 53 MZ09xx and 26 shared, at 2b36c8f; 49 codes pending). `not` sits at its own precedence level (#100). Enforced by tests: every code the compiler can emit has an entry or is on the pending list, every trigger still raises its code with a declared fix kind, every example still checks, and every program example still prints its stated output. Written by hand and not compared with the checker: each code's say text and each feature's teaching text. component and service are registered at kind level only. The plugin host and the generated skills are not built; tracker row H1 is 🟡.",
+    text: "The language harness, the spine of the language: every built feature of a program registers an entry in compiler/src/harness.rs, and mz harness version, definition and entry print the definition as JSON (197 entries, 79 distinct diagnostic codes, 53 MZ09xx and 26 shared, measured at 2b36c8f, now v0.12.0; 49 codes pending). `not` sits at its own precedence level (#100). Enforced by tests: every code the compiler can emit has an entry or is on the pending list, every trigger still raises its code with a declared fix kind, every example still checks, and every program example still prints its stated output. Written by hand and not compared with the checker: each code's say text and each feature's teaching text. component and service are registered at kind level only. The plugin host and the generated skills are not built; tracker row H1 is 🟡.",
     links: [
       pr(88),
       pr(93),
@@ -198,7 +242,7 @@ export const onMain: Item[] = [
     text: "One kind of backend program: a service with HTTP routes and handlers. mz contract runs it in process; mz build lowers it to a local Rust + axum package, which CI compiles, tests and serves.",
   },
   {
-    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 767 tests in 35 suites in the workspace at 2b36c8f, run on a macOS laptop: 766 passed, and one (a range too long to hold in memory) was killed by the operating system where it expects exit 101.",
+    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 767 tests in 35 suites in the workspace, measured at 2b36c8f, a commit no longer in the repository's history (the same release is now v0.12.0, 9766929), run on a macOS laptop: 766 passed, and one (a range too long to hold in memory) was killed by the operating system where it expects exit 101. compiler/ is unchanged between 9766929 and main (f9bea2b), and the counts were not re-measured.",
   },
   {
     text: "A performance suite against hand-written Rust (benchmarks/perf): four programs, each with a Rust reference built with and without overflow checks. CI checks only that all three print the same output; no timing is gated or committed, and no overflow check is removed yet.",
@@ -224,12 +268,31 @@ export const onMain: Item[] = [
 
 export const onStaging: Item[] = [
   {
-    text: "A test fix in the compiler's own suite (#149): the program_collections case for a range too long now asks for 2^59 elements, a length every host refuses, where the old 10^11 was refused only by hosts that check it against memory and was killed (exit 137) on macOS (#135, the failure the figures below record). A line in RFC-0013 says the same of macOS. It changes a test and a design note, not the compiler.",
+    text: "A component's static view renders to an element tree and serialises with every text node and attribute value escaped (RFC-0017 Wave 0, a library function in compiler/src/render.rs; there is no mz command for it, and nothing renders in a browser or on a server). A contract may now carry a render clause, which renders the component and tests the markup, with omits as a new test; mz contract runs it on separator, badge, alert, label and skeleton, and an unrenderable clause is MZ0605. A view string's interpolation may hold int arithmetic (+ - * / %, parentheses, min and max). Three primitives join the nine: label, skeleton and progress. Tracker rows U1, U7 and U11 are 🟡 on staging, U9 is 🟡 in a narrow form, and none is ✅.",
+    links: [pr(156), pr(158), pr(160)],
+  },
+  {
+    text: "Three server components written in Mzizi as programs, in examples/components/: a circuit breaker, base64url and a token-bucket rate gate (#157). None is a library another file can import, none is installed with mzizi add, and none is the registry's component. Building them found seven gaps, K1 to K7 in a new tracker section; all seven are ❌, so the tracker counts no component as built with no gap. RFC-0018, a draft, designs function values for K5 (#159); nothing in it is built.",
+    links: [pr(157), pr(159)],
+  },
+  {
+    text: "mz check and mz contract take a directory, reading every .mz file under it in sorted order and printing one summary line (#155). The protocol version is unchanged.",
+    links: [pr(155)],
+  },
+  {
+    text: "Dioxus is out of the stack (owner decision, 2026-11-04): the charter and RFC-0001, RFC-0002 and RFC-0009 carry dated notes, and the Dioxus and Leptos benchmark arms and the pilot results are unchanged (#154). A CI action bump (#152).",
+    links: [pr(154), pr(152)],
+  },
+  {
+    text: "A test fix in the compiler's own suite (#149): the program_collections case for a range too long now asks for 2^59 elements, a length every host refuses, where the old 10^11 was refused only by hosts that check it against memory and was killed (exit 137) on macOS (#135, the failure the figures above record). A line in RFC-0013 says the same of macOS. It changes a test and a design note, not the compiler.",
     links: [pr(149)],
   },
   {
-    text: "The B4 and B5 Python reference servers strip CR and LF from header values (benchmark references, not the language), and the changelog dated for the 2 November release (tagged v0.13.3 on staging).",
+    text: "The B4 and B5 Python reference servers strip CR and LF from header values (benchmark references, not the language), and the changelog dated for the 2 November release (#147, #150).",
     links: [pr(147), pr(150)],
+  },
+  {
+    text: "Staging is 1749471, tagged v0.13.11 on 7 November, and differs from main in 46 files. Test counts, the harness definition and compiler/src's line count were not measured on staging. The release pull request for staging's 2 November tree, #151, is open and stale. All of this waits for a release to main.",
   },
 ];
 
@@ -239,7 +302,14 @@ export const inProgress: Item[] = [
     links: [M2_ISSUE],
   },
   {
-    text: "Still to build for M2, with no pull request open on 29 October: modules and imports across files (P1), and the standard library (P2), which the public suites wait on. The tracker has both as ❌. RFC-0014 is their draft design, on main; nothing in it is implemented. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows; neither has a pull request open. Five other pull requests are open on 29 October, none toward M2: the RFC-0015 (performance teardown) and RFC-0016 (three targets) drafts, a checker fix, a charter wording and a portal doc.",
+    text: "Still to build for M2, with no pull request open on 11 November: modules and imports across files (P1), and the standard library (P2), which the public suites wait on. The tracker has both as ❌. RFC-0014 is their draft design, on main; nothing in it is implemented. Rust crate interop (P6) and errors mapped back to .mz (P5) are also M2 rows; neither has a pull request open.",
+  },
+  {
+    text: "Open on 11 November, toward the components-in-Mzizi work (#153) and not toward M2: function values, RFC-0018 wave 1 (K5): a function type such as fn(int): bool, a fn passed by name, and a call through a value; inline functions and captures are not part of it. And conditional view attributes (U10), so that separator can choose role from decorative. Neither is merged or available.",
+    links: [pr(162), pr(161)],
+  },
+  {
+    text: "Also open on 11 November, none toward M2: the five incumbent backend arms for the benchmark (TypeScript, Python, Go, C++ and Rust; none has been run against Mzizi), a fix making a match in a service handler one MZ0410, a charter wording, a portal doc, and the RFC-0015 (performance teardown) and RFC-0016 (three targets) drafts.",
   },
 ];
 
