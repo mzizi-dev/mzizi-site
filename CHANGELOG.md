@@ -21,6 +21,14 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — the rendered gate expects the registry's 690 components, N2's 409 (2026-11-11, registry v4.28.0)
+
+No issue: the registry gained fifteen `react-*` items (mzizi-registry#640) and `api.mzizi.dev` serves them since the pin moved to v4.28.0, so the build prints 690 components and N2's 409. The rendered-content gate failed on every branch until its expected numbers moved.
+
+- **Changed, `scripts/verify-rendered.py`.** `EXPECTED_COMPONENTS` is 690 (was 675); the N2 checks expect 409 (was 394).
+- **Changed, `AGENTS.md` and `README.md`.** The stated counts follow: 690 components and component pages, N2's 409.
+- A reader of mzizi.dev sees 690 components in the browse list, the component pages and the architecture page after the next deploy.
+
 ### Changed — `@bundu/ui` 0.13.0, the controls that were under the 14px inline floor (2026-11-05, [mzizi-registry#625](https://github.com/mzizi-dev/mzizi-registry/issues/625))
 
 - **Changed:** `@bundu/ui` is now `>=0.13.0 <1` (lockfile at 0.13.0). The package's synced `ToolbarMenu`, `DataTable` row actions, `QuickSearch`, `SideNav` group labels, `TopBarAction` and `CommandPalette` items now take 14px of side padding (were 8px or 10px). The site renders none of these components, so a reader sees no difference: the built pages still have 1997 badges at 14px and none at 8px, and the rendered-content gate passes. The site now follows the package, so any of these components added later arrives at the floor.
