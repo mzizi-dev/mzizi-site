@@ -261,15 +261,14 @@ Read off the repo settings and the rulesets on 2026-10-21, and the queue ruleset
   skills, progress reports and the merge gate" below), then enqueue straight away rather than
   waiting for a later pass. Every PR body carries one `Refs #n`, `Closes #n` or `No issue:`
   line, or the "issue attached" check fails.
-- **Releases.** A merge into `main` deploys `mzizi.dev`, so only the owner releases
-  `staging` to `main`, or an agent the owner has authorised for that release. A release is a
+- **Releases.** A merge into `main` deploys `mzizi.dev`. The owner approves major releases
+  only. Minor and patch releases (the `staging` → `main` release PR, its tag, and the sync-back
+  into `staging`), and merges of green PRs that have passed review, are done by agents
+  following the repo's playbook, without asking the owner (owner, 2026-11-02). A release is a
   `release/` branch made of `main` plus `staging`'s exact tree, squashed into `main`. Before
   cutting one, forward-port any commit that is on `main` but not on `staging` (a bot's, for
   example) to `staging` through the queue; the release-version-check gate fails a release
-  that would delete it. Versioned packages in other Mzizi repositories release minors and
-  patches without asking, and only a major needs the owner's go-ahead (owner, 2026-11-03: "we
-  are about a 1000 minor releases away" from deciding on a v1); this repository has no
-  versioned releases.
+  that would delete it. This repository has no versioned releases.
 - **Sync back after a release.** The squash commit on `main` is never in `staging`'s history,
   and `staging` cannot be reset (non-fast-forward pushes are blocked). After each release,
   open a sync PR into `staging` from a branch off `staging` with `origin/main` merged in, and
@@ -318,5 +317,5 @@ Load the Mzizi **dev skills** before starting work: `mzizi_get_skills category=d
 
 - **Digital hygiene.** Check free disk before starting, clone only under `$TMPDIR`, share build caches, and audit, then delete, your clones once the work merges (`digital-hygiene` skill).
 - **Clone isolation.** Clone only into a directory unique to you; never touch another agent's.
-- **Progress reports.** All dev work runs on a 10-minute progress-report loop (`progress-report` skill): measured bars, what changed, and a final "Needs you:" line. Report ticks never publish, release, merge or deploy without the owner's approval.
+- **Progress reports.** All dev work runs on a 10-minute progress-report loop (`progress-report` skill): measured bars, what changed, and a final "Needs you:" line. Report ticks never release a major without the owner's go-ahead. The owner approves major releases only. Minor and patch releases (the `staging` → `main` release PR, its tag, and the sync-back into `staging`), and merges of green PRs that have passed review, are done by agents following the repo's playbook, without asking the owner (owner, 2026-11-02).
 - **Merge gate.** Merge only when the work is complete, CI is green, it's verified at runtime, and `/code-review` has run with findings resolved.
