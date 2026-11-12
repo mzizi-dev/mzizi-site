@@ -21,6 +21,12 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — llms.txt says the API and the plugin carry skills 0.19.0 (2026-11-12, freshness)
+
+No issue: freshness update. `api.mzizi.dev/v1/skills/summary` reports 0.19.0 since the registry 4.29.0 pin deployed, and the plugin on registry `main` is 1.8.0 with the 0.19.0 skills.
+
+- **Changed, `public/llms.txt`.** The skills paragraph no longer says the API's pin "still carries 0.18.0" or that plugin 1.7.0 "still carries skills 0.18.0"; it says the API serves 0.19.0 (registry `a64e57f`) and plugin 1.8.0 carries 0.19.0. The `/skills` pages, which are read from the API at build time, show 0.19.0 from the next deploy.
+
 ### Fixed — the language's commits, staging and open pull requests, and the package versions (2026-11-11, freshness)
 
 No issue: freshness update. Read on 11 November 2026 from a clone of `mzizi-dev/mzizi`, the GitHub API, npm and `mcp.mzizi.dev`. `python3 scripts/check-facts.py dist` reported that the tag `v0.12.0` no longer points at the commit the figures cite: the language repository's history was rewritten, and `2b36c8f` (`v0.12.0`) and `cf3a44e` (`v0.13.0`) no longer exist. The tags survive: `v0.12.0` is now `9766929`, and `v0.13.0` is `f9bea2b`, which is `main`. (`6f7b096`, `1d5e578` and `4d0cdc3`, named in older history entries, are gone too; `v0.9.0` is now `effe7c7` and `v0.8.0` is `550826a`.)
