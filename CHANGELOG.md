@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the agent guide states the owner's release rule (2026-11-12, [mzizi-dev/mzizi-registry#661](https://github.com/mzizi-dev/mzizi-registry/issues/661))
+
+- `AGENTS.md` state the owner's release rule: the owner approves major releases only; minor and patch releases (the `staging` → `main` release PR, its tag and the sync-back into `staging`) and merges of green PRs that have passed review are done by agents following the repo's playbook, without asking the owner (owner, 2026-11-02). "Only the owner releases `staging` to `main`, or an agent the owner has authorised for that release" and the progress-report line (report ticks never publish, release, merge or deploy without the owner's approval) are replaced with it. Merge method, the merge gate, auto-merge and the changelog rules are unchanged. Nothing served or published changes.
+
 ### Added — /legal/privacy and /legal/terms (2026-11-12)
 
 Owner direction (2026-11-12): mzizi.dev needs legal pages, the Claude plugin directory needs a privacy notice, and bundu.org and nyuchi.com already have theirs. No issue: owner-directed addition. **Flagged for the owner's review:** these are written from what the code does, not by a lawyer, and they name the Bundu Foundation's and Nyuchi's notices as the umbrella.
