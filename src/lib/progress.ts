@@ -18,7 +18,9 @@
  * - Measured figures: `git diff 9766929 f9bea2b` is empty under `compiler/`,
  *   `examples/`, `primitives/` and for LANGUAGE-TRACKER.md and CHARTER.md (66
  *   files, nearly all under benchmarks/, plus two workflows, a line of RFC-0011,
- *   Cargo.toml, CHANGELOG.md and AGENTS.md). The test count (767 in 35 suites),
+ *   Cargo.toml, CHANGELOG.md and AGENTS.md). [Re-measured 2026-11-12 at f9bea2b on
+ *   Linux: 771 tests in 38 suites, 770 passed, 1 ignored; the text below is history.]
+ *   The test count (767 in 35 suites),
  *   the 197 harness entries and the program outputs were measured at 2b36c8f, a
  *   commit no longer in the history (the same release is now v0.12.0 = 9766929).
  *   Because compiler/ is unchanged between 9766929 and main (f9bea2b), they
@@ -242,7 +244,7 @@ export const onMain: Item[] = [
     text: "One kind of backend program: a service with HTTP routes and handlers. mz contract runs it in process; mz build lowers it to a local Rust + axum package, which CI compiles, tests and serves.",
   },
   {
-    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 767 tests in 35 suites in the workspace, measured at 2b36c8f, a commit no longer in the repository's history (the same release is now v0.12.0, 9766929), run on a macOS laptop: 766 passed, and one (a range too long to hold in memory) was killed by the operating system where it expects exit 101. compiler/ is unchanged between 9766929 and main (f9bea2b), and the counts were not re-measured.",
+    text: "The toolchain: mz check (with --agent, NDJSON diagnostics), mz fix, mz contract, mz outline, mz ir and mz hash, mz build (a service or a program), mz run and mz harness. 771 tests in 38 suites in the workspace, measured at main (f9bea2b, v0.13.0) on Linux on 12 November 2026: 770 passed, none failed, and one is ignored because it needs axum and tokio in the cargo cache. compiler/ is unchanged between 9766929 and main, so the line count (33,540) and the harness definition (197 entries, 49 pending codes) are as at v0.12.0.",
   },
   {
     text: "A performance suite against hand-written Rust (benchmarks/perf): four programs, each with a Rust reference built with and without overflow checks. CI checks only that all three print the same output; no timing is gated or committed, and no overflow check is removed yet.",

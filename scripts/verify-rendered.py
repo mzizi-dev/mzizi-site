@@ -550,16 +550,19 @@ stale_patterns = {
     # 26,850 lines, 137 entries, 70 codes, 51 pending) and the staging figures
     # (693, 562, 181, 75, 50) are not the current ones.
     r"\b(644 tests in 24 suites|513 of them|512 of them|562 of them|693 tests|26 suites|24 suites)\b":
-        "the language's current figures are 767 tests in 35 suites and 33,540 lines (measured at 2b36c8f, now v0.12.0, 9766929)",
+        "the language's current figures are 771 tests in 38 suites and 33,540 lines (f9bea2b, v0.13.0)",
     # The 2026-10-08 and v0.8.0 figures (760 tests in 27 suites, 629 of them in the
     # compiler crate, 33,438 lines) are the ones before the 20 October release.
     r"\b(760 tests|629 of them|33,438 lines|760 tests in 27 suites)\b":
-        "the language's current figures are 767 tests in 35 suites and 33,540 lines (measured at 2b36c8f, now v0.12.0, 9766929)",
+        "the language's current figures are 771 tests in 38 suites and 33,540 lines (f9bea2b, v0.13.0)",
     # The v0.9.0 figures (6f7b096): 765 tests in 29 suites, 634 in the compiler crate, 33,518 lines.
     r"\b(765 tests in 29 suites|634 of them|33,518)\b|<b>765</b>":
-        "the language's figures at v0.9.0 were 765 tests in 29 suites, 33,518 lines (6f7b096); at v0.12.0, 767 tests in 35 suites, 33,540 lines (2b36c8f)",
+        "the language's figures at v0.9.0 were 765 tests in 29 suites, 33,518 lines (6f7b096); at v0.13.0, 771 tests in 38 suites, 33,540 lines (f9bea2b)",
     r"\b(744 tests|613 of them|33,138|191 entries|1743e3c)\b":
-        "the language's figures at v0.8.0 were 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578); at v0.12.0, 767 tests in 35 suites, 33,540 lines (2b36c8f)",
+        "the language's figures at v0.8.0 were 760 tests in 27 suites, 629 of them in the compiler crate, 33,438 lines, 197 entries (1d5e578); at v0.13.0, 771 tests in 38 suites, 33,540 lines (f9bea2b)",
+    # The 771 tests in 38 suites at v0.13.0 (f9bea2b, Linux, 2026-11-12) replace the 767 in 35 measured at v0.12.0 on a Mac.
+    r"<b>767</b>|\b767 tests in 35 suites\b|\(766 pass on a Mac\)":
+        "the language's current figures are 771 tests in 38 suites (770 pass, 1 ignored; f9bea2b, Linux, 2026-11-12); 767 in 35 was the v0.12.0 Mac run",
     # The release tag existed from 18:03Z on 2026-10-08 (main-release.yml): no page says it does not.
     r"[Nn]o `?v0\.(9|12)\.0`? tag\b|no tag is named|tag existed on 2026-10-20": "the tags v0.9.0 and v0.12.0 exist (main-release.yml)",
     # Two pilots, as the count of pilots that have run (four have, since 2026-10-29).

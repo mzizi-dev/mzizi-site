@@ -514,7 +514,7 @@ const toolchain = [
     </Alert>
 
     <ul class="figs">
-      <li class="fig"><b>767</b><span>tests, 35 suites (766 pass on a Mac)</span></li>
+      <li class="fig"><b>771</b><span>tests, 38 suites (770 pass, 1 ignored)</span></li>
       <li class="fig"><b>29</b><span>contract clauses in the nine primitives, all passing</span></li>
       <li class="fig"><b>33,540</b><span>lines of Rust in the compiler</span></li>
       <li class="fig"><b>4</b><span>pilots run, 0 showing an advantage</span></li>
@@ -524,11 +524,14 @@ const toolchain = [
         Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> measured at{" "}
         <code>{MEASURED_COMMIT}</code>, a commit no longer in the repository's history: the same release is{" "}
         <code>v0.12.0</code>, <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>,{" "}
-        and <code>compiler/</code> is unchanged between it and <code>main</code> (<code>f9bea2b</code>, v0.13.0), so
-        the counts were not re-measured
-        (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>, counted at <code>main</code>;{" "}
-        <code>mz contract</code> over <code>primitives/*.mz</code>). On a macOS laptop one of the 767 tests, a range too
-        long to hold in memory, was killed by the operating system where it expects exit 101; the other 766 passed. Pilots from{" "}
+        and <code>compiler/</code> is unchanged between it and <code>main</code> (<code>f9bea2b</code>, v0.13.0). The
+        test count was re-measured at <code>main</code> on 12 November 2026 on Linux (16 GB):{" "}
+        <code>cargo test --workspace</code> ran 771 tests in 38 suites (cargo's result blocks, 30 of them holding tests);
+        770 passed, none failed, and one is ignored because it needs <code>axum</code> and <code>tokio</code> in the cargo
+        cache (the language's <code>lowering</code> job runs it). Lines in <code>compiler/src</code> (33,540, counted at <code>main</code>), the
+        harness definition (197 entries, 49 pending codes, the same SHA-256) and <code>mz contract</code> over{" "}
+        <code>primitives/*.mz</code> are as at <code>v0.12.0</code>. The earlier macOS run of 767 tests killed one, a range too
+        long to hold in memory; on this machine it passed. Pilots from{" "}
         <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
           ><code>benchmarks/results/</code></a
         >: two dated 2026-09-27 and two dated 2026-10-29.
