@@ -244,18 +244,14 @@ const arms = [
     <p>
       Real today, in the toolchain: the lexer, a recovering parser, a resolver,
       the agent diagnostic protocol and <code>mz fix</code>, and the
-      content-addressed IR, plus nine primitives written in Mzizi itself, covered by 767 tests in 35 suites
-      (<code>mzizi-dev/mzizi</code> measured at{" "}
-      <code>{MEASURED_COMMIT}</code>, the 29 October release, #140: that commit is no longer in the
-      repository's history, and the same release is tagged <code>v0.12.0</code>, now{" "}
-      <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>;
-      33,540 lines in <code>compiler/src</code>, counted at <code>main</code>). Run on a macOS laptop, 766 of
-      the 767 tests passed; one, a range too long to hold in memory, was killed by the
-      operating system where it expects exit 101, and the upstream README, which
-      lags, still gives the 20 October figures (765 tests, 29 suites). Since then{" "}
-      <code>main</code> has moved to <code>f9bea2b</code> (<code>v0.13.0</code>, 1 November), which changes benchmarks and tooling and nothing
-      under <code>compiler/</code>, <code>examples/</code> or <code>primitives/</code> (<code>git diff 9766929 f9bea2b</code> is empty there), so these figures were not re-measured; the
-      release adds tests to the benchmark runner, so the count at <code>f9bea2b</code> may differ. <code>staging</code> (<code>1749471</code>, <code>v0.13.11</code>) is ahead of <code>main</code> by
+      content-addressed IR, plus nine primitives written in Mzizi itself, covered by 771 tests in 38 suites
+      (<code>mzizi-dev/mzizi</code> <code>main</code> at <code>f9bea2b</code> (<code>v0.13.0</code>, 1 November), measured on Linux on 12 November 2026 with{" "}
+      <code>cargo test --workspace</code>: 770 passed, none failed, and one is ignored because it needs <code>axum</code> and <code>tokio</code> in the cargo cache;
+      33,540 lines in <code>compiler/src</code>, counted at <code>main</code>). The upstream README, which
+      lags, still gives the 20 October figures (765 tests, 29 suites). Since <code>v0.12.0</code>{" "}
+      (<a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>), <code>main</code> changes benchmarks and tooling and nothing
+      under <code>compiler/</code>, <code>examples/</code> or <code>primitives/</code> (<code>git diff 9766929 f9bea2b</code> is empty there); the
+      release adds tests to the benchmark runner, which is why the count is higher than the 767 measured at <code>v0.12.0</code> on a Mac. <code>staging</code> (<code>1749471</code>, <code>v0.13.11</code>) is ahead of <code>main</code> by
       work toward components written in Mzizi, none of it released and none of it measured (the staging column below). Blocks nest at most 64
       deep (MZ0411), and robustness tests hold every command to ending with a
       diagnostic on random and deeply nested input.{" "}

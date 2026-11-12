@@ -21,6 +21,16 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — the language's test count is re-measured at main (2026-11-12, freshness)
+
+No issue: freshness update. `cargo test --workspace` was run on Linux at language `main` (`f9bea2b`, `v0.13.0`): 771 tests in 38 suites (cargo's result blocks; 30 hold tests), 770 passed, none failed, one ignored because it needs `axum` and `tokio` in the cargo cache (the language's `lowering` job runs it). The 767 tests in 35 suites the site carried were measured at `v0.12.0` on a Mac, where one test was killed for memory; it passes with 16 GB on Linux. Lines in `compiler/src` (33,540), the harness definition (197 entries, 49 pending codes, same SHA-256) are unchanged.
+
+- **Changed, `/` and `/language`.** The figure reads 771 tests, 38 suites (770 pass, 1 ignored), with the date, platform and commit stated, and no longer says "not re-measured".
+- **Changed, `public/llms.txt`.** The same figures in the status paragraph and the measured-on-main bullet; the earlier Mac run is kept as history.
+- **Changed, `src/lib/progress.ts`.** The toolchain item carries the new count.
+- **Changed, `scripts/check-facts.py`.** `MEASURED_TESTS, MEASURED_SUITES` are 771 and 38.
+- **Changed, `scripts/verify-rendered.py`.** The 767 / 35 figures are refused as stale, as the earlier ones are.
+
 ### Fixed — llms.txt says the API and the plugin carry skills 0.19.0 (2026-11-12, freshness)
 
 No issue: freshness update. `api.mzizi.dev/v1/skills/summary` reports 0.19.0 since the registry 4.29.0 pin deployed, and the plugin on registry `main` is 1.8.0 with the 0.19.0 skills.

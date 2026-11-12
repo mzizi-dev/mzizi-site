@@ -134,11 +134,11 @@ pages = {
 print("the language (mzizi-dev/mzizi main)")
 readme = upstream("the language README", lambda: fetch(LANGUAGE_README))
 if readme:
-    # The README lags its code (it said 765 in 29 suites when main had 767 in 35), so the
+    # The README lags its code (it says 765 in 29 suites where main has 771 in 38), so the
     # site's figures are measured (cargo test --workspace) and held here. The README is a
     # floor: a README count above ours means the figures need re-measuring (a failure); a
     # lower one is the README lagging (a note).
-    MEASURED_TESTS, MEASURED_SUITES = 767, 35
+    MEASURED_TESTS, MEASURED_SUITES = 771, 38
     tests = re.search(r"\b([\d,]+) tests in (\d+) suites\b", readme)
     if tests:
         readme_n = int(tests.group(1).replace(",", ""))
