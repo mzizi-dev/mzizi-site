@@ -19,8 +19,13 @@ import { decisions, DECISIONS_FIRST_HREF, DECISIONS_HREF, M1_ISSUE } from "../li
 
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
-// The language commit this page's figures and captured output were read at.
-const LANG_COMMIT = "2b36c8f";
+// The language commit this page links: the tag v0.12.0 (9766929). The figures and
+// captured output were measured at MEASURED_COMMIT, 2b36c8f, a commit the language
+// repository's rewritten history no longer contains (the same release); compiler/,
+// examples/ and primitives/ are identical at 9766929 and at main (f9bea2b), and
+// nothing was re-run.
+const LANG_COMMIT = "9766929";
+const MEASURED_COMMIT = "2b36c8f";
 // Captured from `mz build examples/registry.mz --out out/registry` at 6f7b096
 // (v0.9.0); the same output at 1d5e578 (v0.8.0) and at 4d0cdc3, the third 8 October
 // release (#104). examples/registry.mz is unchanged since 1d5e578; lower.rs changed in
@@ -28,7 +33,7 @@ const LANG_COMMIT = "2b36c8f";
 const buildOutput =
   "mz: built `service registry` into out/registry (3 routes, 1 fixtures); run it with `cargo run --release --manifest-path out/registry/Cargo.toml`";
 
-// LANGUAGE-TRACKER.md at 2b36c8f, condensed by area (no mark changed since 1d5e578). Each mark is the one the
+// LANGUAGE-TRACKER.md at 2b36c8f (identical to main's, f9bea2b), condensed by area (no mark changed since 1d5e578). Each mark is the one the
 // tracker's Tier 1, Tier 2 and tooling rows give (C1–C10, P1–P11, T1): its
 // "Against the languages" table still describes the program slice as an open
 // pull request, and the rows are the ones it keeps current.
@@ -178,7 +183,7 @@ const rfcs = [
   },
 ];
 // RFC-0009 §1, the arms; each state is benchmarks/arms/ at mzizi-dev/mzizi
-// 2b36c8f (arms unchanged since 4d0cdc3). "exists" is a directory there; "not added yet" is proposed by
+// 2b36c8f, v0.12.0 (arms unchanged since 4d0cdc3). "exists" is a directory there; "not added yet" is proposed by
 // RFC-0009 with no directory. scripts/check-facts.py compares this table with
 // the live directory listing.
 const arms = [
@@ -240,17 +245,18 @@ const arms = [
       Real today, in the toolchain: the lexer, a recovering parser, a resolver,
       the agent diagnostic protocol and <code>mz fix</code>, and the
       content-addressed IR, plus nine primitives written in Mzizi itself, covered by 767 tests in 35 suites
-      (<code>mzizi-dev/mzizi</code> at{" "}
-      <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>,{" "}
-      <code>main</code> after the 29 October release, #140, tagged <code>v0.12.0</code>; 33,540 lines in{" "}
-      <code>compiler/src</code>, from a fresh count). Run on a macOS laptop, 766 of
+      (<code>mzizi-dev/mzizi</code> measured at{" "}
+      <code>{MEASURED_COMMIT}</code>, the 29 October release, #140: that commit is no longer in the
+      repository's history, and the same release is tagged <code>v0.12.0</code>, now{" "}
+      <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>;
+      33,540 lines in <code>compiler/src</code>, counted at <code>main</code>). Run on a macOS laptop, 766 of
       the 767 tests passed; one, a range too long to hold in memory, was killed by the
       operating system where it expects exit 101, and the upstream README, which
       lags, still gives the 20 October figures (765 tests, 29 suites). Since then{" "}
-      <code>main</code> has moved to <code>cf3a44e</code> (<code>v0.13.0</code>, 1 November), which changes benchmarks and tooling and nothing
-      under <code>compiler/</code>, <code>examples/</code> or <code>primitives/</code>, so these figures were not re-measured; the
-      release adds tests to the benchmark runner, so the count at <code>cf3a44e</code> may differ. <code>staging</code> is ahead of <code>main</code> by a
-      test fix and benchmark references (the staging column below). Blocks nest at most 64
+      <code>main</code> has moved to <code>f9bea2b</code> (<code>v0.13.0</code>, 1 November), which changes benchmarks and tooling and nothing
+      under <code>compiler/</code>, <code>examples/</code> or <code>primitives/</code> (<code>git diff 9766929 f9bea2b</code> is empty there), so these figures were not re-measured; the
+      release adds tests to the benchmark runner, so the count at <code>f9bea2b</code> may differ. <code>staging</code> (<code>1749471</code>, <code>v0.13.11</code>) is ahead of <code>main</code> by
+      work toward components written in Mzizi, none of it released and none of it measured (the staging column below). Blocks nest at most 64
       deep (MZ0411), and robustness tests hold every command to ending with a
       diagnostic on random and deeply nested input.{" "}
       <code>mz contract</code> evaluates contract blocks. A <code>service</code>{" "}
@@ -681,8 +687,9 @@ const arms = [
       href="https://github.com/mzizi-dev/mzizi/blob/main/examples/connectivity_bar.mz"
       ><code>examples/connectivity_bar.mz</code></a
     >, one of the repository's two component examples, at{" "}
+    <code>{MEASURED_COMMIT}</code> (now v0.12.0,{" "}
     <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a
-    >.
+    >).
   </p>
 
   <p>Clean input, run through the whole pipeline:</p>
@@ -739,7 +746,7 @@ const arms = [
     by zero stop the program with <code>MZ0991</code> and exit 101; a{" "}
     <code>float</code> follows IEEE 754 and never traps. Below is{" "}
     <code>examples/numbers.mz</code>, unedited, and what <code>mz run</code>{" "}
-    printed for it at <code>{LANG_COMMIT}</code>. CI runs it and the other
+    printed for it at <code>{MEASURED_COMMIT}</code> (now v0.12.0, <code>{LANG_COMMIT}</code>; not run again). CI runs it and the other
     example programs (<code>hello</code>, <code>fib</code>,{" "}
     <code>control</code> for loops and <code>match</code>, and{" "}
     <code>errors</code> for <code>result</code> and <code>try</code>) and
@@ -751,7 +758,7 @@ const arms = [
   <p>
     Records (RFC-0013 §11, C8) are the next example: <code>examples/records.mz</code>,
     unedited, with the output <code>mz run</code> printed for it at{" "}
-    <code>{LANG_COMMIT}</code>. Its fields are read and assigned, its methods read{" "}
+    <code>{MEASURED_COMMIT}</code> (now v0.12.0, <code>{LANG_COMMIT}</code>; not run again). Its fields are read and assigned, its methods read{" "}
     <code>self</code>, and its <code>always</code> clause holds for every value.
     CI compares it with <code>examples/records.expected</code>.
   </p>
@@ -765,7 +772,7 @@ const arms = [
     feature is defined once, as an entry in the compiler, and that entry is
     what an agent reads. Its first slice is built.{" "}
     <code>compiler/src/harness.rs</code> registers 197 entries on{" "}
-    <code>main</code> at <code>{LANG_COMMIT}</code> (v0.12.0): the <code>program</code> kind and everything a
+    <code>main</code> measured at <code>{MEASURED_COMMIT}</code> (now v0.12.0, <code>{LANG_COMMIT}</code>): the <code>program</code> kind and everything a
     program has (types, operators, methods, statement forms,{" "}
     <code>result</code> and <code>try</code>), the nine <code>mz</code>{" "}
     commands, and 80 diagnostic codes, each with its <code>say</code> text, fix
@@ -801,7 +808,7 @@ const arms = [
     service,{" "}
     <a href="https://github.com/mzizi-dev/mzizi/blob/main/examples/registry.mz"
       ><code>examples/registry.mz</code></a
-    >, at <code>{LANG_COMMIT}</code>:
+    >, at <code>{MEASURED_COMMIT}</code> (now v0.12.0):
   </p>
 
   <div class="terminal">

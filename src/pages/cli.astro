@@ -16,7 +16,7 @@
 import Site from "../layouts/Site.astro";
 import RustCrates from "../components/RustCrates.astro";
 import ProgramRun from "../components/ProgramRun.astro";
-import { controlProgram, PROGRAMS_COMMIT } from "../lib/programs";
+import { controlProgram, PROGRAMS_COMMIT, PROGRAMS_RELEASE_COMMIT } from "../lib/programs";
 import {
   getComponentRecords,
   rustCrates,
@@ -157,7 +157,10 @@ const mzCommands = [
       <code>examples/control.mz</code> (FizzBuzz, <code>match</code> over an
       enum, an <code>int</code> and a <code>text</code>, loops with{" "}
       <code>break</code> and <code>continue</code>), unedited, and what{" "}
-      <code>mz run</code> printed for it at <code>{PROGRAMS_COMMIT}</code>:
+      <code>mz run</code> printed for it at <code>{PROGRAMS_COMMIT}</code>{" "}
+      (a commit no longer in the repository's history; the same release is{" "}
+      <code>v0.12.0</code>, <code>{PROGRAMS_RELEASE_COMMIT}</code>, and nothing under{" "}
+      <code>examples/</code> or <code>compiler/</code> changed since; it was not run again):
     </p>
   </div>
   <code class="cmd lead">cargo run --bin mz -- run ../examples/control.mz</code>
@@ -179,8 +182,8 @@ const mzCommands = [
       The language harness is the spine of the language: every feature a
       program has is registered once, in <code>compiler/src/harness.rs</code>,
       and <code>mz harness</code> prints that definition for an agent to read
-      (197 entries at <code>{PROGRAMS_COMMIT}</code>, 79 distinct diagnostic
-      codes). Tests hold the compiler and the entries together: a code with no
+      (197 entries, 79 distinct diagnostic codes, measured at{" "}
+      <code>{PROGRAMS_COMMIT}</code>, now <code>v0.12.0</code>). Tests hold the compiler and the entries together: a code with no
       entry, a trigger that stops raising its code, or an example that stops
       checking or printing its stated output fails the build. Each
       code's <code>say</code> text and each feature's teaching text are written

@@ -80,9 +80,14 @@ const cliVersion = cli.state === "published" ? cli.version : null;
 
 const CHARTER = "https://github.com/mzizi-dev/mzizi/blob/main/CHARTER.md";
 const TRACKER = "https://github.com/mzizi-dev/mzizi/blob/main/LANGUAGE-TRACKER.md";
-// The language commit the figures below were read at: a fresh build, not the
-// README. scripts/check-facts.py notes when main has moved past it.
-const LANG_COMMIT = "2b36c8f";
+// The language commit the figures below link to: the tag v0.12.0, which
+// scripts/check-facts.py holds to this commit. The figures were measured at
+// MEASURED_COMMIT, 2b36c8f, which the language repository's rewritten history
+// no longer contains (the same release is now 9766929); compiler/, examples/ and
+// primitives/ are identical at 9766929 and at main (f9bea2b), and the figures
+// were not re-measured. A fresh build, not the README.
+const LANG_COMMIT = "9766929";
+const MEASURED_COMMIT = "2b36c8f";
 
 // ---------------------------------------------------------------------------
 // The bench's first paint, rendered at build time.
@@ -343,7 +348,7 @@ const toolchain = [
       <div class="bench-term" id="bench-term" aria-live="polite" set:html={benchTerm} />
       <div class="bench-foot">
         Messages are verbatim from <code>mz contract</code>, checked against a real
-        run at <a href={`https://github.com/mzizi-dev/mzizi/blob/${LANG_COMMIT}/primitives/button.mz`}>{LANG_COMMIT}</a>.
+        run at <code>{MEASURED_COMMIT}</code> (now <a href={`https://github.com/mzizi-dev/mzizi/blob/${LANG_COMMIT}/primitives/button.mz`}>{LANG_COMMIT}</a>, v0.12.0).
         The check is re-implemented in this page's script so you can play with it.
         Each step changes a size's class and its height together (<code>h-12</code>{" "}
         and 48 to <code>h-11</code> and 44): change the height alone and{" "}
@@ -420,7 +425,7 @@ const toolchain = [
         <strong>The language harness is the spine of the language.</strong> Every
         feature a program has registers an entry in the compiler, and{" "}
         on <code>main</code>, <code>mz harness definition</code> prints them as JSON: 197 entries,
-        79 distinct diagnostic codes, at <code>2b36c8f</code> (v0.12.0), unchanged since v0.9.0; 49 codes are pending. Tests enforce that every code the compiler
+        79 distinct diagnostic codes, measured at <code>2b36c8f</code> (now v0.12.0, <code>9766929</code>), unchanged since v0.9.0; 49 codes are pending. Tests enforce that every code the compiler
         can emit has an entry (or, for a component's or a service's codes, is on
         a frozen pending list) and that every entry's examples and triggers still
         do what they say. Each code's <code>say</code> text and each feature's
@@ -516,9 +521,12 @@ const toolchain = [
     </ul>
     <p class="provenance">
       <span>
-        Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> at{" "}
-        <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>{" "}
-        (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>;{" "}
+        Compiler figures from a fresh build of <code>mzizi-dev/mzizi</code> measured at{" "}
+        <code>{MEASURED_COMMIT}</code>, a commit no longer in the repository's history: the same release is{" "}
+        <code>v0.12.0</code>, <a href={`https://github.com/mzizi-dev/mzizi/commit/${LANG_COMMIT}`}><code>{LANG_COMMIT}</code></a>,{" "}
+        and <code>compiler/</code> is unchanged between it and <code>main</code> (<code>f9bea2b</code>, v0.13.0), so
+        the counts were not re-measured
+        (<code>cargo test --workspace</code>; lines in <code>compiler/src</code>, counted at <code>main</code>;{" "}
         <code>mz contract</code> over <code>primitives/*.mz</code>). On a macOS laptop one of the 767 tests, a range too
         long to hold in memory, was killed by the operating system where it expects exit 101; the other 766 passed. Pilots from{" "}
         <a href="https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results"
