@@ -310,12 +310,11 @@ Versions on 2026-11-11 (read the registries before repeating one):
   `registry-propagation` and `pr-gates` (dev: how every agent works, loaded
   before any dev work). The registry requires it from 4.20.0;
   `api.mzizi.dev/v1/skills` and the `/skills` pages here serve the bundle at
-  the API's registry pin, which still carries 0.18.0 on 2026-11-11 until that pin moves (a registry
-  release is in progress).
+  the API's registry pin, which carries 0.19.0 since 2026-11-12 (registry 4.29.0, `a64e57f`).
   `/v1/skills`' `meta.version` says which bundle is
   served. The public `mzizi` plugin (mzizi-dev/mzizi-registry `plugin/`:
   `/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install
-  mzizi@mzizi`, plugin 1.7.0 on 2026-11-11) still carries skills 0.18.0;
+  mzizi@mzizi`, plugin 1.8.0 on 2026-11-12) carries skills 0.19.0;
   mzizi-registry#520, still open, would make it installable in Codex. A client that
   installs nothing gets the skills from `mzizi_get_skills`. How to connect each
   AI client (Claude, ChatGPT, Codex, the Claude and OpenAI APIs, Cursor,
