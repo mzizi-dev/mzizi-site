@@ -97,7 +97,7 @@ and `react`. The pilots below are tests inside Phase 0, not its goal.
 compiler front end exists and is tested — a lexer, a recovering parser, an agent
 diagnostic protocol with `mz fix`, a content-addressed IR, and nine primitives
 written in Mzizi itself, covered by 767 tests in 35 suites
-(`mzizi-dev/mzizi` measured at `2b36c8f`, tagged `v0.12.0`, with `main` at `cf3a44e`, tagged `v0.13.0`, since; 33,540 lines in
+(`mzizi-dev/mzizi` measured at `2b36c8f`, a commit no longer in the repository's history (the same release is tagged `v0.12.0`, now `9766929`), with `main` at `f9bea2b`, tagged `v0.13.0`, since; 33,540 lines in
 `compiler/src`, from a fresh count; run on a macOS laptop, 766 of the 767 tests
 passed and one, a range too long to hold in memory, was killed by the operating
 system where it expects exit 101). Blocks nest at most 64 deep
@@ -141,16 +141,18 @@ still waits on: held-out tasks in a private repository (not yet created);
 the `PLAN.md`; the Leptos and React arms run end to end; and, for the backend
 family, probe scoring in the runner, tasks B2–B5 and the other-language arms.
 
-**Where it stands, 2026-11-03: shipped, next, and in progress.** Read from
-`mzizi-dev/mzizi`'s `main` (`cf3a44e`, tagged `v0.13.0`, the release of 1 November,
+**Where it stands, 2026-11-11: shipped, next, and in progress.** Read from
+`mzizi-dev/mzizi`'s `main` (`f9bea2b`, tagged `v0.13.0`, the release of 1 November,
 [#146](https://github.com/mzizi-dev/mzizi/pull/146)); the figures below were measured at
-`2b36c8f` (`v0.12.0`), and nothing under `compiler/`, `examples/` or `primitives/` or in
-the tracker changed since, so they were not re-measured (the release adds benchmark-runner
-tests, so the workspace count at `cf3a44e` may differ). The open pull requests (five, none
-toward M2) were last read on 29 October.
+`2b36c8f`, a commit no longer in the repository's history (its history was rewritten; the same
+release is `v0.12.0`, now `9766929`). Nothing under `compiler/`, `examples/` or `primitives/`, and
+neither the tracker nor the charter, differs between `9766929` and `f9bea2b`, so the figures
+should still hold, but they were not re-measured (the release adds benchmark-runner
+tests, so the workspace count at `f9bea2b` may differ). Nine pull requests are open (none
+toward M2) and were read on 11 November.
 
 - **On `main` today** (what Mzizi can do; LANGUAGE-TRACKER.md):
-  - Released as v0.13.0 on 1 November ([#146](https://github.com/mzizi-dev/mzizi/pull/146)):
+  - Released as v0.13.0 on 1 November, `f9bea2b` ([#146](https://github.com/mzizi-dev/mzizi/pull/146)):
     benchmarks and tooling only. The runner scores backend episodes with the task's probes
     ([#141](https://github.com/mzizi-dev/mzizi/pull/141)), public backend development tasks B2 to
     B5 ([#142](https://github.com/mzizi-dev/mzizi/pull/142); B2 and B3 have a Mzizi reference, B4
@@ -181,7 +183,7 @@ toward M2) were last read on 29 October.
     [#116](https://github.com/mzizi-dev/mzizi/pull/116)), the README and charter without
     a UI framework's name ([#115](https://github.com/mzizi-dev/mzizi/pull/115)), and the
     dated changelog ([#119](https://github.com/mzizi-dev/mzizi/pull/119)).
-  - Measured on `main` at `2b36c8f` (macOS): `cargo test --workspace --no-fail-fast` ran 767
+  - Measured on `main` at `2b36c8f` (now `v0.12.0`, `9766929`; macOS; not re-measured): `cargo test --workspace --no-fail-fast` ran 767
     tests in 35 suites; 766 passed and one (a range too long to hold in memory) was killed by
     the operating system, exit 137 where 101 is expected; `mz harness definition` gives 197
     entries, 79 distinct diagnostic codes and 49 pending codes, unchanged since v0.9.0; every
@@ -200,18 +202,40 @@ toward M2) were last read on 29 October.
     contracts, a `service` that `mz build` lowers to a local Rust + axum package, the
     nesting cap (MZ0411), robustness tests, no `unsafe` in the compiler, and `match` in
     a view as MZ0410.
-- **Landing on `staging`** (`792ca07`, tagged `v0.13.3`; `main` is `cf3a44e`): a test fix, where the
-  range-too-long case asks for a length every host refuses and no longer gets a process killed on
-  macOS ([#149](https://github.com/mzizi-dev/mzizi/pull/149)), the B4 and B5 Python references
-  stripping CR and LF from header values ([#147](https://github.com/mzizi-dev/mzizi/pull/147)), and the
-  dated changelog. It changes no compiler code.
-- **In progress toward M2, not available:** no pull request toward M2 is open (the five open on
-  29 October are RFC-0015 and RFC-0016 drafts, a checker fix, a charter wording and a portal doc).
+- **Landing on `staging`** (`1749471`, tagged `v0.13.11` on 7 November; `main` is `f9bea2b`; 46
+  files differ), merged and not released, none of it measured:
+  - A component's static view renders to an element tree, with every text node and attribute
+    value escaped ([#156](https://github.com/mzizi-dev/mzizi/pull/156), RFC-0017 Wave 0; a library function with no `mz` command, and
+    nothing renders in a browser or on a server). A contract may carry a `render` clause that
+    tests the rendered markup, and `mz contract` runs it on `separator`, `badge`, `alert`,
+    `label` and `skeleton` ([#158](https://github.com/mzizi-dev/mzizi/pull/158)). A view string's `{…}` may hold `int` arithmetic
+    ([#160](https://github.com/mzizi-dev/mzizi/pull/160)). Three primitives join the nine: `label`, `skeleton` and `progress`.
+    Tracker rows U1, U7 and U11 are 🟡 on `staging`, and none is ✅.
+  - Three server components written in Mzizi as programs, `examples/components/`: a circuit
+    breaker, `base64url` and a rate gate ([#157](https://github.com/mzizi-dev/mzizi/pull/157)). None is a library another file can
+    import, none is installed with `mzizi add`, and none is the registry's component. Building
+    them found seven gaps (K1 to K7), all ❌ in the tracker. RFC-0018, a draft, designs function
+    values for K5 ([#159](https://github.com/mzizi-dev/mzizi/pull/159)); nothing in it is built.
+  - `mz check` and `mz contract` take a directory ([#155](https://github.com/mzizi-dev/mzizi/pull/155)).
+  - Dioxus is out of the stack (owner, 4 November): dated notes on the charter and three RFCs,
+    with the benchmark arms and pilot results unchanged ([#154](https://github.com/mzizi-dev/mzizi/pull/154)); a CI action bump ([#152](https://github.com/mzizi-dev/mzizi/pull/152)).
+  - The range-too-long test case asks for a length every host refuses and no longer gets a
+    process killed on macOS ([#149](https://github.com/mzizi-dev/mzizi/pull/149)), the B4 and B5 Python references strip CR and LF from
+    header values ([#147](https://github.com/mzizi-dev/mzizi/pull/147)), and the changelog is dated.
+  - Test counts, the harness definition and the compiler line count were not measured on
+    `staging`. The release pull request for `staging`'s 2 November tree (#151) is open and stale.
+- **In progress toward M2, not available:** no pull request toward M2 is open on 11 November.
+  Two are open toward the components-in-Mzizi work (#153), not M2: [#162](https://github.com/mzizi-dev/mzizi/pull/162) (function values,
+  RFC-0018 wave 1: a function type, a `fn` passed by name; no inline functions or captures) and
+  [#161](https://github.com/mzizi-dev/mzizi/pull/161) (conditional view attributes, so `separator` can set `role` from `decorative`).
+  Seven more are open and none is toward M2: the five incumbent backend arms for the benchmark
+  (never run against Mzizi), a `match` in a service handler as one MZ0410, a charter wording, a
+  portal doc, the RFC-0015 and RFC-0016 drafts, and the stale release pull request.
   Never describe any of this as something Mzizi has.
   - [#110](https://github.com/mzizi-dev/mzizi/issues/110), M2's tracking issue
     (opened 9 October): M2 is Tier 1 plus P1–P6 ✅. M1
     ([#69](https://github.com/mzizi-dev/mzizi/issues/69)) is met.
-  - Still to build, with no pull request open on 29 October: modules and imports
+  - Still to build, with no pull request open on 11 November: modules and imports
     (P1) and the standard library (P2), which the public suites wait on. RFC-0014 is
     their draft design, on `main`; nothing in it is implemented.
 - **Owner decisions, 2026-10-07** ([#69](https://github.com/mzizi-dev/mzizi/issues/69)):
@@ -265,7 +289,7 @@ skills, and the CLI.
 (anything that files into the Fundi issue desk or needs a console user). That is
 the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.17.0 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
-act as your console user and need sign-in (checked 2026-11-04). The MCP server is
+act as your console user and need sign-in (checked 2026-11-11). The MCP server is
 Rust first: where a component has a Mzizi Roots implementation,
 `mzizi_get_component` returns it under `rust` (the crate, the `cargo add` line,
 the contract and the `.rs` source), then the pure Astro build under `astro` where
@@ -275,28 +299,29 @@ the components with that build, and its rows and `mzizi_search`'s hits carry
 `rustCrate` and `astroFile`. `mzizi_get_skills` takes `category` (`dev`,
 `design`, `language` or `build`) and returns every skill in it in full.
 
-Versions on 2026-11-04 (read the registries before repeating one):
+Versions on 2026-11-11 (read the registries before repeating one):
 
 - `mzizi-mcp` **0.17.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
   Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.17.0)
-- `@nyuchi/mzizi-skills` **0.18.0** on npm: twelve skills in four categories,
+- `@nyuchi/mzizi-skills` **0.19.0** on npm and in the MCP server (`mcp.mzizi.dev`): twelve skills in four categories,
   `mzizi-language` (language), `mzizi-design` and `mukoko-design` (design),
   `mzizi-roots`, `mzizi-backend`, `mzizi-architecture` and `discoverability`
   (build), and `digital-hygiene`, `progress-report`, `ship-release`,
   `registry-propagation` and `pr-gates` (dev: how every agent works, loaded
   before any dev work). The registry requires it from 4.20.0;
   `api.mzizi.dev/v1/skills` and the `/skills` pages here serve the bundle at
-  the API's registry pin (0.18.0 on 2026-11-04) until that pin moves.
+  the API's registry pin, which still carries 0.18.0 on 2026-11-11 until that pin moves (a registry
+  release is in progress).
   `/v1/skills`' `meta.version` says which bundle is
   served. The public `mzizi` plugin (mzizi-dev/mzizi-registry `plugin/`:
   `/plugin marketplace add mzizi-dev/mzizi-registry`, `/plugin install
-  mzizi@mzizi`, plugin 1.7.0 on 2026-11-04) carries skills 0.18.0;
+  mzizi@mzizi`, plugin 1.7.0 on 2026-11-11) still carries skills 0.18.0;
   mzizi-registry#520, still open, would make it installable in Codex. A client that
   installs nothing gets the skills from `mzizi_get_skills`. How to connect each
   AI client (Claude, ChatGPT, Codex, the Claude and OpenAI APIs, Cursor,
   VS Code, Gemini CLI, OpenCode, Windsurf):
   https://docs.mzizi.dev/toolchain/connect
-- `@nyuchi/mzizi-cli` **0.8.0**, which ships the installer: `mzizi add <name>`
+- `@nyuchi/mzizi-cli` **0.9.0**, which ships the installer: `mzizi add <name>`
   for React (writes the TSX), Rust (records the crate the component's
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
   Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
