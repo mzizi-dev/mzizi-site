@@ -21,6 +21,15 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — /legal/privacy and /legal/terms (2026-11-12)
+
+Owner direction (2026-11-12): mzizi.dev needs legal pages, the Claude plugin directory needs a privacy notice, and bundu.org and nyuchi.com already have theirs. No issue: owner-directed addition. **Flagged for the owner's review:** these are written from what the code does, not by a lawyer, and they name the Bundu Foundation's and Nyuchi's notices as the umbrella.
+
+- **Added, `/legal/privacy`.** What mzizi.dev, docs.mzizi.dev, api.mzizi.dev, mcp.mzizi.dev and the Claude plugin collect: the site sets no cookies and runs no analytics (it loads Google Fonts), the API has no database, the MCP server limits requests per IP address and records an issue report sent with `mzizi_report_issue`, docs is hosted by Mintlify. Links the Bundu Foundation's and Nyuchi's privacy notices; requests go to support@bundu.org.
+- **Added, `/legal/terms`.** Free to read, Apache-2.0 for public source, rate limits, Phase 0 prototype, no warranty; the Foundation's and Nyuchi's terms apply where it is silent.
+- **Changed, every footer.** "The org" lists Privacy and Terms of use. `llms.txt` lists both pages.
+- **Changed, `scripts/verify-rendered.py`.** A "legal pages" section checks both pages exist, name the umbrella notices and the surfaces, are linked from every footer and are in `llms.txt`.
+
 ### Changed — the language's test count is re-measured at main (2026-11-12, freshness)
 
 No issue: freshness update. `cargo test --workspace` was run on Linux at language `main` (`f9bea2b`, `v0.13.0`): 771 tests in 38 suites (cargo's result blocks; 30 hold tests), 770 passed, none failed, one ignored because it needs `axum` and `tokio` in the cargo cache (the language's `lowering` job runs it). The 767 tests in 35 suites the site carried were measured at `v0.12.0` on a Mac, where one test was killed for memory; it passes with 16 GB on Linux. Lines in `compiler/src` (33,540), the harness definition (197 entries, 49 pending codes, same SHA-256) are unchanged.

@@ -371,6 +371,8 @@ Hostnames change; resolve one before repeating it.
 - [Architecture](/architecture): the DNA double helix the components sit on
 - [Tokens](/tokens): the 21 colour families, type, spacing and component specs
 - [Ecosystem](/ecosystem): every public repository, what it holds, whether it is routed, and how to reach Mzizi
+- [Privacy](/legal/privacy): what the sites, the API, the MCP server and the Claude plugin collect, and where the Bundu Foundation's and Nyuchi's notices apply
+- [Terms of use](/legal/terms): how you may use what Mzizi publishes, and what is not promised
 
 ## Source of truth
 

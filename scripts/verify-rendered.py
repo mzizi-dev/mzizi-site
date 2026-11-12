@@ -686,6 +686,34 @@ strays = sorted({f"{p.relative_to(DIST)}: {m}" for p in surfaces
                  if m not in allowed and not (p.name == "security.txt" and m == "security@nyuchi.com")})
 check("dist/", f"no contact address but {CONTACT} and {SECURITY}", not strays, ", ".join(strays[:5]))
 
+# --- legal pages -------------------------------------------------------------
+# The Claude plugin directory and anyone reading the plugin need a privacy notice
+# at a stable address (owner, 2026-11-12). /legal/privacy and /legal/terms exist,
+# are linked from every footer, and say who the Foundation's and Nyuchi's notices
+# are. They must not claim data practices the surfaces do not have.
+print("\nlegal pages")
+for name, needles in (
+    ("legal/privacy.html", ("https://www.bundu.org/legal/privacy", "https://www.nyuchi.com/legal/privacy",
+                            "mcp.mzizi.dev", "api.mzizi.dev", "no database")),
+    ("legal/terms.html", ("https://www.bundu.org/legal/terms", "https://www.nyuchi.com/legal/terms",
+                          "Apache-2.0", "Phase 0")),
+):
+    page = DIST / name
+    check(name, "is built", page.exists())
+    if page.exists():
+        body = reader_text(page)
+        raw = page.read_text(encoding="utf-8")  # links live in href attributes, which reader_text strips
+        for needle in needles:
+            check(name, f"says {needle!r}", needle in body or needle in raw)
+no_legal_link = [str(p.relative_to(DIST)) for p in html_pages
+                 if 'href="/legal/privacy"' not in p.read_text(encoding="utf-8")
+                 or 'href="/legal/terms"' not in p.read_text(encoding="utf-8")]
+check("footer", "every page links /legal/privacy and /legal/terms", not no_legal_link,
+      f"{len(no_legal_link)} without: {', '.join(no_legal_link[:5])}")
+check("llms.txt", "lists /legal/privacy and /legal/terms",
+      "(/legal/privacy)" in (DIST / "llms.txt").read_text(encoding="utf-8")
+      and "(/legal/terms)" in (DIST / "llms.txt").read_text(encoding="utf-8"))
+
 # --- spaces around inline elements -------------------------------------------
 # Astro drops the line break between a line that ends in text and a next line
 # that starts with an inline element, so

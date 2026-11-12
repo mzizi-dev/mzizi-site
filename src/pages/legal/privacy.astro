@@ -1,0 +1,91 @@
+---
+import Site from "../../layouts/Site.astro";
+
+/**
+ * The privacy notice for the Mzizi surfaces. Every statement here is one this
+ * repository, the API, the MCP server or the Bundu Foundation's and Nyuchi's own
+ * notices can back: what the site loads, what the read-only API stores (nothing),
+ * what the MCP server does with a sign-in and an issue report. Do not add a data
+ * practice here that the code does not have, and change this page in the same
+ * pull request as the change that alters one. The date below is the last time the
+ * facts were checked against the code.
+ */
+const UPDATED = "12 November 2026";
+---
+
+<Site
+  title="Privacy"
+  description="What the Mzizi websites, API, MCP server and Claude plugin collect, and where the Bundu Foundation's and Nyuchi's notices apply."
+  eyebrow="Legal"
+  lede={`Last updated ${UPDATED}. What mzizi.dev, docs.mzizi.dev, api.mzizi.dev, mcp.mzizi.dev and the Mzizi Claude plugin collect, and who to ask.`}
+>
+  <h2>Who this covers</h2>
+  <p class="prose">
+    This notice covers the Mzizi surfaces that are public and free to read:{" "}
+    <code>mzizi.dev</code>, <code>docs.mzizi.dev</code>, <code>api.mzizi.dev</code>,{" "}
+    <code>mcp.mzizi.dev</code> and the Mzizi Claude plugin. Mzizi is not a separate legal
+    entity. It sits inside the Bundu ecosystem, whose parent is the Bundu Foundation, a
+    non-profit company limited by guarantee registered in Zimbabwe. The Foundation's{" "}
+    <a href="https://www.bundu.org/legal/privacy">privacy notice</a> is the umbrella notice,
+    and this page adds what is specific to Mzizi.
+  </p>
+  <p class="prose">
+    The Mzizi console at <code>app.mzizi.dev</code> has accounts. It is run by Nyuchi Africa
+    (Pvt) Ltd, and <a href="https://www.nyuchi.com/legal/privacy">Nyuchi's privacy notice</a>{" "}
+    governs it.
+  </p>
+
+  <h2>What each surface collects</h2>
+  <ul>
+    <li>
+      <strong>mzizi.dev.</strong> A static site. It has no accounts, sets no cookies, and runs
+      no analytics or advertising scripts. Search runs in your browser, over files the site
+      serves. Your browser asks Google Fonts for the typefaces, so Google sees your IP address
+      and the page that asked.
+    </li>
+    <li>
+      <strong>api.mzizi.dev.</strong> A read-only API that answers from files bundled when it was
+      built. It has no database and no accounts, so it keeps nothing about who asked.
+    </li>
+    <li>
+      <strong>mcp.mzizi.dev.</strong> The Mzizi MCP server. The free tools need no sign-in. It
+      limits requests per IP address, so it reads your address to do that. Two tools,{" "}
+      <code>mzizi_fundi</code> and <code>mzizi_report_issue</code>, need you to sign in and act
+      as your Mzizi console user. A report you send with <code>mzizi_report_issue</code> is
+      recorded in our database and filed as a GitHub issue, so do not put a secret or anyone's
+      personal data in one.
+    </li>
+    <li>
+      <strong>docs.mzizi.dev.</strong> Hosted by Mintlify, which processes page requests and may
+      collect usage analytics under its own notice.
+    </li>
+    <li>
+      <strong>The Mzizi Claude plugin.</strong> Markdown skills and a connection to the MCP
+      server above. It runs no script of its own and sends nothing anywhere else.
+    </li>
+  </ul>
+
+  <h2>Service providers</h2>
+  <p class="prose">
+    These sites and servers are hosted on Cloudflare, which processes request data (IP address,
+    address requested, browser) to deliver and protect them. The other processors are Google
+    (Fonts), Mintlify (the documentation) and GitHub (the issues and the source). Nothing here is
+    sold, and there is no advertising.
+  </p>
+
+  <h2>Your rights</h2>
+  <p class="prose">
+    Depending on where you live you have rights of access, correction, portability, deletion and
+    objection, and the right to withdraw consent. The Foundation's notice is drafted to satisfy
+    the Zimbabwe Data Protection Act, POPIA and the EU GDPR; this one follows it. Write to{" "}
+    <a href="mailto:support@bundu.org">support@bundu.org</a> with the subject line "Data
+    request". Security reports go to <a href="mailto:security@nyuchi.com">security@nyuchi.com</a>.
+  </p>
+
+  <h2>Changes</h2>
+  <p class="prose">
+    A change to what the surfaces collect changes this page, with the date above. The history is
+    in this site's <a href="https://github.com/mzizi-dev/mzizi-site/blob/main/CHANGELOG.md">changelog</a>.
+    See also the <a href="/legal/terms">terms of use</a>.
+  </p>
+</Site>
