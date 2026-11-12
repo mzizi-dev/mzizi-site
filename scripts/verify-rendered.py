@@ -28,7 +28,7 @@ DIST = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "dist")
 # The registry's own numbers. Kept here deliberately rather than read from the
 # API: if the corpus really grows, that is a change someone should make on
 # purpose, in a commit, with the number in the diff.
-EXPECTED_COMPONENTS = 690
+EXPECTED_COMPONENTS = 693
 EXPECTED_NODES = 8
 EXPECTED_RUNGS = 4
 EXPECTED_STRANDS = 6
@@ -165,7 +165,7 @@ body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("playground.ht
 check("playground.html", "says plainly it is not interactive", "Not interactive." in body)
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("observability.html")))
 check("observability.html", "links the console", "app.mzizi.dev" in body)
-check("observability.html", "shows the file-backed N2 count", "N2" in body and "409" in body)
+check("observability.html", "shows the file-backed N2 count", "N2" in body and "412" in body)
 
 # --- /architecture -------------------------------------------------------
 print("\narchitecture.html")
@@ -191,8 +191,8 @@ for strand in ("Core guarantee", "Shipped", "Swappable", "Spine",
                "Genetic code", "Transcription"):
     check("architecture.html", f"strand “{strand}” rendered", strand in plain)
 
-# Real component counts, not placeholders: N2 holds 409, N6 holds 93.
-check("architecture.html", "N2 shows its live count of 409", "409 components" in plain)
+# Real component counts, not placeholders: N2 holds 412, N6 holds 93.
+check("architecture.html", "N2 shows its live count of 412", "412 components" in plain)
 check("architecture.html", "N6 shows its live count of 93", "93 components" in plain)
 check("architecture.html", f"the {EXPECTED_COMPONENTS} total is printed", str(EXPECTED_COMPONENTS) in plain)
 
@@ -685,6 +685,34 @@ strays = sorted({f"{p.relative_to(DIST)}: {m}" for p in surfaces
                  for m in address.findall(reader_text(p))
                  if m not in allowed and not (p.name == "security.txt" and m == "security@nyuchi.com")})
 check("dist/", f"no contact address but {CONTACT} and {SECURITY}", not strays, ", ".join(strays[:5]))
+
+# --- legal pages -------------------------------------------------------------
+# The Claude plugin directory and anyone reading the plugin need a privacy notice
+# at a stable address (owner, 2026-11-12). /legal/privacy and /legal/terms exist,
+# are linked from every footer, and say who the Foundation's and Nyuchi's notices
+# are. They must not claim data practices the surfaces do not have.
+print("\nlegal pages")
+for name, needles in (
+    ("legal/privacy.html", ("https://www.bundu.org/legal/privacy", "https://www.nyuchi.com/legal/privacy",
+                            "mcp.mzizi.dev", "api.mzizi.dev", "no database")),
+    ("legal/terms.html", ("https://www.bundu.org/legal/terms", "https://www.nyuchi.com/legal/terms",
+                          "Apache-2.0", "Phase 0")),
+):
+    page = DIST / name
+    check(name, "is built", page.exists())
+    if page.exists():
+        body = reader_text(page)
+        raw = page.read_text(encoding="utf-8")  # links live in href attributes, which reader_text strips
+        for needle in needles:
+            check(name, f"says {needle!r}", needle in body or needle in raw)
+no_legal_link = [str(p.relative_to(DIST)) for p in html_pages
+                 if 'href="/legal/privacy"' not in p.read_text(encoding="utf-8")
+                 or 'href="/legal/terms"' not in p.read_text(encoding="utf-8")]
+check("footer", "every page links /legal/privacy and /legal/terms", not no_legal_link,
+      f"{len(no_legal_link)} without: {', '.join(no_legal_link[:5])}")
+check("llms.txt", "lists /legal/privacy and /legal/terms",
+      "(/legal/privacy)" in (DIST / "llms.txt").read_text(encoding="utf-8")
+      and "(/legal/terms)" in (DIST / "llms.txt").read_text(encoding="utf-8"))
 
 # --- spaces around inline elements -------------------------------------------
 # Astro drops the line break between a line that ends in text and a next line

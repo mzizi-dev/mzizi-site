@@ -21,6 +21,29 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — registry 4.36.0 counts, the package versions and the plugin split (2026-11-12, freshness)
+
+No issue: a freshness update after registry 4.36.0 (`f94666b`), `@nyuchi/mzizi-skills` 0.20.0, `@nyuchi/mzizi-mcp` 0.19.0 and `@nyuchi/mzizi-cli` 0.10.0.
+
+- **Changed (`llms.txt`):** `mzizi-mcp` 0.19.0 (npm and the MCP Registry), `@nyuchi/mzizi-skills` 0.20.0, `@nyuchi/mzizi-cli` 0.10.0, and the API's registry pin at 4.36.0 (`f94666b`). It describes two Claude Code plugins, `mzizi` (seven Markdown skills and the MCP, 1.10.0) and `mzizi-dev` (the five dev skills with their scripts and hooks, 0.1.0). The anonymous-access statement was rechecked on 0.19.0: 14 tools answer without a token.
+- **Changed (`/.well-known/mcp.json`):** the authorization note names `mzizi-mcp` 0.19.0, checked 12 November 2026.
+- **Changed (`/skills`):** the plugin paragraph names both plugins and both install lines.
+- **Changed (counts):** the site renders 693 component cards and pages (up from 690) and N2's 412 components (up from 409), read from the API at build time. The expected numbers in `scripts/verify-rendered.py`, `AGENTS.md` and `README.md` move with them.
+- **Not changed:** the language figures (`index.astro`, `language.astro`) still cite language commit `9766929`; `check-facts.py` notes that language `main` is `f9bea2b`, and re-running those figures needs a `cargo test --workspace` run in the language repository.
+
+### Changed — the agent guide states the owner's release rule (2026-11-12, [mzizi-dev/mzizi-registry#661](https://github.com/mzizi-dev/mzizi-registry/issues/661))
+
+- `AGENTS.md` state the owner's release rule: the owner approves major releases only; minor and patch releases (the `staging` → `main` release PR, its tag and the sync-back into `staging`) and merges of green PRs that have passed review are done by agents following the repo's playbook, without asking the owner (owner, 2026-11-02). "Only the owner releases `staging` to `main`, or an agent the owner has authorised for that release" and the progress-report line (report ticks never publish, release, merge or deploy without the owner's approval) are replaced with it. Merge method, the merge gate, auto-merge and the changelog rules are unchanged. Nothing served or published changes.
+
+### Added — /legal/privacy and /legal/terms (2026-11-12)
+
+Owner direction (2026-11-12): mzizi.dev needs legal pages, the Claude plugin directory needs a privacy notice, and bundu.org and nyuchi.com already have theirs. No issue: owner-directed addition. **Flagged for the owner's review:** these are written from what the code does, not by a lawyer, and they name the Bundu Foundation's and Nyuchi's notices as the umbrella.
+
+- **Added, `/legal/privacy`.** What mzizi.dev, docs.mzizi.dev, api.mzizi.dev, mcp.mzizi.dev and the Claude plugin collect: the site sets no cookies and runs no analytics (it loads Google Fonts), the API has no database, the MCP server limits requests per IP address and records an issue report sent with `mzizi_report_issue`, docs is hosted by Mintlify. Links the Bundu Foundation's and Nyuchi's privacy notices; requests go to `support@bundu.org`.
+- **Added, `/legal/terms`.** Free to read, Apache-2.0 for public source, rate limits, Phase 0 prototype, no warranty; the Foundation's and Nyuchi's terms apply where it is silent.
+- **Changed, every footer.** "The org" lists Privacy and Terms of use. `llms.txt` lists both pages.
+- **Changed, `scripts/verify-rendered.py`.** A "legal pages" section checks both pages exist, name the umbrella notices and the surfaces, are linked from every footer and are in `llms.txt`.
+
 ### Changed — the language's test count is re-measured at main (2026-11-12, freshness)
 
 No issue: freshness update. `cargo test --workspace` was run on Linux at language `main` (`f9bea2b`, `v0.13.0`): 771 tests in 38 suites (cargo's result blocks; 30 hold tests), 770 passed, none failed, one ignored because it needs `axum` and `tokio` in the cargo cache (the language's `lowering` job runs it). The 767 tests in 35 suites the site carried were measured at `v0.12.0` on a Mac, where one test was killed for memory; it passes with 16 GB on Linux. Lines in `compiler/src` (33,540), the harness definition (197 entries, 49 pending codes, same SHA-256) are unchanged.

@@ -1,0 +1,60 @@
+---
+import Site from "../../layouts/Site.astro";
+
+const UPDATED = "12 November 2026";
+---
+
+<Site
+  title="Terms of use"
+  description="The terms for using the Mzizi websites, API, MCP server and Claude plugin."
+  eyebrow="Legal"
+  lede={`Last updated ${UPDATED}. How you may use what Mzizi publishes, and what we do not promise.`}
+>
+  <h2>What this covers</h2>
+  <p class="prose">
+    These terms cover <code>mzizi.dev</code>, <code>docs.mzizi.dev</code>,{" "}
+    <code>api.mzizi.dev</code>, <code>mcp.mzizi.dev</code> and the Mzizi Claude plugin. They sit
+    under the Bundu Foundation's <a href="https://www.bundu.org/legal/terms">terms of use</a>,
+    which apply where this page is silent. The console at <code>app.mzizi.dev</code> is run by
+    Nyuchi Africa (Pvt) Ltd, whose <a href="https://www.nyuchi.com/legal/terms">terms</a> apply
+    to it.
+  </p>
+
+  <h2>Using what we publish</h2>
+  <p class="prose">
+    The websites, the registry API and the free MCP tools are open to read with no account. The
+    public source code, the components and the design tokens are licensed under Apache-2.0; each
+    repository carries the licence file that governs it. You may use the API and the MCP server
+    in your own tools. They are rate limited, and we may slow or refuse a client that harms the
+    service for others.
+  </p>
+
+  <h2>Mzizi is a research prototype</h2>
+  <p class="prose">
+    The Mzizi language is in Phase 0. This site says what is built and what is only designed, and
+    the language's own tracker is the record. Nothing here is a promise of speed, fitness for a
+    purpose or availability. The APIs and the MCP tools can change, and a component's contract
+    can change between versions.
+  </p>
+
+  <h2>No warranty</h2>
+  <p class="prose">
+    Everything is provided as it is, without warranty of any kind, to the extent the law allows.
+    Check what you rely on against the source: every claim on this site traces to a file in the
+    open repositories or to a request you can make yourself.
+  </p>
+
+  <h2>Names and marks</h2>
+  <p class="prose">
+    Mzizi, Bundu, Nyuchi, Mukoko and Shamwari are names and marks of their owners within the
+    Bundu ecosystem. The Apache-2.0 licence does not grant the right to use them to suggest
+    endorsement.
+  </p>
+
+  <h2>Contact</h2>
+  <p class="prose">
+    Questions about these terms: <a href="mailto:support@bundu.org">support@bundu.org</a>.
+    Security reports: <a href="mailto:security@nyuchi.com">security@nyuchi.com</a>. See also the{" "}
+    <a href="/legal/privacy">privacy notice</a>.
+  </p>
+</Site>
