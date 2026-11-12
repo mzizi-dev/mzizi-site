@@ -106,9 +106,11 @@ const sorted = [...skills].sort((a, b) => a.name.localeCompare(b.name));
     <p>
       <strong>As a plugin</strong>: the public <code>mzizi</code> plugin, in{" "}
       <a href="https://github.com/mzizi-dev/mzizi-registry/tree/main/plugin"><code>mzizi-dev/mzizi-registry</code></a>,
-      installs the skills and connects the MCP server in one step. In Claude Code:{" "}
+      installs the seven Markdown skills and connects the MCP server in one step. In Claude Code:{" "}
       <code>/plugin marketplace add mzizi-dev/mzizi-registry</code>, then{" "}
-      <code>/plugin install mzizi@mzizi</code>. It carries the same bundle as the API.
+      <code>/plugin install mzizi@mzizi</code>. The five dev skills, with their shell scripts and
+      hooks, are a second plugin from the same marketplace, <code>mzizi-dev</code>:{" "}
+      <code>/plugin install mzizi-dev@mzizi</code>. Both carry the same bundle as the API.
     </p>
     <p>
       The MCP server needs nothing installed, so a client that cannot install a package
