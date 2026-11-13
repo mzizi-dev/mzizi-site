@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — `@nyuchi/mzizi-mcp` 0.20.0, registry 4.37.0 (2026-11-13, freshness)
+
+No issue: a freshness update after registry 4.37.0 (`7c6449a`) and `@nyuchi/mzizi-mcp` 0.20.0.
+
+- **Changed (`llms.txt`):** `mzizi-mcp` 0.20.0 (npm and the MCP Registry), was 0.19.0.
+- **Changed (`/.well-known/mcp.json`):** the authorization note names `mzizi-mcp` 0.20.0, checked 13 November 2026.
+
 ### Changed — registry 4.36.0 counts, the package versions and the plugin split (2026-11-12, freshness)
 
 No issue: a freshness update after registry 4.36.0 (`f94666b`), `@nyuchi/mzizi-skills` 0.20.0, `@nyuchi/mzizi-mcp` 0.19.0 and `@nyuchi/mzizi-cli` 0.10.0.
