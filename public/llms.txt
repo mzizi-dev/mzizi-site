@@ -287,7 +287,7 @@ direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.19.0 serves
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.20.0 serves
 every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
 act as your console user and need sign-in (checked 2026-11-12). The MCP server is
 Rust first: where a component has a Mzizi Roots implementation,
@@ -301,8 +301,8 @@ the components with that build, and its rows and `mzizi_search`'s hits carry
 
 Versions on 2026-11-12 (read the registries before repeating one):
 
-- `mzizi-mcp` **0.19.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
-  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.19.0)
+- `mzizi-mcp` **0.20.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
+  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.20.0)
 - `@nyuchi/mzizi-skills` **0.20.0** on npm and in the MCP server (`mcp.mzizi.dev`): twelve skills in four categories,
   `mzizi-language` (language), `mzizi-design` and `mukoko-design` (design),
   `mzizi-roots`, `mzizi-backend`, `mzizi-architecture` and `discoverability`
