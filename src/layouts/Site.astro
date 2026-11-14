@@ -163,6 +163,12 @@ const crumbs =
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Both schemes are supported: declared before first paint so native UI
+         (scrollbars, form controls, the canvas) never flashes the wrong one. -->
+    <meta name="color-scheme" content="light dark" />
+    <!-- The type scale is rem-based, so opting in lets the OS text-size
+         preference the reader set actually reach the page. -->
+    <meta name="text-scale" content="scale" />
     <title>{documentTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
