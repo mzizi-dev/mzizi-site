@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — Dependabot proposes no semver-major updates (2026-11-14)
+
+No issue: records the CI change already on `staging` (`d9048ee`), so the release that carries it has notes.
+
+- `.github/dependabot.yml` ignores `version-update:semver-major` for both the `github-actions` and the `npm` ecosystems, so a major bump arrives only when someone chooses it (owner, 2026-11-12). The ignore rule never blocks security updates. Dependabot reads its configuration from `main`, so the rule takes effect once this release lands.
+- Nothing served changes: no page, asset or redirect moves.
+
 ### Changed — `@nyuchi/mzizi-mcp` 0.20.0, registry 4.37.0 (2026-11-13, freshness)
 
 No issue: a freshness update after registry 4.37.0 (`7c6449a`) and `@nyuchi/mzizi-mcp` 0.20.0.
