@@ -20,6 +20,10 @@ requests can carry the `no-changelog` label instead. When a dated section is
 cut, the Unreleased entries move under it.
 
 ## [Unreleased]
+### Changed — mzizi.dev follows the reader's OS text size, and both color schemes are declared (2026-11-14, [#148](https://github.com/mzizi-dev/mzizi-site/issues/148))
+
+`Site.astro` gains two meta tags. `<meta name="color-scheme" content="light dark">` tells the browser before first paint that both schemes are supported, so scrollbars, form controls and the canvas theme with the palette instead of flashing light under a dark preference. `<meta name="text-scale" content="scale">` opts the page into the reader's operating-system text-size setting; the site's type scale is rem-based (the registry tokens), so the setting now actually reaches the text. Nothing changes for a reader who never moved the OS setting.
+
 
 ### Security — `astro` 7.4.12 for GHSA-r3h5-4585-7x3w (2026-11-14)
 
