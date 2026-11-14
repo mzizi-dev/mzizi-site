@@ -21,6 +21,13 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Security — `astro` 7.4.12 for GHSA-r3h5-4585-7x3w (2026-11-14)
+
+Refs #146: ports Dependabot's security update into `staging`, since `main` only accepts release pull requests.
+
+- `package.json` raises the `astro` floor from `>=7.4.5` to `>=7.4.12`, and `pnpm-lock.yaml` resolves 7.4.12, clearing [GHSA-r3h5-4585-7x3w](https://github.com/advisories/GHSA-r3h5-4585-7x3w) (moderate; affects 5.14.3 to 7.4.6). Dependabot proposed 7.4.7; 7.4.12 is the latest 7.4 patch and the floor `mzizi-registry` set for the same advisory (#679). Astro's own dependencies move with it (`satteri` 0.11.7, `@astrojs/markdown-satteri` 0.4.10, `cookie` 2.0.2, `p-queue` 10.0.0).
+- Checked: `pnpm check` (0 errors), `pnpm run lint`, `pnpm build` (the agent-facing files are all in `dist/`) and `pnpm audit` (no known vulnerabilities). Nothing a reader sees should change.
+
 ### Changed — Dependabot proposes no semver-major updates (2026-11-14)
 
 No issue: records the CI change already on `staging` (`d9048ee`), so the release that carries it has notes.
