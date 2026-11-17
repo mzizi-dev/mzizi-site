@@ -21,6 +21,41 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — Mzizi tools, runtime, crates and org policy (2026-11-17)
+
+- **Added: the Bundu ecosystem and doctrine on `/ecosystem` and `llms.txt`.** The four
+  pillars (Bundu Labs, Nyuchi Africa, Mukoko, Shamwari AI) and the narrative spine, the
+  `.cell` status (a proposal), the Mukoko tokens (proposed, off the current roadmap), and the
+  Ubuntu doctrine: five pillars, five principles and seven engineering constraints, copied
+  verbatim from mzizi-registry `content/doctrine` (staging). The ecosystem image and the
+  Bundu newsroom are linked, not copied.
+- **Changed: `/ecosystem`.** Mzizi is described as owned by the Bundu Foundation and built by
+  Nyuchi Africa (was: governed by Mzizi). `mzizi-api` is a Rust (workers-rs) Worker, served
+  since 2026-11-17 (was Hono).
+
+- **Changed: the MCP server.** `mzizi-mcp` is 0.23.0 and exposes three tools:
+  `mzizi_search`, `mzizi_execute` (which runs the operations, including `fundi`) and
+  `mzizi_feedback`. The 17 earlier tool names still work until 1.0.0. The `/cli`, `/skills`,
+  `/legal/privacy`, `llms.txt`, `/.well-known/mcp.json` and the README now name the three
+  tools and the Fundi operation, in place of `mzizi_fundi` and `mzizi_report_issue`. The
+  sign-in rule is unchanged: free, except the `fundi` operation and filing an issue.
+- **Changed: the registry API runtime.** `api.mzizi.dev` has been served by a Rust
+  (workers-rs) Worker since 2026-11-17, with the same routes and responses (strict parity,
+  1669 of 1669, against the previous TypeScript Worker). The README and the site's code
+  comment name the Rust Worker. `llms.txt`'s repository list still says Hono until the
+  ecosystem wording is updated.
+- **Changed: Mzizi Roots.** The crates on crates.io are 0.8.0 (was 0.7.0), and install lines
+  use `"0.8"`. The `mzizi-roots` core no longer depends on Dioxus; removing it from the rest
+  is in progress. Eight components render unstyled from the Roots runtime, and `/components`
+  and `llms.txt` say so.
+- **Changed: versions named in `llms.txt`.** Registry 4.43.0 and `@nyuchi/mzizi-cli` 0.11.0
+  (was 0.10.0). The hard-coded skills version was removed; `/v1/skills` says which bundle it
+  serves.
+- **Changed: org policy.** The README's "Working on it" section now states the versioning
+  rule (staging merge is a patch, staging to main is a minor, a major is manual), the merge
+  rule, the all-checks-green rule (stated as the rule; org-wide enforcement is pending) and
+  the owner's tooling direction of 2026-11-17 (pure Rust, then Deno or Vite+, Node last).
+
 ### Changed — vite-plus 1.6.0 (2026-11-17, Refs #145)
 
 `package.json` raises the `vite-plus` floor from `>=1.4.0` to `>=1.6.0` and `pnpm-lock.yaml` resolves 1.6.0, the release Dependabot's minor-and-patch groups move to. `check`, `lint`, the tests and the full build pass on it. Dev tooling only: nothing the site serves changes.

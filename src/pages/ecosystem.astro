@@ -2,6 +2,7 @@
 import { Card } from "@bundu/ui/ui/card";
 import Site from "../layouts/Site.astro";
 import { crateStatus, npmStatus } from "../lib/registry";
+import doctrine from "../data/doctrine.json";
 
 // Versions are read at build time, never typed in: the MCP server's from npm,
 // the Roots crates' from crates.io (they move together, so the umbrella's
@@ -41,7 +42,7 @@ const repos = [
     role: "The registry API (formerly mzizi-api-gateway)",
     state: "serving api.mzizi.dev today",
     site: "https://api.mzizi.dev/v1",
-    body: "Serves api.mzizi.dev, in mzizi-dev/mzizi-api (formerly mzizi-api-gateway): the registry API as a Hono Cloudflare Worker (TypeScript). Every route answers from the registry's repository files, generated at a pinned registry commit and bundled into the Worker. A bot moves that pin to registry main (checked hourly, merged only when CI and strict parity against production pass; mzizi-api#16), so the commit changes without an edit here: every response's x-mzizi-source header names the one being served. There's no origin, no database and no Supabase. It replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check. The repository was mzizi-dev/mzizi-api-gateway until its rename to mzizi-api.",
+    body: "Serves api.mzizi.dev, in mzizi-dev/mzizi-api (formerly mzizi-api-gateway): the registry API as a Rust (workers-rs) Cloudflare Worker, served since 2026-11-17 with the same routes and responses. Every route answers from the registry's repository files, generated at a pinned registry commit and bundled into the Worker. A bot moves that pin to registry main (checked hourly, merged only when CI and strict parity against production pass; mzizi-api#16), so the commit changes without an edit here: every response's x-mzizi-source header names the one being served. There's no origin, no database and no Supabase. It replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check. The repository was mzizi-dev/mzizi-api-gateway until its rename to mzizi-api.",
   },
   {
     name: "mzizi-console",
@@ -79,9 +80,8 @@ const repos = [
   lede="Seven public repositories. Four serve a live hostname; the rest are code that is built but not routed, or a placeholder. This page says which is which."
 >
   <p>
-    Mzizi is a programming language. Its ecosystem is governed by{" "}
-    <strong>Mzizi</strong>, which owns the language, its toolchain and its
-    components outright and operates the registry and tooling day-to-day. Everything listed here is public and Apache-2.0.
+    Mzizi is a programming language, owned by the Bundu Foundation and built by Nyuchi Africa.{" "}
+    Everything listed here is public and Apache-2.0.
     There are private repositories in the org too — they are not listed, and
     neither is anything that is not yet real.
   </p>
@@ -113,20 +113,102 @@ const repos = [
     ))
   }
 
+  <h2>The Bundu ecosystem</h2>
+
+  <p>
+    Mzizi sits inside the Bundu ecosystem. Its umbrella is the Bundu Foundation;
+    Bundu is Shona for wilderness. The ecosystem's own summary is: One ecosystem.
+    One doctrine. One source of truth. Many interfaces. The ecosystem image and
+    its story are on <a href="https://www.bundu.org/ecosystem">bundu.org/ecosystem</a>{" "}
+    and in <a href="https://www.bundu.org/newsroom/the-bundu-ecosystem">the Bundu newsroom</a>.
+  </p>
+
+  <p>In one line: bundu is the wilderness, shamwari is the ranger, nyuchi is the bee, mukoko is the hive, Mzizi is the root everything grows from.</p>
+
+  <h3>The four pillars</h3>
+
+  <ul>
+    <li>
+      <strong>Bundu Labs</strong>, research, knowledge, standards and frameworks.
+      The research and standards arm of the Bundu Foundation. It investigates
+      infrastructure gaps across Africa and emerging markets, and publishes the
+      standards, frameworks and vocabulary the rest of the ecosystem builds on.
+    </li>
+    <li>
+      <strong>Nyuchi Africa</strong>, platform and infrastructure. The platform and
+      infrastructure company of the ecosystem: the Nyuchi API, the console, and its
+      own tools and products. It builds platforms others build on; it is not an
+      outsourced IT department or a managed service provider.
+    </li>
+    <li>
+      <strong>Mukoko</strong>, the consumer pillar. <em>Mukoko is a product of Nyuchi Africa.</em>{" "}
+      Mukoko is a pillar of Bundu and a product of Nyuchi Africa, built and operated
+      by Nyuchi: the hive and the consumer pillar, and the proof that what is
+      researched reaches production and is used by people, and that the
+      infrastructure works.
+    </li>
+    <li>
+      <strong>Shamwari AI</strong>, community-facing AI and conversational
+      experiences. Shamwari AI is the ranger in the wilderness, guiding and managing
+      things. It is an African AI companion that answers in Shona, Ndebele and
+      English and cites its sources.
+    </li>
+  </ul>
+
+  <p>
+    <strong>.cell</strong> is a Bundu Labs project that maps directly to SiafuDB;
+    its repository is siafuDB/cell. Its spec (0.1.0) is a draft and PROPOSED. The
+    register is at <a href="https://standards.bundu.org/cell/">standards.bundu.org/cell</a>.
+    The Mukoko tokens are a proposed project and are OFF the current roadmap.
+  </p>
+
+  <h2>Doctrine: Ubuntu</h2>
+
+  <p>
+    Ubuntu is not a marketing claim; it is the specification. Its five pillars are
+    the spheres of belonging and its five principles the values practised in them;
+    seven engineering constraints make them testable. The text below is copied from
+    the doctrine files in{" "}
+    <a href="https://github.com/mzizi-dev/mzizi-registry/tree/staging/content/doctrine">mzizi-registry</a>,
+    in the order those files list them, and is served by Mzizi through{" "}
+    <code>get_doctrine</code>.
+  </p>
+
+  <h3>Five pillars</h3>
+  <ul>
+    {doctrine.pillars.map((i) => (
+      <li><strong>{i.title}</strong>. {i.description}</li>
+    ))}
+  </ul>
+
+  <h3>Five principles</h3>
+  <ul>
+    {doctrine.principles.map((i) => (
+      <li><strong>{i.title}</strong>. {i.description}</li>
+    ))}
+  </ul>
+
+  <h3>Seven engineering constraints</h3>
+  <ul>
+    {doctrine.constraints.map((i) => (
+      <li><strong>{i.title}</strong>. {i.description}</li>
+    ))}
+  </ul>
+
   <h2>The one live agent endpoint</h2>
 
   <p>
     <code>https://mcp.mzizi.dev/mcp</code> is an MCP server over Streamable HTTP,
-    serving the component registry as whole documents — one call returns
-    everything about a component rather than several, plus the skills and the
-    docs. It is Rust first: where a component has a Mzizi Roots implementation,{" "}
-    <code>mzizi_get_component</code> leads with it (the crate, the{" "}
-    <code>cargo add</code> line, the contract and the <code>.rs</code> source)
-    then the pure Astro build where there is one, and the React build last, and{" "}
-    <code>mzizi_list_components</code> takes <code>rust</code> and{" "}
-    <code>astro</code> filters. It is free with no sign-in, except the
-    Fundi tools, which file into the console's issue desk and need a console
-    user. That is the owner's decision of 2026-09-29, and it is live:{" "}
+    serving the component registry as whole documents, the skills and the docs. It
+    exposes three tools: <code>mzizi_search</code>, <code>mzizi_execute</code> (which
+    runs the operations, such as <code>get_component</code> and <code>fundi</code>),
+    and <code>mzizi_feedback</code>. It is Rust first: where a component has a Mzizi
+    Roots implementation, <code>get_component</code> leads with it (the crate, the{" "}
+    <code>cargo add</code> line, the contract and the <code>.rs</code> source), then
+    the pure Astro build where there is one, and the React build last. It is free with
+    no sign-in, except the <code>fundi</code> operation and issue reports through{" "}
+    <code>mzizi_feedback</code>, which act as your console user. That is the owner's
+    decision of 2026-09-29, and it is live:{" "}
     {
       mcp.state === "published" ? (
         <>
@@ -136,9 +218,8 @@ const repos = [
         <>the server (npm could not be checked when this page was built)</>
       )
     }{" "}
-    answers <code>initialize</code>, <code>tools/list</code> and the component
-    tools with no token, and only <code>mzizi_fundi</code> and{" "}
-    <code>mzizi_report_issue</code> ask for sign-in (checked 2026-10-07). Its source is not public, so it has no row
+    answers <code>initialize</code> and <code>tools/list</code> with no token, and only the{" "}
+    <code>fundi</code> operation and issue reports ask for sign-in (checked 2026-11-17). Its source is not public, so it has no row
     above.
   </p>
 

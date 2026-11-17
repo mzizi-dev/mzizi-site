@@ -306,8 +306,8 @@ MCP server and the CLI are free with no gate: auth is required only for the Fund
 tools (anything that files into the Fundi issue desk or needs a console user), and
 the card says so. That change is live (`mzizi-mcp` 0.13.0, listed in the MCP
 Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-10-07):
-`initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
-`mzizi_report_issue` ask for sign-in. The load-bearing agent
+`initialize` and `tools/list` answer with no token, and only the `fundi` operation (through `mzizi_execute`) and issue reports (through
+`mzizi_feedback`) ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
 the server, over a standard `tools/list` request.
 
@@ -351,6 +351,30 @@ pnpm preview          # serve dist/ locally
 See [`AGENTS.md`](./AGENTS.md) for the full command set, what CI checks (including the
 rendered-content gate that `mzizi-console` shipped without), and — before you touch
 `wrangler.jsonc` or deploy — the route footgun that took this apex by accident.
+
+### Versioning, merges and green checks (org policy)
+
+The org policy is in [`nyuchi/.github`](https://github.com/nyuchi/.github)
+(`AGENTS.md` and `CONTRIBUTING.md`, Versioning, nyuchi/.github#80). This repository's
+workflows (`staging-version.yml`, `main-release.yml`) apply it:
+
+- A merge into `staging` is a **PATCH** (x.y.z to x.y.z+1), tagged automatically.
+- Releasing `staging` to `main` is a **MINOR** (x.y.z to x.y+1.0).
+- A **MAJOR** is manual only: a person runs the release with `bump: major`.
+
+Merges: the default branch takes releases only, from `staging` or a `release/*` branch.
+Promote `staging` to `main` with a merge commit, never a squash (`nyuchi/.github`
+`AGENTS.md`, "Releases and the main gate"). Pull requests into `staging` are squashed
+(`nyuchi/.github` `CONTRIBUTING.md`, "Merge strategy").
+
+**All checks green (the rule):** nothing merges while any check is red or orange, in
+every repository (owner, 2026-11-17; `nyuchi/.github` `settings/README.md`). Org-wide
+enforcement is still pending, so this is the rule, not yet a setting in every repository.
+
+### Tooling order (owner's direction, 2026-11-17)
+
+The owner's direction (2026-11-17): Rust first, then Deno or Vite+ (`vp`), never Node by default. This repository still builds with Node and pnpm, as
+[`AGENTS.md`](./AGENTS.md) describes.
 
 ## Ecosystem
 

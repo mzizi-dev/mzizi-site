@@ -159,7 +159,7 @@ check("cli.html", "the Rust path", "/v1/rs/<name>" in body)
 check("cli.html", "mzizi add names the release it ships in",
       "mzizi add" in body and "@nyuchi/mzizi-cli" in body and "0.6.0" in body)
 check("cli.html", "the MCP gate is named as the Fundi tools only",
-      "mzizi_fundi" in body and "mzizi_report_issue" in body)
+      "mzizi_execute" in body and "mzizi_feedback" in body and "fundi" in body)
 check("cli.html", "mz check --agent", "mz check --agent" in body)
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("playground.html")))
 check("playground.html", "says plainly it is not interactive", "Not interactive." in body)
