@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — vite-plus 1.6.0 (2026-11-17, Refs #145)
+
+`package.json` raises the `vite-plus` floor from `>=1.4.0` to `>=1.6.0` and `pnpm-lock.yaml` resolves 1.6.0, the release Dependabot's minor-and-patch groups move to. `check`, `lint`, the tests and the full build pass on it. Dev tooling only: nothing the site serves changes.
+
 ### Changed — mzizi.dev follows the reader's OS text size, and both color schemes are declared (2026-11-14, [#148](https://github.com/mzizi-dev/mzizi-site/issues/148))
 
 `Site.astro` gains two meta tags. `<meta name="color-scheme" content="light dark">` tells the browser before first paint that both schemes are supported, so scrollbars, form controls and the canvas theme with the palette instead of flashing light under a dark preference. `<meta name="text-scale" content="scale">` opts the page into the reader's operating-system text-size setting; the site's type scale is rem-based (the registry tokens), so the setting now actually reaches the text. Nothing changes for a reader who never moved the OS setting.
