@@ -311,7 +311,7 @@ Versions on 2026-11-17 (read the registries before repeating one):
 
 - `mzizi-mcp` **0.23.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP Registry:
   `io.github.mzizi-dev/mzizi-mcp`). It serves the three tools above.
-- Registry **4.43.0**. `api.mzizi.dev` has been served by a Rust (workers-rs) Worker
+- Registry **4.44.0**. `api.mzizi.dev` has been served by a Rust (workers-rs) Worker
   since 2026-11-17, with the same routes and responses; strict parity was 1669 of 1669
   against the previous TypeScript Worker.
 - `@nyuchi/mzizi-skills` on npm and in the MCP server (`mcp.mzizi.dev`), served by
@@ -448,31 +448,31 @@ the current roadmap.
 
 Ubuntu is not a marketing claim; it is the specification. Its five pillars are the spheres of
 belonging and its five principles the values practised in them; seven engineering constraints
-make them testable. Copied from mzizi-dev/mzizi-registry content/doctrine (staging), in the
-order those files list them; served by Mzizi through `get_doctrine`.
+make them testable. Copied from mzizi-dev/mzizi-registry content/doctrine at tag v4.44.0, in the
+registry's sort order; served by Mzizi through `get_doctrine`.
 
 Five pillars:
-- **Community**. The extended sphere of neighbours, peers, and chosen kin. Where the family ends, the community begins; the two are continuous, not opposed. Ubuntu treats community as the medium through which a person grows into society.
-- **Environment**. The natural world that holds all relationships. Ubuntu is ecological before it is social — soil, water, and weather are kin too. A person who exhausts the environment has broken Ubuntu, even if they have wronged no human directly.
 - **Family**. The first sphere of Ubuntu — the household and kin who form a person's primary web of belonging. Ubuntu begins here: identity is given by family before it is given by any institution.
+- **Community**. The extended sphere of neighbours, peers, and chosen kin. Where the family ends, the community begins; the two are continuous, not opposed. Ubuntu treats community as the medium through which a person grows into society.
 - **Society**. The broader human web — strangers, institutions, the polity. Ubuntu does not stop at the village wall; vanhu means people, all people. A person who treats strangers as strangers has not yet practised Ubuntu.
+- **Environment**. The natural world that holds all relationships. Ubuntu is ecological before it is social — soil, water, and weather are kin too. A person who exhausts the environment has broken Ubuntu, even if they have wronged no human directly.
 - **Spirituality**. The vertical axis of being human — meaning, purpose, ancestry, and the sacred. Unhu names the inner quality from which Ubuntu flows outward. Without unhu, the four horizontal pillars are scaffolding without a soul.
 
 Five principles:
-- **Compassion**. Active care, sympathy, and concern shown through helping, sharing, and welcoming. Tsitsi extends beyond kin to all — a stranger in need is not a stranger to compassion. (Also: Du Toit, Poovan & Engelbretch 2006.)
-- **Dignity**. Inherent worth held by virtue of existence — irrespective of status, ethnicity, age, or background. Humanity is sacred. Dignity is not earned and cannot be revoked. (Also: Ramose 2002.)
-- **Respect**. Unprejudiced consideration of another's privileges, beliefs, and norms. Encompasses elder-respect (ukuhlonipha) but applies to every person, every age, every belief. (Also: Poovan et al. 2006.)
-- **Solidarity**. A firm and persevering commitment to the common good. Not vague compassion but active allegiance to the welfare of the whole — kubatana means to hold together.
 - **Survival**. Collective endurance. No one survives alone; basic needs are met through one another. Reciprocal care sustains the community before any individual can flourish.
+- **Solidarity**. A firm and persevering commitment to the common good. Not vague compassion but active allegiance to the welfare of the whole — kubatana means to hold together.
+- **Compassion**. Active care, sympathy, and concern shown through helping, sharing, and welcoming. Tsitsi extends beyond kin to all — a stranger in need is not a stranger to compassion. (Also: Du Toit, Poovan & Engelbretch 2006.)
+- **Respect**. Unprejudiced consideration of another's privileges, beliefs, and norms. Encompasses elder-respect (ukuhlonipha) but applies to every person, every age, every belief. (Also: Poovan et al. 2006.)
+- **Dignity**. Inherent worth held by virtue of existence — irrespective of status, ethnicity, age, or background. Humanity is sacred. Dignity is not earned and cannot be revoked. (Also: Ramose 2002.)
 
 Seven engineering constraints:
-- **The Bundu floor**. The minimums nothing can go under: text size, contrast, hit regions and spacing, so that nobody is punished for their eyesight or their device.
+- **Outdoor readability**. Every surface is read in direct sunlight on a budget phone, not only at a desk.
 - **Connectivity-gradient design**. Design for the whole range of connections, from none to fibre. Offline-first is the enforced minimum: core tasks work with no connection, and better connectivity adds to that baseline.
 - **Multilingual parity**. Shona, Ndebele and English are equal. No language is a translation of another, and none ships later.
-- **No surveillance business model**. We do not earn money from attention or personal data.
-- **Outdoor readability**. Every surface is read in direct sunlight on a budget phone, not only at a desk.
-- **Personal data sovereignty**. A person owns their data. It lives on their device first, syncs to their own isolated cloud space, and moves to pods in the Nyuchi Honeycomb without being reshaped.
 - **Shared-device awareness**. One phone often serves a household. A person's data belongs to that person, not to the device.
+- **Personal data sovereignty**. A person owns their data. It lives on their device first, syncs to their own isolated cloud space, and moves to pods in the Nyuchi Honeycomb without being reshaped.
+- **No surveillance business model**. We do not earn money from attention or personal data.
+- **The Bundu floor**. The minimums nothing can go under: text size, contrast, hit regions and spacing, so that nobody is punished for their eyesight or their device.
 
 ## Public repositories
 

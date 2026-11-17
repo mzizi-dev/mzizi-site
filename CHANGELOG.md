@@ -27,7 +27,7 @@ cut, the Unreleased entries move under it.
   pillars (Bundu Labs, Nyuchi Africa, Mukoko, Shamwari AI) and the narrative spine, the
   `.cell` status (a proposal), the Mukoko tokens (proposed, off the current roadmap), and the
   Ubuntu doctrine: five pillars, five principles and seven engineering constraints, copied
-  verbatim from mzizi-registry `content/doctrine` (staging). The ecosystem image and the
+  verbatim from mzizi-registry `content/doctrine` (tag v4.44.0), in the registry's sort order. The ecosystem image and the
   Bundu newsroom are linked, not copied.
 - **Changed: `/ecosystem`.** Mzizi is described as owned by the Bundu Foundation and built by
   Nyuchi Africa (was: governed by Mzizi). `mzizi-api` is a Rust (workers-rs) Worker, served
@@ -48,7 +48,7 @@ cut, the Unreleased entries move under it.
   use `"0.8"`. The `mzizi-roots` core no longer depends on Dioxus; removing it from the rest
   is in progress. Eight components render unstyled from the Roots runtime, and `/components`
   and `llms.txt` say so.
-- **Changed: versions named in `llms.txt`.** Registry 4.43.0 and `@nyuchi/mzizi-cli` 0.11.0
+- **Changed: versions named in `llms.txt`.** Registry 4.44.0 and `@nyuchi/mzizi-cli` 0.11.0
   (was 0.10.0). The hard-coded skills version was removed; `/v1/skills` says which bundle it
   serves.
 - **Changed: org policy.** The README's "Working on it" section now states the versioning

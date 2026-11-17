@@ -1,25 +1,25 @@
 {
-  "source": "mzizi-dev/mzizi-registry content/doctrine (staging), read 2026-11-17",
+  "source": "mzizi-dev/mzizi-registry content/doctrine at tag v4.44.0, in sort_order",
   "pillars": [
-    {
-      "name": "community",
-      "title": "Community",
-      "description": "The extended sphere of neighbours, peers, and chosen kin. Where the family ends, the community begins; the two are continuous, not opposed. Ubuntu treats community as the medium through which a person grows into society."
-    },
-    {
-      "name": "environment",
-      "title": "Environment",
-      "description": "The natural world that holds all relationships. Ubuntu is ecological before it is social — soil, water, and weather are kin too. A person who exhausts the environment has broken Ubuntu, even if they have wronged no human directly."
-    },
     {
       "name": "family",
       "title": "Family",
       "description": "The first sphere of Ubuntu — the household and kin who form a person's primary web of belonging. Ubuntu begins here: identity is given by family before it is given by any institution."
     },
     {
+      "name": "community",
+      "title": "Community",
+      "description": "The extended sphere of neighbours, peers, and chosen kin. Where the family ends, the community begins; the two are continuous, not opposed. Ubuntu treats community as the medium through which a person grows into society."
+    },
+    {
       "name": "society",
       "title": "Society",
       "description": "The broader human web — strangers, institutions, the polity. Ubuntu does not stop at the village wall; vanhu means people, all people. A person who treats strangers as strangers has not yet practised Ubuntu."
+    },
+    {
+      "name": "environment",
+      "title": "Environment",
+      "description": "The natural world that holds all relationships. Ubuntu is ecological before it is social — soil, water, and weather are kin too. A person who exhausts the environment has broken Ubuntu, even if they have wronged no human directly."
     },
     {
       "name": "spirituality",
@@ -29,19 +29,9 @@
   ],
   "principles": [
     {
-      "name": "compassion",
-      "title": "Compassion",
-      "description": "Active care, sympathy, and concern shown through helping, sharing, and welcoming. Tsitsi extends beyond kin to all — a stranger in need is not a stranger to compassion. (Also: Du Toit, Poovan & Engelbretch 2006.)"
-    },
-    {
-      "name": "dignity",
-      "title": "Dignity",
-      "description": "Inherent worth held by virtue of existence — irrespective of status, ethnicity, age, or background. Humanity is sacred. Dignity is not earned and cannot be revoked. (Also: Ramose 2002.)"
-    },
-    {
-      "name": "respect",
-      "title": "Respect",
-      "description": "Unprejudiced consideration of another's privileges, beliefs, and norms. Encompasses elder-respect (ukuhlonipha) but applies to every person, every age, every belief. (Also: Poovan et al. 2006.)"
+      "name": "survival",
+      "title": "Survival",
+      "description": "Collective endurance. No one survives alone; basic needs are met through one another. Reciprocal care sustains the community before any individual can flourish."
     },
     {
       "name": "solidarity",
@@ -49,16 +39,26 @@
       "description": "A firm and persevering commitment to the common good. Not vague compassion but active allegiance to the welfare of the whole — kubatana means to hold together."
     },
     {
-      "name": "survival",
-      "title": "Survival",
-      "description": "Collective endurance. No one survives alone; basic needs are met through one another. Reciprocal care sustains the community before any individual can flourish."
+      "name": "compassion",
+      "title": "Compassion",
+      "description": "Active care, sympathy, and concern shown through helping, sharing, and welcoming. Tsitsi extends beyond kin to all — a stranger in need is not a stranger to compassion. (Also: Du Toit, Poovan & Engelbretch 2006.)"
+    },
+    {
+      "name": "respect",
+      "title": "Respect",
+      "description": "Unprejudiced consideration of another's privileges, beliefs, and norms. Encompasses elder-respect (ukuhlonipha) but applies to every person, every age, every belief. (Also: Poovan et al. 2006.)"
+    },
+    {
+      "name": "dignity",
+      "title": "Dignity",
+      "description": "Inherent worth held by virtue of existence — irrespective of status, ethnicity, age, or background. Humanity is sacred. Dignity is not earned and cannot be revoked. (Also: Ramose 2002.)"
     }
   ],
   "constraints": [
     {
-      "name": "bundu-floor",
-      "title": "The Bundu floor",
-      "description": "The minimums nothing can go under: text size, contrast, hit regions and spacing, so that nobody is punished for their eyesight or their device."
+      "name": "outdoor-readability",
+      "title": "Outdoor readability",
+      "description": "Every surface is read in direct sunlight on a budget phone, not only at a desk."
     },
     {
       "name": "connectivity-gradient-design",
@@ -71,14 +71,9 @@
       "description": "Shona, Ndebele and English are equal. No language is a translation of another, and none ships later."
     },
     {
-      "name": "no-surveillance-business-model",
-      "title": "No surveillance business model",
-      "description": "We do not earn money from attention or personal data."
-    },
-    {
-      "name": "outdoor-readability",
-      "title": "Outdoor readability",
-      "description": "Every surface is read in direct sunlight on a budget phone, not only at a desk."
+      "name": "shared-device-awareness",
+      "title": "Shared-device awareness",
+      "description": "One phone often serves a household. A person's data belongs to that person, not to the device."
     },
     {
       "name": "personal-data-sovereignty",
@@ -86,9 +81,14 @@
       "description": "A person owns their data. It lives on their device first, syncs to their own isolated cloud space, and moves to pods in the Nyuchi Honeycomb without being reshaped."
     },
     {
-      "name": "shared-device-awareness",
-      "title": "Shared-device awareness",
-      "description": "One phone often serves a household. A person's data belongs to that person, not to the device."
+      "name": "no-surveillance-business-model",
+      "title": "No surveillance business model",
+      "description": "We do not earn money from attention or personal data."
+    },
+    {
+      "name": "bundu-floor",
+      "title": "The Bundu floor",
+      "description": "The minimums nothing can go under: text size, contrast, hit regions and spacing, so that nobody is punished for their eyesight or their device."
     }
   ]
 }
