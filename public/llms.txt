@@ -449,7 +449,7 @@ the current roadmap.
 Ubuntu is not a marketing claim; it is the specification. Its five pillars are the spheres of
 belonging and its five principles the values practised in them; seven engineering constraints
 make them testable. Copied from mzizi-dev/mzizi-registry content/doctrine at tag v4.44.0, in the
-registry's sort order; served by Mzizi through `get_doctrine` (topic `engineering-constraints`, MCP 0.24.0 and later) returns the seven engineering constraints. The HTTP API has no constraints route yet; only `/api/v1/ubuntu/pillars` and `/principles` exist.
+registry's sort order; served by Mzizi through `get_doctrine`; its topic `engineering-constraints` (MCP 0.24.0 and later) returns the seven engineering constraints. The HTTP API has no constraints route yet; only `/api/v1/ubuntu/pillars` and `/principles` exist.
 
 Five pillars:
 - **Family**. The first sphere of Ubuntu — the household and kin who form a person's primary web of belonging. Ubuntu begins here: identity is given by family before it is given by any institution.
