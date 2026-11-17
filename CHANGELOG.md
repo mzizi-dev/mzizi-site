@@ -30,7 +30,10 @@ cut, the Unreleased entries move under it.
   verbatim from mzizi-registry `content/doctrine` (tag v4.44.0), in the registry's sort order. The ecosystem image and the
   Bundu newsroom are linked, not copied.
 - **Changed: `/ecosystem`.** `mzizi-api` is a Rust (workers-rs) Worker, served since 2026-11-17
-  (was Hono), with the strict parity figure. The ownership wording is unchanged.
+  (was Hono), with the strict parity figure.
+- **Changed: who Mzizi belongs to.** `/ecosystem`, the site footer and `llms.txt` now say
+  Mzizi is a Bundu Foundation project, run and built by Nyuchi. They said Mzizi owned and
+  operated itself.
 
 - **Changed: the MCP server.** `mzizi-mcp` is 0.24.0 and exposes three tools:
   `mzizi_search`, `mzizi_execute` (which runs the operations, including `fundi`) and

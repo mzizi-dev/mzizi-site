@@ -1,6 +1,6 @@
 # Mzizi
 
-> Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better: no borrows, lifetimes or ownership in the language you write, with the harness at its core. "Makes Rust better" is the goal Phase 0 measures, not a result. Rust is its platform, the way JavaScript is TypeScript's: Mzizi is designed to lower to Rust, and Mzizi Roots is its component model, the way React is JavaScript's. Its core is a harness, the layer an agent reads and works through, and it is designed for machine authorship, specifically by small open-weight models. Its goal is to be the language people choose instead of TypeScript, Python and C++: write Mzizi, get Rust underneath. That is a goal, not a result. Phase 0 has one goal: to build Mzizi as a programming language, measured against the best existing language for each kind of task. Nothing has been measured against that yet. The toolchain and the components are built to support the language; neither is the language. An independent research project, owned and operated by Mzizi. This file describes `mzizi.dev`, which leads with the language.
+> Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better: no borrows, lifetimes or ownership in the language you write, with the harness at its core. "Makes Rust better" is the goal Phase 0 measures, not a result. Rust is its platform, the way JavaScript is TypeScript's: Mzizi is designed to lower to Rust, and Mzizi Roots is its component model, the way React is JavaScript's. Its core is a harness, the layer an agent reads and works through, and it is designed for machine authorship, specifically by small open-weight models. Its goal is to be the language people choose instead of TypeScript, Python and C++: write Mzizi, get Rust underneath. That is a goal, not a result. Phase 0 has one goal: to build Mzizi as a programming language, measured against the best existing language for each kind of task. Nothing has been measured against that yet. The toolchain and the components are built to support the language; neither is the language. A Bundu Foundation project, run and built by Nyuchi. This file describes `mzizi.dev`, which leads with the language.
 
 **What is which.** Say this plainly when you describe Mzizi:
 
@@ -357,7 +357,7 @@ are common. The difference is state: the
 components ship now; the language has not yet shown the advantage it is designed
 for.
 
-License: Apache-2.0. Owned, governed and operated by Mzizi.
+License: Apache-2.0. A Bundu Foundation project, run and built by Nyuchi.
 
 ## Hosting caveat — read before repeating a URL
 
