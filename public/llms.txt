@@ -286,7 +286,7 @@ direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.23.0 serves every
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.24.0 serves every
 tool without a token, except the `fundi` operation of `mzizi_execute` and filing an
 issue through `mzizi_feedback`, which act as your console user and need sign-in.
 
@@ -309,7 +309,7 @@ to list only the components with that build, and its rows and `mzizi_search`'s h
 
 Versions on 2026-11-17 (read the registries before repeating one):
 
-- `mzizi-mcp` **0.23.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP Registry:
+- `mzizi-mcp` **0.24.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP Registry:
   `io.github.mzizi-dev/mzizi-mcp`). It serves the three tools above.
 - Registry **4.44.0**. `api.mzizi.dev` has been served by a Rust (workers-rs) Worker
   since 2026-11-17, with the same routes and responses; strict parity was 1669 of 1669
@@ -449,7 +449,7 @@ the current roadmap.
 Ubuntu is not a marketing claim; it is the specification. Its five pillars are the spheres of
 belonging and its five principles the values practised in them; seven engineering constraints
 make them testable. Copied from mzizi-dev/mzizi-registry content/doctrine at tag v4.44.0, in the
-registry's sort order; served by Mzizi through `get_doctrine`.
+registry's sort order; served by Mzizi through `get_doctrine` (topic `engineering-constraints`, MCP 0.24.0 and later) returns the seven engineering constraints. The HTTP API has no constraints route yet; only `/api/v1/ubuntu/pillars` and `/principles` exist.
 
 Five pillars:
 - **Family**. The first sphere of Ubuntu — the household and kin who form a person's primary web of belonging. Ubuntu begins here: identity is given by family before it is given by any institution.

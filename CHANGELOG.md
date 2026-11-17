@@ -33,7 +33,7 @@ cut, the Unreleased entries move under it.
   Nyuchi Africa (was: governed by Mzizi). `mzizi-api` is a Rust (workers-rs) Worker, served
   since 2026-11-17 (was Hono).
 
-- **Changed: the MCP server.** `mzizi-mcp` is 0.23.0 and exposes three tools:
+- **Changed: the MCP server.** `mzizi-mcp` is 0.24.0 and exposes three tools:
   `mzizi_search`, `mzizi_execute` (which runs the operations, including `fundi`) and
   `mzizi_feedback`. The 17 earlier tool names still work until 1.0.0. The `/cli`, `/skills`,
   `/legal/privacy`, `llms.txt`, `/.well-known/mcp.json` and the README now name the three
@@ -51,6 +51,7 @@ cut, the Unreleased entries move under it.
 - **Changed: versions named in `llms.txt`.** Registry 4.44.0 and `@nyuchi/mzizi-cli` 0.11.0
   (was 0.10.0). The hard-coded skills version was removed; `/v1/skills` says which bundle it
   serves.
+- **Changed: doctrine on the MCP server.** `get_doctrine` with topic `engineering-constraints` (MCP 0.24.0 and later) returns the seven engineering constraints. The HTTP API has no constraints route yet; only `/api/v1/ubuntu/pillars` and `/principles` exist.
 - **Changed: org policy.** The README's "Working on it" section now states the versioning
   rule (staging merge is a patch, staging to main is a minor, a major is manual), the merge
   rule, the all-checks-green rule (stated as the rule; org-wide enforcement is pending) and
