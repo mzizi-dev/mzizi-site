@@ -42,7 +42,7 @@ const repos = [
     role: "The registry API (formerly mzizi-api-gateway)",
     state: "serving api.mzizi.dev today",
     site: "https://api.mzizi.dev/v1",
-    body: "Serves api.mzizi.dev, in mzizi-dev/mzizi-api (formerly mzizi-api-gateway): the registry API as a Rust (workers-rs) Cloudflare Worker, served since 2026-11-17 with the same routes and responses. Every route answers from the registry's repository files, generated at a pinned registry commit and bundled into the Worker. A bot moves that pin to registry main (checked hourly, merged only when CI and strict parity against production pass; mzizi-api#16), so the commit changes without an edit here: every response's x-mzizi-source header names the one being served. There's no origin, no database and no Supabase. It replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check. The repository was mzizi-dev/mzizi-api-gateway until its rename to mzizi-api.",
+    body: "Serves api.mzizi.dev, in mzizi-dev/mzizi-api (formerly mzizi-api-gateway): the registry API as a Rust (workers-rs) Cloudflare Worker, served since 2026-11-17 with the same routes and responses. Every route answers from the registry's repository files, generated at a pinned registry commit and bundled into the Worker. A bot moves that pin to registry main (checked hourly, merged only when CI and strict parity against production pass; mzizi-api#16), so the commit changes without an edit here: every response's x-mzizi-source header names the one being served. There's no origin, no database and no Supabase. The original gateway replaced the registry's own Worker on 2026-09-29 with zero unexplained differences in a 1,359-request parity check. The Rust Worker, served since 2026-11-17, passed strict parity against the previous TypeScript Worker: 1669 of 1669 identical. The repository was mzizi-dev/mzizi-api-gateway until its rename to mzizi-api.",
   },
   {
     name: "mzizi-console",
@@ -80,8 +80,9 @@ const repos = [
   lede="Seven public repositories. Four serve a live hostname; the rest are code that is built but not routed, or a placeholder. This page says which is which."
 >
   <p>
-    Mzizi is a programming language, owned by the Bundu Foundation and built by Nyuchi Africa.{" "}
-    Everything listed here is public and Apache-2.0.
+    Mzizi is a programming language. Its ecosystem is governed by{" "}
+    <strong>Mzizi</strong>, which owns the language, its toolchain and its
+    components outright and operates the registry and tooling day-to-day. Everything listed here is public and Apache-2.0.
     There are private repositories in the org too — they are not listed, and
     neither is anything that is not yet real.
   </p>
@@ -150,8 +151,8 @@ const repos = [
     <li>
       <strong>Shamwari AI</strong>, community-facing AI and conversational
       experiences. Shamwari AI is the ranger in the wilderness, guiding and managing
-      things. It is an African AI companion that answers in Shona, Ndebele and
-      English and cites its sources.
+      things. Shamwari is Shona for friend: an AI companion with open weights,
+      grounded in Zimbabwean law and policy.
     </li>
   </ul>
 

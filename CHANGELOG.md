@@ -29,9 +29,8 @@ cut, the Unreleased entries move under it.
   Ubuntu doctrine: five pillars, five principles and seven engineering constraints, copied
   verbatim from mzizi-registry `content/doctrine` (tag v4.44.0), in the registry's sort order. The ecosystem image and the
   Bundu newsroom are linked, not copied.
-- **Changed: `/ecosystem`.** Mzizi is described as owned by the Bundu Foundation and built by
-  Nyuchi Africa (was: governed by Mzizi). `mzizi-api` is a Rust (workers-rs) Worker, served
-  since 2026-11-17 (was Hono).
+- **Changed: `/ecosystem`.** `mzizi-api` is a Rust (workers-rs) Worker, served since 2026-11-17
+  (was Hono), with the strict parity figure. The ownership wording is unchanged.
 
 - **Changed: the MCP server.** `mzizi-mcp` is 0.24.0 and exposes three tools:
   `mzizi_search`, `mzizi_execute` (which runs the operations, including `fundi`) and
@@ -42,8 +41,7 @@ cut, the Unreleased entries move under it.
 - **Changed: the registry API runtime.** `api.mzizi.dev` has been served by a Rust
   (workers-rs) Worker since 2026-11-17, with the same routes and responses (strict parity,
   1669 of 1669, against the previous TypeScript Worker). The README and the site's code
-  comment name the Rust Worker. `llms.txt`'s repository list still says Hono until the
-  ecosystem wording is updated.
+  comment name the Rust Worker.
 - **Changed: Mzizi Roots.** The crates on crates.io are 0.8.0 (was 0.7.0), and install lines
   use `"0.8"`. The `mzizi-roots` core no longer depends on Dioxus; removing it from the rest
   is in progress. Eight components render unstyled from the Roots runtime, and `/components`
