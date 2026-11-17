@@ -32,8 +32,8 @@ cut, the Unreleased entries move under it.
 - **Changed: `/ecosystem`.** `mzizi-api` is a Rust (workers-rs) Worker, served since 2026-11-17
   (was Hono), with the strict parity figure.
 - **Changed: who Mzizi belongs to.** `/ecosystem`, the site footer and `llms.txt` now say
-  Mzizi is a Bundu Foundation project, run and built by Nyuchi. They said Mzizi owned and
-  operated itself.
+  Mzizi is a Bundu Foundation project, built by Nyuchi, and that Nyuchi runs its cyber section
+  (the console and active cyber testing). They said Mzizi owned and operated itself.
 
 - **Changed: the MCP server.** `mzizi-mcp` is 0.24.0 and exposes three tools:
   `mzizi_search`, `mzizi_execute` (which runs the operations, including `fundi`) and
