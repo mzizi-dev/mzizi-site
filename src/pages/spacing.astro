@@ -73,8 +73,8 @@ const groups: { title: string; note: string; tokens: Token[] }[] = [
     title: "Targets",
     note: "Hit regions. Touch on a coarse pointer or under 64rem; desktop on a fine pointer from 64rem. Dense controls keep these through the hit-area pseudo-element.",
     tokens: [
-      { token: "--hit-touch", px: 45, rec: "44", source: "WCAG 2.5.5 · Apple HIG 44 pt", dense: null, denseRec: "", denseSource: "Full hit area kept at every density", today: "49" },
-      { token: "--hit-desktop", px: 24, rec: "24", source: "WCAG 2.5.8", dense: null, denseRec: "", denseSource: "Full hit area kept at every density", today: "28" },
+      { token: "--target-floor (touch)", px: 45, rec: "44", source: "2.8125rem · WCAG 2.5.5 · Apple HIG 44 pt", dense: null, denseRec: "", denseSource: "Full hit area kept at every density", today: "49" },
+      { token: "--target-floor (desktop)", px: 24, rec: "24", source: "1.5rem · WCAG 2.5.8", dense: null, denseRec: "", denseSource: "Full hit area kept at every density", today: "28" },
     ],
   },
   {
@@ -139,21 +139,21 @@ const tokenRows = groups.map((g) => ({
   })),
 }));
 
-// The ladder, drawn at real size, tightest first (default values).
+// The ladder, drawn at real size, sorted strictly by value (default values).
 const ladder = [
   { name: "Pill gap, icon to label", token: "--space-pill-gap", px: 5, layer: "controls" },
+  { name: "Label to field", token: "--space-label-gap", px: 7, layer: "controls" },
+  { name: "Card stack, title to body", token: "--space-card-stack", px: 7, layer: "cards" },
   { name: "Pill padding", token: "--space-pill-x", px: 9, layer: "controls" },
   { name: "Control gap, icon to label", token: "--space-control-gap", px: 9, layer: "controls" },
   { name: "Control gap, between targets", token: "--space-control-between", px: 9, layer: "controls" },
-  { name: "Label to field", token: "--space-label-gap", px: 7, layer: "controls" },
   { name: "Chip padding", token: "--space-chip-x", px: 12, layer: "controls" },
-  { name: "Control padding, button and field", token: "--space-control-x", px: 17, layer: "controls" },
-  { name: "Card stack, title to body", token: "--space-card-stack", px: 7, layer: "cards" },
   { name: "Card gap", token: "--space-card-gap", px: 14, layer: "cards" },
+  { name: "Control padding, button and field", token: "--space-control-x", px: 17, layer: "controls" },
+  { name: "Page edge, phone", token: "--space-page-x", px: 17, layer: "layout" },
   { name: "Card padding", token: "--space-card", px: 21, layer: "cards" },
   { name: "Container gap", token: "--space-container-gap", px: 21, layer: "containers" },
   { name: "Container padding", token: "--space-container", px: 28, layer: "containers" },
-  { name: "Page edge, phone", token: "--space-page-x", px: 17, layer: "layout" },
   { name: "Page edge, wide", token: "--space-page-x-wide", px: 28, layer: "layout" },
   { name: "Section", token: "--space-section", px: 49, layer: "layout" },
 ];
@@ -205,7 +205,7 @@ const ladder = [
           <h3>Why 45</h3>
           <p>
             44 is 4 × 11, so it is not a Mzizi number. The next one up is 45 =
-            3 × 15, which is the new touch floor.
+            3 × 15, which is the touch floor.
           </p>
         </div>
       </div>
@@ -236,7 +236,7 @@ const ladder = [
       <div class="calc panel">
         <div class="calc-row">
           <label for="ref">Recommended value (px)</label>
-          <input id="ref" type="number" min="1" step="1" value="44" inputmode="numeric" />
+          <input id="ref" type="number" min="1" max="10000" step="1" value="44" inputmode="numeric" />
         </div>
         <div class="calc-row">
           <label for="layer">Layer</label>
@@ -289,7 +289,7 @@ const ladder = [
       <p class="eyebrow">Live specimen</p>
       <h2>The layers, nested</h2>
       <p class="prose">
-        A dialog built from the proposed values: a container holding cards that
+        A dialog built from the values above: a container holding cards that
         hold controls. Turn on the overlay to see each layer's padding in its own
         colour.
       </p>
@@ -308,7 +308,7 @@ const ladder = [
           <div class="cards">
             <article class="card">
               <span class="tag tl">card 21 · stack 7</span>
-              <span class="chip-tag">Popular</span>
+              <span class="chip-tag" data-mzizi-layer="chip">Popular</span>
               <h4>Daily 1 GB</h4>
               <p class="price">$1.00</p>
               <p class="muted">For the market day: maps, payments and WhatsApp.</p>
@@ -338,8 +338,8 @@ const ladder = [
       <p class="prose muted">
         Buttons are 49 px tall on touch (56 for the large size), with 17 px of side padding and 9 px
         between the icon and the label. Chips are drawn at 30 px with 12 px of
-        side padding, and keep a 45 px hit region. Neighbouring controls sit 9 px
-        apart.
+        side padding. A chip is a label, not a control, so it has no hit region of
+        its own. Neighbouring controls sit 9 px apart.
       </p>
     </section>
 
@@ -392,7 +392,7 @@ const ladder = [
                     <th scope="col">Dense</th>
                     <th scope="col">Built from</th>
                     <th scope="col">Dense recommended</th>
-                    <th scope="col">Today</th>
+                    <th scope="col">Before 4.45</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -424,7 +424,7 @@ const ladder = [
     </section>
 
     <section id="changes" class="block">
-      <p class="eyebrow">Changes from today</p>
+      <p class="eyebrow">Changes in 4.45</p>
       <h2>What a reader will see</h2>
       <ul class="changes">
         <li>
@@ -492,10 +492,13 @@ const ladder = [
       if (isPrime(n)) out.push("prime");
       return out.join(", also ");
     };
+    // Factor n the way the page writes it. An even number takes its smallest odd factor
+    // (44 is 4 × 11, not 2 × 22); a power of two is 2 × n/2.
     const describe = (n: number): string => {
       if (isPrime(n)) return "prime";
-      for (let p = 2; p <= n; p++) if (n % p === 0) return `${p} × ${n / p}`;
-      return String(n);
+      for (let q = 3; q < n; q += 2)
+        if (n % q === 0) return n % 2 === 0 ? `${n / q} × ${q}` : `${q} × ${n / q}`;
+      return `2 × ${n / 2}`;
     };
 
     const ref = document.getElementById("ref") as HTMLInputElement;
@@ -503,23 +506,27 @@ const ladder = [
     const out = document.getElementById("out") as HTMLOutputElement;
     const why = document.getElementById("why") as HTMLElement;
 
+    // The search for the next Mzizi number always ends, because the input is clamped.
+    const MAX = 10000;
     const calc = () => {
-      const r = Math.round(Number(ref.value));
-      if (!r || r < 1) {
+      const typed = Math.round(Number(ref.value));
+      if (!Number.isFinite(typed) || typed < 1) {
         out.textContent = "—";
-        why.textContent = "Enter a whole number of pixels, 1 or more.";
+        why.textContent = `Enter a whole number of pixels, from 1 to ${MAX}.`;
         return;
       }
+      const r = Math.min(Math.max(typed, 1), MAX);
+      const clamped = typed > MAX ? `Values stop at ${MAX}. ` : "";
       let n = r;
       while (!isMzizi(n, layer.value)) n++;
       out.textContent = String(n);
       const sevens = layer.value === "cards";
       if (n === r) {
-        why.textContent = `${r} is already a Mzizi number (${sevens ? `7 × ${r / 7}` : parts(r)}).`;
+        why.textContent = `${clamped}${r} is already a Mzizi number (${sevens ? `7 × ${r / 7}` : parts(r)}).`;
       } else {
         const from = sevens ? `${r} is not a multiple of 7` : `${r} is ${describe(r)}`;
         const built = sevens ? `7 × ${n / 7}` : parts(n);
-        why.textContent = `${from}. The next Mzizi number up is ${n} = ${built}.`;
+        why.textContent = `${clamped}${from}. The next Mzizi number up is ${n} = ${built}.`;
       }
     };
     ref.addEventListener("input", calc);
@@ -538,8 +545,7 @@ const ladder = [
     /* The values, scoped to this page. The registry serves the same tokens from
        Registry 4.45 and later. */
     .spacing {
-      --hit-touch: 45px;
-      --hit-desktop: 24px;
+      --target-floor: 2.8125rem;
       --space-control-x: 17px;
       --space-chip-x: 12px;
       --space-pill-x: 9px;
@@ -589,8 +595,9 @@ const ladder = [
       font-size: var(--text-h5);
     }
 
+    /* Muted text is 80% of the foreground: 7 : 1 on both surfaces, in both themes. */
     .muted {
-      color: var(--muted-foreground);
+      color: color-mix(in srgb, var(--foreground) 80%, var(--background));
     }
 
     .mono {
@@ -643,6 +650,7 @@ const ladder = [
     /* The calculator */
     .calc {
       max-width: 36rem;
+      grid-template-columns: minmax(0, 1fr);
       gap: var(--space-control-between);
     }
 
@@ -651,6 +659,11 @@ const ladder = [
       flex-wrap: wrap;
       align-items: center;
       gap: var(--space-control-between);
+      min-inline-size: 0;
+    }
+
+    .calc-row select {
+      inline-size: min(100%, 24rem);
     }
 
     .calc label {
@@ -671,6 +684,11 @@ const ladder = [
 
     .calc input[type="number"] {
       inline-size: 8.5rem;
+      max-inline-size: 100%;
+    }
+
+    .calc select {
+      max-inline-size: 100%;
     }
 
     .result-line {
@@ -679,16 +697,18 @@ const ladder = [
       gap: var(--space-card-gap);
     }
 
+    /* The result is the primary, deepened toward the foreground: 7 : 1 or more. */
     .result {
       font-family: var(--font-mono);
       font-size: var(--text-h3);
       font-weight: 700;
-      color: var(--primary);
+      color: color-mix(in srgb, var(--primary) 55%, var(--foreground));
     }
 
     .why {
       color: var(--muted-foreground);
       font-size: var(--text-body-small);
+      overflow-wrap: anywhere;
     }
 
     /* Tables: the site's own rules, with page-width tables kept whole. */
@@ -720,14 +740,15 @@ const ladder = [
       display: inline-flex;
       align-items: center;
       gap: var(--space-control-gap);
-      min-block-size: var(--hit-touch);
+      min-block-size: var(--target-floor);
       font-weight: 600;
       cursor: pointer;
     }
 
     .toggle input {
-      inline-size: 20px;
-      block-size: 20px;
+      inline-size: var(--target-floor);
+      block-size: var(--target-floor);
+      margin: 0;
       accent-color: var(--primary);
     }
 
@@ -811,12 +832,11 @@ const ladder = [
       border-radius: 999px;
       background: var(--accent);
       color: var(--foreground);
-      font-size: 0.82rem;
+      font-size: 0.875rem;
       font-weight: 600;
     }
 
-    /* Buttons and chips are real <button>s. Drawn at the proposed size, with the
-       hit region kept at 45 px on touch. */
+    /* Buttons are drawn at their full size, with the hit region kept at 45 px on touch. */
     .btn {
       position: relative;
       display: inline-flex;
@@ -854,7 +874,7 @@ const ladder = [
       background: var(--foreground);
       color: var(--background);
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.875rem;
       padding: 3px 5px;
       border-radius: 3px;
       white-space: nowrap;
@@ -926,12 +946,13 @@ const ladder = [
 
     .rung .name {
       font-family: var(--font-mono);
-      font-size: var(--text-caption);
+      font-size: 0.875rem;
       font-weight: 600;
     }
 
     .rung .name small {
       display: block;
+      font-size: 1em;
       font-weight: 400;
       color: var(--muted-foreground);
     }
@@ -977,6 +998,20 @@ const ladder = [
 
     .sw-layout {
       background: var(--layer-layout);
+    }
+
+    /* Dark values for the card and container layers, so the ladder and the overlay
+       read on the dark surface. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .spacing {
+        --layer-card: #4fb892;
+        --layer-container: #7ea6f0;
+      }
+    }
+
+    :root[data-theme="dark"] .spacing {
+      --layer-card: #4fb892;
+      --layer-container: #7ea6f0;
     }
 
     .changes {

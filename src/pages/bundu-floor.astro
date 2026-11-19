@@ -26,7 +26,7 @@ const rows: Row[] = [
     name: "Fine-pointer target",
     mz: { v: "24 × 24 px", n: "Desktop: fine pointer with hover, 64rem and up. Was 28.", s: "enf", l: "Enforced" },
     wcag: { v: "24 × 24 px", n: "2.5.8 Target Size (Minimum), or enough spacing", l: "AA criterion" },
-    apple: { v: "28 pt", n: "macOS regular control height, not a stated floor", l: "Convention" },
+    apple: { v: "28 × 28 pt", n: "The macOS default control size", l: "Convention" },
     m3: { v: "—", n: "48 dp applies on all platforms", s: "none", l: "Not separate" },
     anth: { v: "—", s: "none", l: "Not set" },
   },
@@ -232,7 +232,7 @@ const sources = [
       <p class="eyebrow">02 · To scale</p>
       <h2>What a fingertip gets</h2>
       <p class="prose">
-        Drawn at 1 CSS pixel per pixel. Mzizi's new touch floor is 1 px above
+        Drawn at 1 CSS pixel per pixel. Mzizi's touch floor is 1 px above
         WCAG AAA and Apple's 44, and Material asks for 3 px more than Mzizi. The
         dashed box is the old 49 px floor.
       </p>
@@ -270,7 +270,7 @@ const sources = [
         {
           accents.map((a) => (
             <div class="sw">
-              <div class="pair">
+              <div class="pair" data-mzizi-contrast-exempt="demonstrates the measured ratio">
                 <div style={`background:${LIGHT};color:${a.hex}`}>{a.name}</div>
                 <div style={`background:${DARK};color:${a.hex}`}>{a.name}</div>
               </div>
@@ -442,8 +442,14 @@ const sources = [
       margin-block: 0;
     }
 
+    /* Muted text is 80% of the foreground: 7 : 1 on both surfaces, in both themes. */
     .muted {
-      color: var(--muted-foreground);
+      color: color-mix(in srgb, var(--foreground) 80%, var(--background));
+    }
+
+    .muted a {
+      color: inherit;
+      text-decoration: underline;
     }
 
     .mono {
@@ -602,7 +608,7 @@ const sources = [
     }
 
     .sw .pair div {
-      padding: var(--space-md) var(--space-sm);
+      padding: var(--space-inset);
       font-weight: 600;
     }
 
@@ -666,7 +672,7 @@ const sources = [
       margin: 0;
       border-inline-start: 3px solid var(--primary);
       background: var(--surface-container);
-      padding: var(--space-md) var(--space-lg);
+      padding: var(--space-inset) var(--space-lg);
       font-family: var(--font-serif);
       font-style: italic;
       font-size: var(--text-h5);

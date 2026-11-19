@@ -277,7 +277,7 @@ check("bundu-floor.html", "the change is dated and the previous floor is named",
 check("bundu-floor.html", "the who-the-floor-serves section renders", "Who the floor serves" in body and "Mbare" in body)
 
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("spacing.html")))
-for heading in ("The number rule", "Number calculator", "Live specimen", "The ladder", "Changes from today"):
+for heading in ("The number rule", "Number calculator", "Live specimen", "The ladder", "Changes in 4.45"):
     check("spacing.html", f"section “{heading}” renders", heading in body)
 check("spacing.html", "the calculator's answer is in the static HTML", re.search(r'<output id="out"[^>]*>45</output>', text_without_scripts("spacing.html")) is not None)
 check("spacing.html", "the worked examples render with scripts off", "Built from" in body and "3 × 15" in body)
