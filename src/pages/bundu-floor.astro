@@ -1,0 +1,684 @@
+---
+/**
+ * /bundu-floor — the minimums no Mzizi screen can go under, set beside WCAG
+ * 2.2, Apple's Human Interface Guidelines, Google's Material 3 and Anthropic's
+ * brand guidelines. Decided by the owner on 19 November 2026; the values are
+ * the Bundu floor in the spacing spec (/spacing).
+ *
+ * The numbers here are the decided values, typed on purpose: the registry
+ * release that carries them is in progress, and until it ships the live API
+ * still serves the previous floor (49 and 28). The banner says so.
+ */
+import Site from "../layouts/Site.astro";
+
+type Cell = { v: string; n?: string; s?: "enf" | "rec" | "none"; l: string };
+type Row = { name: string; mz: Cell; wcag: Cell; apple: Cell; m3: Cell; anth: Cell };
+
+const rows: Row[] = [
+  {
+    name: "Touch target",
+    mz: { v: "45 × 45 px", n: "Coarse pointer, or any window under 64rem. 3 × 15, the nearest Mzizi number at or above 44. Was 49 until 19 Nov.", s: "enf", l: "Enforced" },
+    wcag: { v: "44 × 44 px", n: "2.5.5 Target Size (Enhanced)", l: "AAA criterion" },
+    apple: { v: "44 × 44 pt", n: "Minimum hit target for controls", s: "rec", l: "Recommended" },
+    m3: { v: "48 × 48 dp", n: "About 9 mm physical, on most platforms", s: "rec", l: "Recommended" },
+    anth: { v: "—", n: "A visual identity, not a UI system", s: "none", l: "Not set" },
+  },
+  {
+    name: "Fine-pointer target",
+    mz: { v: "24 × 24 px", n: "Desktop: fine pointer with hover, 64rem and up. Was 28.", s: "enf", l: "Enforced" },
+    wcag: { v: "24 × 24 px", n: "2.5.8 Target Size (Minimum), or enough spacing", l: "AA criterion" },
+    apple: { v: "28 pt", n: "macOS regular control height, not a stated floor", l: "Convention" },
+    m3: { v: "—", n: "48 dp applies on all platforms", s: "none", l: "Not separate" },
+    anth: { v: "—", s: "none", l: "Not set" },
+  },
+  {
+    name: "Body text",
+    mz: { v: "17 px touch · 15 px desktop", n: "Captions and secondary labels 14 px minimum", s: "enf", l: "Enforced" },
+    wcag: { v: "—", n: "No size; 1.4.4 requires text to resize to 200%", s: "none", l: "No minimum" },
+    apple: { v: "17 pt body", n: "Default Dynamic Type size; captions 12 and 11 pt", l: "Default" },
+    m3: { v: "16 sp / 14 sp", n: "Body Large and Body Medium", l: "Type scale" },
+    anth: { v: "Lora body", n: "Poppins for headings at 24 pt and up", l: "Face only" },
+  },
+  {
+    name: "Body text contrast",
+    mz: { v: "7 : 1", n: "Plus APCA. Non-body text 4.5 : 1.", s: "enf", l: "Enforced" },
+    wcag: { v: "4.5 : 1 · 7 : 1", n: "1.4.3 at AA; 1.4.6 at AAA", l: "AA / AAA" },
+    apple: { v: "4.5 : 1", n: "For custom colours; system colours adapt", s: "rec", l: "Recommended" },
+    m3: { v: "4.5 : 1", n: "3 : 1 for large text", s: "rec", l: "Recommended" },
+    anth: { v: "17.5 : 1", n: "Dark #141413 on Light #faf9f5, measured", s: "none", l: "Not a rule" },
+  },
+  {
+    name: "UI parts contrast",
+    mz: { v: "3 : 1", n: "Borders, icons, focus, control states", s: "enf", l: "Enforced" },
+    wcag: { v: "3 : 1", n: "1.4.11 Non-text Contrast", l: "AA criterion" },
+    apple: { v: "—", n: "Covered by system materials and Increase Contrast", l: "Implicit" },
+    m3: { v: "3 : 1", n: "Icons and component boundaries", s: "rec", l: "Recommended" },
+    anth: { v: "—", s: "none", l: "Not set" },
+  },
+  {
+    name: "Line height",
+    mz: { v: "1.5 body", n: "The default, not just a tolerated override", s: "enf", l: "Enforced" },
+    wcag: { v: "1.5", n: "1.4.12: content must survive a user setting of 1.5", l: "AA criterion" },
+    apple: { v: "≈ 1.29", n: "Body 17 pt on 22 pt leading", l: "Default" },
+    m3: { v: "1.5", n: "Body Large 16 sp on 24 sp", l: "Type scale" },
+    anth: { v: "—", s: "none", l: "Not set" },
+  },
+  {
+    name: "Spacing",
+    mz: { v: "Layered, each with a default and a dense floor", n: "Controls 17 padding (12 dense), 9 gap (7 dense) · Chips 12 (9) · Pills 9 (5) · Cards 21 (14) · Containers 28 (21) · Page edge 17 on phones, 28 wide · Sections 49 (28). Both values are floors; nothing goes below dense.", s: "enf", l: "Enforced" },
+    wcag: { v: "—", n: "Only through 2.5.8 spacing and 1.4.12", l: "Indirect" },
+    apple: { v: "Layout margins", n: "Safe areas and standard margins, no fixed grid", l: "Guidance" },
+    m3: { v: "8 dp grid", n: "4 dp for small elements", l: "Grid" },
+    anth: { v: "—", s: "none", l: "Not set" },
+  },
+  {
+    name: "Focus",
+    mz: { v: "2 px ring, 2 px offset", n: "Full keyboard support through Radix primitives", s: "enf", l: "Enforced" },
+    wcag: { v: "Visible", n: "2.4.7 (AA); 2.4.13 Focus Appearance (AAA)", l: "AA / AAA" },
+    apple: { v: "System", n: "Platform focus rings and Full Keyboard Access", l: "Built in" },
+    m3: { v: "Focus state", n: "State layer and focus indicator per component", l: "Built in" },
+    anth: { v: "—", s: "none", l: "Not set" },
+  },
+  {
+    name: "Who can lower it",
+    mz: { v: "No one", n: "No brand pack, density layer, component or app. One documented opt-out: data-mzizi-sizes=\"legacy\".", l: "Locked" },
+    wcag: { v: "Conformance", n: "A page either meets the level or it does not", l: "Audit" },
+    apple: { v: "Each app", n: "Guidelines plus App Review", l: "Advisory" },
+    m3: { v: "Each app", n: "Guidelines plus Accessibility Scanner", l: "Advisory" },
+    anth: { v: "—", s: "none", l: "Not set" },
+  },
+];
+
+// The to-scale drawing: each target at its true size in CSS pixels.
+const targets = [
+  { px: 24, label: "24", name: "Mzizi desktop · WCAG AA", old: false, mz: true },
+  { px: 44, label: "44", name: "WCAG AAA · Apple", old: false, mz: false },
+  { px: 45, label: "45", name: "Mzizi touch (3 × 15)", old: false, mz: true },
+  { px: 48, label: "48", name: "Material 3", old: false, mz: false },
+  { px: 49, label: "49", name: "Old Mzizi floor, until 19 Nov", old: true, mz: false },
+];
+
+// Anthropic's accents against the brand's own backgrounds. Measured with the
+// WCAG 2 relative-luminance formula; see the sources at the foot of the page.
+const LIGHT = "#faf9f5";
+const DARK = "#141413";
+const accents = [
+  { name: "Orange", hex: "#d97757", onLight: "2.96", onDark: "5.90" },
+  { name: "Blue", hex: "#6a9bcc", onLight: "2.78", onDark: "6.30" },
+  { name: "Green", hex: "#788c5d", onLight: "3.49", onDark: "5.01" },
+  { name: "Mid Gray", hex: "#b0aea5", onLight: "2.11", onDark: "8.29" },
+];
+
+const systems = [
+  {
+    who: "Mzizi",
+    title: "Ubuntu, made testable",
+    mz: true,
+    body: [
+      "Five pillars: Family, Community, Society, Environment, Spirituality.",
+      "Five principles: Survival, Solidarity, Compassion, Respect, Dignity.",
+      "Seven engineering constraints: outdoor readability, connectivity-gradient design, multilingual parity, shared-device awareness, personal data sovereignty, no surveillance business model, and the Bundu floor.",
+    ],
+  },
+  {
+    who: "Apple · HIG",
+    title: "Hierarchy, Harmony, Consistency",
+    mz: false,
+    body: [
+      "Hierarchy. Controls and interface elements elevate and distinguish the content beneath them.",
+      "Harmony. Align with the concentric design of the hardware and software.",
+      "Consistency. Adopt platform conventions that adapt across window sizes and displays.",
+      "These came with Liquid Glass (2025). The earlier HIG named Clarity, Deference and Depth.",
+    ],
+  },
+  {
+    who: "Google · Material 3",
+    title: "Personal, adaptive, expressive",
+    mz: false,
+    body: [
+      "Personal. Dynamic colour drawn from the user's own wallpaper and settings.",
+      "Adaptive. One system across phones, foldables, tablets, desktop and watch.",
+      "Expressive. Material 3 Expressive (2025) adds shape, motion and colour, grounded in Google's user research.",
+      "Accessibility is built into components through state layers, touch targets and contrast roles.",
+    ],
+  },
+  {
+    who: "Anthropic · brand",
+    title: "A warm, restrained identity",
+    mz: false,
+    body: [
+      "Colour. Dark #141413 and Light #faf9f5, with greys #b0aea5 and #e8e6dc.",
+      "Accents. Orange #d97757 first, then Blue #6a9bcc and Green #788c5d, used on shapes.",
+      "Type. Poppins for headings (Arial fallback), Lora for body text (Georgia fallback).",
+      "Brand guidelines for documents and decks. They do not cover interface accessibility.",
+    ],
+  },
+];
+
+const sources = [
+  { href: "https://www.w3.org/TR/WCAG22/", label: "WCAG 2.2", note: "Criteria 1.4.3, 1.4.6, 1.4.11, 1.4.12, 2.4.7, 2.4.13, 2.5.5 and 2.5.8." },
+  { href: "https://developer.apple.com/design/human-interface-guidelines", label: "Apple Human Interface Guidelines", note: "" },
+  { href: "https://developer.apple.com/documentation/technologyoverviews/liquid-glass", label: "Apple Liquid Glass", note: "" },
+  { href: "https://m3.material.io/foundations/designing/structure", label: "Material 3 · touch targets", note: "" },
+  { href: "https://design.google/library/expressive-material-design-google-research", label: "Material 3 Expressive research", note: "" },
+];
+---
+
+<Site
+  title="The Bundu floor"
+  eyebrow="Mzizi design system · accessibility floor"
+  description="The minimums no Mzizi screen can go under, set beside WCAG 2.2, Apple's Human Interface Guidelines, Google's Material 3 and Anthropic's brand guidelines."
+  lede="The minimums no Mzizi screen can go under, set beside WCAG 2.2, Apple's Human Interface Guidelines, Google's Material 3 and Anthropic's brand guidelines."
+  wide
+>
+  <div class="floor">
+    <p class="prose">
+      The other systems recommend most of these numbers. Mzizi enforces them:
+      the token layer applies them by default, and the tests, component
+      contracts and <code>mzizi check</code> fail a build that goes under one.
+    </p>
+
+    <aside class="status" aria-labelledby="changing-now">
+      <strong id="changing-now">Changing now.</strong>
+      <span>
+        On 19 November 2026 the owner moved the hit-area floor from 49 px on
+        touch and 28 px on desktop to 45 px and 24 px, and approved layered
+        spacing tokens (<a href="/spacing">the spacing layers</a>). Every Mzizi
+        number is a multiple of 3 or 7, or a prime: the nearest one at or above
+        the recommended value, never below. So WCAG's 44 becomes 45 (3 × 15).{" "}
+        <strong>The registry release that carries these tokens is in progress.</strong>{" "}
+        Until it ships, the live registry API and the tokens on{" "}
+        <a href="/tokens">/tokens</a> still report 49 and 28. This page shows the
+        new floor.
+      </span>
+    </aside>
+
+    <section id="numbers" class="block">
+      <p class="eyebrow">01 · The numbers</p>
+      <h2>Floor against floor</h2>
+      <p class="prose">
+        Green means the system enforces the value. Amber means it recommends it.
+        A dash means the system does not set that value.
+      </p>
+      <div class="scroller table-wrap">
+        <table class="floor-table">
+          <thead>
+            <tr>
+              <th scope="col">Requirement</th>
+              <th scope="col" class="mz">Mzizi · Bundu floor</th>
+              <th scope="col">WCAG 2.2</th>
+              <th scope="col">Apple HIG</th>
+              <th scope="col">Material 3</th>
+              <th scope="col">Anthropic brand</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.name}</th>
+                  {[row.mz, row.wcag, row.apple, row.m3, row.anth].map((cell, i) => (
+                    <td class={i === 0 ? "mz" : undefined}>
+                      <span class="v">{cell.v}</span>
+                      {cell.n && <span class="n">{cell.n}</span>}
+                      <span class={`chip ${cell.s ?? "plain"}`}>{cell.l}</span>
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="scale" class="block">
+      <p class="eyebrow">02 · To scale</p>
+      <h2>What a fingertip gets</h2>
+      <p class="prose">
+        Drawn at 1 CSS pixel per pixel. Mzizi's new touch floor is 1 px above
+        WCAG AAA and Apple's 44, and Material asks for 3 px more than Mzizi. The
+        dashed box is the old 49 px floor.
+      </p>
+      <div class="scale" role="img" aria-label="Target sizes drawn to scale: 24, 44, 45, 48 and 49 pixels square.">
+        <div class="targets">
+          {
+            targets.map((t) => (
+              <div class="t">
+                <div
+                  class={`box ${t.mz ? "mz" : ""} ${t.old ? "old" : ""}`}
+                  style={`width:${t.px}px;height:${t.px}px`}
+                />
+                <span class="lbl">{t.label}</span>
+                <span class="src">{t.name}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="contrast" class="block">
+      <p class="eyebrow">03 · Contrast</p>
+      <h2>Anthropic's palette against the floor</h2>
+      <p class="prose">
+        Anthropic's guidelines name colours and typefaces but set no
+        accessibility rules. Each accent was measured against the brand's own
+        Light (#faf9f5) and Dark (#141413) backgrounds with the WCAG 2 formula.
+        On Light, no accent reaches 4.5 : 1 for text; only Green (3.49 : 1)
+        clears the 3 : 1 floor for shapes. On Dark, Orange, Blue and Green pass
+        non-body text at 4.5 : 1 but not the 7 : 1 body floor. Mid Gray, at 8.29
+        : 1 on Dark, clears it.
+      </p>
+      <div class="swatches">
+        {
+          accents.map((a) => (
+            <div class="sw">
+              <div class="pair">
+                <div style={`background:${LIGHT};color:${a.hex}`}>{a.name}</div>
+                <div style={`background:${DARK};color:${a.hex}`}>{a.name}</div>
+              </div>
+              <div class="meta">
+                <div class="row">
+                  <span>on Light</span>
+                  <span class="mono">{a.onLight} : 1</span>
+                </div>
+                <div class="row">
+                  <span>on Dark</span>
+                  <span class="mono">{a.onDark} : 1</span>
+                </div>
+                <div class="row muted">
+                  <span>{a.hex}</span>
+                </div>
+              </div>
+            </div>
+          ))
+        }
+        <div class="sw">
+          <div class="pair">
+            <div style={`background:${LIGHT};color:${DARK}`}>Text</div>
+            <div style={`background:${DARK};color:${LIGHT}`}>Text</div>
+          </div>
+          <div class="meta">
+            <div class="row">
+              <span>Dark on Light</span>
+              <span class="mono">17.50 : 1</span>
+            </div>
+            <div class="row muted">
+              <span>Bundu body passes 7 : 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="prose">
+        That fits how Anthropic uses the palette: the accents are for shapes and
+        highlights, and running text stays in Dark on Light. Mzizi's floor makes
+        the same split explicit and testable.
+      </p>
+    </section>
+
+    <section id="principles" class="block">
+      <p class="eyebrow">04 · Principles</p>
+      <h2>What each system believes</h2>
+      <div class="systems">
+        {
+          systems.map((s) => (
+            <article class={`card ${s.mz ? "mz" : ""}`}>
+              <p class="who">{s.who}</p>
+              <h3>{s.title}</h3>
+              <ul>
+                {s.body.map((line) => (
+                  <li>{line}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="reading" class="block">
+      <p class="eyebrow">05 · Reading the comparison</p>
+      <h2>Where the Bundu floor stands</h2>
+      <div class="verdicts">
+        <article class="card mz">
+          <h3>Ahead of the field</h3>
+          <ul>
+            <li>7 : 1 body contrast is WCAG AAA. Apple and Material ask for 4.5 : 1.</li>
+            <li>Enforced, not advised. A build fails below the floor; elsewhere a review might catch it.</li>
+            <li>Layered spacing floors. Controls, chips, pills, cards, containers and page layout each have a default and a dense minimum. No other system here sets spacing minimums at all.</li>
+            <li>1.5 leading by default. WCAG only requires that content survive it.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Now in line</h3>
+          <ul>
+            <li>45 px touch and 24 px desktop meet WCAG 2.5.5 and 2.5.8 and Apple's 44 pt. 45 is 1 px above 44, the smallest Mzizi number that still clears it.</li>
+            <li>Material's 48 dp stays 3 px larger. An Android-only product can still choose 48.</li>
+            <li>The old 49 px was above every standard and cost 5 px of every row on small phones.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Worth watching</h3>
+          <ul>
+            <li>Text scaling. Apple's Dynamic Type and Android font scaling grow text with the user's setting. Mzizi's px floors must use rem or respect the OS text scale.</li>
+            <li>A 3, 7 and prime rhythm. Material and most tools count in 4 and 8. Each Mzizi value is the nearest number at or above theirs: 9 for 8, 17 for 16, 21 for 16 on cards, 28 for 24. Designers coming from Figma kits will notice.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="people" class="block">
+      <p class="eyebrow">06 · How to talk about it</p>
+      <h2>Who the floor serves</h2>
+      <p class="prose">
+        A specification sheet won't sell the floor. Describe the people it
+        protects, and lead with what it guarantees them, not with the WCAG
+        criteria.
+      </p>
+      <ul class="people">
+        <li>
+          A market trader in Mbare at midday reads prices on a cracked phone in
+          full sun. 7 : 1 contrast and 17 px text are what make that possible:
+          the outdoor-readability constraint.
+        </li>
+        <li>
+          A family sharing one phone, from a grandmother with less-steady hands
+          to a child, can hit every button. The 45 px target and the 9 px gap
+          between controls are why.
+        </li>
+        <li>
+          A developer in Bulawayo or Nairobi doesn't need to know the WCAG
+          numbers to ship to them, because Mzizi won't let the build go under.
+        </li>
+      </ul>
+      <blockquote>
+        Every screen built on Mzizi is readable in the sun and usable with one
+        thumb, because the system won't let it be anything less.
+      </blockquote>
+    </section>
+
+    <section id="sources" class="block">
+      <p class="eyebrow">Sources</p>
+      <h2>Where the numbers come from</h2>
+      <ul class="sources">
+        <li>
+          Mzizi: the floors in the registry, and the owner's ruling of 19
+          November 2026. The live registry reports the earlier values until the
+          release ships.
+        </li>
+        {
+          sources.map((s) => (
+            <li>
+              <a href={s.href}>{s.label}</a>
+              {s.note && <> · {s.note}</>}
+            </li>
+          ))
+        }
+        <li>
+          Contrast ratios: computed with the WCAG 2 relative-luminance formula
+          against the Light and Dark backgrounds of the Anthropic brand.
+        </li>
+        <li>
+          Modern web guidance on form-factor adaptation: 24 px by default, and
+          44 px under <code>pointer: coarse</code>.
+        </li>
+      </ul>
+      <p class="prose muted">
+        The spacing values that follow from this floor are on <a href="/spacing">/spacing</a>.
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .floor {
+      display: grid;
+      gap: var(--space-xl);
+      padding-block: var(--space-lg) var(--space-3xl);
+    }
+
+    .block {
+      display: grid;
+      gap: var(--space-md);
+      scroll-margin-top: var(--space-xl);
+    }
+
+    .block h2 {
+      margin-block: 0;
+    }
+
+    .muted {
+      color: var(--muted-foreground);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Status callout: the registry release is in progress, said once, here. */
+    .status {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      background: var(--surface-container);
+      border-inline-start: 3px solid var(--warning);
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--text-body-small);
+      line-height: var(--leading-body-small);
+    }
+
+    .status strong {
+      color: var(--warning);
+    }
+
+    /* Comparison table. The site's own table rules; this page adds the chips. */
+    .table-wrap {
+      border: 1px solid var(--border);
+    }
+
+    .floor-table {
+      min-width: 52rem;
+    }
+
+    .floor-table th,
+    .floor-table td {
+      padding: var(--space-md);
+    }
+
+    .floor-table thead th.mz {
+      color: var(--primary);
+    }
+
+    .floor-table td.mz {
+      background: var(--surface-container);
+    }
+
+    .floor-table td {
+      min-width: 9rem;
+    }
+
+    .v {
+      display: block;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .n {
+      display: block;
+      margin-block-start: var(--space-xxs);
+      color: var(--muted-foreground);
+      font-size: var(--text-caption);
+    }
+
+    .chip {
+      display: inline-block;
+      margin-block-start: var(--space-xs);
+      border-radius: var(--radius-sm);
+      padding: 0.25em 0.5em;
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+    }
+
+    .chip.enf {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .chip.rec {
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+
+    .chip.none {
+      color: var(--muted-foreground);
+    }
+
+    /* To scale. Sizes are the values in px; the drawing is not a token. */
+    .scale {
+      border: 1px solid var(--border);
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      overflow-x: auto;
+    }
+
+    .targets {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: var(--space-lg);
+    }
+
+    .t {
+      display: grid;
+      justify-items: start;
+      gap: var(--space-xs);
+    }
+
+    .box {
+      border: 2px solid var(--foreground);
+      background: var(--background);
+    }
+
+    .box.mz {
+      border-color: var(--primary);
+      background: var(--surface-container);
+    }
+
+    .box.old {
+      border-style: dashed;
+      border-color: var(--muted-foreground);
+      background: transparent;
+    }
+
+    .t .lbl {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: var(--text-body-small);
+    }
+
+    .t .src {
+      max-width: 14ch;
+      color: var(--muted-foreground);
+      font-size: var(--text-caption);
+    }
+
+    /* Contrast swatches. The hex values are the brand's own, shown as data. */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+      gap: var(--space-md);
+    }
+
+    .sw {
+      border: 1px solid var(--border);
+      display: grid;
+    }
+
+    .sw .pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .sw .pair div {
+      padding: var(--space-md) var(--space-sm);
+      font-weight: 600;
+    }
+
+    .sw .meta {
+      display: grid;
+      gap: var(--space-xxs);
+      padding: var(--space-md);
+      font-size: var(--text-caption);
+    }
+
+    .sw .meta .row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    /* Cards for principles and verdicts. */
+    .systems,
+    .verdicts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+      gap: var(--space-md);
+    }
+
+    .card {
+      display: grid;
+      align-content: start;
+      gap: var(--space-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      min-width: 0;
+    }
+
+    .card.mz {
+      border-block-start: 3px solid var(--primary);
+    }
+
+    .card h3 {
+      font-size: var(--text-h5);
+    }
+
+    .card ul,
+    .people,
+    .sources {
+      margin: 0;
+      padding-inline-start: 1.1em;
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .who {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+    }
+
+    blockquote {
+      margin: 0;
+      border-inline-start: 3px solid var(--primary);
+      background: var(--surface-container);
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: var(--text-h5);
+    }
+
+    .sources a {
+      overflow-wrap: anywhere;
+    }
+  </style>
+</Site>

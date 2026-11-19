@@ -21,6 +21,16 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — /bundu-floor and /spacing: the Bundu floor and the spacing layers (2026-11-19)
+
+Two pages, decided by the owner on 19 November 2026. The registry release that carries these tokens is in progress; until it ships, the live registry API and `/tokens` still report the previous values (49 and 28).
+
+- **`/bundu-floor`** sets the minimums no Mzizi screen goes under beside WCAG 2.2, Apple's Human Interface Guidelines, Google's Material 3 and Anthropic's brand guidelines. It has the comparison table, a to-scale drawing of the target sizes (45 px touch, 24 px desktop), Anthropic's accents measured against the brand's own backgrounds, each system's principles, where the Bundu floor stands, who the floor serves, and the sources.
+- **`/spacing`** sets one spacing value for each layer of component (controls, cards, containers, page layout), each also that layer's floor, and the number rule that chooses them: a multiple of 3, a multiple of 7, or a prime, the nearest at or above the recommended value. It has a number calculator and a table of worked examples, a live specimen with a spacing overlay, the ladder drawn at real size, the token table, and what changes from today.
+- Both pages are in the site navigation and the footer, and `/ecosystem` has a new "Engineering constraints" entry that links them. `llms.txt` describes both pages and their key values. The gate checks both pages.
+
+What a reader will see differently once the registry release ships: touch targets 49 px to 45 px, desktop targets 28 px to 24 px, the gap between neighbouring controls 7 px to 9 px, the inset floor of 14 px replaced by a floor for each layer (17 px buttons and fields, 21 px cards, 28 px containers), control heights 32 to 33 px, 40 to 42 px and 40 to 42 px for the touch-target token. Chips use 12 px of side padding and pills and badges 9 px, in place of the 14 px inline inset on pills. The label-to-field gap is 7 px (5 dense), and sibling items in a list use the 14 px card gap (7 dense). The phone page edge is 17 px. Every layer also has a dense step, its own floor below the default, so a full screen can tighten without going under the hit area. Body text, captions, contrast and line height do not change.
+
 ### Changed — Mzizi tools, runtime, crates and org policy (2026-11-17)
 
 - **Added: the Bundu ecosystem and doctrine on `/ecosystem` and `llms.txt`.** The four
