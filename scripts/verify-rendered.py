@@ -287,6 +287,7 @@ check("spacing.html", "the dense step is explained", "Default and dense" in body
 check("spacing.html", "the phone page edge is 17", "17 px" in body and "page edge" in body.lower())
 check("spacing.html", "the page says which registry serves the tokens", "Registry 4.45 and later" in body)
 check("spacing.html", "the decided questions are not asked again", "Confirm" not in body)
+check("tokens.html", "the card and container specimens state the layer defaults", "A card is 21px (dense 14px)" in text_without_scripts("tokens.html") and "A container is 28px (dense 21px)" in text_without_scripts("tokens.html"))
 check("spacing.html", "the label-to-field gap is 7 with a 5 px dense step", "--space-label-gap" in body and "7 px" in body)
 
 # --- / (the landing page, which leads with the language) -----------------
