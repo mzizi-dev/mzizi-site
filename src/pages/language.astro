@@ -207,8 +207,7 @@ const arms = [
 >
   <p>
     Mzizi is designed to lower to Rust: Roots components are moving to Mzizi's
-    own <code>render()</code>; Dioxus is out of the stack (owner, 4 November
-    2026) and the published crates still depend on it until it is removed. The designed server targets are axum and{" "}
+    own <code>render()</code>. The Roots core no longer depends on Dioxus; removing it from the rest of the components is ongoing. The designed server targets are axum and{" "}
     <code>workers-rs</code>. Today two things lower: a{" "}
     <code>service</code>, which <code>mz build</code> turns into a local Rust +
     axum package that CI compiles, tests and serves, and a <code>program</code>,
