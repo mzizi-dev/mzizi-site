@@ -5,9 +5,8 @@
  * brand guidelines. Decided by the owner on 19 November 2026; the values are
  * the Bundu floor in the spacing spec (/spacing).
  *
- * The numbers here are the decided values, typed on purpose: the registry
- * release that carries them is in progress, and until it ships the live API
- * still serves the previous floor (49 and 28). The banner says so.
+ * The numbers here are the decided values, typed as the spec. The registry
+ * serves them from Registry 4.45 and later.
  */
 import Site from "../layouts/Site.astro";
 
@@ -179,17 +178,14 @@ const sources = [
     </p>
 
     <aside class="status" aria-labelledby="changing-now">
-      <strong id="changing-now">Changing now.</strong>
+      <strong id="changing-now">Changed on 19 November 2026.</strong>
       <span>
         On 19 November 2026 the owner moved the hit-area floor from 49 px on
         touch and 28 px on desktop to 45 px and 24 px, and approved layered
         spacing tokens (<a href="/spacing">the spacing layers</a>). Every Mzizi
         number is a multiple of 3 or 7, or a prime: the nearest one at or above
         the recommended value, never below. So WCAG's 44 becomes 45 (3 × 15).{" "}
-        <strong>The registry release that carries these tokens is in progress.</strong>{" "}
-        Until it ships, the live registry API and the tokens on{" "}
-        <a href="/tokens">/tokens</a> still report 49 and 28. This page shows the
-        new floor.
+        The previous floor was 49 px touch and 28 px desktop.
       </span>
     </aside>
 
@@ -403,9 +399,8 @@ const sources = [
       <h2>Where the numbers come from</h2>
       <ul class="sources">
         <li>
-          Mzizi: the floors in the registry, and the owner's ruling of 19
-          November 2026. The live registry reports the earlier values until the
-          release ships.
+          Mzizi: the floors the registry serves, and the owner's ruling of 19
+          November 2026.
         </li>
         {
           sources.map((s) => (
@@ -456,7 +451,7 @@ const sources = [
       font-variant-numeric: tabular-nums;
     }
 
-    /* Status callout: the registry release is in progress, said once, here. */
+    /* Status callout: the decision and the previous floor. */
     .status {
       display: flex;
       flex-direction: column;

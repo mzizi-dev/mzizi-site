@@ -4,10 +4,8 @@
  * (controls, cards, containers, page layout), each value also that layer's
  * floor, and the number rule that chooses them.
  *
- * Decided by the owner on 19 November 2026. The values are typed here on
- * purpose, as the decided spec; the registry release that serves them as
- * tokens is in progress, and until it ships the live API and /tokens still
- * report the previous floor. Nothing on this page reads a live token.
+ * Decided by the owner on 19 November 2026. The registry serves these tokens
+ * from Registry 4.45 and later. The values are typed here as the decided spec.
  */
 import Site from "../layouts/Site.astro";
 
@@ -81,7 +79,7 @@ const groups: { title: string; note: string; tokens: Token[] }[] = [
   },
   {
     title: "Controls",
-    note: "Buttons, chips and inputs (N2 primitives).",
+    note: "Buttons, chips and inputs (N2 primitives). The label-to-field gap, --space-label-gap, is derived from the number rule and pending the owner's confirmation.",
     tokens: [
       { token: "--space-control-x", px: 17, rec: "16", source: "Material 3 small button", dense: 12, denseRec: "12", denseSource: "Material 3 dense button", today: "14 inset floor" },
       { token: "--space-field-x", px: 17, rec: "16", source: "Material 3 text field", dense: 12, denseRec: "12", denseSource: "Dense text field", today: "14 inset floor" },
@@ -90,8 +88,10 @@ const groups: { title: string; note: string; tokens: Token[] }[] = [
       { token: "--space-label-gap", px: 7, rec: "6 to 8", source: "Label to field", dense: 5, denseRec: "4", denseSource: "Material 3", today: "7 gap floor" },
       { token: "--space-chip-x", px: 12, rec: "12", source: "Material 3 chip", dense: 9, denseRec: "8", denseSource: "Material 3 chip", today: "14 inset floor" },
       { token: "--spacing-control-sm", px: 33, rec: "32", source: "Control height, small; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "32" },
-      { token: "--spacing-control-lg", px: 42, rec: "40", source: "Control height, large; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "40" },
-      { token: "--touch-target-sm", px: 42, rec: "40", source: "Small touch target; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "40" },
+      { token: "--spacing-control-dense", px: 33, rec: "32", source: "Control height, dense; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "32" },
+      { token: "--spacing-field-sm", px: 33, rec: "32", source: "Input height, small; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "32" },
+      { token: "--spacing-control-lg", px: 41, rec: "40", source: "Control height, large; rounded up (41 is the nearest Mzizi number)", dense: null, denseRec: "", denseSource: "Height, not padding", today: "40" },
+      { token: "--touch-target-sm", px: 41, rec: "40", source: "Small touch target; rounded up (41 is the nearest Mzizi number)", dense: null, denseRec: "", denseSource: "Height, not padding", today: "40" },
     ],
   },
   {
@@ -104,7 +104,7 @@ const groups: { title: string; note: string; tokens: Token[] }[] = [
   },
   {
     title: "Cards",
-    note: "Cards, list items and tiles (N3 composites). Sibling items in a list, grid or toolbar are cards too, so the gap between them is --space-card-gap.",
+    note: "Cards, list items and tiles (N3 composites). The gap between sibling items in a list, grid or toolbar is --space-card-gap. That rule is derived from the number rule and pending the owner's confirmation.",
     tokens: [
       { token: "--space-card", px: 21, rec: "16", source: "Material 3 card", dense: 14, denseRec: "12", denseSource: "M3 list item", today: "14 inset floor" },
       { token: "--space-card-stack", px: 7, rec: "4", source: "Title to body", dense: 7, denseRec: "4", denseSource: "Title to body, dense", today: "7 gap floor" },
@@ -168,14 +168,11 @@ const ladder = [
 >
   <div class="spacing">
     <aside class="status" aria-labelledby="in-progress">
-      <strong id="in-progress">Decided 19 November 2026.</strong>
+      <strong id="in-progress">Registry 4.45 and later.</strong>
       <span>
-        The registry release that carries these tokens is in progress. Until it
-        ships, the live registry API and <a href="/tokens">/tokens</a> still
-        report the earlier values: a 49 px touch and 28 px desktop floor, a 14 px
-        inset floor and a 7 px gap floor. The values below are the ones the
-        registry will serve. <a href="/bundu-floor">The Bundu floor</a> sets the
-        hit-area minimums they start from.
+        These tokens were decided on 19 November 2026. <a href="/bundu-floor">The
+        Bundu floor</a> sets the hit-area minimums they start from. Before them,
+        the floors were 49 px touch, 28 px desktop, a 14 px inset and a 7 px gap.
       </span>
     </aside>
 
@@ -286,11 +283,6 @@ const ladder = [
           </tbody>
         </table>
       </div>
-      <p class="prose muted">
-        The calculator shows the nearest Mzizi number. The nearest one to 40 is 41,
-        a prime. The owner set the large control height at 42 instead, which is
-        both 3 × 14 and 7 × 6; the token table shows that decided value.
-      </p>
     </section>
 
     <section id="specimen" class="block">
@@ -451,9 +443,9 @@ const ladder = [
         </li>
         <li>
           <strong>Control heights round up onto the rule:</strong> the small
-          control height 32 → 33 (3 × 11), the large control height 40 → 42 (3 × 14),
-          and <code>--touch-target-sm</code> 40 → 42. 36, 28, 48 and 56 are already
-          valid.
+          control, dense control and small input heights 32 → 33 (3 × 11), the large
+          control height 40 → 41 (prime), and <code>--touch-target-sm</code> 40 → 41
+          (prime). 36, 28, 48 and 56 are already valid.
         </li>
         <li>
           <strong>Status pills and badges use <code>--space-pill-x</code>, 9 px
@@ -461,9 +453,15 @@ const ladder = [
           The 14 px inline inset on pills is replaced.
         </li>
         <li>
-          <strong>The page edge is 17 px on phones</strong> and 28 px on wide
+          <strong>The page edge is 17 px on phones</strong>, a prime the owner chose.
+          It is the one layout value outside the multiples of 7. The wide edge is 28 px
+          on wide
           screens (21 dense), against the 16 px of Material 3's compact margin
           and the 16 to 20 px of Apple's layout margins.
+        </li>
+        <li>
+          <strong>Enforcement:</strong> a layer-aware checker ships with the tokens.
+          Each component is checked against its own layer's dense floor.
         </li>
         <li>
           <strong>Unchanged:</strong> body text, captions, contrast (7 : 1 body,
@@ -537,8 +535,8 @@ const ladder = [
   </script>
 
   <style>
-    /* The proposed values, scoped to this page. They become the registry's
-       tokens when the release ships; until then this specimen is the spec. */
+    /* The values, scoped to this page. The registry serves the same tokens from
+       Registry 4.45 and later. */
     .spacing {
       --hit-touch: 45px;
       --hit-desktop: 24px;

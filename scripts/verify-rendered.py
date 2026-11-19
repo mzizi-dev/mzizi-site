@@ -262,7 +262,7 @@ check("tokens.html", "radii rendered", "9999px" in body)
 # --- /bundu-floor and /spacing ---------------------------------------------
 # The decided floor (owner, 2026-11-19). The values are typed on the pages on
 # purpose, so these checks hold the pages to the ruling, not to the live API,
-# which keeps serving 49 and 28 until the registry release ships.
+# the registry serves them from Registry 4.45.
 print("\nbundu-floor.html, spacing.html")
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("bundu-floor.html")))
 for system in ("WCAG 2.2", "Apple HIG", "Material 3", "Anthropic"):
@@ -272,8 +272,8 @@ check("bundu-floor.html", "the desktop floor is 24 × 24 px", "24 × 24 px" in b
 check("bundu-floor.html", "the to-scale drawing is in the HTML", 'aria-label="Target sizes drawn to scale' in text_without_scripts("bundu-floor.html"))
 check("bundu-floor.html", "Mid Gray on Dark is 8.29 : 1, measured", "8.29 : 1" in body)
 check("bundu-floor.html", "dark on light is 17.50 : 1", "17.50 : 1" in body)
-check("bundu-floor.html", "the registry release is said to be in progress",
-      "The registry release that carries these tokens is in progress" in body)
+check("bundu-floor.html", "the change is dated and the previous floor is named",
+      "Changed on 19 November 2026" in body and "49 px touch" in body)
 check("bundu-floor.html", "the who-the-floor-serves section renders", "Who the floor serves" in body and "Mbare" in body)
 
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("spacing.html")))
@@ -281,12 +281,11 @@ for heading in ("The number rule", "Number calculator", "Live specimen", "The la
     check("spacing.html", f"section “{heading}” renders", heading in body)
 check("spacing.html", "the calculator's answer is in the static HTML", re.search(r'<output id="out"[^>]*>45</output>', text_without_scripts("spacing.html")) is not None)
 check("spacing.html", "the worked examples render with scripts off", "Built from" in body and "3 × 15" in body)
-check("spacing.html", "control heights are decided: 33 and 42", "33 px" in body and "42 px" in body)
+check("spacing.html", "control heights are decided: 33 and 41", "33 px" in body and "41 px" in body and "42 px" not in body)
 check("spacing.html", "pills use 9 px with a 5 px dense step, not the old 14 px inset", "--space-pill-x" in body and "9 px" in body and "5 px" in body)
 check("spacing.html", "the dense step is explained", "Default and dense" in body and "-dense" in body)
 check("spacing.html", "the phone page edge is 17", "17 px" in body and "page edge" in body.lower())
-check("spacing.html", "the registry release is said to be in progress",
-      "The registry release that carries these tokens is in progress" in body)
+check("spacing.html", "the page says which registry serves the tokens", "Registry 4.45 and later" in body)
 check("spacing.html", "the decided questions are not asked again", "Confirm" not in body)
 check("spacing.html", "the label-to-field gap is 7 with a 5 px dense step", "--space-label-gap" in body and "7 px" in body)
 
