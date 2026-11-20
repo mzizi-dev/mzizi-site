@@ -2523,9 +2523,9 @@
       0 12px 32px -12px color-mix(in oklab, var(--foreground) 22%, transparent);
   }
 
-  /* ============================== the Bundu floor: a 49px hit region ======
- * Every control keeps a 49px hit region on every pointer (`--target-floor`,
- * from `@bundu/ui`'s density.css). A single-row target may be DRAWN smaller on
+  /* ============================== the Bundu floor: a 45px hit region on touch, 24px on desktop ======
+ * Every control keeps a hit region of at least 45px on touch and 24px on
+ * desktop (`--target-floor`, from `@bundu/ui`'s density.css). A single-row target may be DRAWN smaller on
  * a fine pointer: this is the same transparent overlay density.css gives
  * `button`, extended to the site's links. Targets stacked in a list instead
  * grow to the floor (min-block-size), because overlays in a column would
@@ -2589,7 +2589,7 @@
     min-block-size: var(--target-floor);
   }
 
-  /* Drawn at the density size; the gap makes up the rest of the 49px so the
+  /* Drawn at the density size; the gap makes up the rest of the hit region so the
  * hit regions of neighbours meet instead of overlapping. */
   .icon-group {
     gap: calc(var(--target-floor) - var(--touch-target));
