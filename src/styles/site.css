@@ -1134,14 +1134,15 @@
     border-block-end: 1px solid var(--border);
   }
 
+  /* 9px between adjacent controls (Bundu floor spacing, 2026-11-19). */
   .finder-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 0.5625rem;
   }
 
-  /* 56px and fully pill, because `componentSpecs.input` says an input is. */
+  /* 49px on touch and fully pill, because `componentSpecs.input` says an input is. */
   .finder input {
     flex: 1 1 18rem;
     height: var(--spec-input-default);
@@ -1158,7 +1159,8 @@
   .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: max(var(--space-gap), calc(var(--target-floor) - var(--touch-target)));
+    /* 9px between adjacent controls (Bundu floor spacing, 2026-11-19). */
+    gap: max(0.5625rem, calc(var(--target-floor) - var(--touch-target)));
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1899,6 +1901,15 @@
     align-items: center;
   }
 
+  /* Native fields keep their component height on touch: 49px drawn. The 45px hit
+     floor is a minimum, not a drawn size (Bundu floor, 2026-11-19). */
+  @media (pointer: coarse), (max-width: 63.99rem) {
+    .finder input,
+    .demo-input {
+      height: 3.0625rem;
+    }
+  }
+
   .demo-avatar {
     width: var(--spec-avatar-default);
     height: var(--spec-avatar-default);
@@ -1939,7 +1950,8 @@
     border: 1px solid var(--border);
     border-radius: var(--spec-card-radius);
     background: var(--card);
-    padding: var(--space-base);
+    /* the card layer's default padding, 21px (Bundu floor spacing, 2026-11-19) */
+    padding: 1.3125rem;
     font-size: var(--text-caption);
     color: var(--muted-foreground);
   }
@@ -1964,7 +1976,8 @@
     border: 1px solid var(--border);
     border-radius: var(--spec-dialog-radius);
     background: var(--surface-overlay);
-    padding: var(--space-lg);
+    /* the container layer's default padding, 28px (Bundu floor spacing, 2026-11-19) */
+    padding: 1.75rem;
     font-size: var(--text-caption);
     color: var(--muted-foreground);
   }
@@ -2510,9 +2523,9 @@
       0 12px 32px -12px color-mix(in oklab, var(--foreground) 22%, transparent);
   }
 
-  /* ============================== the Bundu floor: a 49px hit region ======
- * Every control keeps a 49px hit region on every pointer (`--target-floor`,
- * from `@bundu/ui`'s density.css). A single-row target may be DRAWN smaller on
+  /* ============================== the Bundu floor: a 45px hit region on touch, 24px on desktop ======
+ * Every control keeps a hit region of at least 45px on touch and 24px on
+ * desktop (`--target-floor`, from `@bundu/ui`'s density.css). A single-row target may be DRAWN smaller on
  * a fine pointer: this is the same transparent overlay density.css gives
  * `button`, extended to the site's links. Targets stacked in a list instead
  * grow to the floor (min-block-size), because overlays in a column would
@@ -2576,7 +2589,7 @@
     min-block-size: var(--target-floor);
   }
 
-  /* Drawn at the density size; the gap makes up the rest of the 49px so the
+  /* Drawn at the density size; the gap makes up the rest of the hit region so the
  * hit regions of neighbours meet instead of overlapping. */
   .icon-group {
     gap: calc(var(--target-floor) - var(--touch-target));

@@ -1,6 +1,7 @@
 {
   "index": "Mzizi",
   "architecture": "The double helix",
+  "bundu-floor": "The Bundu floor",
   "cli": "CLI",
   "components": "Components",
   "ecosystem": "Ecosystem",
@@ -8,5 +9,6 @@
   "observability": "Observability",
   "playground": "Playground",
   "skills": "Skills",
+  "spacing": "Spacing layers",
   "tokens": "Colour, type and space"
 }
