@@ -10,21 +10,20 @@
  * Measures, at 390x844 (touch), 820x1180 (tablet, touch) and 1440x900 (fine
  * pointer): the computed font size of every text node, the hit region of every
  * interactive element (its box, grown by a `::after` overlay, which is how
- * `@bundu/ui` keeps 49px on a control drawn smaller), the contrast of every
+ * `@bundu/ui` keeps the hit floor on a control drawn smaller), the contrast of every
  * text/background pair, focus visibility, landmarks, headings, alt text, link
  * purpose, `prefers-reduced-motion`, horizontal scroll at 320px, and (full
  * audit only) the weight, LCP and layout shift on a throttled 3G profile.
  *
- * The floor it holds the site to is the Bundu floor: nothing readable under
- * 14px, body text 17px, a 49px hit region, contrast 7:1 body / 4.5:1 other,
- * and the spacing floor (registry 4.24.0, BUNDU_FLOOR.spacing): a 7px gap
- * between adjacent controls (visible edge to visible edge; hit regions may
- * touch, never overlap), a 14px inset from text to the edge of its container
- * (cards, panels and callouts on all four sides; buttons, links drawn as
- * buttons and inputs on the inline axis, because the visible control is 28px
- * and a 14px block inset cannot fit; a one-line label chip or pill, such as a badge,
- * is held by the same 14px on its inline axis only, its block axis being its line
- * height or fixed height, registry #627), a 1.5 body line height, and a WCAG 1.4.12
+ * The floor it holds the site to is the Bundu floor (owner, 2026-11-19): nothing
+ * readable under 14px, body text 17px, a hit region of 45px on touch (any window
+ * under 64rem) and 24px on desktop, contrast 7:1 body / 4.5:1 other, and the
+ * spacing floor. Each component is checked against its own layer's dense floor:
+ * a gap of 9px between adjacent controls (no dense step), and an inline inset of
+ * 12px for a control, 9px for a chip, 5px for a pill or badge, 14px for a card
+ * and 21px for a container. Where the layer cannot be told, the global floor
+ * stays: a 7px gap and a 14px inset, so enforcement is never weaker than it was.
+ * A 1.5 body line height, and a WCAG 1.4.12
  * text-spacing stress pass (line-height 1.5, paragraph spacing 2x, letter
  * 0.12em, word 0.16em, injected as CSS) with no clipped or overflowing text.
  * An element, or anything inside it, carrying `data-mzizi-spacing-exempt="<reason>"`
@@ -85,6 +84,8 @@ const PAGES = [
   ["language", "/language"],
   ["cli", "/cli"],
   ["ecosystem", "/ecosystem"],
+  ["bundu-floor", "/bundu-floor"],
+  ["spacing", "/spacing"],
   ["404", "/__no-such-page__"],
 ];
 
@@ -144,7 +145,11 @@ function measure({
   floorHit,
   floorInset,
   floorGap,
+  floorGapControl,
+  insetByLayer,
   floorLeading,
+  desktop,
+  floorDrawnDesktop,
   root,
 }) {
   const scope = (root && document.querySelector(root)) || document;
@@ -277,7 +282,7 @@ function measure({
       out.body.push({ el: sel(el), px, text: t.slice(0, 50) });
     if (seen.has(key)) continue;
     seen.add(key);
-    // contrast
+    // contrast: every text node, with no exemption
     const bg = back(el);
     if (!bg) continue;
     let fg = rgba(s.color);
@@ -321,6 +326,7 @@ function measure({
     ),
   ].filter(visible);
   const boxes = [];
+  const drawnRecs = [];
   const inlineEls = new Set();
   for (const el of interactive) {
     const r = el.getBoundingClientRect();
@@ -350,6 +356,7 @@ function measure({
     const skip = el.closest(".sr-only,.skip") && !el.matches(":focus");
     const rec = {
       el: sel(el),
+      drawnH: Math.round(r.height),
       w: Math.round(w),
       h: Math.round(h),
       inline: !!inline,
@@ -360,6 +367,7 @@ function measure({
     if (skip) continue;
     if (inline) inlineEls.add(el);
     out.targets.push(rec);
+    drawnRecs.push({ rec, el });
     if (!inline && base.contains(el) && (w > r.width + 1 || h > r.height + 1))
       boxes.push({
         rec,
@@ -370,9 +378,9 @@ function measure({
         el,
       });
   }
-  out.belowHit = out.targets.filter(
-    (t) => !t.inline && (t.w < floorHit || t.h < floorHit),
-  );
+  out.belowHit = out.targets
+    .filter((t) => !t.inline && (t.w < floorHit || t.h < floorHit))
+    .map((t) => ({ ...t, need: floorHit }));
   // two distinct targets whose hit regions overlap by more than a sliver
   for (let i = 0; i < boxes.length; i++)
     for (let j = i + 1; j < boxes.length; j++) {
@@ -443,6 +451,42 @@ function measure({
       bottom: Math.max(...rs.map((r) => r.bottom)),
     };
   };
+  // The layer a component belongs to, where the page can tell: an explicit
+  // data-mzizi-layer, a registry primitive's data-slot, or a native control. Anything
+  // else has no layer and is held to the global floor.
+  const layerOf = (el) => {
+    const explicit = el.getAttribute("data-mzizi-layer");
+    if (explicit) return explicit;
+    if (el.matches("[data-slot=badge],.badge")) return "pill";
+    if (el.matches("[data-slot=chip],.chip")) return "chip";
+    if (
+      el.matches(
+        "button,input:not([type=hidden]),select,textarea,[role=button],[role=tab],[role=checkbox],[role=switch],[role=radio],[data-slot=button],[data-slot=input],[data-slot=select],[data-slot=checkbox],[data-slot=switch],[data-slot=tabs-trigger]",
+      )
+    )
+      return "control";
+    if (el.matches("[data-slot=card],.card")) return "card";
+    if (
+      el.matches(
+        "dialog,[role=dialog],[data-slot=dialog-content],[data-slot=sheet-content],[data-slot=popover-content],[data-slot=alert]",
+      )
+    )
+      return "container";
+    return null;
+  };
+  // On desktop a control drawn as a control (a button, a field, a primitive) is never
+  // drawn under 28px. Plain text links are not controls and are not held to it.
+  out.drawnUnder = desktop
+    ? drawnRecs
+        .filter(
+          ({ rec, el }) =>
+            !rec.inline &&
+            rec.drawnH > 0 &&
+            rec.drawnH < floorDrawnDesktop &&
+            layerOf(el) === "control",
+        )
+        .map(({ rec }) => ({ ...rec, need: floorDrawnDesktop }))
+    : [];
   // gaps between adjacent controls, visible edge to visible edge
   const CONTROLS =
     "a[href],button,input:not([type=hidden]),select,textarea,summary,[role=button],[role=tab],[role=link],[role=menuitem],[role=switch],[role=checkbox],[role=radio]";
@@ -455,7 +499,7 @@ function measure({
         !inlineEls.has(e) &&
         !(e.closest(".sr-only,.skip") && !e.matches(":focus")),
     )
-    .map((e) => ({ e, r: visibleRect(e) }));
+    .map((e) => ({ e, r: visibleRect(e), layer: layerOf(e) }));
   for (let i = 0; i < ctl.length; i++)
     for (let j = i + 1; j < ctl.length; j++) {
       const a = ctl[i];
@@ -464,11 +508,18 @@ function measure({
       const dx = Math.max(a.r.left - b.r.right, b.r.left - a.r.right, 0);
       const dy = Math.max(a.r.top - b.r.bottom, b.r.top - a.r.bottom, 0);
       const d = dx > 0 && dy > 0 ? Math.hypot(dx, dy) : Math.max(dx, dy);
-      if (d < floorGap - 0.5)
+      // between two controls the gap is the control floor (9px, no dense step);
+      // otherwise, or where a layer is unknown, the global 7px
+      const need =
+        a.layer === "control" && b.layer === "control"
+          ? floorGapControl
+          : floorGap;
+      if (d < need - 0.5)
         out.gaps.push({
           a: sel(a.e),
           b: sel(b.e),
           gap: +d.toFixed(1),
+          need,
           text: `${a.e.textContent.trim().slice(0, 18)} | ${b.e.textContent.trim().slice(0, 18)}`,
         });
     }
@@ -525,7 +576,7 @@ function measure({
         Math.max(...tr.map((r) => r.bottom)) -
           Math.min(...tr.map((r) => r.top)) <=
           1.5 * Math.min(...tr.map((r) => r.height));
-      if (/^inline/.test(cs.display)) {
+      if (cs.display.startsWith("inline")) {
         // a highlight inside running text (a search hit) is not a label chip
         if (!oneLine || c.matches("mark")) continue;
         chip = true;
@@ -589,11 +640,19 @@ function measure({
         x.control || x.chip || scrollsY || x.sy ? Infinity : b.bottom - x.b,
     };
     const [side, inset] = Object.entries(sides).sort((p, q) => p[1] - q[1])[0];
-    if (inset < floorInset - 1)
+    // the layer's dense floor where the layer is known, the global inset where it is not
+    const layer = layerOf(c);
+    const need =
+      layer && insetByLayer[layer] !== undefined
+        ? insetByLayer[layer]
+        : floorInset;
+    if (inset < need - 1)
       out.insets.push({
         el: sel(c),
         side,
         inset: +inset.toFixed(1),
+        need,
+        layer,
         text: c.textContent.trim().slice(0, 30),
       });
   }
@@ -988,18 +1047,31 @@ async function perfAudit(browser, origin, path) {
   return { kb: Math.round(bytes / 1024), reqs, load, ...m };
 }
 
-// BUNDU_FLOOR from the registry (4.24.0): text 14, body 17, hit 49; spacing
-// insetPx 14 (--inset-floor), controlGapPx 7 (--gap-floor), leadingBody 1.5 (--leading-floor)
+// The Bundu floor (owner, 2026-11-19): text 14, body 17; hit region 45 on touch and
+// 24 on desktop (floorHitTouch, floorHitDesktop); the spacing floor per layer, dense
+// values (insetByLayer), 9px between adjacent controls (floorGapControl); and the
+// global floors where the layer is unknown, 14px inset and 7px gap.
 const MEASURE_OPTS = {
   floorText: 14,
   floorBody: 17,
-  floorHit: 49,
+  floorHitTouch: 45,
+  floorHitDesktop: 24,
   floorInset: 14,
   floorGap: 7,
+  floorGapControl: 9,
+  floorDrawnDesktop: 28,
+  insetByLayer: { control: 12, chip: 9, pill: 5, card: 14, container: 21 },
   floorLeading: 1.5,
 };
 
 async function auditPage(browser, origin, [name, path], vp, shots) {
+  const opts = {
+    ...MEASURE_OPTS,
+    floorHit: vp.touch
+      ? MEASURE_OPTS.floorHitTouch
+      : MEASURE_OPTS.floorHitDesktop,
+    desktop: !vp.touch,
+  };
   const ctx = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
     hasTouch: vp.touch,
@@ -1014,7 +1086,7 @@ async function auditPage(browser, origin, [name, path], vp, shots) {
   );
   page.on("pageerror", (e) => errors.push(String(e).slice(0, 120)));
   const res = await page.goto(origin + path, { waitUntil: "load" });
-  const r = await page.evaluate(measure, MEASURE_OPTS);
+  const r = await page.evaluate(measure, opts);
   r.status = res.status();
   r.errors = errors;
   r.page = name;
@@ -1035,7 +1107,7 @@ async function auditPage(browser, origin, [name, path], vp, shots) {
       await page.click("#nav-toggle");
       await page.waitForTimeout(400);
       const d = await page.evaluate(measure, {
-        ...MEASURE_OPTS,
+        ...opts,
         root: "#mobile-drawer",
       });
       d.page = "drawer";
@@ -1058,7 +1130,7 @@ async function auditPage(browser, origin, [name, path], vp, shots) {
       await page.fill("#search-input", "button").catch(() => {});
       await page.waitForTimeout(1200);
       const d = await page.evaluate(measure, {
-        ...MEASURE_OPTS,
+        ...opts,
         root: "#search-dialog",
       });
       d.page = "search";
@@ -1156,15 +1228,19 @@ const main = async () => {
       );
     if (r.belowHit.length)
       fails.push(
-        `${tag}: ${r.belowHit.length} control(s) under a 49px hit region, e.g. ${r.belowHit[0].el} ${r.belowHit[0].w}x${r.belowHit[0].h} "${r.belowHit[0].text}"`,
+        `${tag}: ${r.belowHit.length} control(s) under a ${r.belowHit[0].need}px hit region, e.g. ${r.belowHit[0].el} ${r.belowHit[0].w}x${r.belowHit[0].h} "${r.belowHit[0].text}"`,
+      );
+    if (r.drawnUnder.length)
+      fails.push(
+        `${tag}: ${r.drawnUnder.length} control(s) drawn under ${r.drawnUnder[0].need}px on desktop, e.g. ${r.drawnUnder[0].el} ${r.drawnUnder[0].drawnH}px "${r.drawnUnder[0].text}"`,
       );
     if (r.gaps.length)
       fails.push(
-        `${tag}: ${r.gaps.length} pair(s) of adjacent controls under a 7px gap, e.g. ${r.gaps[0].a} / ${r.gaps[0].b} ${r.gaps[0].gap}px "${r.gaps[0].text}"`,
+        `${tag}: ${r.gaps.length} pair(s) of adjacent controls under a ${r.gaps[0].need}px gap, e.g. ${r.gaps[0].a} / ${r.gaps[0].b} ${r.gaps[0].gap}px "${r.gaps[0].text}"`,
       );
     if (r.insets.length)
       fails.push(
-        `${tag}: ${r.insets.length} container(s) with text under a 14px inset, e.g. ${r.insets[0].el} ${r.insets[0].side} ${r.insets[0].inset}px "${r.insets[0].text}"`,
+        `${tag}: ${r.insets.length} container(s) with text under a ${r.insets[0].need}px inset, e.g. ${r.insets[0].el} ${r.insets[0].side} ${r.insets[0].inset}px "${r.insets[0].text}"`,
       );
     if (r.leading.length)
       fails.push(
@@ -1219,19 +1295,23 @@ const main = async () => {
     sum((r) => r.proseSmall),
   );
   t(
-    "controls under a 49px hit region (non-inline)",
+    "controls under their hit-region floor (45px touch, 24px desktop)",
     sum((r) => r.belowHit),
+  );
+  t(
+    "controls drawn under 28px on desktop",
+    sum((r) => r.drawnUnder),
   );
   t(
     "overlapping hit regions",
     sum((r) => r.overlaps),
   );
   t(
-    "adjacent controls under a 7px gap",
+    "adjacent controls under their gap floor (9px, 7px where unknown)",
     sum((r) => r.gaps),
   );
   t(
-    "containers with text under a 14px inset",
+    "text under its layer's inset floor (14px where unknown)",
     sum((r) => r.insets),
   );
   t(
@@ -1314,7 +1394,7 @@ const main = async () => {
     if (GUARD) process.exit(1);
   } else
     console.log(
-      "\nfloor holds: no text under 14px, no control under a 49px hit region, 7px between controls, 14px text inset, 1.5 line height, the 1.4.12 stress passes, no sideways scroll, no console errors",
+      "\nfloor holds: no text under 14px, no control under its hit-region floor (45px touch, 24px desktop), gaps and insets at their layer floors, 1.5 line height, the 1.4.12 stress passes, no sideways scroll, no console errors",
     );
 };
 main().catch((e) => {

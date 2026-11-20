@@ -240,6 +240,8 @@ mzizi-site/
 | `/playground`        | Static, dated screenshots of React builds, each linked to its source. Says plainly that none of it is interactive                   |
 | `/architecture`      | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
 | `/tokens`            | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
+| `/bundu-floor`       | The Bundu floor: the minimums no Mzizi screen goes under, beside WCAG 2.2, Apple HIG, Material 3 and Anthropic's brand              |
+| `/spacing`           | The spacing layers (controls, cards, containers, layout), the number rule and its calculator, and the token table                   |
 | `/skills`            | The agent skills, and each one's body at `/skills/<name>`                                                                           |
 | `/observability`     | Where the logs live (the console), and what is file-backed                                                                          |
 | `/ecosystem`         | Every public repository, what it holds, and whether it is routed                                                                    |
