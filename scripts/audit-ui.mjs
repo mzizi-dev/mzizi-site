@@ -29,10 +29,6 @@
  * An element, or anything inside it, carrying `data-mzizi-spacing-exempt="<reason>"`
  * is skipped and counted; the reason is mandatory (the convention the CLI's
  * `mzizi check` reads as a `mzizi-spacing-exempt: <reason>` comment).
- * An element, or anything inside it, carrying `data-mzizi-contrast-exempt="<reason>"` is
- * skipped by the contrast check only, and counted; the reason is mandatory. It is for a
- * colour that is shown on purpose to demonstrate a measured ratio, never for a colour
- * that should be fixed.
  * Inline links inside running text are exempt from the hit region, as in
  * WCAG 2.5.8. Playwright is a devDependency; set PW_EXECUTABLE=<path> or PW_CHANNEL=chrome to use an
  * installed Chrome (CI) instead of Playwright's own chromium.
@@ -255,8 +251,6 @@ function measure({
     leading: [],
     exempt: 0,
     exemptNoReason: [],
-    contrastExempt: 0,
-    contrastExemptNoReason: [],
     headings: [],
     imgs: [],
     links: [],
@@ -288,14 +282,7 @@ function measure({
       out.body.push({ el: sel(el), px, text: t.slice(0, 50) });
     if (seen.has(key)) continue;
     seen.add(key);
-    // contrast (a deliberate demonstration of a measured ratio is exempt, and counted)
-    const cx = el.closest("[data-mzizi-contrast-exempt]");
-    if (cx) {
-      if (!cx.getAttribute("data-mzizi-contrast-exempt").trim())
-        out.contrastExemptNoReason.push(sel(cx));
-      else out.contrastExempt++;
-      continue;
-    }
+    // contrast: every text node, with no exemption
     const bg = back(el);
     if (!bg) continue;
     let fg = rgba(s.color);
@@ -1263,10 +1250,6 @@ const main = async () => {
       fails.push(
         `${tag}: data-mzizi-spacing-exempt without a reason on ${r.exemptNoReason.join(", ")}`,
       );
-    if (r.contrastExemptNoReason.length)
-      fails.push(
-        `${tag}: data-mzizi-contrast-exempt without a reason on ${r.contrastExemptNoReason.join(", ")}`,
-      );
     const st = r.stress;
     if (st) {
       const lost = [...st.clipped, ...st.spill, ...st.truncated];
@@ -1355,10 +1338,6 @@ const main = async () => {
   t(
     "spacing exemptions (data-mzizi-spacing-exempt)",
     rows.reduce((n, r) => n + (r.exempt ?? 0), 0),
-  );
-  t(
-    "contrast exemptions (data-mzizi-contrast-exempt, shown on purpose)",
-    rows.reduce((n, r) => n + (r.contrastExempt ?? 0), 0),
   );
   t(
     "contrast failures (7:1 body, 4.5:1 other)",

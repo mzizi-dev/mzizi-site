@@ -270,11 +270,19 @@ const sources = [
         {
           accents.map((a) => (
             <div class="sw">
-              <div class="pair" data-mzizi-contrast-exempt="demonstrates the measured ratio">
-                <div style={`background:${LIGHT};color:${a.hex}`}>{a.name}</div>
-                <div style={`background:${DARK};color:${a.hex}`}>{a.name}</div>
+              <div class="pair" aria-hidden="true">
+                <div style={`background:${LIGHT}`}>
+                  <span class="fill" style={`background:${a.hex}`}></span>
+                </div>
+                <div style={`background:${DARK}`}>
+                  <span class="fill" style={`background:${a.hex}`}></span>
+                </div>
               </div>
               <div class="meta">
+                <div class="row">
+                  <span>{a.name}</span>
+                  <span class="mono">{a.hex}</span>
+                </div>
                 <div class="row">
                   <span>on Light</span>
                   <span class="mono">{a.onLight} : 1</span>
@@ -282,9 +290,6 @@ const sources = [
                 <div class="row">
                   <span>on Dark</span>
                   <span class="mono">{a.onDark} : 1</span>
-                </div>
-                <div class="row muted">
-                  <span>{a.hex}</span>
                 </div>
               </div>
             </div>
@@ -607,9 +612,17 @@ const sources = [
       grid-template-columns: 1fr 1fr;
     }
 
-    .sw .pair div {
+    .sw .pair > div {
       padding: var(--space-inset);
       font-weight: 600;
+    }
+
+    /* The accent is a filled block, a non-text swatch; its name and ratios are
+       set as text in the page's own ink, which passes 7:1 on both backgrounds. */
+    .sw .pair .fill {
+      display: block;
+      block-size: 3rem;
+      inline-size: 100%;
     }
 
     .sw .meta {
