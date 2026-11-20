@@ -1,0 +1,1024 @@
+---
+/**
+ * /spacing — the Mzizi spacing layers: one value per layer of component
+ * (controls, cards, containers, page layout), each value also that layer's
+ * floor, and the number rule that chooses them.
+ *
+ * Decided by the owner on 19 November 2026. The registry serves these tokens
+ * from Registry 4.45 and later. The values are typed here as the decided spec.
+ */
+import Site from "../layouts/Site.astro";
+
+// ---- the number rule -------------------------------------------------------
+
+const isPrime = (n: number): boolean => {
+  if (n < 2) return false;
+  for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+  return true;
+};
+
+type Layer = "controls" | "cards";
+
+// Controls may use any Mzizi number; cards, containers and page layout use the
+// multiples of 7.
+const isMzizi = (n: number, layer: Layer): boolean =>
+  layer === "cards" ? n % 7 === 0 : n % 3 === 0 || n % 7 === 0 || isPrime(n);
+
+const nextUp = (ref: number, layer: Layer): number => {
+  let n = Math.max(1, Math.round(ref));
+  while (!isMzizi(n, layer)) n++;
+  return n;
+};
+
+// How a Mzizi number is built: 3 × n, 7 × n, or prime.
+const builtFrom = (n: number): string => {
+  const parts: string[] = [];
+  if (n % 3 === 0) parts.push(`3 × ${n / 3}`);
+  if (n % 7 === 0) parts.push(`7 × ${n / 7}`);
+  if (isPrime(n)) parts.push("prime");
+  return parts.length ? parts.join(", also ") : "not a Mzizi number";
+};
+
+const exampleInputs: { ref: number; layer: Layer; what: string }[] = [
+  { ref: 8, layer: "controls", what: "Icon to label, Material 3" },
+  { ref: 16, layer: "controls", what: "Small button padding, Material 3" },
+  { ref: 12, layer: "controls", what: "Chip padding, Material 3" },
+  { ref: 44, layer: "controls", what: "Touch target, WCAG 2.5.5 and Apple" },
+  { ref: 24, layer: "controls", what: "Desktop target, WCAG 2.5.8" },
+  { ref: 16, layer: "cards", what: "Card padding, Material 3" },
+  { ref: 8, layer: "cards", what: "Gap between cards, Material 3" },
+  { ref: 24, layer: "cards", what: "Dialog padding, Material 3" },
+  { ref: 48, layer: "cards", what: "Section spacing, Material 3" },
+];
+const examples = exampleInputs.map((e) => {
+  const value = nextUp(e.ref, e.layer);
+  return { ...e, value, from: builtFrom(value) };
+});
+
+// ---- the token table, as decided (default and dense) -----------------------
+
+type Token = {
+  token: string;
+  px: number;
+  rec: string;
+  source: string;
+  dense: number | null;
+  denseRec: string;
+  denseSource: string;
+  today: string;
+};
+
+const groups: { title: string; note: string; tokens: Token[] }[] = [
+  {
+    title: "Targets",
+    note: "Hit regions. Touch on a coarse pointer or under 64rem; desktop on a fine pointer from 64rem. Dense controls keep these through the hit-area pseudo-element.",
+    tokens: [
+      { token: "--target-floor (touch)", px: 45, rec: "44", source: "2.8125rem · WCAG 2.5.5 · Apple HIG 44 pt", dense: null, denseRec: "", denseSource: "Full hit area kept at every density", today: "49" },
+      { token: "--target-floor (desktop)", px: 24, rec: "24", source: "1.5rem · WCAG 2.5.8", dense: null, denseRec: "", denseSource: "Full hit area kept at every density", today: "28" },
+    ],
+  },
+  {
+    title: "Controls",
+    note: "Buttons, chips and inputs (N2 primitives). The label-to-field gap, --space-label-gap, is 7 (dense 5), from the number rule.",
+    tokens: [
+      { token: "--space-control-x", px: 17, rec: "16", source: "Material 3 small button", dense: 12, denseRec: "12", denseSource: "Material 3 dense button", today: "14 inset floor" },
+      { token: "--space-field-x", px: 17, rec: "16", source: "Material 3 text field", dense: 12, denseRec: "12", denseSource: "Dense text field", today: "14 inset floor" },
+      { token: "--space-control-gap", px: 9, rec: "8", source: "Material 3 icon to label", dense: 7, denseRec: "6", denseSource: "Icon to label, dense", today: "—" },
+      { token: "--space-control-between", px: 9, rec: "8", source: "Material 3 target spacing", dense: 9, denseRec: "8", denseSource: "No dense step: target spacing stays at the default", today: "7 gap floor" },
+      { token: "--space-label-gap", px: 7, rec: "6 to 8", source: "Label to field", dense: 5, denseRec: "4", denseSource: "Material 3", today: "7 gap floor" },
+      { token: "--space-chip-x", px: 12, rec: "12", source: "Material 3 chip", dense: 9, denseRec: "8", denseSource: "Material 3 chip", today: "14 inset floor" },
+      { token: "--spacing-control-sm", px: 33, rec: "32", source: "Control height, small; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "32" },
+      { token: "--spacing-control-dense", px: 33, rec: "32", source: "Control height, dense; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "32" },
+      { token: "--spacing-field-sm", px: 33, rec: "32", source: "Input height, small; rounded up", dense: null, denseRec: "", denseSource: "Height, not padding", today: "32" },
+      { token: "--spacing-control-lg", px: 41, rec: "40", source: "Control height, large; rounded up (41 is the nearest Mzizi number)", dense: null, denseRec: "", denseSource: "Height, not padding", today: "40" },
+      { token: "--touch-target-sm", px: 41, rec: "40", source: "Small touch target; rounded up (41 is the nearest Mzizi number)", dense: null, denseRec: "", denseSource: "Height, not padding", today: "40" },
+    ],
+  },
+  {
+    title: "Pills and badges",
+    note: "Status pills and badges. They no longer use the 14 px inline inset.",
+    tokens: [
+      { token: "--space-pill-x", px: 9, rec: "8", source: "Pill and badge inline padding", dense: 5, denseRec: "4", denseSource: "M3 badge", today: "14 inline inset" },
+      { token: "--space-pill-gap", px: 5, rec: "4", source: "Pill icon to label", dense: 3, denseRec: "2", denseSource: "Dense pill gap", today: "—" },
+    ],
+  },
+  {
+    title: "Cards",
+    note: "Cards, list items and tiles (N3 composites). The gap between sibling items in a list, grid or toolbar is --space-card-gap, 14 (dense 7), from the number rule.",
+    tokens: [
+      { token: "--space-card", px: 21, rec: "16", source: "Material 3 card", dense: 14, denseRec: "12", denseSource: "M3 list item", today: "14 inset floor" },
+      { token: "--space-card-stack", px: 7, rec: "4", source: "Title to body", dense: 7, denseRec: "4", denseSource: "Title to body, dense", today: "7 gap floor" },
+      { token: "--space-card-gap", px: 14, rec: "8", source: "Material 3 card gap", dense: 7, denseRec: "4", denseSource: "Dense card gap", today: "7 gap floor" },
+    ],
+  },
+  {
+    title: "Containers",
+    note: "Dialogs, sheets and panels.",
+    tokens: [
+      { token: "--space-container", px: 28, rec: "24", source: "Material 3 dialog", dense: 21, denseRec: "16", denseSource: "M3 sheet", today: "14 inset floor" },
+      { token: "--space-container-gap", px: 21, rec: "16", source: "Material 3 dialog", dense: 14, denseRec: "12", denseSource: "Dense dialog gap", today: "7 gap floor" },
+    ],
+  },
+  {
+    title: "Layout",
+    note: "The page edge and the gaps between sections.",
+    tokens: [
+      { token: "--space-page-x", px: 17, rec: "16", source: "Apple and Material 3 compact", dense: null, denseRec: "", denseSource: "No dense step", today: "—" },
+      { token: "--space-page-x-wide", px: 28, rec: "24", source: "Material 3 medium and expanded", dense: 21, denseRec: "16 to 24", denseSource: "Material 3 medium and expanded", today: "—" },
+      { token: "--space-section", px: 49, rec: "48", source: "Section spacing", dense: 28, denseRec: "24", denseSource: "Section spacing, dense", today: "—" },
+    ],
+  },
+];
+
+const tokenRows = groups.map((g) => ({
+  ...g,
+  tokens: g.tokens.map((t) => ({
+    ...t,
+    from: builtFrom(t.px),
+    denseFrom: t.dense === null ? "—" : builtFrom(t.dense),
+  })),
+}));
+
+// The ladder, drawn at real size, sorted strictly by value (default values).
+const ladder = [
+  { name: "Pill gap, icon to label", token: "--space-pill-gap", px: 5, layer: "controls" },
+  { name: "Label to field", token: "--space-label-gap", px: 7, layer: "controls" },
+  { name: "Card stack, title to body", token: "--space-card-stack", px: 7, layer: "cards" },
+  { name: "Pill padding", token: "--space-pill-x", px: 9, layer: "controls" },
+  { name: "Control gap, icon to label", token: "--space-control-gap", px: 9, layer: "controls" },
+  { name: "Control gap, between targets", token: "--space-control-between", px: 9, layer: "controls" },
+  { name: "Chip padding", token: "--space-chip-x", px: 12, layer: "controls" },
+  { name: "Card gap", token: "--space-card-gap", px: 14, layer: "cards" },
+  { name: "Control padding, button and field", token: "--space-control-x", px: 17, layer: "controls" },
+  { name: "Page edge, phone", token: "--space-page-x", px: 17, layer: "layout" },
+  { name: "Card padding", token: "--space-card", px: 21, layer: "cards" },
+  { name: "Container gap", token: "--space-container-gap", px: 21, layer: "containers" },
+  { name: "Container padding", token: "--space-container", px: 28, layer: "containers" },
+  { name: "Page edge, wide", token: "--space-page-x-wide", px: 28, layer: "layout" },
+  { name: "Section", token: "--space-section", px: 49, layer: "layout" },
+];
+---
+
+<Site
+  title="Spacing layers"
+  eyebrow="Mzizi tokens · spacing"
+  description="The Mzizi spacing layers: one value for each layer of component, controls, cards, containers and page layout, each value also that layer's floor, and the number rule that chooses them."
+  lede="One spacing level for each layer of component: controls, cards, containers and page layout. Each level's value is also its floor. Controls sit tightest, and every layer above them steps up on the seven."
+  wide
+>
+  <div class="spacing">
+    <aside class="status" aria-labelledby="in-progress">
+      <strong id="in-progress">Registry 4.45 and later.</strong>
+      <span>
+        These tokens were decided on 19 November 2026. <a href="/bundu-floor">The
+        Bundu floor</a> sets the hit-area minimums they start from. Before them,
+        the floors were 49 px touch, 28 px desktop, a 14 px inset and a 7 px gap.
+      </span>
+    </aside>
+
+    <section id="rule" class="block">
+      <p class="eyebrow">The number rule</p>
+      <h2>Multiples of 3 or 7, or a prime number</h2>
+      <p class="prose">
+        Every Mzizi spacing or size value is a multiple of 3, a multiple of 7, or
+        a prime number. Start from the recommended value (WCAG, Apple HIG or
+        Material 3) and take the nearest Mzizi number at or above it. A little
+        larger is fine; lower never is.
+      </p>
+      <div class="rule-grid">
+        <div class="panel">
+          <h3>Layers that step on the seven</h3>
+          <p>
+            Cards, containers and section spacing use multiples of 7: 7, 14, 21, 28
+            and 49. The phone page edge is 17, a prime, the one layout value the
+            owner set outside the seven.
+          </p>
+        </div>
+        <div class="panel">
+          <h3>Controls may sit tighter</h3>
+          <p>
+            Controls may use any Mzizi number, so they can sit tighter: 9 between
+            neighbours, 12 for a chip, 17 for a button.
+          </p>
+        </div>
+        <div class="panel">
+          <h3>Why 45</h3>
+          <p>
+            44 is 4 × 11, so it is not a Mzizi number. The next one up is 45 =
+            3 × 15, which is the touch floor.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dense" class="block">
+      <p class="eyebrow">Default and dense</p>
+      <h2>White space where it serves, dense where the content needs it</h2>
+      <p class="prose">
+        Each layer has a default value and a dense value. Both are floors: the
+        default is the floor at default density, the dense value is the absolute
+        floor, and nothing goes below dense. A screen that has room uses the
+        default; a screen that is full, a table or a list of many items, can step
+        down to dense.
+      </p>
+      <p class="prose">
+        Dense controls are drawn smaller but keep the full hit area, 45 px on touch
+        and 24 px on desktop, through the hit-area pseudo-element. The dense tokens
+        are named <code>&lt;token&gt;-dense</code>, for example{" "}
+        <code>--space-card-dense</code>. Control gap between targets has no dense
+        step: it stays at 9.
+      </p>
+    </section>
+
+    <section id="calculator" class="block">
+      <p class="eyebrow">Try it</p>
+      <h2>Number calculator</h2>
+      <div class="calc panel">
+        <div class="calc-row">
+          <label for="ref">Recommended value (px)</label>
+          <input id="ref" type="number" min="1" max="10000" step="1" value="44" inputmode="numeric" />
+        </div>
+        <div class="calc-row">
+          <label for="layer">Layer</label>
+          <select id="layer">
+            <option value="controls" selected>Controls: 3, 7 or prime</option>
+            <option value="cards">Cards and up: multiple of 7</option>
+          </select>
+        </div>
+        <p class="result-line">
+          <span class="muted">Mzizi value</span>
+          <output id="out" class="result">45</output>
+        </p>
+        <p id="why" class="why" aria-live="polite">44 is 4 × 11. The next Mzizi number up is 45 = 3 × 15.</p>
+      </div>
+
+      <h3 class="sub">Worked examples</h3>
+      <p class="prose muted">
+        The same rule, applied to recommended values from the three systems. The
+        table is computed when the page is built, so it reads with scripts off.
+      </p>
+      <div class="scroller table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Recommended</th>
+              <th scope="col">Layer</th>
+              <th scope="col">Where it comes from</th>
+              <th scope="col">Mzizi value</th>
+              <th scope="col">Built from</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              examples.map((e) => (
+                <tr>
+                  <td class="num">{e.ref}</td>
+                  <td>{e.layer === "cards" ? "Cards and up" : "Controls"}</td>
+                  <td>{e.what}</td>
+                  <td class="num">{e.value}</td>
+                  <td class="mono">{e.from}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="specimen" class="block">
+      <p class="eyebrow">Live specimen</p>
+      <h2>The layers, nested</h2>
+      <p class="prose">
+        A dialog built from the values above: a container holding cards that
+        hold controls. Turn on the overlay to see each layer's padding in its own
+        colour.
+      </p>
+      <label class="toggle">
+        <input id="overlay" type="checkbox" />
+        Show spacing
+      </label>
+
+      <div class="stage" id="stage">
+        <div class="dialog">
+          <span class="tag tl">container 28 · gap 21</span>
+          <div class="dialog-head">
+            <h3>Choose a data bundle</h3>
+            <p class="muted">Prices in US dollars. Bundles last 30 days and roll over once.</p>
+          </div>
+          <div class="cards">
+            <article class="card">
+              <span class="tag tl">card 21 · stack 7</span>
+              <span class="chip-tag" data-mzizi-layer="chip">Popular</span>
+              <h4>Daily 1 GB</h4>
+              <p class="price">$1.00</p>
+              <p class="muted">For the market day: maps, payments and WhatsApp.</p>
+              <div class="actions">
+                <button type="button" class="btn">Buy</button>
+                <button type="button" class="btn ghost">Details</button>
+              </div>
+            </article>
+            <article class="card">
+              <span class="tag tl">card gap 14</span>
+              <h4>Family</h4>
+              <p class="muted">Shared 10 GB</p>
+              <p class="price">$7.00</p>
+              <p class="muted">One bundle for every phone in the household.</p>
+              <div class="actions">
+                <button type="button" class="btn">Buy</button>
+                <button type="button" class="btn ghost">Details</button>
+              </div>
+            </article>
+          </div>
+          <div class="dialog-foot">
+            <button type="button" class="btn ghost">Cancel</button>
+            <button type="button" class="btn">Continue</button>
+          </div>
+        </div>
+      </div>
+      <p class="prose muted">
+        Buttons are 49 px tall on touch (56 for the large size), with 17 px of side padding and 9 px
+        between the icon and the label. Chips are drawn at 30 px with 12 px of
+        side padding. A chip is a label, not a control, so it has no hit region of
+        its own. Neighbouring controls sit 9 px apart.
+      </p>
+    </section>
+
+    <section id="ladder" class="block">
+      <p class="eyebrow">To scale</p>
+      <h2>The ladder</h2>
+      <p class="prose">
+        Every value drawn at its real size in px, from tightest to loosest.
+        Colour shows the layer.
+      </p>
+      <div class="ladder">
+        {
+          ladder.map((r) => (
+            <div class={`rung l-${r.layer}`}>
+              <span class="name">
+                {r.name}{" "}
+                <small>
+                  {r.token} · {r.px} px
+                </small>
+              </span>
+              <span class="bar" style={`width:${r.px}px`} aria-hidden="true" />
+            </div>
+          ))
+        }
+      </div>
+      <div class="legend">
+        <span><i class="sw-controls" /> Controls</span>
+        <span><i class="sw-cards" /> Cards</span>
+        <span><i class="sw-containers" /> Containers</span>
+        <span><i class="sw-layout" /> Layout</span>
+      </div>
+    </section>
+
+    <section id="tokens" class="block">
+      <p class="eyebrow">Tokens</p>
+      <h2>Every value, and where it comes from</h2>
+      {
+        tokenRows.map((g) => (
+          <div class="token-group">
+            <h3>{g.title}</h3>
+            <p class="muted">{g.note}</p>
+            <div class="scroller table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Token</th>
+                    <th scope="col">Default</th>
+                    <th scope="col">Built from</th>
+                    <th scope="col">Recommended</th>
+                    <th scope="col">Dense</th>
+                    <th scope="col">Built from</th>
+                    <th scope="col">Dense recommended</th>
+                    <th scope="col">Before 4.45</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {g.tokens.map((t) => (
+                    <tr>
+                      <td class="mono">{t.token}</td>
+                      <td class="num">{t.px} px</td>
+                      <td class="mono">{t.from}</td>
+                      <td>
+                        {t.rec} · {t.source}
+                      </td>
+                      <td class="num">{t.dense === null ? "—" : `${t.dense} px`}</td>
+                      <td class="mono">{t.denseFrom}</td>
+                      <td>{t.dense === null ? "—" : `${t.denseRec} · ${t.denseSource}`}</td>
+                      <td class="muted">{t.today}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))
+      }
+      <p class="prose muted">
+        Both values are floors. The default is the floor at default density, the
+        dense value is the absolute floor, and nothing goes below dense. A component
+        can go larger, never smaller. No brand pack or density layer can lower one.
+      </p>
+    </section>
+
+    <section id="changes" class="block">
+      <p class="eyebrow">Changes in 4.45</p>
+      <h2>What a reader will see</h2>
+      <ul class="changes">
+        <li>
+          <strong>Touch target 49 → 45 px.</strong> Desktop 28 → 24 px.
+        </li>
+        <li>
+          <strong>The gap between controls goes 7 → 9 px.</strong> Material asks
+          for 8, and 9 is the next Mzizi number. The 7 px value remains only as
+          the card stack gap.
+        </li>
+        <li>
+          <strong>The single 14 px inset floor becomes a floor per layer,</strong>{" "}
+          each with a dense step: 17 px for buttons and fields (12 dense), 12 px
+          for chips (9 dense), 21 px for cards (14 dense), 28 px for containers
+          (21 dense).
+        </li>
+        <li>
+          <strong>Control heights round up onto the rule:</strong> the small
+          control, dense control and small input heights 32 → 33 (3 × 11), the large
+          control height 40 → 41 (prime), and <code>--touch-target-sm</code> 40 → 41
+          (prime). 36, 28, 48 and 56 are already valid.
+        </li>
+        <li>
+          <strong>Status pills and badges use <code>--space-pill-x</code>, 9 px
+          (5 dense),</strong> and <code>--space-pill-gap</code>, 5 px (3 dense).
+          The 14 px inline inset on pills is replaced.
+        </li>
+        <li>
+          <strong>The page edge is 17 px on phones</strong>, a prime the owner chose.
+          It is the one layout value outside the multiples of 7. The wide edge is 28 px
+          on wide
+          screens (21 dense), against the 16 px of Material 3's compact margin
+          and the 16 to 20 px of Apple's layout margins.
+        </li>
+        <li>
+          <strong>Enforcement:</strong> a layer-aware checker ships with the tokens.
+          Each component is checked against its own layer's dense floor.
+        </li>
+        <li>
+          <strong>Unchanged:</strong> body text, captions, contrast (7 : 1 body,
+          4.5 : 1 other text, 3 : 1 UI parts) and the 1.5 body leading.
+        </li>
+      </ul>
+      <p class="prose">
+        Screens built on the old 7 and 14 values get a little roomier when they
+        update. Nothing breaks.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    // The calculator. The static HTML already shows the default answer; this
+    // keeps it live. The rule is the same as the build-time one above.
+    const isPrime = (n: number): boolean => {
+      if (n < 2) return false;
+      for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+      return true;
+    };
+    const isMzizi = (n: number, layer: string): boolean =>
+      layer === "cards" ? n % 7 === 0 : n % 3 === 0 || n % 7 === 0 || isPrime(n);
+    const parts = (n: number): string => {
+      const out: string[] = [];
+      if (n % 3 === 0) out.push(`3 × ${n / 3}`);
+      if (n % 7 === 0) out.push(`7 × ${n / 7}`);
+      if (isPrime(n)) out.push("prime");
+      return out.join(", also ");
+    };
+    // Factor n the way the page writes it. An even number takes its smallest odd factor
+    // (44 is 4 × 11, not 2 × 22); a power of two is 2 × n/2.
+    const describe = (n: number): string => {
+      if (isPrime(n)) return "prime";
+      for (let q = 3; q < n; q += 2)
+        if (n % q === 0) return n % 2 === 0 ? `${n / q} × ${q}` : `${q} × ${n / q}`;
+      return `2 × ${n / 2}`;
+    };
+
+    const ref = document.getElementById("ref") as HTMLInputElement;
+    const layer = document.getElementById("layer") as HTMLSelectElement;
+    const out = document.getElementById("out") as HTMLOutputElement;
+    const why = document.getElementById("why") as HTMLElement;
+
+    // The search for the next Mzizi number always ends, because the input is clamped.
+    const MAX = 10000;
+    const calc = () => {
+      const typed = Math.round(Number(ref.value));
+      if (!Number.isFinite(typed) || typed < 1) {
+        out.textContent = "—";
+        why.textContent = `Enter a whole number of pixels, from 1 to ${MAX}.`;
+        return;
+      }
+      const r = Math.min(Math.max(typed, 1), MAX);
+      const clamped = typed > MAX ? `Values stop at ${MAX}. ` : "";
+      let n = r;
+      while (!isMzizi(n, layer.value)) n++;
+      out.textContent = String(n);
+      const sevens = layer.value === "cards";
+      if (n === r) {
+        why.textContent = `${clamped}${r} is already a Mzizi number (${sevens ? `7 × ${r / 7}` : parts(r)}).`;
+      } else {
+        const from = sevens ? `${r} is not a multiple of 7` : `${r} is ${describe(r)}`;
+        const built = sevens ? `7 × ${n / 7}` : parts(n);
+        why.textContent = `${clamped}${from}. The next Mzizi number up is ${n} = ${built}.`;
+      }
+    };
+    ref.addEventListener("input", calc);
+    layer.addEventListener("change", calc);
+    calc();
+
+    // The overlay: one colour per layer, drawn with inset shadows.
+    const overlay = document.getElementById("overlay") as HTMLInputElement;
+    const stage = document.getElementById("stage") as HTMLElement;
+    overlay.addEventListener("change", () => {
+      stage.classList.toggle("show", overlay.checked);
+    });
+  </script>
+
+  <style>
+    /* The values, scoped to this page. The registry serves the same tokens from
+       Registry 4.45 and later. */
+    .spacing {
+      --target-floor: 2.8125rem;
+      --space-control-x: 17px;
+      --space-chip-x: 12px;
+      --space-pill-x: 9px;
+      --space-pill-gap: 5px;
+      --space-control-x-dense: 12px;
+      --space-field-x-dense: 12px;
+      --space-control-gap-dense: 7px;
+      --space-chip-x-dense: 9px;
+      --space-pill-x-dense: 5px;
+      --space-pill-gap-dense: 3px;
+      --space-card-dense: 14px;
+      --space-card-gap-dense: 7px;
+      --space-container-dense: 21px;
+      --space-section-dense: 28px;
+      --space-field-x: 17px;
+      --space-control-gap: 9px;
+      --space-control-between: 9px;
+      --space-card: 21px;
+      --space-card-stack: 7px;
+      --space-card-gap: 14px;
+      --space-container: 28px;
+      --space-container-gap: 21px;
+      --space-page-x: 17px;
+      --space-page-x-wide: 28px;
+      --space-section: 49px;
+      --layer-control: var(--primary);
+      --layer-card: #1d6b52;
+      --layer-container: #2a4f9a;
+      --layer-layout: var(--foreground);
+      display: grid;
+      gap: var(--space-section);
+      padding-block: var(--space-lg) var(--space-section);
+    }
+
+    .block {
+      display: grid;
+      gap: var(--space-container-gap);
+      scroll-margin-top: var(--space-xl);
+    }
+
+    .block h2 {
+      margin-block: 0;
+    }
+
+    .sub {
+      margin-block-start: var(--space-md);
+      font-size: var(--text-h5);
+    }
+
+    /* Muted text is 80% of the foreground: 7 : 1 on both surfaces, in both themes. */
+    .muted {
+      color: color-mix(in srgb, var(--foreground) 80%, var(--background));
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .num {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .status {
+      background: var(--surface-container);
+      border-inline-start: 3px solid var(--warning);
+      padding: var(--space-card-gap) var(--space-card);
+      font-size: var(--text-body-small);
+      line-height: var(--leading-body-small);
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .status strong {
+      color: var(--warning);
+    }
+
+    /* The rule */
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+      gap: var(--space-card-gap);
+    }
+
+    .panel {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      padding: var(--space-card);
+      display: grid;
+      gap: var(--space-card-stack);
+      align-content: start;
+      min-width: 0;
+    }
+
+    .panel h3 {
+      font-size: var(--text-h5);
+    }
+
+    /* The calculator */
+    .calc {
+      max-width: 36rem;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-control-between);
+    }
+
+    .calc-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-control-between);
+      min-inline-size: 0;
+    }
+
+    .calc-row select {
+      inline-size: min(100%, 24rem);
+    }
+
+    .calc label {
+      font-weight: 600;
+      font-size: var(--text-body-small);
+    }
+
+    .calc input[type="number"],
+    .calc select {
+      min-block-size: 3.0625rem;
+      padding-inline: var(--space-field-x);
+      border: 1px solid var(--muted-foreground);
+      border-radius: var(--radius-sm);
+      background: var(--background);
+      color: var(--foreground);
+      font: 600 1rem var(--font-mono);
+    }
+
+    .calc input[type="number"] {
+      inline-size: 8.5rem;
+      max-inline-size: 100%;
+    }
+
+    .calc select {
+      max-inline-size: 100%;
+    }
+
+    .result-line {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-card-gap);
+    }
+
+    /* The result is the primary, deepened toward the foreground: 7 : 1 or more. */
+    .result {
+      font-family: var(--font-mono);
+      font-size: var(--text-h3);
+      font-weight: 700;
+      color: color-mix(in srgb, var(--primary) 55%, var(--foreground));
+    }
+
+    .why {
+      color: var(--muted-foreground);
+      font-size: var(--text-body-small);
+      overflow-wrap: anywhere;
+    }
+
+    /* Tables: the site's own rules, with page-width tables kept whole. */
+    .table-wrap {
+      border: 1px solid var(--border);
+      margin-block: 0;
+    }
+
+    .table-wrap table {
+      min-width: 46rem;
+    }
+
+    .table-wrap th,
+    .table-wrap td {
+      padding: var(--space-sm) var(--space-md);
+    }
+
+    .token-group {
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .token-group h3 {
+      margin-block-start: var(--space-md);
+    }
+
+    /* The toggle: a real checkbox with its own hit region. */
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-control-gap);
+      min-block-size: var(--target-floor);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toggle input {
+      inline-size: var(--target-floor);
+      block-size: var(--target-floor);
+      margin: 0;
+      accent-color: var(--primary);
+    }
+
+    /* The specimen */
+    .stage {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      padding-block: var(--space-section);
+      padding-inline: var(--space-page-x);
+      overflow-x: auto;
+    }
+
+    @media (min-width: 56rem) {
+      .stage {
+        padding-inline: var(--space-page-x-wide);
+      }
+    }
+
+    .dialog {
+      position: relative;
+      max-width: 44rem;
+      margin-inline: auto;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-container);
+      display: grid;
+      gap: var(--space-container-gap);
+    }
+
+    .dialog-head {
+      display: grid;
+      gap: var(--space-card-stack);
+    }
+
+    .dialog-head h3 {
+      font-size: var(--text-h4);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+      gap: var(--space-card-gap);
+    }
+
+    .card {
+      position: relative;
+      display: grid;
+      gap: var(--space-card-stack);
+      align-content: start;
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-card);
+      min-width: 0;
+    }
+
+    .card h4 {
+      font-size: var(--text-h5);
+    }
+
+    .price {
+      font-family: var(--font-mono);
+      font-size: var(--text-h4);
+      font-weight: 600;
+    }
+
+    .card .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-control-between);
+      margin-block-start: var(--space-card-gap);
+    }
+
+    .chip-tag {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      min-block-size: 30px;
+      padding-inline: var(--space-chip-x);
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--foreground);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    /* Buttons are drawn at their full size, with the hit region kept at 45 px on touch. */
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-control-gap);
+      min-block-size: 3.0625rem;
+      padding-inline: var(--space-control-x);
+      border-radius: 999px;
+      border: 1px solid var(--foreground);
+      background: var(--foreground);
+      color: var(--background);
+      font: 600 0.95rem var(--font-sans);
+      cursor: pointer;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--foreground);
+    }
+
+    .dialog-foot {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-control-between);
+    }
+
+    /* The overlay: each layer's padding in its own colour. */
+    .tag {
+      display: none;
+      position: absolute;
+      inset-block-start: -10px;
+      inset-inline-start: 10px;
+      z-index: 2;
+      background: var(--foreground);
+      color: var(--background);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      padding: 3px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .show .tag {
+      display: inline-block;
+    }
+
+    .show .dialog {
+      box-shadow: inset 0 0 0 var(--space-container) color-mix(in srgb, var(--layer-container) 18%, transparent);
+    }
+
+    .show .card {
+      box-shadow: inset 0 0 0 var(--space-card) color-mix(in srgb, var(--layer-card) 20%, transparent);
+    }
+
+    .show .btn {
+      box-shadow:
+        inset var(--space-control-x) 0 0 0 color-mix(in srgb, var(--layer-control) 45%, transparent),
+        inset calc(-1 * var(--space-control-x)) 0 0 0 color-mix(in srgb, var(--layer-control) 45%, transparent);
+    }
+
+    .show .chip-tag {
+      box-shadow:
+        inset var(--space-chip-x) 0 0 0 color-mix(in srgb, var(--layer-control) 40%, transparent),
+        inset calc(-1 * var(--space-chip-x)) 0 0 0 color-mix(in srgb, var(--layer-control) 40%, transparent);
+    }
+
+    .show .cards,
+    .show .dialog-foot,
+    .show .card .actions {
+      outline: 1px dashed var(--layer-control);
+    }
+
+    /* The ladder */
+    .ladder {
+      display: grid;
+      gap: var(--space-control-between);
+    }
+
+    .rung {
+      display: grid;
+      grid-template-columns: minmax(10rem, 15rem) 1fr;
+      gap: var(--space-card-gap);
+      align-items: center;
+    }
+
+    .rung .bar {
+      display: block;
+      height: 18px;
+      border-radius: 2px;
+      background: var(--layer-control);
+      max-width: 100%;
+    }
+
+    .rung.l-cards .bar {
+      background: var(--layer-card);
+    }
+
+    .rung.l-containers .bar {
+      background: var(--layer-container);
+    }
+
+    .rung.l-layout .bar {
+      background: var(--layer-layout);
+    }
+
+    .rung .name {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .rung .name small {
+      display: block;
+      font-size: 1em;
+      font-weight: 400;
+      color: var(--muted-foreground);
+    }
+
+    @media (max-width: 34rem) {
+      .rung {
+        grid-template-columns: 1fr;
+        gap: var(--space-xxs);
+      }
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-card-gap);
+      font-size: var(--text-caption);
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-control-gap);
+    }
+
+    .legend i {
+      display: inline-block;
+      inline-size: 14px;
+      block-size: 14px;
+      border-radius: 3px;
+    }
+
+    .sw-controls {
+      background: var(--layer-control);
+    }
+
+    .sw-cards {
+      background: var(--layer-card);
+    }
+
+    .sw-containers {
+      background: var(--layer-container);
+    }
+
+    .sw-layout {
+      background: var(--layer-layout);
+    }
+
+    /* Dark values for the card and container layers, so the ladder and the overlay
+       read on the dark surface. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .spacing {
+        --layer-card: #4fb892;
+        --layer-container: #7ea6f0;
+      }
+    }
+
+    :root[data-theme="dark"] .spacing {
+      --layer-card: #4fb892;
+      --layer-container: #7ea6f0;
+    }
+
+    .changes {
+      margin: 0;
+      padding-inline-start: 1.1em;
+      display: grid;
+      gap: var(--space-control-between);
+    }
+  </style>
+</Site>

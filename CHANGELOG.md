@@ -21,6 +21,17 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — /bundu-floor and /spacing: the Bundu floor and the spacing layers (2026-11-19)
+
+Two pages, decided by the owner on 19 November 2026. The registry serves these tokens from Registry 4.45 and later.
+
+- **`/bundu-floor`** sets the minimums no Mzizi screen goes under beside WCAG 2.2, Apple's Human Interface Guidelines, Google's Material 3 and Anthropic's brand guidelines. It has the comparison table, a to-scale drawing of the target sizes (45 px touch, 24 px desktop), Anthropic's accents measured against the brand's own backgrounds, each system's principles, where the Bundu floor stands, who the floor serves, and the sources.
+- **`/spacing`** sets one spacing value for each layer of component (controls, cards, containers, page layout), each also that layer's floor, and the number rule that chooses them: a multiple of 3, a multiple of 7, or a prime, the nearest at or above the recommended value. It has a number calculator and a table of worked examples, a live specimen with a spacing overlay, the ladder drawn at real size, the token table, and what changes in 4.45.
+- Both pages are in the site navigation and the footer. `/ecosystem` has a paragraph under its seven engineering constraints list that links to both pages. `llms.txt` describes both pages and their key values.
+- The UI guard checks both pages at all three viewports, with no contrast exemption. The Anthropic accents on `/bundu-floor` are shown as filled, non-text swatches, and their measured ratios are stated as text in the page's own ink.
+
+From Registry 4.45, a reader sees: touch targets 49 px to 45 px, desktop targets 28 px to 24 px, the gap between neighbouring controls 7 px to 9 px, and the single 14 px inset floor replaced by a floor for each layer (17 px buttons and fields, 21 px cards, 28 px containers). Control heights move 32 to 33 px (small, dense and input), 40 to 41 px (large) and 40 to 41 px (small touch target). Chips use 12 px of side padding and pills and badges 9 px, in place of the 14 px inline inset on pills. The phone page edge is 17 px, a value the owner chose. On `/tokens`, the card and container specimens state 21 px (dense 14) and 28 px (dense 21), and native fields are drawn at their component height on touch, 49 px. Every layer also has a dense step, its own floor below the default, so a full screen can tighten without going under the hit area. The label-to-field gap (7 px, 5 dense) and the card gap for sibling items in a list (14 px, 7 dense) are set by the number rule and confirmed by the owner. Body text, captions, contrast and line height do not change.
+
 ### Changed — Mzizi tools, runtime, crates and org policy (2026-11-17)
 
 - **Added: the Bundu ecosystem and doctrine on `/ecosystem` and `llms.txt`.** The four
