@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Fixed — build check expects the button's N2 React source (2026-11-21)
+
+The rendered-page check in `scripts/verify-rendered.py` looked for the retired class-variance-authority import on `/components/button`. The registry now serves the N2 primitive, which imports `Slot` from `radix-ui`, so the check now looks for that line. No reader sees a difference: the page already rendered its source correctly.
+
 ### Added — /bundu-floor and /spacing: the Bundu floor and the spacing layers (2026-11-19)
 
 Two pages, decided by the owner on 19 November 2026. The registry serves these tokens from Registry 4.45 and later.
