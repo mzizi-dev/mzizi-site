@@ -28,7 +28,7 @@
  * 0.12em, word 0.16em, injected as CSS) with no clipped or overflowing text.
  * An element, or anything inside it, carrying `data-mzizi-spacing-exempt="<reason>"`
  * is skipped and counted; the reason is mandatory (the convention the CLI's
- * `mzizi check` reads as a `mzizi-spacing-exempt: <reason>` comment).
+ * `mz floor` reads as a `mzizi-spacing-exempt: <reason>` comment).
  * Inline links inside running text are exempt from the hit region, as in
  * WCAG 2.5.8. Playwright is a devDependency; set PW_EXECUTABLE=<path> or PW_CHANNEL=chrome to use an
  * installed Chrome (CI) instead of Playwright's own chromium.

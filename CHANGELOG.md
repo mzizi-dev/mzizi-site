@@ -24,6 +24,7 @@ cut, the Unreleased entries move under it.
 ### Changed — dependency updates (2026-11-23)
 
 - **Changed:** minor and patch updates to seven npm dependencies (Dependabot group). No page, URL or agent-facing file changes; readers of the site see no difference.
+- **Changed:** the CLI is `mz` (mzizi-cli 0.14.1, one Rust binary): the `/cli` page, `/components`, the component pages, `/bundu-floor` and `llms.txt` say `mz add` and `mz floor` (was `mzizi add` and `mzizi check`), give `npx @nyuchi/mzizi-cli add button --dry-run`, `npm install --global @nyuchi/mzizi-cli` and `cargo install mzizi-cli --locked` as the install lines, and call `mzizi` and `fundi` deprecated names. `llms.txt` states `@nyuchi/mzizi-cli` 0.14.1 (was 0.11.0). `scripts/verify-rendered.py` and `scripts/audit-ui.mjs` follow the new command names. Built the site locally and checked: `astro check` 0 errors, `verify-rendered.py` passes. `scripts/check-facts.py` fails on the same language-page lines before and after this change (compiler line count, RFC links, benchmark arms); those are not touched here.
 
 ### Fixed — build check expects the button's N2 React source (2026-11-21)
 
