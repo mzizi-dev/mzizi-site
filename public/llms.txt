@@ -48,7 +48,7 @@ program, errors mapped back to `.mz`, and Rust crate interop), so do not call Mz
   compiler (lexer, recovering parser, name and type resolver,
   content-addressed IR, the agent diagnostic protocol behind
   `mz check --agent`, `mz fix` and `mz contract`), `@nyuchi/mzizi-cli`
-  (`mzizi add` and the `fundi` agent), `mz build` (a service, to a local
+  (the same `mz` binary: `mz add`, `mz floor` and the `fundi` agent commands), `mz build` (a service, to a local
   Rust + axum package, or a program, to a Rust package with no
   dependencies), `mz run` (builds and runs a program), `mz harness` (prints
   the language harness's definition), the MCP server at `mcp.mzizi.dev`, the
@@ -212,7 +212,7 @@ toward M2) and were read on 11 November.
     Tracker rows U1, U7 and U11 are 🟡 on `staging`, and none is ✅.
   - Three server components written in Mzizi as programs, `examples/components/`: a circuit
     breaker, `base64url` and a rate gate ([#157](https://github.com/mzizi-dev/mzizi/pull/157)). None is a library another file can
-    import, none is installed with `mzizi add`, and none is the registry's component. Building
+    import, none is installed with `mz add`, and none is the registry's component. Building
     them found seven gaps (K1 to K7), all ❌ in the tracker. RFC-0018, a draft, designs function
     values for K5 ([#159](https://github.com/mzizi-dev/mzizi/pull/159)); nothing in it is built.
   - `mz check` and `mz contract` take a directory ([#155](https://github.com/mzizi-dev/mzizi/pull/155)).
@@ -326,13 +326,13 @@ Versions on 2026-11-17 (read the registries before repeating one):
   skills from `get_skills`. How to connect each AI client (Claude, ChatGPT, Codex, the Claude
   and OpenAI APIs, Cursor, VS Code, Gemini CLI, OpenCode, Windsurf):
   <https://docs.mzizi.dev/toolchain/connect>
-- `@nyuchi/mzizi-cli` **0.11.0**, which ships the installer: `mzizi add <name>`
+- `@nyuchi/mzizi-cli` **0.14.1**, the Mzizi CLI (one Rust binary, `mz`; also `cargo install mzizi-cli`): `mz add <name>`
   for React (writes the TSX), Rust (records the crate the component's
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
   Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
-  `src/components/mzizi/`), plus the `fundi` agent, and (from 0.8.0) `mzizi check`,
+  `src/components/mzizi/`), plus the `fundi` agent commands, and `mz floor` (called `mzizi check` before 0.14.0),
   which fails on padding, gaps and line heights under the spacing floor.
-  `npx mzizi` works.
+  `npx @nyuchi/mzizi-cli add <name>` works; `mzizi` and `fundi` are deprecated names of `mz`.
 - Mzizi Roots on crates.io, all **0.8.0**: `mzizi-tokens`, `mzizi-ui`, `mzizi-brand`,
   `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`, `mzizi-discovery`, and the
   umbrellas `mzizi-roots` (UI) and `mzizi-roots-server` (server). `cargo add mzizi-roots`

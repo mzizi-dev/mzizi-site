@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed
+
+- **The CLI is `mz`** (mzizi-cli 0.14.1, one Rust binary): the `/cli` page, `/components`, the component pages, `/bundu-floor` and `llms.txt` say `mz add` and `mz floor` (was `mzizi add` and `mzizi check`), give `npx @nyuchi/mzizi-cli add button --dry-run`, `npm install --global @nyuchi/mzizi-cli` and `cargo install mzizi-cli --locked` as the install lines, and call `mzizi` and `fundi` deprecated names. `llms.txt` states `@nyuchi/mzizi-cli` 0.14.1 (was 0.11.0). `scripts/verify-rendered.py` and `scripts/audit-ui.mjs` follow the new command names. Built the site locally and checked: `astro check` 0 errors, `verify-rendered.py` passes. `scripts/check-facts.py` fails on the same language-page lines before and after this change (compiler line count, RFC links, benchmark arms); those are not touched here.
+
 ### Fixed — build check expects the button's N2 React source (2026-11-21)
 
 The rendered-page check in `scripts/verify-rendered.py` looked for the retired class-variance-authority import on `/components/button`. The registry now serves the N2 primitive, which imports `Slot` from `radix-ui`, so the check now looks for that line. No reader sees a difference: the page already rendered its source correctly.
