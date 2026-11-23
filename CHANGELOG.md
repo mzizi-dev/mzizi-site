@@ -21,6 +21,12 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Added — org-standard community files (2026-11-24)
+
+No issue: bootstrap proposal from `nyuchi/.github`. Documentation files only; no package or code change, and nothing changes for a reader of the site.
+
+- Adds the org-standard `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` where they were absent.
+
 ### Changed — mzizi.dev follows the reader's OS text size, and both color schemes are declared (2026-11-14, [#148](https://github.com/mzizi-dev/mzizi-site/issues/148))
 
 `Site.astro` gains two meta tags. `<meta name="color-scheme" content="light dark">` tells the browser before first paint that both schemes are supported, so scrollbars, form controls and the canvas theme with the palette instead of flashing light under a dark preference. `<meta name="text-scale" content="scale">` opts the page into the reader's operating-system text-size setting; the site's type scale is rem-based (the registry tokens), so the setting now actually reaches the text. Nothing changes for a reader who never moved the OS setting.
