@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — dependency updates (2026-11-23)
+
+- **Changed:** minor and patch updates to seven npm dependencies (Dependabot group). No page, URL or agent-facing file changes; readers of the site see no difference.
+
 ### Fixed — build check expects the button's N2 React source (2026-11-21)
 
 The rendered-page check in `scripts/verify-rendered.py` looked for the retired class-variance-authority import on `/components/button`. The registry now serves the N2 primitive, which imports `Slot` from `radix-ui`, so the check now looks for that line. No reader sees a difference: the page already rendered its source correctly.
