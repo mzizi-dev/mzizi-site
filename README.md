@@ -240,6 +240,8 @@ mzizi-site/
 | `/playground`        | Static, dated screenshots of React builds, each linked to its source. Says plainly that none of it is interactive                   |
 | `/architecture`      | The helix drawn — 8 nodes, 4 rungs, 6 strands, every covenant, live component counts                                                |
 | `/tokens`            | All 21 colour families light and dark, the surface ladder, semantic roles, type, spacing, radii and component specs                 |
+| `/bundu-floor`       | The Bundu floor: the minimums no Mzizi screen goes under, beside WCAG 2.2, Apple HIG, Material 3 and Anthropic's brand              |
+| `/spacing`           | The spacing layers (controls, cards, containers, layout), the number rule and its calculator, and the token table                   |
 | `/skills`            | The agent skills, and each one's body at `/skills/<name>`                                                                           |
 | `/observability`     | Where the logs live (the console), and what is file-backed                                                                          |
 | `/ecosystem`         | Every public repository, what it holds, and whether it is routed                                                                    |
@@ -304,10 +306,10 @@ operate", so the file carries no `$schema` and claims conformance to nothing. It
 names `https://mcp.mzizi.dev/mcp`. The owner's decision of 2026-09-29 is that the
 MCP server and the CLI are free with no gate: auth is required only for the Fundi
 tools (anything that files into the Fundi issue desk or needs a console user), and
-the card says so. That change is live (`mzizi-mcp` 0.13.0, listed in the MCP
-Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-10-07):
-`initialize` and `tools/list` answer with no token, and only `mzizi_fundi` and
-`mzizi_report_issue` ask for sign-in. The load-bearing agent
+the card says so. That change is live (`mzizi-mcp` 0.24.0, listed in the MCP
+Registry as `io.github.mzizi-dev/mzizi-mcp`, checked 2026-11-17):
+`initialize` and `tools/list` answer with no token, and only the `fundi` operation (through `mzizi_execute`) and issue reports (through
+`mzizi_feedback`) ask for sign-in. The load-bearing agent
 surface on this site is `/llms.txt`; the authority on what that server exposes is
 the server, over a standard `tools/list` request.
 
@@ -352,13 +354,37 @@ See [`AGENTS.md`](./AGENTS.md) for the full command set, what CI checks (includi
 rendered-content gate that `mzizi-console` shipped without), and — before you touch
 `wrangler.jsonc` or deploy — the route footgun that took this apex by accident.
 
+### Versioning, merges and green checks (org policy)
+
+The org policy is in [`nyuchi/.github`](https://github.com/nyuchi/.github)
+(`AGENTS.md` and `CONTRIBUTING.md`, Versioning, nyuchi/.github#80). This repository's
+workflows (`staging-version.yml`, `main-release.yml`) apply it:
+
+- A merge into `staging` is a **PATCH** (x.y.z to x.y.z+1), tagged automatically.
+- Releasing `staging` to `main` is a **MINOR** (x.y.z to x.y+1.0).
+- A **MAJOR** is manual only: a person runs the release with `bump: major`.
+
+Merges: the default branch takes releases only, from `staging` or a `release/*` branch.
+Promote `staging` to `main` with a merge commit, never a squash (`nyuchi/.github`
+`AGENTS.md`, "Releases and the main gate"). Pull requests into `staging` are squashed
+(`nyuchi/.github` `CONTRIBUTING.md`, "Merge strategy").
+
+**All checks green (the rule):** nothing merges while any check is red or orange, in
+every repository (owner, 2026-11-17; `nyuchi/.github` `settings/README.md`). Org-wide
+enforcement is still pending, so this is the rule, not yet a setting in every repository.
+
+### Tooling order (owner's direction, 2026-11-17)
+
+The owner's direction (2026-11-17): Rust first, then Deno or Vite+ (`vp`), never Node by default. This repository still builds with Node and pnpm, as
+[`AGENTS.md`](./AGENTS.md) describes.
+
 ## Ecosystem
 
 | Repository                                                                           | What it is                                                                                                                         | Address                                   |
 | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | [`mzizi`](https://github.com/mzizi-dev/mzizi)                                        | The language, and Mzizi's main goal — compiler, RFCs, benchmark                                                                    | —                                         |
 | [`mzizi-registry`](https://github.com/mzizi-dev/mzizi-registry)                      | The component registry, brand system, DNA helix and Mzizi Roots                                                                    | Roots crates on crates.io                 |
-| [`mzizi-api`](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`) | The registry API as a Hono Worker, from the registry's files                                                                       | [api.mzizi.dev](https://api.mzizi.dev/v1) |
+| [`mzizi-api`](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`) | The registry API as a Rust (workers-rs) Worker, from the registry's files                                                          | [api.mzizi.dev](https://api.mzizi.dev/v1) |
 | [`mzizi-console`](https://github.com/mzizi-dev/mzizi-console)                        | The console — Astro shell; live data loads in the browser today, moving to server rendering with a Rust backend (mzizi-console#34) | [app.mzizi.dev](https://app.mzizi.dev)    |
 | [`mzizi-docs`](https://github.com/mzizi-dev/mzizi-docs)                              | The Mintlify documentation site — the one home of Mzizi's docs                                                                     | [docs.mzizi.dev](https://docs.mzizi.dev)  |
 | `mzizi-site`                                                                         | This repository                                                                                                                    | [mzizi.dev](https://mzizi.dev)            |

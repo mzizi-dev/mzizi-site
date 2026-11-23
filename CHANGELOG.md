@@ -27,6 +27,67 @@ No issue: bootstrap proposal from `nyuchi/.github`. Documentation files only; no
 
 - Adds the org-standard `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` where they were absent.
 
+### Changed — dependency updates (2026-11-23)
+
+- **Changed:** minor and patch updates to seven npm dependencies (Dependabot group). No page, URL or agent-facing file changes; readers of the site see no difference.
+- **Changed:** the CLI is `mz` (mzizi-cli 0.14.1, one Rust binary): the `/cli` page, `/components`, the component pages, `/bundu-floor` and `llms.txt` say `mz add` and `mz floor` (was `mzizi add` and `mzizi check`), give `npx @nyuchi/mzizi-cli add button --dry-run`, `npm install --global @nyuchi/mzizi-cli` and `cargo install mzizi-cli --locked` as the install lines, and call `mzizi` and `fundi` deprecated names. `llms.txt` states `@nyuchi/mzizi-cli` 0.14.1 (was 0.11.0). `scripts/verify-rendered.py` and `scripts/audit-ui.mjs` follow the new command names. Built the site locally and checked: `astro check` 0 errors, `verify-rendered.py` passes. `scripts/check-facts.py` fails on the same language-page lines before and after this change (compiler line count, RFC links, benchmark arms); those are not touched here.
+
+### Fixed — build check expects the button's N2 React source (2026-11-21)
+
+The rendered-page check in `scripts/verify-rendered.py` looked for the retired class-variance-authority import on `/components/button`. The registry now serves the N2 primitive, which imports `Slot` from `radix-ui`, so the check now looks for that line. No reader sees a difference: the page already rendered its source correctly.
+
+### Added — /bundu-floor and /spacing: the Bundu floor and the spacing layers (2026-11-19)
+
+Two pages, decided by the owner on 19 November 2026. The registry serves these tokens from Registry 4.45 and later.
+
+- **`/bundu-floor`** sets the minimums no Mzizi screen goes under beside WCAG 2.2, Apple's Human Interface Guidelines, Google's Material 3 and Anthropic's brand guidelines. It has the comparison table, a to-scale drawing of the target sizes (45 px touch, 24 px desktop), Anthropic's accents measured against the brand's own backgrounds, each system's principles, where the Bundu floor stands, who the floor serves, and the sources.
+- **`/spacing`** sets one spacing value for each layer of component (controls, cards, containers, page layout), each also that layer's floor, and the number rule that chooses them: a multiple of 3, a multiple of 7, or a prime, the nearest at or above the recommended value. It has a number calculator and a table of worked examples, a live specimen with a spacing overlay, the ladder drawn at real size, the token table, and what changes in 4.45.
+- Both pages are in the site navigation and the footer. `/ecosystem` has a paragraph under its seven engineering constraints list that links to both pages. `llms.txt` describes both pages and their key values.
+- The UI guard checks both pages at all three viewports, with no contrast exemption. The Anthropic accents on `/bundu-floor` are shown as filled, non-text swatches, and their measured ratios are stated as text in the page's own ink.
+
+From Registry 4.45, a reader sees: touch targets 49 px to 45 px, desktop targets 28 px to 24 px, the gap between neighbouring controls 7 px to 9 px, and the single 14 px inset floor replaced by a floor for each layer (17 px buttons and fields, 21 px cards, 28 px containers). Control heights move 32 to 33 px (small, dense and input), 40 to 41 px (large) and 40 to 41 px (small touch target). Chips use 12 px of side padding and pills and badges 9 px, in place of the 14 px inline inset on pills. The phone page edge is 17 px, a value the owner chose. On `/tokens`, the card and container specimens state 21 px (dense 14) and 28 px (dense 21), and native fields are drawn at their component height on touch, 49 px. Every layer also has a dense step, its own floor below the default, so a full screen can tighten without going under the hit area. The label-to-field gap (7 px, 5 dense) and the card gap for sibling items in a list (14 px, 7 dense) are set by the number rule and confirmed by the owner. Body text, captions, contrast and line height do not change.
+
+### Changed — Mzizi tools, runtime, crates and org policy (2026-11-17)
+
+- **Added: the Bundu ecosystem and doctrine on `/ecosystem` and `llms.txt`.** The four
+  pillars (Bundu Labs, Nyuchi Africa, Mukoko, Shamwari AI) and the narrative spine, the
+  `.cell` status (a proposal), the Mukoko tokens (proposed, off the current roadmap), and the
+  Ubuntu doctrine: five pillars, five principles and seven engineering constraints, copied
+  verbatim from mzizi-registry `content/doctrine` (tag v4.44.0), in the registry's sort order. The ecosystem image and the
+  Bundu newsroom are linked, not copied.
+- **Changed: `/ecosystem`.** `mzizi-api` is a Rust (workers-rs) Worker, served since 2026-11-17
+  (was Hono), with the strict parity figure.
+- **Changed: who Mzizi belongs to.** `/ecosystem`, the site footer and `llms.txt` now say
+  Mzizi is a Bundu Foundation project, built by Nyuchi, and that Nyuchi runs its cyber section
+  (the console and active cyber testing). They said Mzizi owned and operated itself.
+
+- **Changed: the MCP server.** `mzizi-mcp` is 0.24.0 and exposes three tools:
+  `mzizi_search`, `mzizi_execute` (which runs the operations, including `fundi`) and
+  `mzizi_feedback`. The 17 earlier tool names still work until 1.0.0. The `/cli`, `/skills`,
+  `/legal/privacy`, `llms.txt`, `/.well-known/mcp.json` and the README now name the three
+  tools and the Fundi operation, in place of `mzizi_fundi` and `mzizi_report_issue`. The
+  sign-in rule is unchanged: free, except the `fundi` operation and filing an issue.
+- **Changed: the registry API runtime.** `api.mzizi.dev` has been served by a Rust
+  (workers-rs) Worker since 2026-11-17, with the same routes and responses (strict parity,
+  1669 of 1669, against the previous TypeScript Worker). The README and the site's code
+  comment name the Rust Worker.
+- **Changed: Mzizi Roots.** The crates on crates.io are 0.8.0 (was 0.7.0), and install lines
+  use `"0.8"`. The `mzizi-roots` core no longer depends on Dioxus; removing it from the rest
+  is in progress. Eight components render unstyled from the Roots runtime, and `/components`
+  and `llms.txt` say so.
+- **Changed: versions named in `llms.txt`.** Registry 4.44.0 and `@nyuchi/mzizi-cli` 0.11.0
+  (was 0.10.0). The hard-coded skills version was removed; `/v1/skills` says which bundle it
+  serves.
+- **Changed: doctrine on the MCP server.** `get_doctrine` with topic `engineering-constraints` (MCP 0.24.0 and later) returns the seven engineering constraints. The HTTP API has no constraints route yet; only `/api/v1/ubuntu/pillars` and `/principles` exist.
+- **Changed: org policy.** The README's "Working on it" section now states the versioning
+  rule (staging merge is a patch, staging to main is a minor, a major is manual), the merge
+  rule, the all-checks-green rule (stated as the rule; org-wide enforcement is pending) and
+  the owner's tooling direction of 2026-11-17 (pure Rust, then Deno or Vite+, Node last).
+
+### Changed — vite-plus 1.6.0 (2026-11-17, Refs #145)
+
+`package.json` raises the `vite-plus` floor from `>=1.4.0` to `>=1.6.0` and `pnpm-lock.yaml` resolves 1.6.0, the release Dependabot's minor-and-patch groups move to. `check`, `lint`, the tests and the full build pass on it. Dev tooling only: nothing the site serves changes.
+
 ### Changed — mzizi.dev follows the reader's OS text size, and both color schemes are declared (2026-11-14, [#148](https://github.com/mzizi-dev/mzizi-site/issues/148))
 
 `Site.astro` gains two meta tags. `<meta name="color-scheme" content="light dark">` tells the browser before first paint that both schemes are supported, so scrollbars, form controls and the canvas theme with the palette instead of flashing light under a dark preference. `<meta name="text-scale" content="scale">` opts the page into the reader's operating-system text-size setting; the site's type scale is rem-based (the registry tokens), so the setting now actually reaches the text. Nothing changes for a reader who never moved the OS setting.

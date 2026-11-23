@@ -6,7 +6,7 @@
  *   1. `mz`, the compiler that implements the language. It is toolchain,
  *      not the language itself. Built from a checkout; no release.
  *   2. Installing components. React through `npx shadcn add`; Rust read from
- *      `/v1/rs`; `mzizi add` (React and Rust from `@nyuchi/mzizi-cli` 0.6.0,
+ *      `/v1/rs`; `mz add` (React and Rust from `@nyuchi/mzizi-cli` 0.6.0,
  *      Astro from 0.7.0).
  *   3. `fundi`, the agent CLI in the same package.
  *
@@ -37,7 +37,7 @@ const [crates, cli] = await Promise.all([
   npmStatus("@nyuchi/mzizi-cli"),
 ]);
 
-// `mzizi add` first shipped in @nyuchi/mzizi-cli 0.6.0. Whether the latest on
+// `mz add` (called `mzizi add` before 0.14.0) first shipped in @nyuchi/mzizi-cli 0.6.0. Whether the latest on
 // npm is at least that is asked at build time, not assumed.
 const INSTALLER_SINCE = "0.6.0";
 // Semver order on the release numbers; a prerelease (`0.7.0-beta.1`) sorts
@@ -52,7 +52,7 @@ const atLeast = (version: string, floor: string) => {
   return !prerelease;
 };
 const allPublished = crates.length > 0 && crates.every(({ status }) => status.state === "published");
-// Examples for the two largest crates, read from the API: `mzizi add <component>`
+// Examples for the two largest crates, read from the API: `mz add <component>`
 // records that component's crate.
 const crateExamples = crates.slice(0, 2).map(({ name, components }) => ({
   crate: name,
@@ -237,18 +237,18 @@ const mzCommands = [
   <code class="cmd lead">npx shadcn@latest add <span class="flag">{CANONICAL_BASE}/ui/&lt;name&gt;</span></code>
   <p class="prose">For example: <code>{installCommand("button")}</code></p>
 
-  <h3 id="mzizi-add"><code>mzizi add</code>: {astroShipped ? "every target" : "React and Rust"}, one command</h3>
+  <h3 id="mzizi-add"><code>mz add</code>: {astroShipped ? "every target" : "React and Rust"}, one command</h3>
   <div class="prose">
     <p>
       {
         installerShipped ? (
           <>
-            <code>mzizi add &lt;name&gt;</code> ships in <code>@nyuchi/mzizi-cli</code>{" "}
+            <code>mz add &lt;name&gt;</code> ships in <code>@nyuchi/mzizi-cli</code>{" "}
             from <code>{INSTALLER_SINCE}</code> (latest on npm: <code>{cli.state === "published" && cli.version}</code>).
           </>
         ) : (
           <>
-            <code>mzizi add &lt;name&gt;</code> ships in <code>@nyuchi/mzizi-cli</code>{" "}
+            <code>mz add &lt;name&gt;</code> ships in <code>@nyuchi/mzizi-cli</code>{" "}
             from <code>{INSTALLER_SINCE}</code>; npm could not be checked when this page was built.
           </>
         )
@@ -273,7 +273,7 @@ const mzCommands = [
             {crateExamples.map((example, i) => (
               <>
                 {i > 0 && "; "}
-                <code>mzizi add {example.component}</code> records <code>{example.crate}</code>
+                <code>mz add {example.component}</code> records <code>{example.crate}</code>
               </>
             ))}
             )
@@ -315,13 +315,14 @@ const mzCommands = [
       </li>
     </ul>
   </div>
-  <code class="cmd lead">npm install --save-dev @nyuchi/mzizi-cli</code>
-  <code class="cmd lead">npx mzizi add button --dry-run</code>
+  <code class="cmd lead">npx @nyuchi/mzizi-cli add button --dry-run</code>
+  <code class="cmd lead">npm install --global @nyuchi/mzizi-cli</code>
+  <code class="cmd lead">cargo install mzizi-cli --locked</code>
 
-  <h2 id="agent">The agent CLI: <code>fundi</code></h2>
+  <h2 id="agent">The agent commands: <code>mz plan</code> and friends</h2>
   <div class="prose">
     <p>
-      The same package's other binary, <code>fundi</code>, reads your project off
+      The same <code>mz</code> binary (under its old name, <code>fundi</code>) reads your project off
       disk and plans a Mzizi-aligned change against the registry and skills.{" "}
       <code>explore</code> runs offline. <code>plan</code> and <code>chat</code>{" "}
       read the MCP server; without an <code>ANTHROPIC_API_KEY</code>,{" "}
@@ -330,9 +331,9 @@ const mzCommands = [
     </p>
     <p>
       The CLI is free, with no gate, and so is the MCP server it reads: nothing
-      needs a sign-in except the Fundi tools (<code>mzizi_fundi</code> and{" "}
-      <code>mzizi_report_issue</code>), which act as your console user.{" "}
-      <code>fundi login</code> exists for those alone.
+      needs a sign-in except the Fundi tools (the <code>fundi</code> operation of <code>mzizi_execute</code>, and issue reports through{" "}
+      <code>mzizi_feedback</code>), which act as your console user.{" "}
+      <code>mz login</code> exists for those alone.
     </p>
   </div>
 

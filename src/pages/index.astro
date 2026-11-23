@@ -178,7 +178,7 @@ const isntList = [
   },
   {
     what: "Not a rendering engine",
-    note: "Mzizi is designed to lower to Rust. Roots components are moving to Mzizi's own render(). Dioxus is out of the stack (owner, 4 November 2026), and the published crates still depend on it until it is removed. Mzizi does not rebuild a renderer for other targets.",
+    note: "Mzizi is designed to lower to Rust. Roots components are moving to Mzizi's own render(). The Roots core no longer depends on Dioxus; removing it from the rest of the components is ongoing. Mzizi does not rebuild a renderer for other targets.",
   },
   {
     what: "Not an ML runtime",
@@ -318,7 +318,7 @@ const toolchain = [
     name: "The CLIs",
     href: "/cli",
     kind: "Command line",
-    note: `mz for the language; mzizi add (in @nyuchi/mzizi-cli${cliVersion ? ` ${cliVersion}` : ""}), cargo add or npx shadcn for components; fundi, the agent. Free, with no gate.`,
+    note: `mz for the language; mz add (in @nyuchi/mzizi-cli${cliVersion ? ` ${cliVersion}` : ""}), cargo add or npx shadcn for components; fundi, the agent. Free, with no gate.`,
   },
 ];
 ---

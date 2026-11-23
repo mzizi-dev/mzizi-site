@@ -1,6 +1,6 @@
 # Mzizi
 
-> Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better: no borrows, lifetimes or ownership in the language you write, with the harness at its core. "Makes Rust better" is the goal Phase 0 measures, not a result. Rust is its platform, the way JavaScript is TypeScript's: Mzizi is designed to lower to Rust, and Mzizi Roots is its component model, the way React is JavaScript's. Its core is a harness, the layer an agent reads and works through, and it is designed for machine authorship, specifically by small open-weight models. Its goal is to be the language people choose instead of TypeScript, Python and C++: write Mzizi, get Rust underneath. That is a goal, not a result. Phase 0 has one goal: to build Mzizi as a programming language, measured against the best existing language for each kind of task. Nothing has been measured against that yet. The toolchain and the components are built to support the language; neither is the language. An independent research project, owned and operated by Mzizi. This file describes `mzizi.dev`, which leads with the language.
+> Mzizi is a general-purpose programming language, built to make Rust better, the way TypeScript makes JavaScript better: no borrows, lifetimes or ownership in the language you write, with the harness at its core. "Makes Rust better" is the goal Phase 0 measures, not a result. Rust is its platform, the way JavaScript is TypeScript's: Mzizi is designed to lower to Rust, and Mzizi Roots is its component model, the way React is JavaScript's. Its core is a harness, the layer an agent reads and works through, and it is designed for machine authorship, specifically by small open-weight models. Its goal is to be the language people choose instead of TypeScript, Python and C++: write Mzizi, get Rust underneath. That is a goal, not a result. Phase 0 has one goal: to build Mzizi as a programming language, measured against the best existing language for each kind of task. Nothing has been measured against that yet. The toolchain and the components are built to support the language; neither is the language. A Bundu Foundation project, built by Nyuchi; Nyuchi runs its cyber section (the console and active cyber testing). This file describes `mzizi.dev`, which leads with the language.
 
 **What is which.** Say this plainly when you describe Mzizi:
 
@@ -17,8 +17,7 @@
   designed, in RFC-0012 (a draft), so never describe them as working.
   It lives in the language repository, `mzizi-dev/mzizi`; the agent-tools
   packages (`@nyuchi/mzizi-cli`, `mzizi-mcp`, `fundi`) are its clients.
-  Designed to lower to Rust (Roots are moving to Mzizi's own `render()`; Dioxus is out of the stack (owner, 4 November 2026) and the published crates still depend on it
-  until it is removed; axum or `workers-rs` for servers). Today two things lower: `mz build` lowers a
+  Designed to lower to Rust (Roots are moving to Mzizi's own `render()`; the Roots core no longer depends on Dioxus, and removing it from the rest of the components is ongoing; axum or `workers-rs` for servers). Today two things lower: `mz build` lowers a
   `service` to a local Rust + axum package, which CI compiles, tests and
   serves, and `mz run` (or `mz build`) lowers a `program` to a Rust package
   with no dependencies, which `mz run` builds and runs. No component lowers yet, and there is no Workers, Containers or
@@ -49,7 +48,7 @@ program, errors mapped back to `.mz`, and Rust crate interop), so do not call Mz
   compiler (lexer, recovering parser, name and type resolver,
   content-addressed IR, the agent diagnostic protocol behind
   `mz check --agent`, `mz fix` and `mz contract`), `@nyuchi/mzizi-cli`
-  (`mzizi add` and the `fundi` agent), `mz build` (a service, to a local
+  (the same `mz` binary: `mz add`, `mz floor` and the `fundi` agent commands), `mz build` (a service, to a local
   Rust + axum package, or a program, to a Rust package with no
   dependencies), `mz run` (builds and runs a program), `mz harness` (prints
   the language harness's definition), the MCP server at `mcp.mzizi.dev`, the
@@ -213,7 +212,7 @@ toward M2) and were read on 11 November.
     Tracker rows U1, U7 and U11 are 🟡 on `staging`, and none is ✅.
   - Three server components written in Mzizi as programs, `examples/components/`: a circuit
     breaker, `base64url` and a rate gate ([#157](https://github.com/mzizi-dev/mzizi/pull/157)). None is a library another file can
-    import, none is installed with `mzizi add`, and none is the registry's component. Building
+    import, none is installed with `mz add`, and none is the registry's component. Building
     them found seven gaps (K1 to K7), all ❌ in the tracker. RFC-0018, a draft, designs function
     values for K5 ([#159](https://github.com/mzizi-dev/mzizi/pull/159)); nothing in it is built.
   - `mz check` and `mz contract` take a directory ([#155](https://github.com/mzizi-dev/mzizi/pull/155)).
@@ -287,56 +286,68 @@ direction.
 skills, and the CLI.
 **The MCP server and the CLI are free, with no sign-in, except the Fundi tools**
 (anything that files into the Fundi issue desk or needs a console user). That is
-the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.20.0 serves
-every tool without a token except `mzizi_fundi` and `mzizi_report_issue`, which
-act as your console user and need sign-in (checked 2026-11-12). The MCP server is
-Rust first: where a component has a Mzizi Roots implementation,
-`mzizi_get_component` returns it under `rust` (the crate, the `cargo add` line,
-the contract and the `.rs` source), then the pure Astro build under `astro` where
-there is one, then the React build under `react`, and `lead` says which comes
-first. `mzizi_list_components` takes `rust: true` or `astro: true` to list only
-the components with that build, and its rows and `mzizi_search`'s hits carry
-`rustCrate` and `astroFile`. `mzizi_get_skills` takes `category` (`dev`,
-`design`, `language` or `build`) and returns every skill in it in full.
+the owner's decision of 2026-09-29, and it is live: `mzizi-mcp` 0.24.0 serves every
+tool without a token, except the `fundi` operation of `mzizi_execute` and filing an
+issue through `mzizi_feedback`, which act as your console user and need sign-in.
 
-Versions on 2026-11-12 (read the registries before repeating one):
+The MCP server exposes three tools. `mzizi_search` finds components, conventions,
+releases, toolchain, crates, skills and docs, and lists the operations a caller may
+run, with their arguments and permissions. `mzizi_execute` runs one operation by name:
+`get_component`, `list_components`, `get_tokens`, `get_architecture`, `get_doctrine`,
+`get_skills`, `check_accessibility`, `list_crates`, `describe`, the `docs_*` operations,
+and `fundi` (with sign-in). `mzizi_feedback` files an issue (sign-in) or sends docs
+feedback (free). The 17 earlier tool names still work, called directly or as operation
+names, until 1.0.0.
 
-- `mzizi-mcp` **0.20.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP
-  Registry: `io.github.mzizi-dev/mzizi-mcp`, both at 0.20.0)
-- `@nyuchi/mzizi-skills` **0.20.0** on npm and in the MCP server (`mcp.mzizi.dev`): twelve skills in four categories,
-  `mzizi-language` (language), `mzizi-design` and `mukoko-design` (design),
-  `mzizi-roots`, `mzizi-backend`, `mzizi-architecture` and `discoverability`
-  (build), and `digital-hygiene`, `progress-report`, `ship-release`,
-  `registry-propagation` and `pr-gates` (dev: how every agent works, loaded
-  before any dev work). The registry requires it from 4.20.0;
-  `api.mzizi.dev/v1/skills` and the `/skills` pages here serve the bundle at
-  the API's registry pin, which carries 0.20.0 since 2026-11-12 (registry 4.36.0, `f94666b`).
-  `/v1/skills`' `meta.version` says which bundle is
-  served. Two Claude Code plugins carry them
-  (`/plugin marketplace add mzizi-dev/mzizi-registry`): the public `mzizi`
-  plugin (`/plugin install mzizi@mzizi`, plugin 1.10.0 on 2026-11-12), seven
-  Markdown skills and the Mzizi MCP with no scripts or hooks, and the
-  `mzizi-dev` plugin (`/plugin install mzizi-dev@mzizi`, plugin 0.1.0), the
-  five dev skills with their scripts and hooks; both carry skills 0.20.0;
-  mzizi-registry#520, still open, would make it installable in Codex. A client that
-  installs nothing gets the skills from `mzizi_get_skills`. How to connect each
-  AI client (Claude, ChatGPT, Codex, the Claude and OpenAI APIs, Cursor,
-  VS Code, Gemini CLI, OpenCode, Windsurf):
-  https://docs.mzizi.dev/toolchain/connect
-- `@nyuchi/mzizi-cli` **0.10.0**, which ships the installer: `mzizi add <name>`
+Rust first: where a component has a Mzizi Roots implementation, `get_component` returns
+it under `rust` (the crate, the `cargo add` line, the contract and the `.rs` source), then
+the pure Astro build under `astro` where there is one, then the React build under `react`,
+and `lead` says which comes first. `list_components` takes `rust: true` or `astro: true`
+to list only the components with that build, and its rows and `mzizi_search`'s hits carry
+`rustCrate` and `astroFile`. `get_skills` takes `category` (`dev`, `design`, `language` or
+`build`) and returns every skill in it in full.
+
+Versions on 2026-11-17 (read the registries before repeating one):
+
+- `mzizi-mcp` **0.24.0** at `mcp.mzizi.dev` (npm: `@nyuchi/mzizi-mcp`; MCP Registry:
+  `io.github.mzizi-dev/mzizi-mcp`). It serves the three tools above.
+- Registry **4.44.0**. `api.mzizi.dev` has been served by a Rust (workers-rs) Worker
+  since 2026-11-17, with the same routes and responses; strict parity was 1669 of 1669
+  against the previous TypeScript Worker.
+- `@nyuchi/mzizi-skills` on npm and in the MCP server (`mcp.mzizi.dev`), served by
+  `get_skills` and by `/v1/skills`, whose `meta.version` says which bundle is served. The
+  skills are in four categories: `mzizi-language` (language), `mzizi-design` and
+  `mukoko-design` (design), `mzizi-roots`, `mzizi-backend`, `mzizi-architecture` and
+  `discoverability` (build), and `digital-hygiene`, `progress-report`, `ship-release`,
+  `registry-propagation` and `pr-gates` (dev). Two Claude Code plugins carry them
+  (`/plugin marketplace add mzizi-dev/mzizi-registry`): the public `mzizi` plugin, and the
+  `mzizi-dev` plugin with the five dev skills, its scripts and hooks. mzizi-registry#520,
+  still open, would make it installable in Codex. A client that installs nothing gets the
+  skills from `get_skills`. How to connect each AI client (Claude, ChatGPT, Codex, the Claude
+  and OpenAI APIs, Cursor, VS Code, Gemini CLI, OpenCode, Windsurf):
+  <https://docs.mzizi.dev/toolchain/connect>
+- `@nyuchi/mzizi-cli` **0.14.1**, the Mzizi CLI (one Rust binary, `mz`; also `cargo install mzizi-cli`): `mz add <name>`
   for React (writes the TSX), Rust (records the crate the component's
   `/v1/rs/<name>` document names) or Astro (`--target astro`, inferred in an
   Astro project: writes the pure `.astro` from `/v1/astro/<name>` into
-  `src/components/mzizi/`), plus the `fundi` agent, and (from 0.8.0) `mzizi check`,
+  `src/components/mzizi/`), plus the `fundi` agent commands, and `mz floor` (called `mzizi check` before 0.14.0),
   which fails on padding, gaps and line heights under the spacing floor.
-  `npx mzizi` works.
-- Mzizi Roots on crates.io, all **0.7.0**: `mzizi-tokens`, `mzizi-ui`,
-  `mzizi-brand`, `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`,
-  `mzizi-discovery`, and the umbrellas `mzizi-roots` (UI) and
-  `mzizi-roots-server` (server). `cargo add mzizi-roots` works.
+  `npx @nyuchi/mzizi-cli add <name>` works; `mzizi` and `fundi` are deprecated names of `mz`.
+- Mzizi Roots on crates.io, all **0.8.0**: `mzizi-tokens`, `mzizi-ui`, `mzizi-brand`,
+  `mzizi-shell`, `mzizi-assurance`, `mzizi-fundi`, `mzizi-docs`, `mzizi-discovery`, and the
+  umbrellas `mzizi-roots` (UI) and `mzizi-roots-server` (server). `cargo add mzizi-roots`
+  works, and install lines use `"0.8"`. `mzizi-tokens` exports the full per-family colour
+  record (21 families). `mzizi-discovery`'s `SeoConfig` takes any site's own identity.
+  The `mzizi-roots` core no longer depends on Dioxus. Eight components render unstyled from
+  it: alert, badge, card, chart, markdown-renderer, progress, safe-area-frame and separator.
+  They ship structure, state, `data-*` hooks and ARIA, with no styling: `tokens.css` holds
+  the values, `floor.css` the accessibility minimums, and `mzizi-theme.css` an opt-in look.
+  The button is the first pattern component (React, Astro and Rust), built with Lightning
+  CSS. Removing Dioxus from the rest of the components, and moving them off Tailwind, is in
+  progress.
 
 **The components are built to support the language.** *Mzizi Roots* is
-Mzizi's own UI and server components for the agentic web, in Rust (moving to Mzizi's own `render()`; Dioxus is out of the stack (owner, 4 November 2026) and the published crates still depend on it until it is removed):
+Mzizi's own UI and server components for the agentic web, in Rust (moving to Mzizi's own `render()`; the Roots core no longer depends on Dioxus, and removing it from the rest of the components is ongoing):
 the language's component model, the way React is JavaScript's, and its UI
 layer. Where a component has a Rust implementation, it is presented first. The
 React/TSX builds keep working but are deprioritised. The registry also supplies
@@ -346,7 +357,7 @@ are common. The difference is state: the
 components ship now; the language has not yet shown the advantage it is designed
 for.
 
-License: Apache-2.0. Owned, governed and operated by Mzizi.
+License: Apache-2.0. A Bundu Foundation project, built by Nyuchi; Nyuchi runs its cyber section (the console and active cyber testing).
 
 ## Hosting caveat — read before repeating a URL
 
@@ -373,6 +384,8 @@ Hostnames change; resolve one before repeating it.
 - [Observability](/observability): logs belong to the console (app.mzizi.dev); this page shows the file-backed per-node counts
 - [Architecture](/architecture): the DNA double helix the components sit on
 - [Tokens](/tokens): the 21 colour families, type, spacing and component specs
+- [Bundu floor](/bundu-floor): the accessibility minimums Mzizi enforces, decided 19 November 2026, served by the registry from Registry 4.45: touch hit region 45 px (was 49), desktop 24 px (was 28), body text 17 px touch and 15 px desktop, 14 px minimum for captions, 7 : 1 body contrast, 4.5 : 1 other text, 3 : 1 UI parts, 1.5 body leading. Set beside WCAG 2.2, Apple HIG, Material 3 and Anthropic's brand.
+- [Spacing](/spacing): the spacing layers, decided 19 November 2026, served by the registry from Registry 4.45. Each layer has a default and a dense value, both floors, and nothing goes below dense: controls 17 padding (dense 12), gap between controls 9 (dense 7), field 17 (dense 12), label to field 7 (dense 5);chips 12 (dense 9); pills and badges 9 (dense 5) and their gap 5 (dense 3); cards 21 (dense 14), stack 7, card gap 14 (dense 7; the gap between list siblings);containers 28 (dense 21), container gap 21 (dense 14); page edge 17 on phones (a prime, the one layout value outside the multiples of 7), 28 wide (21 dense); sections 49 (dense 28). Control heights 33 (small, dense, input), 41 (large) and 41 (small touch target). The number rule: a Mzizi value is a multiple of 3, a multiple of 7, or prime, the nearest at or above the recommended value.
 - [Ecosystem](/ecosystem): every public repository, what it holds, whether it is routed, and how to reach Mzizi
 - [Privacy](/legal/privacy): what the sites, the API, the MCP server and the Claude plugin collect, and where the Bundu Foundation's and Nyuchi's notices apply
 - [Terms of use](/legal/terms): how you may use what Mzizi publishes, and what is not promised
@@ -396,15 +409,78 @@ Hostnames change; resolve one before repeating it.
 - [design/LANGUAGE-SURVEY.md](https://github.com/mzizi-dev/mzizi/blob/main/design/LANGUAGE-SURVEY.md): the top 10 languages, feature by feature, as design input. Nothing in it is implemented or measured
 - RFC-0005 is reserved and unwritten
 - [RFC: Mzizi Roots](https://github.com/mzizi-dev/mzizi-registry/blob/main/docs/roots/RFC-roots.md) (in `mzizi-registry`, `docs/roots/RFC-roots.md`): Mzizi's own components converted to Rust, with host-agnostic server components (the RFC as written names Dioxus for the UI components; Dioxus is now out of the stack). Proposed
+- Org release and merge policy (versioning: a staging merge is a patch, staging to main is a minor, a major is manual; all checks green): nyuchi/.github `AGENTS.md` and `CONTRIBUTING.md`, summarised in this repository's README under "Working on it"
 - [Design System](https://claude.ai/artifact/G8CCtAbZ8w717uQ3R5itCc): the published Mzizi design system on claude.ai — voice and content fundamentals, visual foundations, the marks, and component previews. It is built file for file from the `design-system/` folder in `mzizi-registry` (arriving with mzizi-registry#418), which is the source of truth: change the folder, never the artifact page
 - [benchmarks/results/](https://github.com/mzizi-dev/mzizi/tree/main/benchmarks/results): all four pilot write-ups and their raw episodes
 - [benchmarks/READINESS.md](https://github.com/mzizi-dev/mzizi/blob/main/benchmarks/READINESS.md): the audit of pilot 2's fixes, and what the kill-criterion run still waits on
+
+## The Bundu ecosystem and doctrine
+
+Mzizi sits inside the Bundu ecosystem. Its umbrella is the Bundu Foundation; Bundu is
+Shona for wilderness. The ecosystem's summary: One ecosystem. One doctrine. One source
+of truth. Many interfaces. The ecosystem image and story: https://www.bundu.org/ecosystem
+and https://www.bundu.org/newsroom/the-bundu-ecosystem. The register of standards:
+https://standards.bundu.org/cell/ (for .cell).
+
+The narrative spine: bundu is the wilderness, shamwari is the ranger, nyuchi is the bee,
+mukoko is the hive, Mzizi is the root everything grows from.
+
+The four pillars:
+
+- **Bundu Labs**, research, knowledge, standards and frameworks. The research and standards
+  arm of the Bundu Foundation. It investigates infrastructure gaps across Africa and emerging
+  markets, and publishes the standards, frameworks and vocabulary the rest of the ecosystem
+  builds on.
+- **Nyuchi Africa**, platform and infrastructure. The platform and infrastructure company of
+  the ecosystem: the Nyuchi API, the console, and its own tools and products. It builds
+  platforms others build on; it is not an outsourced IT department or a managed service
+  provider.
+- **Mukoko**, the consumer pillar. Mukoko is a product of Nyuchi Africa. Mukoko is a pillar
+  of Bundu and a product of Nyuchi Africa, built and operated by Nyuchi: the hive and the
+  consumer pillar, and the proof that what is researched reaches production and is used by
+  people, and that the infrastructure works.
+- **Shamwari AI**, community-facing AI and conversational experiences. Shamwari AI is the
+  ranger in the wilderness, guiding and managing things.
+
+.cell is a Bundu Labs project that maps directly to SiafuDB; its repository is siafuDB/cell.
+Its spec (0.1.0) is a draft and PROPOSED. The Mukoko tokens are a proposed project and are OFF
+the current roadmap.
+
+## Doctrine: Ubuntu
+
+Ubuntu is not a marketing claim; it is the specification. Its five pillars are the spheres of
+belonging and its five principles the values practised in them; seven engineering constraints
+make them testable. Copied from mzizi-dev/mzizi-registry content/doctrine at tag v4.44.0, in the
+registry's sort order; served by Mzizi through `get_doctrine`; its topic `engineering-constraints` (MCP 0.24.0 and later) returns the seven engineering constraints. The HTTP API has no constraints route yet; only `/api/v1/ubuntu/pillars` and `/principles` exist.
+
+Five pillars:
+- **Family**. The first sphere of Ubuntu — the household and kin who form a person's primary web of belonging. Ubuntu begins here: identity is given by family before it is given by any institution.
+- **Community**. The extended sphere of neighbours, peers, and chosen kin. Where the family ends, the community begins; the two are continuous, not opposed. Ubuntu treats community as the medium through which a person grows into society.
+- **Society**. The broader human web — strangers, institutions, the polity. Ubuntu does not stop at the village wall; vanhu means people, all people. A person who treats strangers as strangers has not yet practised Ubuntu.
+- **Environment**. The natural world that holds all relationships. Ubuntu is ecological before it is social — soil, water, and weather are kin too. A person who exhausts the environment has broken Ubuntu, even if they have wronged no human directly.
+- **Spirituality**. The vertical axis of being human — meaning, purpose, ancestry, and the sacred. Unhu names the inner quality from which Ubuntu flows outward. Without unhu, the four horizontal pillars are scaffolding without a soul.
+
+Five principles:
+- **Survival**. Collective endurance. No one survives alone; basic needs are met through one another. Reciprocal care sustains the community before any individual can flourish.
+- **Solidarity**. A firm and persevering commitment to the common good. Not vague compassion but active allegiance to the welfare of the whole — kubatana means to hold together.
+- **Compassion**. Active care, sympathy, and concern shown through helping, sharing, and welcoming. Tsitsi extends beyond kin to all — a stranger in need is not a stranger to compassion. (Also: Du Toit, Poovan & Engelbretch 2006.)
+- **Respect**. Unprejudiced consideration of another's privileges, beliefs, and norms. Encompasses elder-respect (ukuhlonipha) but applies to every person, every age, every belief. (Also: Poovan et al. 2006.)
+- **Dignity**. Inherent worth held by virtue of existence — irrespective of status, ethnicity, age, or background. Humanity is sacred. Dignity is not earned and cannot be revoked. (Also: Ramose 2002.)
+
+Seven engineering constraints:
+- **Outdoor readability**. Every surface is read in direct sunlight on a budget phone, not only at a desk.
+- **Connectivity-gradient design**. Design for the whole range of connections, from none to fibre. Offline-first is the enforced minimum: core tasks work with no connection, and better connectivity adds to that baseline.
+- **Multilingual parity**. Shona, Ndebele and English are equal. No language is a translation of another, and none ships later.
+- **Shared-device awareness**. One phone often serves a household. A person's data belongs to that person, not to the device.
+- **Personal data sovereignty**. A person owns their data. It lives on their device first, syncs to their own isolated cloud space, and moves to pods in the Nyuchi Honeycomb without being reshaped.
+- **No surveillance business model**. We do not earn money from attention or personal data.
+- **The Bundu floor**. The minimums nothing can go under: text size, contrast, hit regions and spacing, so that nobody is punished for their eyesight or their device.
 
 ## Public repositories
 
 - [mzizi-dev/mzizi](https://github.com/mzizi-dev/mzizi): the language, and Mzizi's main goal: the charter, the RFCs and LANGUAGE-TRACKER.md, the `mz` compiler front end that implements it, nine primitives and an example service written in it, the benchmark harness and the pilot results. Rust. Public.
 - [mzizi-dev/mzizi-registry](https://github.com/mzizi-dev/mzizi-registry): the components built to support the language: the design system and component registry, including the Mzizi Roots Rust components (`mzizi-rs/`) and the component contracts (`contracts/`: a versioned, machine-readable contract for each of the Mzizi Dashboard Standard's 31 `@bundu/ui` app components; [docs](https://docs.mzizi.dev/patterns/dashboard-standard)). Its files are the source of the registry API; it holds no database.
-- [mzizi-dev/mzizi-api](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`): the registry API as a Hono Cloudflare Worker, serving [api.mzizi.dev](https://api.mzizi.dev/v1) from the registry's files bundled at a pinned commit.
+- [mzizi-dev/mzizi-api](https://github.com/mzizi-dev/mzizi-api) (formerly `mzizi-api-gateway`): the registry API as a Rust (workers-rs) Cloudflare Worker, served since 2026-11-17, serving [api.mzizi.dev](https://api.mzizi.dev/v1) from the registry's files bundled at a pinned commit.
 - [mzizi-dev/mzizi-console](https://github.com/mzizi-dev/mzizi-console): the console — Astro chrome; live data loads in the browser today, and it keeps no database of its own. Decided, not built (mzizi-console#34): one Rust Worker serves Astro's output on the server, and any state it keeps goes in Cloudflare D1. Live at [app.mzizi.dev](https://app.mzizi.dev), behind AuthKit sign-in.
 - [mzizi-dev/mzizi-site](https://github.com/mzizi-dev/mzizi-site): this site, serving [mzizi.dev](https://mzizi.dev).
 - [mzizi-dev/mzizi-docs](https://github.com/mzizi-dev/mzizi-docs): the Mintlify documentation site, live at [docs.mzizi.dev](https://docs.mzizi.dev). The one home of Mzizi's documentation.

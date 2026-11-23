@@ -2,13 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main]
   pull_request:
     # Not just main. Stacked pull requests target the branch below them in the
     # stack, and a filter of [main] silently gives every layer but the bottom
     # one zero checks — a green PR with nothing run looks identical to a
     # passing one.
-    branches: [main, staging, "claude/**"]
+    branches: [main, "claude/**"]
   # Required checks must also report on a merge queue's gh-readonly-queue/** ref, or a queued PR waits
   # until the queue times it out. Harmless where no queue is configured.
   merge_group:
@@ -87,11 +87,13 @@ jobs:
         run: python3 scripts/verify-rendered.py dist
 
       # The Bundu floor, measured in a real browser (the runner's Chrome, so
-      # nothing is downloaded): nothing readable under 14px, a 49px hit region
-      # on every control, contrast, one h1 and no skipped levels, no sideways
-      # scroll at 320px, at 390, 820 and 1440px. It reads only the built dist/.
-      # It also holds the spacing floor: 7px between adjacent controls, a 14px
-      # text inset, a 1.5 line height and the WCAG 1.4.12 text-spacing stress.
+      # nothing is downloaded): nothing readable under 14px, a 45px hit region
+      # on touch and 24px on desktop, contrast 7:1 body and 4.5:1 other text,
+      # one h1 and no skipped levels, no sideways scroll at 320px, at 390, 820
+      # and 1440px. It reads only the built dist/. It also holds the spacing
+      # floor: 9px between adjacent controls, each layer's inset (12 control,
+      # 9 chip, 5 pill, 14 card, 21 container; 14 where the layer is unknown), a
+      # 1.5 line height and the WCAG 1.4.12 text-spacing stress.
       - name: The Bundu floor holds in a browser
         env:
           PW_CHANNEL: chrome

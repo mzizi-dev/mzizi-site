@@ -129,7 +129,7 @@ plain = html.unescape(re.sub(r"<[^>]+>", " ", body))
 check("components/button.html", "button leads with its Rust source",
       "Mzizi Roots: the Rust implementation" in plain and "button.rs" in plain)
 check("components/button.html", "button shows its React source too",
-      "class-variance-authority" in plain and "React build" in plain)
+      'import { Slot } from "radix-ui"' in plain and "React build" in plain)
 for fact in ("Owner", "Collection", "npm dependencies", "Registry dependencies"):
     check("components/button.html", f"“{fact}” is shown", fact in plain)
 body = text_without_scripts("components/accordion.html")
@@ -156,11 +156,22 @@ print("\ncli, playground, observability")
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("cli.html")))
 check("cli.html", "the React install path", "npx shadcn@latest add https://api.mzizi.dev/v1/ui/" in body)
 check("cli.html", "the Rust path", "/v1/rs/<name>" in body)
-check("cli.html", "mzizi add names the release it ships in",
-      "mzizi add" in body and "@nyuchi/mzizi-cli" in body and "0.6.0" in body)
+check("cli.html", "mz add names the release it ships in",
+      "mz add" in body and "@nyuchi/mzizi-cli" in body and "0.6.0" in body)
 check("cli.html", "the MCP gate is named as the Fundi tools only",
-      "mzizi_fundi" in body and "mzizi_report_issue" in body)
+      "mzizi_execute" in body and "mzizi_feedback" in body and re.search(r"fundi\s+operation", body))
 check("cli.html", "mz check --agent", "mz check --agent" in body)
+
+# --- /ecosystem: the seven engineering constraints, in canonical order -----
+eco = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("ecosystem.html")))
+eco = re.sub(r"\s+", " ", eco)
+CONSTRAINTS = ["Outdoor readability", "Connectivity-gradient design", "Multilingual parity",
+               "Shared-device awareness", "Personal data sovereignty",
+               "No surveillance business model", "The Bundu floor"]
+start = eco.find("Seven engineering constraints")
+positions = [eco.find(t, start) for t in CONSTRAINTS] if start >= 0 else [-1]
+check("ecosystem.html", "the seven engineering constraints, in canonical order",
+      start >= 0 and all(p >= 0 for p in positions) and positions == sorted(positions))
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("playground.html")))
 check("playground.html", "says plainly it is not interactive", "Not interactive." in body)
 body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("observability.html")))
@@ -247,6 +258,37 @@ steps = count(r"<li class=\"step\"", body)
 check("tokens.html", "spacing steps rendered", steps in (SPACING_STEPS, SPACING_STEPS + FLOOR_ROWS),
       f"found {steps}, expected {SPACING_STEPS} (API without the floor) or {SPACING_STEPS + FLOOR_ROWS}")
 check("tokens.html", "radii rendered", "9999px" in body)
+
+# --- /bundu-floor and /spacing ---------------------------------------------
+# The decided floor (owner, 2026-11-19). The values are typed on the pages on
+# purpose, so these checks hold the pages to the ruling, not to the live API,
+# the registry serves them from Registry 4.45.
+print("\nbundu-floor.html, spacing.html")
+body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("bundu-floor.html")))
+for system in ("WCAG 2.2", "Apple HIG", "Material 3", "Anthropic"):
+    check("bundu-floor.html", f"compares with {system}", system in body)
+check("bundu-floor.html", "the touch floor is 45 × 45 px", "45 × 45 px" in body)
+check("bundu-floor.html", "the desktop floor is 24 × 24 px", "24 × 24 px" in body)
+check("bundu-floor.html", "the to-scale drawing is in the HTML", 'aria-label="Target sizes drawn to scale' in text_without_scripts("bundu-floor.html"))
+check("bundu-floor.html", "Mid Gray on Dark is 8.29 : 1, measured", "8.29 : 1" in body)
+check("bundu-floor.html", "dark on light is 17.50 : 1", "17.50 : 1" in body)
+check("bundu-floor.html", "the change is dated and the previous floor is named",
+      "Changed on 19 November 2026" in body and "49 px touch" in body)
+check("bundu-floor.html", "the who-the-floor-serves section renders", "Who the floor serves" in body and "Mbare" in body)
+
+body = html.unescape(re.sub(r"<[^>]+>", " ", text_without_scripts("spacing.html")))
+for heading in ("The number rule", "Number calculator", "Live specimen", "The ladder", "Changes in 4.45"):
+    check("spacing.html", f"section “{heading}” renders", heading in body)
+check("spacing.html", "the calculator's answer is in the static HTML", re.search(r'<output id="out"[^>]*>45</output>', text_without_scripts("spacing.html")) is not None)
+check("spacing.html", "the worked examples render with scripts off", "Built from" in body and "3 × 15" in body)
+check("spacing.html", "control heights are decided: 33 and 41", "33 px" in body and "41 px" in body and "42 px" not in body)
+check("spacing.html", "pills use 9 px with a 5 px dense step, not the old 14 px inset", "--space-pill-x" in body and "9 px" in body and "5 px" in body)
+check("spacing.html", "the dense step is explained", "Default and dense" in body and "-dense" in body)
+check("spacing.html", "the phone page edge is 17", "17 px" in body and "page edge" in body.lower())
+check("spacing.html", "the page says which registry serves the tokens", "Registry 4.45 and later" in body)
+check("spacing.html", "the decided questions are not asked again", "Confirm" not in body)
+check("tokens.html", "the card and container specimens state the layer defaults", "A card is 21px (dense 14px)" in text_without_scripts("tokens.html") and "A container is 28px (dense 21px)" in text_without_scripts("tokens.html"))
+check("spacing.html", "the label-to-field gap is 7 with a 5 px dense step", "--space-label-gap" in body and "7 px" in body)
 
 # --- / (the landing page, which leads with the language) -----------------
 print("\nindex.html")
@@ -513,7 +555,7 @@ print("\nstale claims")
 stale = {
     "invalid_token": "the MCP server answers without a token (since mzizi-mcp 0.10.1)",
     "until it deploys": "the no-sign-in MCP change has deployed",
-    "written but not published": "mzizi add ships in @nyuchi/mzizi-cli 0.6.0",
+    "written but not published": "mz add ships in @nyuchi/mzizi-cli 0.6.0",
     "mzizi-registry.nyuchi.workers.dev/components": "component pages are served here",
 }
 built = [p for p in DIST.rglob("*") if p.suffix in (".html", ".txt", ".json") and "pagefind" not in p.parts]
