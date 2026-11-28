@@ -13,6 +13,10 @@ Security, and anything that breaks a URL or an agent-facing file
 **The rule (owner, 2026-09-30):** every pull request that changes a page, a
 stated fact, an agent-facing file, a redirect, a dependency or a default adds
 an entry under `## [Unreleased]` in the same pull request, saying what a reader
+
+### Changed — marked 18.2.1 (2026-11-28, #169)
+
+- **Changed:** `marked` moves from 18.2.0 to 18.2.1 (patch). No page, URL or agent-facing file changes; readers of the site see no difference.
 of the site will see differently. The `changelog / entry required` check fails
 a pull request that doesn't. Pull requests that touch only `.github/`,
 lockfiles or lint config pass without one, and pure CI, lint or typo pull
