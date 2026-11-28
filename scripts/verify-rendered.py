@@ -43,7 +43,7 @@ def text_without_scripts(page: str, quiet: bool = False) -> str:
     raw = (DIST / page).read_text(encoding="utf-8")
     if "<script" in raw and not quiet:
         notes.append(f"{page}: contains <script>; stripping it before every check")
-    stripped = re.sub(r"<script\b.*?</script>", "", raw, flags=re.S | re.I)
+    stripped = re.sub(r"<script\b.*?</script\b[^>]*>", "", raw, flags=re.S | re.I)
     return stripped
 
 
@@ -664,8 +664,8 @@ stale_patterns = {
 def reader_text(path: pathlib.Path) -> str:
     raw = path.read_text(encoding="utf-8")
     if path.suffix == ".html":
-        raw = re.sub(r"<script\b.*?</script>", " ", raw, flags=re.S | re.I)
-        raw = re.sub(r"<style\b.*?</style>", " ", raw, flags=re.S | re.I)
+        raw = re.sub(r"<script\b.*?</script\b[^>]*>", " ", raw, flags=re.S | re.I)
+        raw = re.sub(r"<style\b.*?</style\s*>", " ", raw, flags=re.S | re.I)
         raw = re.sub(r"<[^>]+>", " ", raw)
         raw = html.unescape(raw)
     raw = raw.replace("`", "")

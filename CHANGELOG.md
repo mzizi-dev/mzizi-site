@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Security — CodeQL sanitization alerts (2026-11-28, #173)
+
+The npm status check encodes every slash in a package name, and the rendered-page verifier tolerates whitespace in closing `</script >` and `</style >` tags. Build and test tooling plus one status lookup: no change to any page, URL or agent-facing file.
+
 ### Changed — marked 18.2.1 (2026-11-28, #169)
 
 - **Changed:** `marked` moves from 18.2.0 to 18.2.1 (patch). No page, URL or agent-facing file changes; readers of the site see no difference.
