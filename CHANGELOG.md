@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — marked 18.2.1 (2026-11-28, #169)
+
+- **Changed:** `marked` moves from 18.2.0 to 18.2.1 (patch). No page, URL or agent-facing file changes; readers of the site see no difference.
+
 ### Added — org-standard community files (2026-11-24)
 
 No issue: bootstrap proposal from `nyuchi/.github`. Documentation files only; no package or code change, and nothing changes for a reader of the site.
