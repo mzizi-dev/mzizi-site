@@ -589,7 +589,7 @@ export function rustCrateStates(
 /** An npm package's `latest` dist-tag. */
 export function npmStatus(name: string): Promise<PackageStatus> {
   return checkPackage(
-    `https://registry.npmjs.org/${name.replace("/", "%2f")}/latest`,
+    `https://registry.npmjs.org/${name.replace(/\//g, "%2f")}/latest`,
     (body) => (body as { version?: string }).version,
   );
 }
