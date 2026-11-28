@@ -27,6 +27,10 @@ No issue: bootstrap proposal from `nyuchi/.github`. Documentation files only; no
 
 - Adds the org-standard `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` where they were absent.
 
+### Security — mzizi.dev sends HSTS and baseline security headers (2026-11-28)
+
+- **Added:** `public/_headers` makes mzizi.dev send `Strict-Transport-Security: max-age=31536000` (no `includeSubDomains` or `preload`: no subdomain has been proven HTTPS-only), `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin` and a `Permissions-Policy` that turns off camera, microphone, geolocation and payment. api.mzizi.dev already sent the last four. No page or URL changes.
+
 ### Changed — dependency updates (2026-11-23)
 
 - **Changed:** minor and patch updates to seven npm dependencies (Dependabot group). No page, URL or agent-facing file changes; readers of the site see no difference.

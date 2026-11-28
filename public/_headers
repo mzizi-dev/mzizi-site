@@ -1,0 +1,15 @@
+# Response headers applied by the Cloudflare Workers static-asset server.
+#
+# Astro copies public/ into dist/ verbatim, and Workers Static Assets reads
+# _headers from the root of the assets directory. src/lib/headers.test.ts
+# keeps this file honest.
+#
+# Strict-Transport-Security: one year, and deliberately NOT includeSubDomains
+# or preload. Both are claims about every subdomain of mzizi.dev, and none of
+# them has been proven HTTPS-only. Add either only after that is proven.
+/*
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
