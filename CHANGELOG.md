@@ -21,6 +21,10 @@ cut, the Unreleased entries move under it.
 
 ## [Unreleased]
 
+### Changed — staging wording removed from comments (2026-11-28)
+
+Comments in the release and Dependabot workflows no longer describe a `staging` branch; the repo is trunk-based. No behaviour changes.
+
 ### Security — CodeQL sanitization alerts (2026-11-28, #173)
 
 The npm status check encodes every slash in a package name, and the rendered-page verifier tolerates whitespace in closing `</script >` and `</style >` tags. Build and test tooling plus one status lookup: no change to any page, URL or agent-facing file.
